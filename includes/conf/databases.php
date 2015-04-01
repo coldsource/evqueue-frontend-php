@@ -18,9 +18,6 @@
   * Authors: Nicolas Jean, Christophe Marti 
   */
 
-if(isset($_SERVER['ENVTYPE']))
-	return require_once 'inc-global/conf/databases.php';
-
 global $DATABASES_CONFIG;
 $DATABASES_CONFIG = array();
 

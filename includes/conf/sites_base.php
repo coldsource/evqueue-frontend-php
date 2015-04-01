@@ -18,8 +18,5 @@
   * Authors: Nicolas Jean, Christophe Marti 
   */
 
-if(isset($_SERVER['ENVTYPE']))
-	return require_once 'inc-global/conf/sites_base.php';
-
 define('QUEUEING_WS_URL','http://localhost/');
 ?>

@@ -18,9 +18,6 @@
   * Authors: Nicolas Jean, Christophe Marti 
   */
 
-if(isset($_SERVER['ENVTYPE']))
-	return require_once 'inc-global/conf/queueing.php';
-
 define('QUEUEING_HOST','127.0.0.1');
 define('QUEUEING_PORT','5000');
 ?>

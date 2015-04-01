@@ -20,33 +20,5 @@
 
 
 
-if(isset($_SERVER['ENVTYPE'])) {
-	switch($_SERVER['ENVTYPE'])
-	{
-		case 'dev':
-			if ( isset($_SERVER['HTTP_HOST']) ) {
-				$host_parts = explode('.',$_SERVER['HTTP_HOST']);
-				$login = $host_parts[0];
-			} else if ( isset($_SERVER['PWD']) ) {
-				preg_match(';/data/sandbox/([^/]*)/;', $_SERVER['PWD'], $matches);
-				$login = $matches[1];
-			} else {
-				die('Impossible de trouver le login de l\'utilisateur pour calculer l\'emplacement du fichier de log (ni $_SERVER[HTTP_HOST] ni $_SERVER[PWD] ne sont définis).');
-			}
-			define('QUEUEING_BASEPATH', "/data/sandbox/$login/logger/htdocs");
-			break;
-
-		case 'preprod':
-		case 'prod':
-			define('QUEUEING_BASEPATH',"/data/logs");
-			break;
-	}
-	
-} else {
-	define('QUEUEING_BASEPATH', $_SERVER['DOCUMENT_ROOT']."/logs");
-}
-
-
-
-
+define('QUEUEING_BASEPATH', $_SERVER['DOCUMENT_ROOT']."/logs");
 ?>
