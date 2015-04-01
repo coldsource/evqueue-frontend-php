@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf8"?>
+<statistics>
+	<statistic id="accepted_connections">Accepted connections</statistic>
+	<statistic id="input_errors">Errors parsing request</statistic>
+	<statistic id="statistics_queries">Number of statistics queries</statistic>
+	<statistic id="workflow_cancel_queries">Number of cancel queries</statistic>
+	<statistic id="workflow_exceptions">Exceptions during workflow execution</statistic>
+	<statistic id="workflow_instance_errors">Number of workflow instances in error state</statistic>
+	<statistic id="workflow_instance_executing">Number of workflow instances currently executing</statistic>
+	<statistic id="workflow_instance_launched">Number of workflow instances launched</statistic>
+	<statistic id="workflow_queries">Number of workflow launch queries</statistic>
+	<statistic id="workflow_status_queries">Number of workflow status queries</statistic>
+</statistics>

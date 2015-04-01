@@ -1,0 +1,23 @@
+#!/bin/bash
+
+if [ "$1" = "configure" ]; then
+
+	if [ -d /etc/apache2/conf.d ]; then
+		ln -s /etc/evqueue/apache.conf /etc/apache2/conf.d/evqueue.conf
+	elif [ -d /etc/apache2/conf-available ]; then
+		ln -s /etc/evqueue/apache.conf /etc/apache2/conf-available/evqueue.conf
+		/usr/sbin/a2enconf evqueue
+	fi
+	
+	a2enmod rewrite
+	
+	if [ -x /usr/sbin/invoke-rc.d ]; then
+		invoke-rc.d apache2 restart
+	else
+		/etc/init.d/apache2 restart
+	fi
+	
+	chown -R www-data:www-data /etc/evqueue/conf
+	chown www-data:www-data /usr/share/evqueue/install.php
+
+fi

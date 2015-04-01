@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<task_output_methods>
+	<task_output_method value="TEXT">TEXT</task_output_method>
+	<task_output_method value="XML">XML</task_output_method>
+</task_output_methods>

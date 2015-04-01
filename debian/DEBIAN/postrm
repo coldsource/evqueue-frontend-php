@@ -1,0 +1,36 @@
+#!/bin/bash
+
+case "$1" in
+	failed-upgrade|abort-install|abort-upgrade|disappear|upgrade)
+	;;
+	
+	remove)
+		if [ -f /etc/apache2/conf.d/evqueue.conf ]; then
+			rm -f /etc/apache2/conf.d/evqueue.conf
+		elif [ -f /etc/apache2/conf-available/evqueue.conf ]; then
+			rm -f /etc/apache2/conf-available/evqueue.conf
+			/usr/sbin/a2disconf evqueue
+		fi
+	;;
+	
+	purge)
+		if [ -f /etc/apache2/conf.d/evqueue.conf ]; then
+			rm -f /etc/apache2/conf.d/evqueue.conf
+		elif [ -f /etc/apache2/conf-available/evqueue.conf ]; then
+			rm -f /etc/apache2/conf-available/evqueue.conf
+			/usr/sbin/a2disconf evqueue
+		fi
+		
+		rm -rf /etc/evqueue
+	;;
+
+	*)
+		echo "postrm called with unknown argument \`$1'" >&2
+		exit 1
+esac
+
+if [ -x /usr/sbin/invoke-rc.d ]; then
+	invoke-rc.d apache2 restart
+else
+	/etc/init.d/apache2 restart
+fi

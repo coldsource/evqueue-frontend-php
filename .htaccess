@@ -1,0 +1,7 @@
+RewriteEngine On
+RewriteBase /
+
+RewriteRule ^ws/([a-zA-Z]+)/([a-z][a-z0-9-]*)   ajax/send_datas.php   [L,QSA,env=WSROOT:$2]
+
+# You should set a correct path here
+#php_value "include_path" ".:includes"
