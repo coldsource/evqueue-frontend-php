@@ -8,12 +8,12 @@
 			<head>
 				<meta http-equiv="Content-Type" content="application/xhtml+xml; charset=utf-8" />
 				
-				<link rel="stylesheet" type="text/css" href="jquery-ui-1.11.2.custom/jquery-ui.min.css"/>
+				<link rel="stylesheet" type="text/css" href="js/jquery-ui-1.11.4.custom/jquery-ui.min.css"/>
 				<link rel="stylesheet" type="text/css" href="styles/style.css"/>
 				<link rel="stylesheet" type="text/css" href="js/jQuery-Timepicker-Addon/dist/jquery-ui-timepicker-addon.min.css"/>
 				
 				<script type="text/javascript" src="js/jquery-1.7.1.min.js" />
-				<script type="text/javascript" src="jquery-ui-1.11.2.custom/jquery-ui.min.js" />
+				<script type="text/javascript" src="js/jquery-ui-1.11.4.custom/jquery-ui.min.js" />
 				<script type="text/javascript" src="js/forms.js" />
 				<script type="text/javascript" src="js/jQuery-Timepicker-Addon/dist/jquery-ui-timepicker-addon.min.js" />
 				<script type="text/javascript" src="js/progressbar.js" />
