@@ -62,20 +62,9 @@
 				</xsl:variable>
 				
 				<xsl:text>(</xsl:text>
-				<xsl:if test="$seconds div 86400 >= 1">
-					<xsl:value-of select="floor($seconds div 86400)" />
-					<xsl:text>days, </xsl:text>
-				</xsl:if>
-				<xsl:if test="$seconds div 3600 >= 1">
-					<xsl:value-of select="floor($seconds div 3600) mod 24" />
-					<xsl:text>h </xsl:text>
-				</xsl:if>
-				<xsl:if test="$seconds div 60 >= 1">
-					<xsl:value-of select="floor($seconds div 60) mod 60" />
-					<xsl:text>m </xsl:text>
-				</xsl:if>
-				<xsl:value-of select="$seconds mod 60" />
-				<xsl:text>s</xsl:text>
+				<xsl:call-template name="display-split-time">
+					<xsl:with-param name="seconds" select="$seconds" />
+				</xsl:call-template>
 				<xsl:text>)</xsl:text>
 			</td>
 			<td class="tdHost">
@@ -115,6 +104,26 @@
 			<td colspan="6" class="details">
 			</td>
 		</tr>
+	</xsl:template>
+	
+	
+	<xsl:template name="display-split-time">
+		<xsl:param name="seconds" />
+		
+		<xsl:if test="$seconds div 86400 >= 1">
+			<xsl:value-of select="floor($seconds div 86400)" />
+			<xsl:text>days, </xsl:text>
+		</xsl:if>
+		<xsl:if test="$seconds div 3600 >= 1">
+			<xsl:value-of select="floor($seconds div 3600) mod 24" />
+			<xsl:text>h </xsl:text>
+		</xsl:if>
+		<xsl:if test="$seconds div 60 >= 1">
+			<xsl:value-of select="floor($seconds div 60) mod 60" />
+			<xsl:text>m </xsl:text>
+		</xsl:if>
+		<xsl:value-of select="$seconds mod 60" />
+		<xsl:text>s</xsl:text>
 	</xsl:template>
 	
 	
@@ -200,6 +209,21 @@
 			<xsl:if test="@version != '' and $EDITION = 0">
 				(version <xsl:value-of select="@version" />)
 			</xsl:if>
+			
+			<span class="exectime" style="margin-left: 5px; background-color: rgba(0,0,255,0.1); padding: 2px 5px; /* TODO: move to stylesheet */">
+				<xsl:text>real time </xsl:text>
+				<xsl:call-template name="display-split-time">
+					<xsl:with-param name="seconds" select="php:function('sumExecTimes',.//task/output)" />
+				</xsl:call-template>
+			</span>
+			<span class="retrytime" style="margin-left: 5px; background-color: rgba(0,255,0,0.1); padding: 2px 5px; /* TODO: move to stylesheet */">
+				<xsl:text>waited </xsl:text>
+				<xsl:call-template name="display-split-time">
+					<xsl:with-param name="seconds" select="php:function('sumRetryTimes',.//task/output)" />
+				</xsl:call-template>
+				<xsl:text> for retrials</xsl:text>
+			</span>
+			
 			<div id="xml_{@id}" class="xml">
 				<div class="okxml{$hiddenClass}">
 					<xsl:apply-templates select="parameters" />

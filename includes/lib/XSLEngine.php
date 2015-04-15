@@ -18,6 +18,29 @@
   * Authors: Nicolas Jean, Christophe Marti 
   */
 
+
+function sumExecTimes ($nodes) {
+	$total_time = 0;
+	foreach ($nodes as $node)
+		$total_time += strtotime($node->getAttribute('exit_time')) - strtotime($node->getAttribute('execution_time'));
+	return $total_time;
+}
+
+
+function sumRetryTimes ($nodes) {
+	$total_time = 0;
+	$prev_exit_time = null;
+	foreach ($nodes as $node) {
+		if (!$prev_exit_time)
+			$prev_exit_time = $node->getAttribute('execution_time');  // initialise prev_exec_time at the beginning, *and* when we move on to another task (previous node was output[@retval=0])
+		
+		$total_time += strtotime($node->getAttribute('execution_time')) - strtotime($prev_exit_time);
+		$prev_exit_time = ($node->getAttribute('retval') == 0) ? null : $node->getAttribute('exit_time');  // reset prev_exit_time on retval=0 since we're moving to another task after that
+	}
+	return $total_time;
+}
+
+
 class XSLEngine
 {
 	protected $xmldoc;
@@ -238,6 +261,7 @@ class XSLEngine
 		$xsltproc->registerPHPFunctions('sprintf');
 		$xsltproc->registerPHPFunctions('addslashes');
 		$xsltproc->registerPHPFunctions('strtotime');
+		$xsltproc->registerPHPFunctions(array('sumExecTimes','sumRetryTimes'));
 
 		// Set static parameters
 		foreach($this->parameters as $name=>$value)
