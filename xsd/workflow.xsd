@@ -51,7 +51,7 @@
 	<xs:complexType name="taskType">
 		<xs:sequence>
 			<xs:element name="input" type="inputType" minOccurs="0" maxOccurs="unbounded" />
-			<xs:element name="stdin" type="inputType" minOccurs="0" maxOccurs="1" />
+			<xs:element name="stdin" type="stdinType" minOccurs="0" maxOccurs="1" />
 		</xs:sequence>
 		<xs:attribute name="name" type="xs:string" use="required" />
 		<xs:attribute name="queue" type="xs:string" use="required" />
@@ -68,6 +68,14 @@
 			<xs:element name="copy" type="valueType" />
     </xs:choice>      
 		<xs:attribute name="name" type="StrNonEmpty" use="optional" />
+	</xs:complexType>
+	
+	<xs:complexType name="stdinType" mixed="true">
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:element name="value" type="valueType" />
+			<xs:element name="copy" type="valueType" />
+    </xs:choice>      
+		<xs:attribute name="mode" type="StrNonEmpty" use="required" />
 	</xs:complexType>
 	
 	

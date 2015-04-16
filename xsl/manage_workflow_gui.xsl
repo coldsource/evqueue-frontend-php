@@ -61,6 +61,10 @@
 				<form id="editTaskInput" onsubmit="executeAction('editTaskInput',$(this)); return false;">
 					<input type="hidden" name="type" />
 					<input name="name" placeholder="input name" />
+					<select name="mode">
+						<option value="xml" title="Texts, values and copies here on the right will be concatenated and serialised as XML, including the stdin node.">xml</option>
+						<option value="text" title="Texts, values and copies here on the right will be concatenated as a simple text value. Any encountered XML node will be stripped.">text</option>
+					</select>
 					
 					<div class="taskInputValues">
 						<!-- value/copy/text lines will be appended here by the javascript -->

@@ -125,10 +125,13 @@ function editTaskInput (clicked) {
 	// input type (input/stdin)
 	$('form#editTaskInput input[name=type]').val(input.data('type'));
 	
-	if (input.find('.taskInputName').is('.taskInputNameSTDIN'))  // stdin: name can't be changed, disable input
+	if (input.find('.taskInputName').is('.taskInputNameSTDIN')) {  // stdin: name can't be changed, disable input
 		$('form#editTaskInput input[name=name]').attr('disabled', true).val('STDIN');
-	else
+		$('form#editTaskInput select[name=mode]').show().find('option[value='+input.data('mode')+']').attr('selected','selected');
+	} else {
 		$('form#editTaskInput input[name=name]').attr('disabled', false).val(input.data('name'));
+		$('form#editTaskInput select[name=mode]').hide().find('option').removeAttr('selected');
+	}
 	
 	// clear values
 	$('form#editTaskInput .taskInputValues .taskInputValue').remove();

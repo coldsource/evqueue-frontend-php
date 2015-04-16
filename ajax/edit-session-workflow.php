@@ -185,6 +185,7 @@ switch ($_POST['action']) {
 					$location->appendChild($stdin);  // we add a new stdin node
 					$location = $stdin;  // and switch to it
 				}
+				$location->setAttribute('mode', $_POST['mode']);  // mode 'text' or 'xml'
 				break;
 		}
 		

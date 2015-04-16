@@ -696,14 +696,14 @@
 	
 	
 	<xsl:template match="input|stdin">
-		<li class="taskInput actionItem" data-name="{@name}" data-type="{local-name(.)}">
+		<li class="taskInput actionItem" data-name="{@name}" data-type="{local-name(.)}" data-mode="{@mode}">
 			<xsl:attribute name="data-xpath">
 				<xsl:apply-templates select="." mode="xpath" />
 			</xsl:attribute>
 			
 			<!-- stdin -->
 			<xsl:if test="local-name(.) = 'stdin'">
-				<span class="taskInputName taskInputNameSTDIN">STDIN</span>
+				<span class="taskInputName taskInputNameSTDIN">STDIN (<xsl:value-of select="@mode" />)</span>
 			</xsl:if>
 			
 			<!-- regular <input>s -->
