@@ -51,14 +51,7 @@
 				</span>
 				<xsl:text>&#160;</xsl:text>
 				<xsl:variable name="seconds">
-					<xsl:choose>
-						<xsl:when test="count(@end_time) > 0">
-							<xsl:value-of select="php:function('strtotime',string(@end_time))-php:function('strtotime',string(@start_time))" />
-						</xsl:when>
-						<xsl:otherwise>
-							<xsl:value-of select="php:function('strtotime',string($NOW))-php:function('strtotime',string(@start_time))" />
-						</xsl:otherwise>
-					</xsl:choose>
+					<xsl:apply-templates select="." mode="total-time" />
 				</xsl:variable>
 				
 				<xsl:text>(</xsl:text>
@@ -104,6 +97,18 @@
 			<td colspan="6" class="details">
 			</td>
 		</tr>
+	</xsl:template>
+	
+	
+	<xsl:template match="workflow" mode="total-time">
+		<xsl:choose>
+			<xsl:when test="count(@end_time) > 0">
+				<xsl:value-of select="php:function('strtotime',string(@end_time))-php:function('strtotime',string(@start_time))" />
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:value-of select="php:function('strtotime',string($NOW))-php:function('strtotime',string(@start_time))" />
+			</xsl:otherwise>
+		</xsl:choose>
 	</xsl:template>
 	
 	
@@ -210,19 +215,35 @@
 				(version <xsl:value-of select="@version" />)
 			</xsl:if>
 			
-			<span class="exectime" style="margin-left: 5px; background-color: rgba(0,0,255,0.1); padding: 2px 5px; /* TODO: move to stylesheet */">
-				<xsl:text>real time </xsl:text>
-				<xsl:call-template name="display-split-time">
-					<xsl:with-param name="seconds" select="php:function('sumExecTimes',.//task/output)" />
-				</xsl:call-template>
-			</span>
-			<span class="retrytime" style="margin-left: 5px; background-color: rgba(0,255,0,0.1); padding: 2px 5px; /* TODO: move to stylesheet */">
-				<xsl:text>waited </xsl:text>
-				<xsl:call-template name="display-split-time">
-					<xsl:with-param name="seconds" select="php:function('sumRetryTimes',.//task/output)" />
-				</xsl:call-template>
-				<xsl:text> for retrials</xsl:text>
-			</span>
+			<xsl:if test="$EDITION = 0">
+				<xsl:variable name="totalTime">
+					<xsl:apply-templates select="." mode="total-time" />
+				</xsl:variable>
+				
+				<xsl:variable name="execTime" select="php:function('sumExecTimes', .//task/output)" />
+				<xsl:variable name="retryTime" select="php:function('sumRetryTimes', .//task/output)" />
+				<xsl:variable name="queueTime" select="$totalTime - $execTime - $retryTime" />
+				
+				<span class="exectime" style="margin-left: 5px; background-color: rgba(0,255,0,0.1); padding: 2px 5px; /* TODO: move to stylesheet */">
+					<xsl:text>real time </xsl:text>
+					<xsl:call-template name="display-split-time">
+						<xsl:with-param name="seconds" select="$execTime" />
+					</xsl:call-template>
+				</span>
+				<span class="queuetime" style="margin-left: 5px; background-color: rgba(0,0,255,0.1); padding: 2px 5px; /* TODO: move to stylesheet */">
+					<xsl:text>queued for </xsl:text>
+					<xsl:call-template name="display-split-time">
+						<xsl:with-param name="seconds" select="$queueTime" />
+					</xsl:call-template>
+				</span>
+				<span class="retrytime" style="margin-left: 5px; background-color: rgba(255,0,0,0.1); padding: 2px 5px; /* TODO: move to stylesheet */">
+					<xsl:text>waited </xsl:text>
+					<xsl:call-template name="display-split-time">
+						<xsl:with-param name="seconds" select="$retryTime" />
+					</xsl:call-template>
+					<xsl:text> for retrials</xsl:text>
+				</span>
+			</xsl:if>
 			
 			<div id="xml_{@id}" class="xml">
 				<div class="okxml{$hiddenClass}">
