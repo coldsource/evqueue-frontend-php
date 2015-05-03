@@ -64,7 +64,7 @@ if(isset($_POST['db_host']) && isset($_POST['db_user']) && isset($_POST['db_pass
 		
 		fclose($f);
 		
-		$url_parts = parse_url($_SERVER['SCRIPT_URI']);
+		$url_parts = parse_url(isset($_SERVER['SCRIPT_URI'])?$_SERVER['SCRIPT_URI']:"{$_SERVER['REQUEST_SCHEME']}://{$_SERVER['HTTP_HOST']}{$_SERVER['REQUEST_URI']}");
 		$path = dirname($url_parts['path']);
 		if($path!='/')
 			$path .= '/';
