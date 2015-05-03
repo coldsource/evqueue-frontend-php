@@ -1,5 +1,4 @@
 RewriteEngine On
-RewriteBase /
 
 RewriteRule ^ws/([a-zA-Z]+)/([a-z][a-z0-9-]*)   ajax/send_datas.php   [L,QSA,env=WSROOT:$2]
 
