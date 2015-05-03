@@ -4,7 +4,7 @@
 	<xsl:import href="templates/view-logs.xsl" />
 	
 	<xsl:variable name="javascript">
-		<src>/js/view-logs.js</src>
+		<src>js/view-logs.js</src>
 	</xsl:variable>
 
 	<xsl:template name="content">

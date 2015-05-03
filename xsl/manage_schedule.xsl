@@ -3,7 +3,7 @@
 	<xsl:import href="templates/main-template.xsl" />
 	
 	<xsl:variable name="javascript">
-		<src>/js/manage-schedule.js</src>
+		<src>js/manage-schedule.js</src>
 	</xsl:variable>
 	
 	<xsl:template name="content">

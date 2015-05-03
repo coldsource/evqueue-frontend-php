@@ -4,7 +4,7 @@
 	<xsl:import href="templates/list_queues.xsl" />
 	
 	<xsl:variable name="javascript">
-		<src>/js/list-queues.js</src>
+		<src>js/list-queues.js</src>
 	</xsl:variable>
 
 	<xsl:template name="content">

@@ -4,7 +4,7 @@
 	<xsl:import href="templates/list_schedules.xsl" />
 	
 	<xsl:variable name="javascript">
-		<src>/js/list-schedules.js</src>
+		<src>js/list-schedules.js</src>
 	</xsl:variable>
 
 	<xsl:template name="content">

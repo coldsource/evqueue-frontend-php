@@ -6,8 +6,8 @@
 	<xsl:variable name="title" select="'Board'" />
 	
 	<xsl:variable name="javascript">
-		<src>/js/index.js</src>
-		<src>/js/workflow-instance.js</src>
+		<src>js/index.js</src>
+		<src>js/workflow-instance.js</src>
 	</xsl:variable>
 	
 	<xsl:template name="content">

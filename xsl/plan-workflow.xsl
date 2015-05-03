@@ -5,7 +5,7 @@
 		<xsl:import href="templates/edit_workflow.xsl" />
 
     <xsl:variable name="javascript">
-		<src>/js/plan-wf.js</src>
+		<src>js/plan-wf.js</src>
 	</xsl:variable>
 
 	<xsl:template name="content">

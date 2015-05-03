@@ -8,7 +8,7 @@
 	<xsl:import href="templates/workflow.xsl" />
 	
 	<xsl:variable name="javascript">
-		<src>/js/manage-workflow.js</src>
+		<src>js/manage-workflow.js</src>
 	</xsl:variable>
 
 	<xsl:template name="content">

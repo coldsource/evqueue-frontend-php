@@ -4,7 +4,7 @@
 	<xsl:import href="templates/list_workflows.xsl" />
 	
 	<xsl:variable name="javascript">
-		<src>/js/list-workflows.js</src>
+		<src>js/list-workflows.js</src>
 	</xsl:variable>
 	
 	<xsl:template name="content">
