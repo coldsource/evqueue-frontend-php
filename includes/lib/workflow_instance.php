@@ -165,6 +165,21 @@ class WorkflowInstance {
 		return $output;
 	}
 	
+	public function GetConfiguration()
+	{
+		$s = @fsockopen($this->evqueue_ip,$this->evqueue_port);
+		if ($s === false)
+			return false;
+		
+		fwrite($s,"<status type='configuration' />\n");
+		$output = stream_get_contents($s);
+		fclose($s);
+		
+		if(!$s)
+			return false;
+		return $output;
+	}
+	
 	
 	public function ResetStatistics()
 	{

@@ -37,6 +37,7 @@
 									<h2><a href="list-workflow-schedules.php?display=state">Scheduled workflows</a></h2>
 									<h2><a href="system_state.php">Queues</a></h2>
 									<h2><a href="system_statistics.php">Statistics</a></h2>
+									<h2><a href="system_configuration.php">Configuration</a></h2>
 									<xsl:if test="/page/private/logged-in-user/@profile = 'ADMIN'">
 										<h1>Settings</h1>
 										<h2><a href="list-queues.php">Queues</a></h2>
