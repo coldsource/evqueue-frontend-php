@@ -20,7 +20,7 @@
 
 require_once 'inc/auth_check.php';
 require_once 'inc/logger.php';
-require_once 'lib/WebserviceWrapper.php';
+require_once 'lib/save_workflow.php';
 
 
 function pie ($type, $msg='') {
@@ -306,28 +306,9 @@ switch ($_POST['action']) {
 	case 'saveWorkflow':
 		
 		// EDITION
-		if (isset($_POST['workflow_id']) && $_POST['workflow_id'] != '') {
-			$ws = new WebserviceWrapper('save-workflow', 'formWorkflow', array(
-					'workflow_id' => $_POST['workflow_id'],
-					'workflow_name' => $_POST['workflow_name'],
-					'workflow_group' => $_POST['workflow_group'],
-					'workflow_comment' => $_POST['workflow_comment'],
-					'workflow_xml' => $_SESSION['edition']['workflow'],
-			), true);
-			$ws->FetchResult();
-			
-		} else {  // CREATION
-			$ws = new WebserviceWrapper('save-workflow', 'formWorkflow', array(
-					'workflow_id' => '',
-					'workflow_name' => $_POST['workflow_name'],
-					'workflow_group' => $_POST['workflow_group'],
-					'workflow_comment' => $_POST['workflow_comment'],
-					'workflow_xml' => $_SESSION['edition']['workflow'],
-			), true);
-			$ws->FetchResult();
-		}
+		$_POST['workflow_xml'] = $_SESSION['edition']['workflow'];
+		$errors = saveWorkflow($_POST);
 		
-		$errors = $ws->HasErrors();
 		if ($errors !== false)
 			pie('ko',$errors);
 		

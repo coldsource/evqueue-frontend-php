@@ -27,6 +27,8 @@ require_once 'bo/BO_task.php';
 require_once 'bo/BO_queue.php';
 require_once 'bo/BO_schedule.php';
 require_once 'bo/BO_workflowSchedule.php';
+require_once 'bo/BO_notification.php';
+require_once 'bo/BO_notificationType.php';
 
 
 /*
@@ -155,6 +157,38 @@ if (isset($_POST) && !empty($_POST)){
 			
 			echo $xml;
 			break;
+		
+		case 'saveNotif':
+			$notif = new Notification($_POST['id']);
+			
+			if (!isset($_POST['type_id']))
+				$_POST['type_id'] = $notif->getTypeID();
+			$type = new NotificationType($_POST['type_id']);
+			
+			$params = $_POST;
+			unset($params['id'],$params['type_id'],$params['name'],$params['form_id']);
+			require_once '../plugins/notifications/'.$type->getName().'/notification.php';
+			$_POST['parameters'] = NotificationParameters::serialise($params);
+			
+			$errors = NotificationParameters::check_parameters($params);
+			$errorz = $notif->check_values($_POST,false);  // just check the parameters
+			$errors = array_merge($errorz!==true?$errorz:array(), $errors!==true?$errors:array());
+			
+			if (empty($errors)) {
+				$errors = true;
+				$notif->check_values($_POST,$setVals);  // actually commit the object
+			}
+			
+			writeEnd($errors,$notif);
+			break;
+		
+		case 'deleteNotif':
+			$notif = new Notification($_POST['id']);
+			writeEnd($notif->delete());
+			break;
+		
+		default:
+			Logger::GetInstance()->Log(LOG_WARNING,'send_datas.php',"Dunno any webservice named '{$_POST['form_id']}'");
 	}
 	
 }

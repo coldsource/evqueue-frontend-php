@@ -24,7 +24,7 @@
 	
 	<xsl:template name="form_workflow_header">
 		<input type="hidden" name="workflow_id" value="{/page/workflow/@id}" />
-		<label class="formLabel" for="workflow_name">Name :</label>
+		<label class="formLabel" for="workflow_name">Name:</label>
 		<input type="text" name="workflow_name" id="workflow_name" placeholder="The name of your workflow" value="{/page/post/@workflow_name | /page/workflow/@name}"  />
 		<br />
 		
@@ -38,13 +38,31 @@
 			];
 		</script>
 		
-		<label class="formLabel" for="workflow_group">Group :</label>
+		<label class="formLabel" for="workflow_group">Group:</label>
 		<input type="text" name="workflow_group" id="workflow_group" value="{/page/post/@workflow_group | /page/workflow/@group }" placeholder="Group name" />
 		
 		<br />
-		<label class="formLabel" for="workflow_comment">Comment :</label>
+		<label class="formLabel" for="workflow_comment">Comment:</label>
 		<input type="text" name="workflow_comment" id="workflow_comment" value="{/page/post/@workflow_comment | /page/workflow/@comment }" placeholder="Comment" />
 		<br />
+		
+		<label class="formLabel" for="workflow_comment">Notifications:</label>
+		<ul>
+			<xsl:for-each select="/page/notifications/notification">
+				<li>
+					<label>
+						<input type="checkbox" name="notification[]" value="{@id}">
+							<xsl:if test="/page/workflow/notifications/notification = @id">
+								<xsl:attribute name="checked">checked</xsl:attribute>
+							</xsl:if>
+						</input>
+						<xsl:value-of select="/page/notification-types/notification-type[@id = current()/type-id]/name" />
+						<xsl:text>&#160;</xsl:text>
+						<i><xsl:value-of select="name" /></i>
+					</label>
+				</li>
+			</xsl:for-each>
+		</ul>
 	</xsl:template>
 	
 	<xsl:template name="escapeQuote">

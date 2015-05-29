@@ -25,6 +25,8 @@ require_once 'bo/BO_workflow.php';
 require_once 'bo/BO_schedule.php';
 require_once 'bo/BO_queue.php';
 require_once 'bo/BO_task.php';
+require_once 'bo/BO_notification.php';
+require_once 'bo/BO_notificationType.php';
 
 
 $xml = null;
@@ -66,6 +68,8 @@ $xsl->AddFragment(Queue::getAllXml());
 $xsl->AddFragment(Task::getAllXml($filter='no-tied-task'));
 $xsl->AddFragment(Task::getAllGroupXml());
 $xsl->AddFragment(Workflow::getAllGroupXml());
+$xsl->AddFragment(Notification::getAllXml());
+$xsl->AddFragment(NotificationType::getAllXml());
 
 $xsl->DisplayXHTML('xsl/manage_workflow_gui.xsl');
 

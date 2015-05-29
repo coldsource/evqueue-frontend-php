@@ -1,0 +1,113 @@
+
+
+@import 'xml';
+
+
+body{
+	font-family: Arial,Helvetica,sans-serif;
+	font-size: 14px;
+	margin:0px;
+}
+
+table {
+	border-collapse: collapse;
+	border-spacing: 0;
+	width: 100%;
+}
+
+ul {
+	list-style: none;
+}
+
+input, select {
+	border: 1px solid darkgray;
+}
+
+.loginFields {
+	width: 30%;
+	margin: 15% auto;
+	text-align: center;
+}
+
+.loginFields input {
+	text-align: center;
+	margin: 1px;
+}
+
+input[type=text],
+input[type=password] {
+	border: 1px solid darkgray;
+	padding: 2px 1px;
+	margin: 1px;
+}
+
+/* Menu */
+td.menu {
+	vertical-align:top;
+	width:200px;
+	padding-left:10px;
+}
+
+td.menu div{
+	position: fixed;
+}
+
+td.menu a {
+	color:#000000;
+	text-decoration:none;
+}
+
+td.menu h1 {
+	font-size:16px;
+	font-weight:bold;
+	margin-top:10px;
+	margin-bottom:2px;
+}
+
+td.menu h2 {
+	font-size:14px;
+	font-weight:normal;
+	margin-left:10px;
+	margin-top:2px;
+	margin-bottom:2px;
+}
+
+textarea {
+	border: 1px solid darkgray;
+}
+
+td > textarea {
+	width: 96%;
+	margin: 2%;
+}
+
+/* User info */
+div#userInfo {
+	position: absolute;
+	right: 10px;
+	top: 10px;
+	padding: 5px 10px;
+	border: 1px solid black;
+	border-radius: 5px;
+	background-color: rgba(255,255,255,0.5);
+}
+
+div#userInfo span,
+div#userInfo img {
+	vertical-align: middle;
+}
+
+div#userInfo img {
+	cursor: pointer;
+}
+
+
+#footer {
+	position: fixed;
+	bottom: 10px;
+	right: 10px;
+}
+
+a, a:visited {
+	color: #4996ce;
+}

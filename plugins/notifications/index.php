@@ -18,15 +18,19 @@
   * Authors: Nicolas Jean, Christophe Marti 
   */
 
-require_once 'bo/BO_user.php';
+define('RELPATH', '../../');
+require_once 'inc/auth_check.php';
 
-session_start();
+require_once 'inc/logger.php';
+require_once 'lib/XSLEngine.php';
+require_once 'bo/BO_notification.php';
+require_once 'bo/BO_notificationType.php';
 
-if (!isset($_SESSION['user_login'])) {
-	$relpath = defined('RELPATH') ? constant('RELPATH') : '';
-	header("Location: {$relpath}auth.php");
-	session_write_close();
-	die();
-}
+$xsl = new XSLEngine();
+
+$xsl->AddFragment(Notification::getAllXml());
+$xsl->AddFragment(NotificationType::getAllXml());
+
+$xsl->DisplayXHTML('index.xsl');
 
 ?>

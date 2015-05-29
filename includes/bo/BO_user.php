@@ -76,6 +76,7 @@ class User {
 		if ($this->profile == 'ADMIN')
 			return true;
 		
+		// For non-admins:
 		switch ($params['form_id']) {
 			case "formTask":
 			case "formQueue":
@@ -87,6 +88,7 @@ class User {
 			case "deleteSchedule":
 			case "deleteWorkflowSchedule":
 			case 'resetStats':
+			case 'saveNotif':
 				return false;
 			
 			case "formWorkflow":

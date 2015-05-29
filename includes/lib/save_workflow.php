@@ -17,8 +17,22 @@
   * 
   * Authors: Nicolas Jean, Christophe Marti 
   */
-
 require_once 'lib/WebserviceWrapper.php';
+
+
+function saveWorkflow ($parameters) {
+	
+	$notifs = isset($parameters['notification']) ? $parameters['notification'] : array();
+	if (!is_array($notifs))
+		$notifs = array($notifs);
+	
+	$parameters['workflow_notifications'] = join(',',$notifs);
+	
+	$ws = new WebserviceWrapper('save-workflow', 'formWorkflow', $parameters, true);
+	$ws->FetchResult();
+	
+	return $ws->HasErrors();
+}
 
 
 function edit_simple_workflow ($parameters) {
@@ -26,28 +40,18 @@ function edit_simple_workflow ($parameters) {
 	$var = $parameters['script_path'];
 	exec ('sh -c \'for var in "$@"; do echo "$var"; done\' -- '.$var, $output);
 	if(isset($output[0])){
-		$script_path = $output[0];
-		$args = $output;
-		unset($args[0]);
+		$parameters['script_path'] = $output[0];
+		$parameters['script_arguments'] = $output;
+		unset($parameters['script_arguments'][0]);
 	}
 	else{
-		$script_path = '';
-		$args = array();
+		$parameters['script_path'] = '';
+		$parameters['script_arguments'] = array();
 	}
 	
-	$ws = new WebserviceWrapper('save-workflow', 'formWorkflow', array(
-			'workflow_id' => $parameters['workflow_id'],
-			'workflow_name' => $parameters['workflow_name'],
-			'script_path' => $script_path,
-			'script_arguments' => $args,
-			'workflow_group' => $parameters['workflow_group'],
-			'workflow_comment' => $parameters['workflow_comment'],
-			'task_wd' => $parameters['task_wd'],
-			'bound' => isset($parameters['bound']) ? $parameters['bound'] : false,
-	), true);
-	$ws->FetchResult();
+	$parameters['bound'] = isset($parameters['bound']) ? $parameters['bound'] : false;
 	
-	return $ws;
+	return saveWorkflow($parameters);
 }
 
 

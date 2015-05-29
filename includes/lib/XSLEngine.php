@@ -17,6 +17,7 @@
   * 
   * Authors: Nicolas Jean, Christophe Marti 
   */
+require_once 'bo/BO_user.php';
 
 
 function sumExecTimes ($nodes) {
@@ -117,6 +118,8 @@ class XSLEngine
 		
 		$this->SetParameter('NOW', date('Y-m-d H:i:s'));
 		$this->SetParameter('EDITION', '0');
+		if (defined('RELPATH'))
+			$this->SetParameter('RELPATH', constant('RELPATH'));
 		
 		@session_start();
 		

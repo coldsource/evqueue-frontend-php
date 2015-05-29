@@ -20,24 +20,19 @@
 
 require_once 'inc/auth_check.php';
 require_once 'inc/logger.php';
-require_once 'lib/WebserviceWrapper.php';
 require_once 'lib/XSLEngine.php';
 require_once 'lib/workflow_instance.php';
+require_once 'lib/save_workflow.php';
 require_once 'bo/BO_workflow.php';
+require_once 'bo/BO_notification.php';
+require_once 'bo/BO_notificationType.php';
 require_once 'utils/xml_utils.php';
 
 $xml_error = "";
 if (isset($_POST) && (count($_POST)>1)){
-	$ws = new WebserviceWrapper('save-workflow', 'formWorkflow', array(
-			'workflow_id' => $_POST['workflow_id'],
-			'workflow_name' => $_POST['workflow_name'],
-			'workflow_xml' => $_POST['workflow_xml'],
-			'workflow_group' => $_POST['workflow_group'],
-			'workflow_comment' => $_POST['workflow_comment']
-	), true);
-	$ws->FetchResult();
 	
-	$errors = $ws->HasErrors();
+	$errors = saveWorkflow($_POST);
+	
 	if ($errors !== false) {
 		$xml_error = $errors;
 	} else {
@@ -59,6 +54,8 @@ if ($xml_error)
 
 
 $xsl->AddFragment(Workflow::getAllGroupXml());
+$xsl->AddFragment(Notification::getAllXml());
+$xsl->AddFragment(NotificationType::getAllXml());
 
 $xsl->DisplayXHTML('xsl/manage_workflow.xsl');
 

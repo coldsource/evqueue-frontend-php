@@ -18,44 +18,32 @@
   * Authors: Nicolas Jean, Christophe Marti 
   */
 
+define('RELPATH','../../../');
 require_once 'inc/auth_check.php';
+
 require_once 'inc/logger.php';
 require_once 'lib/XSLEngine.php';
-require_once 'lib/workflow_instance.php';
-require_once 'lib/save_workflow.php';
-require_once 'bo/BO_workflow.php';
-require_once 'bo/BO_task.php';
 require_once 'bo/BO_notification.php';
 require_once 'bo/BO_notificationType.php';
 
+
+if (!isset($_GET['id']) && !isset($_GET['type_id']) || !isset($_GET['action']))
+	die('GET parameter(s) missing');
+
+
+$notif = isset($_GET['id']) ? new Notification($_GET['id']) : null;
+
+$type = new NotificationType($notif ? $notif->getTypeID() : $_GET['type_id']);
+if ($type === false)
+	die("Unknown notification '{$_GET['id']}'");
+
+
+require_once '../'.$type->getName().'/notification.php';  // required for access to NotificationParameters::(de)serialise()
+
 $xsl = new XSLEngine();
-$xsl->AddFragment(Task::getAllXml($filter='only-tied-task'));
+if ($notif) $xsl->AddFragment($notif->getGeneratedXml());
+$xsl->AddFragment($type->getGeneratedXml());
+$xsl->DisplayXHTML('../'.$type->getName().'/notification.xsl');
 
-
-if (isset($_GET["workflow_id"]) && ($_GET["workflow_id"] != '')){
-	$wk = new Workflow($_GET["workflow_id"]);
-	$xsl->AddFragment($wk->getGeneratedXml());
-}
-
-
-$xml_error = "";
-if (isset($_POST) && (count($_POST)>1)){
-	
-	$xml_error = edit_simple_workflow($_POST);
-	
-	if ($xml_error === false) {
-		header('Location: list-workflows.php');
-		die();
-	}
-}
-
-if ($xml_error)
-	$xsl->AddFragment($xml_error);
-
-$xsl->AddFragment(Workflow::getAllGroupXml());
-$xsl->AddFragment(Notification::getAllXml());
-$xsl->AddFragment(NotificationType::getAllXml());
-
-$xsl->DisplayXHTML('xsl/manage_simple_workflow.xsl');
 
 ?>

@@ -24,7 +24,7 @@ require_once 'bo/BO_task.php';
 require_once 'inc/logger.php';
 require_once 'lib/WebserviceWrapper.php';
 require_once 'lib/XSLEngine.php';
-require_once 'lib/simple_workflow.php';
+require_once 'lib/save_workflow.php';
 require_once 'bo/BO_workflowSchedule.php';
 
 $xsl = new XSLEngine();
@@ -62,9 +62,8 @@ if (!empty($_POST)) {
 		case 'Script':
 			$params = $_POST;
 			$params['bound'] = true;
-			$ws = edit_simple_workflow($params);
+			$errors = edit_simple_workflow($params);
 			
-			$errors = $ws->HasErrors();
 			if ($errors !== false)
 				$xml_error = $errors;
 			else

@@ -36,6 +36,8 @@ class Workflow{
 	private $comment;
 	private $has_bound_task;
 	private $workflow_bound;
+	private $notifications;
+	
 	
 	function __construct($id = false){
 		
@@ -58,6 +60,11 @@ class Workflow{
 		$this->comment = $row['workflow_comment'];
 		$this->has_bound_task = $row['nb_bound_tasks'] > 0;
 		$this->workflow_bound = $row['workflow_bound'];
+		
+		$this->db->QueryPrintf("SELECT notification_id FROM t_workflow_notification WHERE workflow_id = %i", $this->id);
+		$this->notifications = array();
+		while (list($notif_id) = $this->db->FetchArray())
+			$this->notifications[] = $notif_id;
 	}
 	
 	private function connectDB ($mode = null) {
@@ -95,6 +102,10 @@ class Workflow{
 	
 	public function set_group($group){
 		$this->group = $group;
+	}
+	
+	public function set_notifications($notifications){
+		$this->notifications = $notifications;
 	}
 	
 	public function set_comment($comment){
@@ -151,6 +162,11 @@ class Workflow{
 					$this->comment,
 					$this->id);
 		}
+		
+		// NOTIFICATIONS
+		$this->db->QueryPrintf('DELETE FROM t_workflow_notification WHERE workflow_id = %i', $this->id);
+		foreach ($this->notifications as $notif)
+			$this->db->QueryPrintf('INSERT INTO t_workflow_notification (workflow_id, notification_id) VALUES (%i,%i)', $this->id, (int)$notif);
 		
 		WorkflowInstance::ReloadEvqueue();
 	}
@@ -265,6 +281,10 @@ class Workflow{
 			$this->set_comment($vals["workflow_comment"]);
 		}
 		
+		if ($setvals === true){
+			$this->set_notifications(explode(',', $vals["workflow_notifications"]));
+		}
+		
 		if (count($errors)>0)
 			return $errors;
 		
@@ -307,6 +327,13 @@ class Workflow{
 	public function getGeneratedXml($nodename='workflow'){
 		$xml = "<$nodename id='".$this->get_id()."' name='".$this->get_name()."' group=\"".$this->get_group()."\" comment=\"".$this->get_comment()."\" has-bound-task='".($this->has_bound_task() ? 'yes' : 'no')."' bound-to-schedule='".$this->get_workflow_bound()."'>";
 		$xml .= $this->get_xml();
+		
+		// notifications
+		$xml .= '<notifications>';
+		foreach ($this->notifications as $notif_id)
+			$xml .= "<notification>$notif_id</notification>";
+		$xml .= '</notifications>';
+		
 		$xml .= "</$nodename>";
 		return $xml;
 	}
