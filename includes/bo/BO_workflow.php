@@ -390,10 +390,12 @@ class Workflow{
 	public function delete(){
 	
 		if ($this->id !== false) {
-	
+			
 			$this->connectDB(DatabaseMySQL::$MODE_RDRW);
-			$this->db->QueryPrintf("DELETE FROM t_workflow WHERE workflow_id = %i", $this->id);
-			$this->db->QueryPrintf("DELETE FROM t_task WHERE workflow_id = %i", $this->id);  // delete bound task too
+			$this->db->QueryPrintf("DELETE FROM t_workflow              WHERE workflow_id = %i", $this->id);
+			$this->db->QueryPrintf("DELETE FROM t_task                  WHERE workflow_id = %i", $this->id);  // delete bound task too
+			$this->db->QueryPrintf("DELETE FROM t_workflow_notification WHERE workflow_id = %i", $this->id);  // detach notifications from this worflow
+			
 			WorkflowInstance::ReloadEvqueue();  // even if the bound task is only used by that workflow, it's cleaner to reload the tasks list still
 			return true;
 		}else{

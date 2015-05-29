@@ -86,6 +86,8 @@ class Notification{
 					$this->parameters,
 					$this->id);
 		}
+		
+		WorkflowInstance::ReloadEvqueue();
 	}
 	
 	public function check_values($vals, $setvals=false){
@@ -163,11 +165,10 @@ class Notification{
 	public function delete(){
 		if ($this->id !== false) {
 			$this->connectDB(DatabaseMySQL::$MODE_RDRW);
-			$this->db->QueryPrintf("
-					DELETE FROM t_notification
-					WHERE notification_id = %i
-					",
-					$this->id);
+			$this->db->QueryPrintf("DELETE FROM t_notification          WHERE notification_id = %i", $this->id);
+			$this->db->QueryPrintf("DELETE FROM t_workflow_notification WHERE notification_id = %i", $this->id);  // delete references to this notification
+			
+			WorkflowInstance::ReloadEvqueue();
 			return true;
 		}else{
 			return false;
