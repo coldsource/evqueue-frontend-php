@@ -26,35 +26,25 @@ $(document).ready(function() {
 	$("#dt_inf, #dt_sup").datepicker({dateFormat : "yy-mm-dd", maxDate: new Date(), showAnim: 'slideDown'});
 	$("#hr_inf, #hr_sup").timepicker();
 	
-	$(document).delegate('#searchWithinWorkflowSelect', 'change', function() {
+	$(document).delegate('#searchByWorkflowSelect', 'change', function() {
 		if ($(this).val() != '') {
 			$("#searchWithinWorkflowParams").html('');
-			var nbParams = workflows[$(this).val()].length;
+			
+			var nbParams = 0;
+			if($(this).val() in workflows)
+				nbParams = workflows[$(this).val()].length;
+			
 			if (nbParams > 0) {
-				var html = '<div class="modalTitle">'+$(this).val() + '</div>';
-				html += '<form id="searchParams" action="index.php" method="get">';
-				html += '<input type="hidden" name="wf_name" value="'+$(this).val()+'" />';
-				html += '<input type="hidden" name="searchParams" />';
-				html += '<table>';
-				for (var i=0; i<nbParams; i++){
-					html += (i%2 == 0)? '<tr class="evenTr">': '<tr class="oddTr">';
-					html += '<td>'+workflows[$(this).val()][i]+'</td>';
-					html += '<td><input type="text" name="'+workflows[$(this).val()][i]+'" value="" /></td>';
-					html += '</tr>';
+				var parameter_input = $('#searchWithinWorkflowParamsInput').html();
+				for(var i=0;i<nbParams;i++)
+				{
+					var html = parameter_input;
+					console.log(html);
+					html = html.split('#PARAMETER_LABEL#').join(workflows[$(this).val()][i]);
+					html = html.split('#PARAMETER_NAME#').join(workflows[$(this).val()][i]);
+					
+					$('#searchWithinWorkflowParams').append(html);
 				}
-				html += '</table>';
-				html += '<input id="searchSubmit2" class="righty searchSubmit2" type="submit" value="Search" />';
-				html += '</form>';
-				$("#searchWithinWorkflowParams").append(html);
-				$("#searchWithinWorkflowParams").dialog({ 
-					minHeight: 300, 
-					minWidth: 650, 
-					modal: true, 
-					title: "Search within workflow",
-					close: function() {
-						$("#searchWithinWorkflowSelect").val("option:first");
-					}
-				});
 			}
 
 			$("#searchWithinWorkflowParams").removeClass('hideMe');
@@ -64,19 +54,29 @@ $(document).ready(function() {
 		}
 	});
 	
-	$(document).delegate('#searchParams', 'submit', function() {
+	if($('#searchform option:selected').val())
+		$('#searchByWorkflowSelect').change();
+	
+	if($('#searchform input[name=searchParams]').val())
+	{
+		search_parameters = JSON.parse($('#searchform input[name=searchParams]').val());
+		for(var i=0;i<search_parameters.length;i++)
+			$('#searchform input[name='+search_parameters[i]['name']+']').val(search_parameters[i]['value']);
+	}
+	
+	$(document).delegate('#searchform', 'submit', function() {
 		// gather params to search in one json-encoded string to be submitted as a GET param
-		$('#searchWithinWorkflowParams input[type!=hidden][type!=submit]').filter("[value='']").remove()
-		var params = $('#searchWithinWorkflowParams input[type!=hidden][type!=submit]');
+		$('#searchWithinWorkflowParams input.parameter').filter("[value='']").remove()
+		var params = $('#searchWithinWorkflowParams input.parameter');
 		var searchParams = JSON.stringify(params.serializeArray());
-		$('#searchWithinWorkflowParams input[name=searchParams]').val(searchParams);
+		$('#searchform input[name=searchParams]').val(searchParams);
 		params.remove();
 	});
 	
 	// Manage autorefresh
 	function autoRefresh() {
 		$('input.autorefresh:checked').each(function() {
-			$(this).parent().find('img.refreshWorkflows').click();
+			$(this).parent().parent().find('img.refreshWorkflows').click();
 		});
 		
 		if ( $('div#EXECUTING-workflows input.autorefresh').length == 0 )  // executing workflows list is not displayed (no executing workflows, or evqueue not running)

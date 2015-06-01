@@ -2,8 +2,10 @@
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
 	<xsl:import href="../../xsl/templates/main-template.xsl" />
 	
+	<xsl:variable name="topmenu" select="'notifications'" />
+	
 	<xsl:variable name="javascript">
-		<src><xsl:value-of select="$RELPATH" />js/notifications.js</src>
+		<src>js/notifications.js</src>
 	</xsl:variable>
 	
 	<xsl:template name="content">
@@ -14,7 +16,7 @@
 			
 			<div class="boxTitle">
 				<span class="title">Notifications</span>
-				<!--<img src="images/plus2.png" title="Add new workflow (simple)" onclick="workflow_edit_method();" class="pointer"/>-->
+				<img class="action" src="{$RELPATH}images/plus3.png" onclick="createNotif();" />
 			</div>
 			<table id="notifications">
 				<tr class="header">
@@ -69,16 +71,14 @@
 						</td>
 						<td class="tdActions">
 							<img class="action" src="{$RELPATH}images/edit.gif" onclick="editNotif($(this));" title="Edit Notification" />
+							<xsl:text>&#160;</xsl:text>
 							<img class="action" src="{$RELPATH}images/delete.gif" onclick="deleteNotif({@id});" title="Delete Notification" />
 						</td>
 					</tr>
 				</xsl:for-each>
 				
 				<tr class="evenOdd createNotif">
-					<td colspan="4" />
-					<td class="tdActions">
-						<img class="action" src="{$RELPATH}images/edition/addTask.png" onclick="createNotif();" />
-					</td>
+					<td colspan="5" />
 				</tr>
 			</table>
 			

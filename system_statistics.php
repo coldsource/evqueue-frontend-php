@@ -29,9 +29,12 @@ $xsl = new XSLEngine();
 
 $wfi = new WorkflowInstance();
 
-if (isset($_POST['action']) && $_POST['action'] == 'reset') {
+if (isset($_GET['action']) && $_GET['action'] == 'reset') {
 	$ws = new WebserviceWrapper('reset-stats', 'resetStats', array(), true);
 	$ws->FetchResult();
+	
+	header('Location: system_statistics.php');
+	die();
 }
 
 $xsl->AddFragment('<global>'.$wfi->GetStatistics("global").'</global>');

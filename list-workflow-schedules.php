@@ -26,7 +26,7 @@ require_once 'bo/BO_workflow.php';
 require_once 'bo/BO_workflowSchedule.php';
 
 $xsl = new XSLEngine();
-if(isset($_GET['display']) && $_GET['display'] == 'state'){	
+if(isset($_GET['display']) && $_GET['display'] == 'state') {
 	$xsl->AddFragment(WorkflowSchedule::getAllXml(array('active'=>1)));
 	$xsl->SetParameter('DISPLAY', 'state');
 }

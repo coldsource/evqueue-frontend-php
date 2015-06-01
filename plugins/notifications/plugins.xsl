@@ -2,6 +2,8 @@
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
 	<xsl:import href="../../xsl/templates/main-template.xsl" />
 	
+	<xsl:variable name="topmenu" select="'notifications'" />
+	
 	<xsl:variable name="javascript">
 		<src><xsl:value-of select="$RELPATH" />js/notifications.js</src>
 	</xsl:variable>
