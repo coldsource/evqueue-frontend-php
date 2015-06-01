@@ -6,7 +6,7 @@
 		
 		<div class="boxTitle">
 			<span class="title">Queues list (<xsl:value-of select="count(/page/queues/queue)" /> active queues, total concurrency is <xsl:value-of select="sum(/page/queues/queue/queue_concurrency)" />)</span>
-			<a href="manage-queue.php"><img src="images/plus2.png" title="Add new queue" /></a>
+			<a href="manage-queue.php"><img class="action" src="images/plus3.png" title="Add new queue" /></a>
 		</div>
 		<table>
 			<tr>

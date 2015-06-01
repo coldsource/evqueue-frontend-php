@@ -93,7 +93,7 @@
 				</xsl:if>
 			</td>		
 		</tr>
-		<tr id="tr{@id}" class="openColor hidden">
+		<tr id="tr{@id}" class="hidden">
 			<td colspan="6" class="details">
 			</td>
 		</tr>
@@ -182,8 +182,8 @@
 							</tr>
 						</table>
 					</div>
-					<input id="searchSubmit2_{$identifier}" class="righty searchSubmit2" type="submit" value="Submit" />
 				</div>
+				<input id="searchSubmit2_{$identifier}" class="righty searchSubmit2" type="submit" value="Launch workflow" />
 			</form>
 		</div>
 	</xsl:template>
@@ -573,12 +573,6 @@
 		
 		<div id="{$status}-workflows" class="workflow-list">
 			<xsl:choose>
-				<xsl:when test="$status = 'EXECUTING' and count(/page/errors/error[@id='evqueue-not-running']) > 0">
-					<div id="evqueue-not-running">
-						Evqueue is not running!!!<br/>
-						If you expect workflows to be launched, you should start the evqueue process urgently!
-					</div>
-				</xsl:when>
 				<xsl:when test="count(workflow)=0">
 					<div style="text-align: center">
 						<div class="boxTitle workflowTitle titleNoResults">
@@ -598,7 +592,7 @@
 								<img src="images/exclamation.png" />
 							</div>
 						</xsl:if>
-						<span class="workflowPages">
+						<span class="workflowPages" style="line-height:20px;">
 							<xsl:if test="$status = 'TERMINATED'">
 								<span class="prevPage action" data-status="{$status}">&lt;</span>
 							</xsl:if>
@@ -620,9 +614,9 @@
 						<xsl:if test="$status = 'EXECUTING'">
 							<img src="images/alarm_clock.png" class="retryAllTasks action" title="Retry all tasks" style="margin-left: 5px;" onclick="retryAllTasks();" />
 						</xsl:if>
-						<input type="checkbox" class="autorefresh" checked="checked" />&#160;Auto-refresh
+						<div style="float:right;"><input type="checkbox" class="autorefresh" checked="checked" />&#160;Auto-refresh</div>
 					</div>
-					<table class="tb_workflows">
+					<table class="tb_workflows highlight_row">
 						<tr>
 							<th class="thState">State</th>
 							<th>ID &#8211; Name</th>
@@ -873,7 +867,7 @@
 										<xsl:attribute name="value"><xsl:value-of select="@id" /></xsl:attribute>
 									</xsl:if>
 									<xsl:if test="$value = 'name'">
-										<xsl:if test="@id = $selected_value">
+										<xsl:if test="@name = $selected_value">
 											<xsl:attribute name="selected">selected</xsl:attribute>
 										</xsl:if>
 										<xsl:attribute name="value"><xsl:value-of select="@name" /></xsl:attribute>

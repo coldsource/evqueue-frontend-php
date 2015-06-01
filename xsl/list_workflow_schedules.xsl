@@ -5,6 +5,11 @@
 	
 	<xsl:key name="groups" match="/page/workflows/workflow/@group" use="." />
 	
+	<xsl:variable name="topmenu">
+		<xsl:if test="$DISPLAY='state'">system-state</xsl:if>
+		<xsl:if test="$DISPLAY='settings'">settings</xsl:if>
+	</xsl:variable>
+	
 	<xsl:variable name="javascript">
 	</xsl:variable>
 	
@@ -13,7 +18,7 @@
 			<div class="boxTitle">
 				<span class="title">Planned workflows</span>
 				<xsl:if test="$DISPLAY = 'settings'">
-					<a href="plan-workflow.php"><img src="images/plus2.png" title="Schedule a new workflow" /></a>
+					<a href="plan-workflow.php"><img class="action" src="images/plus3.png" title="Schedule a new workflow" /></a>
 				</xsl:if>
 			</div>
 			<table>
@@ -133,9 +138,7 @@
 										</a>
 										<xsl:if test="$DISPLAY = 'settings'">
 											<xsl:text>&#160;</xsl:text>
-											<a href="plan-workflow.php?id={@id}" style="text-decoration: none;">
-												<img src="images/edit.gif" />
-											</a>
+											<a href="plan-workflow.php?id={@id}" style="text-decoration: none;"><img src="images/edit.gif" /></a>
 											<xsl:text>&#160;</xsl:text>
 											<img onclick="if (confirm('Really delete (and deactivate) workflow schedule '+{@id}+'?')) ajaxDelete('deleteWorkflowSchedule',{@id},'list-workflow-schedules.php');" src="images/delete.gif" class="pointer"/>
 										</xsl:if>

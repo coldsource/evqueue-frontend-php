@@ -3,6 +3,8 @@
 	<xsl:import href="templates/main-template.xsl" />
 	<xsl:import href="templates/edit_workflow.xsl" />
 	
+	<xsl:variable name="topmenu" select="'settings'" />
+	
 	<xsl:variable name="javascript">
 		<src>js/manage-workflow.js</src>
 	</xsl:variable>

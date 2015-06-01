@@ -3,6 +3,8 @@
 	<xsl:import href="templates/main-template.xsl" />
 	<xsl:import href="templates/edit_queue.xsl" />
 	
+	<xsl:variable name="topmenu" select="'settings'" />
+	
 	<xsl:variable name="javascript">
 	</xsl:variable>
 

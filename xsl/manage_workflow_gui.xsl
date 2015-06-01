@@ -7,6 +7,8 @@
 	<xsl:import href="templates/list_tasks.xsl" />
 	<xsl:import href="templates/workflow.xsl" />
 	
+	<xsl:variable name="topmenu" select="'settings'" />
+	
 	<xsl:variable name="javascript">
 		<src>js/manage-workflow.js</src>
 	</xsl:variable>
@@ -103,17 +105,17 @@
 		    </div>
 				
 		    <div class="actionItem" style="float: right; padding: 10px;">
-					<form onsubmit="return false;" style="display: inline;">
-						<xsl:choose>
-							<xsl:when test="/page/workflow/@id">  <!-- edition -->
-								<input type="button" value="Overwrite workflow {/page/workflow/@id}" onclick="executeAction('saveWorkflow',$('.reference'));" />
-							</xsl:when>
-							<xsl:otherwise>  <!-- creation [TODO] -->
-								<input type="button" value="Create and save workflow" onclick="executeAction('saveWorkflow',$('.reference'));" />
-							</xsl:otherwise>
-						</xsl:choose>
-					</form>
-				<a class="action" onclick="cancelEdition(); return false;">Cancel changes</a>
+				<a class="action" onclick="cancelEdition(); return false;"><button type="button">Cancel changes</button></a>
+				<form onsubmit="return false;" style="display: inline;">
+					<xsl:choose>
+						<xsl:when test="/page/workflow/@id">  <!-- edition -->
+							<input type="button" value="Overwrite workflow {/page/workflow/@id}" onclick="executeAction('saveWorkflow',$('.reference'));" />
+						</xsl:when>
+						<xsl:otherwise>  <!-- creation [TODO] -->
+							<input type="button" value="Create and save workflow" onclick="executeAction('saveWorkflow',$('.reference'));" />
+						</xsl:otherwise>
+					</xsl:choose>
+				</form>
 		    </div>
 				
 		    <p id="statusBar"></p>

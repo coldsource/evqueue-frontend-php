@@ -3,6 +3,7 @@
 	<xsl:import href="templates/workflow.xsl" />
 	<xsl:import href="templates/main-template.xsl" />
 	
+	<xsl:variable name="topmenu" select="'system-state'" />
 	<xsl:variable name="title" select="'Board'" />
 	
 	<xsl:variable name="javascript">
@@ -39,120 +40,122 @@
 				</xsl:otherwise>
 			</xsl:choose>
 		</script>
-
-		<div id="action-infos">
-			<xsl:for-each select="/page/action/*">
-				<span class="{local-name(.)}">
-					<xsl:copy-of select="." />
-				</span>
-			</xsl:for-each>
-		</div>
+		
+		<xsl:if test="count(/page/errors/error[@id='evqueue-not-running']) > 0">
+			<div id="evqueue-not-running">
+				Evqueue is not running!!!<br/>
+				If you expect workflows to be launched, you should start the evqueue process urgently!
+			</div>
+		</xsl:if>
 		
 		<div id="workflows" class="contentList">
 		
 			<xsl:apply-templates select="/page/workflows[count(@status)=0]" />
 			
-			<div class="workflowName">
-				<!-- workflow name -->
-				<xsl:choose>
-					<xsl:when test="/page/get/@wf_name != ''">
-						Showing terminated <i>"<xsl:value-of select="/page/get/@wf_name | /page/get/@selected_workflow" />"</i> workflows
-					</xsl:when>
-					<xsl:otherwise>
-						Showing all terminated workflows
-					</xsl:otherwise>
-				</xsl:choose>
-				
-				<!-- date -->
-				<xsl:choose>
-					<xsl:when test="/page/get/@dt_inf != '' and /page/get/@dt_sup != ''">
-						between <xsl:value-of select="/page/get/@dt_inf" />&#160;<xsl:value-of select="/page/get/@hr_inf" /> and <xsl:value-of select="/page/get/@dt_sup" />&#160;<xsl:value-of select="/page/get/@hr_sup" />
-					</xsl:when>
-					<xsl:when test="/page/get/@dt_inf != ''">
-						since <xsl:value-of select="/page/get/@dt_inf" />
-					</xsl:when>
-					<xsl:when test="/page/get/@dt_sup != ''">
-						before <xsl:value-of select="/page/get/@dt_sup" />
-					</xsl:when>
-				</xsl:choose>
-				
-				<!-- search on wf parameters -->
-				<xsl:for-each select="/page/get/@*">
-					<xsl:if test=". != '' and name() != 'wf_name' and name() != 'dt_inf' and name() != 'dt_sup' and name() != 'hr_inf' and name() != 'hr_sup'">
-						<xsl:if test="position() = 1"> having </xsl:if>
-						<xsl:if test="position() > 1">, </xsl:if>
+			<br />
+			
+			<table style="width:100%;">
+				<tr>
+					<td style="width:300px;">Launch a new workflow</td>
+					<td>
+						<xsl:apply-templates select="/page/groups" mode="select_workflow">
+							<xsl:with-param name="id" select="'launchWF'" />
+							<xsl:with-param name="value" select="'name'" />
+						</xsl:apply-templates>
 						
-						<xsl:value-of select="name()" /> = <b>"<xsl:value-of select="." />
-							<xsl:text>"</xsl:text>
-						</b>
-					</xsl:if>
-				</xsl:for-each>
-				
-				<xsl:if test="count(/page/get/@*) > 0">
-					<br/>
-					<a href="index.php" class="clearSearch">Clear search</a>
-				</xsl:if>
+						<xsl:for-each select="/page/available-workflows/workflow">
+								<xsl:apply-templates select="workflow" mode="launch" />
+						</xsl:for-each>
+					</td>
+				</tr>
+			</table>
+			<br />
+			<div id="searchWithinWorkflowParamsInput" class="nodisplay">
+				<div>
+					<label class="formLabel" for="#PARAMETER_NAME#" >#PARAMETER_LABEL#</label>
+					<input type="text" class="parameter" name="#PARAMETER_NAME#" value="" />
+				</div>
 			</div>
-			
-			<div id="actionTools">
-				<img src="images/search.png" title="Search by workflow" data-div-id="searchByWorkflow" />
-				<img src="images/search_in.png" title="Search within workflow" data-div-id="searchWithinWorkflow" />
-				<img src="images/search_dates.png" title="Filter by dates" data-div-id="searchDates" />
-				<img src="images/launch.png" title="Search within workflow" data-div-id="launchWorkflow" />
-			</div>
-			
-			<div id="searchByWorkflow" class="actionToolsDivs hideMe">
-				<div>Search by workflow</div>
-				
-				<xsl:apply-templates select="/page/groups" mode="select_workflow">
-					<xsl:with-param name="id" select="'searchByWorkflowSelect'" />
-					<xsl:with-param name="value" select="'name'" />
-				</xsl:apply-templates>
-			</div>
-			
-			<div id="searchWithinWorkflow" class="actionToolsDivs hideMe">
-				<form action="index.php" method="get">
-					<div>Search within workflow</div>
-					
-					<xsl:apply-templates select="/page/groups" mode="select_workflow">
-						<xsl:with-param name="id" select="'searchWithinWorkflowSelect'" />
-						<xsl:with-param name="value" select="'name'" />
-						<xsl:with-param name="min_parameters" select="'1'" />
-					</xsl:apply-templates>
-					<div id="searchWithinWorkflowParams">
-					</div>
-				</form>
-			</div>
-			
-			<div id="launchWorkflow" class="actionToolsDivs hideMe">
-				<span>Launch workflow:</span>
-				
-				<xsl:apply-templates select="/page/groups" mode="select_workflow">
-					<xsl:with-param name="id" select="'launchWF'" />
-					<xsl:with-param name="value" select="'name'" />
-				</xsl:apply-templates>
-
-				<xsl:for-each select="/page/available-workflows/workflow">
-					<xsl:apply-templates select="workflow" mode="launch" />
-				</xsl:for-each>
-			</div>
-			
-			<div id="searchDates" class="actionToolsDivs hideMe">
-				<span>Filter by dates:</span><br/>
-				<form>
-					<xsl:for-each select="/page/get/@*">
-						<input type="hidden" name="{local-name()}" value="{.}" />
-					</xsl:for-each>
-					between <input id="dt_inf" name="dt_inf" value="{/page/get/@dt_inf}" />
-					<input id="hr_inf" name="hr_inf" value="{/page/get/@hr_inf}" />
-					and <input id="dt_sup" name="dt_sup" value="{/page/get/@dt_sup}" />
-					<input id="hr_sup" name="hr_sup" value="{/page/get/@hr_sup}" />
-					<input type="submit" value="Filter" />
-				</form>
-			</div>
+			<form id="searchform" action="{$RELPATH}index.php">
+				<input type="hidden" name="searchParams" value="{/page/get/@searchParams}" />
+				<table id="filters" style="width:100%;">
+					<tr>
+						<td colspan="2"><a onclick="$('.filter').toggle();" href="javascript:void(0)">Filters</a> : <xsl:call-template name="explain_search" /></td>
+					</tr>
+					<tr class="filter nodisplay">
+						<td style="width:300px;">Workflow</td>
+						<td>
+							<xsl:apply-templates select="/page/groups" mode="select_workflow">
+								<xsl:with-param name="id" select="'searchByWorkflowSelect'" />
+								<xsl:with-param name="value" select="'name'" />
+								<xsl:with-param name="selected_value" select="/page/get/@workflow_id" />
+							</xsl:apply-templates>
+						</td>
+					</tr>
+					<tr class="filter nodisplay">
+						<td style="width:300px;">Workflow parameters</td>
+						<td>
+							<div id="searchWithinWorkflowParams"><xsl:comment /></div>
+						</td>
+					</tr>
+					<tr class="filter nodisplay">
+						<td>Launched between</td>
+						<td>
+							Date&#160;:&#160;<input id="dt_inf" name="dt_inf" value="{/page/get/@dt_inf}" />
+							Hour&#160;:&#160;<input id="hr_inf" name="hr_inf" value="{/page/get/@hr_inf}" />
+							&#160;&#160;<b>and</b>&#160;&#160;
+							Date&#160;:&#160;<input id="dt_sup" name="dt_sup" value="{/page/get/@dt_sup}" />
+							Hour&#160;:&#160;<input id="hr_sup" name="hr_sup" value="{/page/get/@hr_sup}" />
+						</td>
+					</tr>
+					<tr class="filter nodisplay">
+						<td colspan="2" class="center">
+							<input type="submit" value="Filter workflows" />
+							<xsl:text>&#160;</xsl:text>
+							<a href="{$RELPATH}index.php"><button type="button" class="blue">Clear filters</button></a>
+						</td>
+					</tr>
+				</table>
+			</form>
 			
 			<xsl:apply-templates select="/page/workflows[@status='TERMINATED']" />
 		</div>
+	</xsl:template>
+	
+	<xsl:template name="explain_search">
+		<xsl:choose>
+			<xsl:when test="/page/get/@wf_name != ''">
+				Showing terminated <i>"<xsl:value-of select="/page/get/@wf_name | /page/get/@selected_workflow" />"</i> workflows
+			</xsl:when>
+			<xsl:otherwise>
+				Showing all terminated workflows
+			</xsl:otherwise>
+		</xsl:choose>
+		
+		<!-- date -->
+		<xsl:choose>
+			<xsl:when test="/page/get/@dt_inf != '' and /page/get/@dt_sup != ''">
+				between <xsl:value-of select="/page/get/@dt_inf" />&#160;<xsl:value-of select="/page/get/@hr_inf" /> and <xsl:value-of select="/page/get/@dt_sup" />&#160;<xsl:value-of select="/page/get/@hr_sup" />
+			</xsl:when>
+			<xsl:when test="/page/get/@dt_inf != ''">
+				since <xsl:value-of select="/page/get/@dt_inf" />
+			</xsl:when>
+			<xsl:when test="/page/get/@dt_sup != ''">
+				before <xsl:value-of select="/page/get/@dt_sup" />
+			</xsl:when>
+		</xsl:choose>
+		
+		<!-- search on wf parameters -->
+		<xsl:for-each select="/page/get/@*">
+			<xsl:if test=". != '' and name() != 'wf_name' and name() != 'dt_inf' and name() != 'dt_sup' and name() != 'hr_inf' and name() != 'hr_sup'">
+				<xsl:if test="position() = 1"> having </xsl:if>
+				<xsl:if test="position() > 1">, </xsl:if>
+				
+				<xsl:value-of select="name()" /> = <b>"<xsl:value-of select="." />
+					<xsl:text>"</xsl:text>
+				</b>
+			</xsl:if>
+		</xsl:for-each>
 	</xsl:template>
 
 </xsl:stylesheet>

@@ -2,6 +2,8 @@
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
 	<xsl:import href="templates/main-template.xsl" />
 	
+	<xsl:variable name="topmenu" select="'settings'" />
+	
 	<xsl:variable name="javascript">
 		<src>js/manage-schedule.js</src>
 	</xsl:variable>

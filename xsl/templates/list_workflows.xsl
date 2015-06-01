@@ -11,7 +11,7 @@
 		<div id="workflow_edit_select" style="display:none;">Select workflow edition mode</div>
 		<div class="boxTitle">
 			<span class="title">Workflows List</span>
-			<img src="images/plus2.png" title="Add new workflow (simple)" onclick="workflow_edit_method();" class="pointer"/>
+			<img src="images/plus3.png" title="Add new workflow (simple)" onclick="workflow_edit_method();" class="action"/>
 		</div>
 		<table>
 			<tr>

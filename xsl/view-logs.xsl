@@ -3,6 +3,8 @@
 	<xsl:import href="templates/main-template.xsl" />
 	<xsl:import href="templates/view-logs.xsl" />
 	
+	<xsl:variable name="topmenu" select="'logging'" />
+	
 	<xsl:variable name="javascript">
 		<src>js/view-logs.js</src>
 	</xsl:variable>

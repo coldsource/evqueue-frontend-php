@@ -7,7 +7,7 @@
 		
 		<div class="boxTitle">
 			<span class="title">Schedules List</span>
-			<a href="manage-schedule.php"><img src="images/plus2.png" title="Add new retry schedule" /></a>
+			<a href="manage-schedule.php"><img class="action" src="images/plus3.png" title="Add new retry schedule" /></a>
 		</div>
 		<table>
 			<tr>

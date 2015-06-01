@@ -9,7 +9,7 @@
 		
 		<div class="boxTitle">
 			<span class="title">Tasks list</span>
-			<a href="manage-task.php"><img src="images/plus2.png" title="Add new task" /></a>
+			<a href="manage-task.php"><img class="action" src="images/plus3.png" title="Add new task" /></a>
 		</div>
 		<table>
 			<tr>

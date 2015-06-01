@@ -3,6 +3,8 @@
 	<xsl:import href="templates/main-template.xsl" />
 	<xsl:import href="templates/list_schedules.xsl" />
 	
+	<xsl:variable name="topmenu" select="'settings'" />
+	
 	<xsl:variable name="javascript">
 		<src>js/list-schedules.js</src>
 	</xsl:variable>
