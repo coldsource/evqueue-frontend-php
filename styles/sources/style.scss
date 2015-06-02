@@ -20,23 +20,6 @@ span.time {
 	text-align:center;
 }
 
-input[type=button], input[type=submit], .button {
-	display: inline-block;
-	margin: 5px;
-	padding: 2px;
-	
-	border: 0;
-	background-color: #6b9bdb;
-	background: linear-gradient(to top, #6382b0, #7fafef);
-	padding: 2px 5px;
-	border-radius: 6px;
-	box-shadow: rgba(0,0,0,0.6) 0 1px 0;
-	text-shadow: rgba(0,0,0,.4) 0 1px 0;
-	color: white;
-	text-decoration: none;
-	vertical-align: middle;
-	cursor: pointer;
-}
 a.button {
 	padding: 5px 10px;
 }
@@ -93,11 +76,6 @@ div.menu{
 
 }
 
-div#workflows {
-    padding: 10px;
-    margin-top: 10px;
-}
-
 div.box {
     margin-top: 10px;
     width: 100%;
@@ -105,18 +83,6 @@ div.box {
 }
 span.title {
 	padding-left: 10px !important;
-}
-.boxTitle,
-.boxSubtitle{
-	background: linear-gradient(#7FAFEF, #6382B0) repeat scroll 0 0 #7FAFEF;
-	border-top-left-radius: 10px;
-	border-top-right-radius: 10px;
-	color: #FFFFFF;
-	width: 100%;
-	display:inline-block;
-	padding: 10px 0 10px 0;
-	text-align: center;
-	font-weight: bold;
 }
 .boxTitle {
 	margin-top: 2em;
@@ -130,8 +96,6 @@ span.title {
 }
 .boxTitle img {
 	height:16px;
-	float:right;
-	margin-right:10px;
 }
 
 .boxTitleJob {
@@ -153,7 +117,6 @@ div.titleAction {
 }
 div.statistics {
 	margin-top: 20px;
-	display: block;
 }
 
 
@@ -180,10 +143,6 @@ div.tasks {
 div.indicators {
 	display: inline;
 	margin-left: 5px;
-}
-
-div.workflowTitle {
-	padding: 6px 0;
 }
 
 div#evqueue-not-running {
@@ -332,15 +291,8 @@ li.fakeTask {
     display: none;
 }
 
-.action {
-	cursor: pointer;
-	text-decoration: underline;
-}
 .action:hover {
 	text-decoration: none;
-}
-span.workflowPages .action {
-	color: white;
 }
 #container {
     width : 600px;
@@ -428,43 +380,16 @@ img.deleteWFI{
 div.statusFilter {
 	float: left;
 	margin-left: 6px;
-	background-color: #4996ce;
-	border-radius: 5px;
-	border: 1px solid lightblue;
 }
 div.statusFilter img {
 	
 }
 
-table th {
-    background: linear-gradient(#7FAFEF, #6382B0) repeat scroll 0 0 #7FAFEF;
-    color: #FFFFFF;
-}
-
-td.content table th, td.content table td {
-    border: 1px solid #B4B4B4;
-    font-size: 0.9em;
-    line-height: 20px;
-    padding: 2px 3px;
-
-}
 .evenTr, tr.evenOdd:nth-child(even) {
     background-color: #EEE;
 }
 .oddTr, tr.evenOdd:nth-child(odd) {
     background-color: #FFF;
-}
-
-tr.evenOdd:hover {
-    background-color: bisque;
-}
-
-table.tb_workflows tr:hover {
-    background-color: bisque;
-}
-
-table tr.openColor {
-    background-color: bisque;
 }
 
 td.workflowStatus {
@@ -550,19 +475,6 @@ form p{
     font-size: 0.9em;
 }
 
-div.formdiv{
-    border: 1px solid #A6C9E2;
-	border-bottom-left-radius: 5px;
-	border-bottom-right-radius: 5px;
-    padding: 10px;
-}
-
-div.formdiv #errors,
-#errors {
-	color: #E00;
-	margin: 15px;
-}
-
 div.formdiv input[type=text],
 div.infoBloc input[type=text] {
 	min-width: 400px;
@@ -589,78 +501,6 @@ p.title{
     font-size: 1.2em;
     margin-top: 0;
     margin-bottom: 0;
-}
-
-#menu, #menu ul{
-    padding:0;
-    margin:0;
-    list-style:none;
-}
-#menu li{
-    display:inline-block;
-    position:relative;
-    border-radius:3px 3px 0 0;
-}
-#menu ul li{
-    display:inherit;
-    border-radius:0;
-    padding: 5px;
-}
-#menu ul li:hover{
-    border-radius:0;
-}
-#menu ul li:last-child{
-    border-radius:0 0 2px 2px;
-}
-#menu ul{
-    position:absolute;
-    max-height:0;
-    width:100%;
-    overflow:hidden;
-    -moz-transition: .3s all .1s;
-    -webkit-transition: .3s all .1s;
-    transition: .3s all .1s;
-    z-index: 10;
-}
-#menu li:hover ul{
-    max-height:15em;
-}
-/* background des liens menus */
-#menu li{
-    background-color: #729EBF;
-    background-image: -webkit-linear-gradient(top, #729EBF 0%, #333A40 100%);
-    background-image:linear-gradient(to bottom, #729EBF 0%, #333A40 100%);
-}
-
-#menu li{
-    background:#595959;
-}
-
-/* background des liens menus et sous menus au survol */
-#menu li:hover{
-    background:#333333;
-}
-
-/* les a href */
-#menu a{
-    text-decoration:none;
-    display:block;
-    padding:8px 32px;
-    color:#fff;
-    font-family:arial;
-}
-#menu ul a{
-    padding:8px 0;
-}
-#menu li:hover li a{
-    color:#fff;
-    text-transform:inherit;
-}
-#menu li:hover a, #menu li li:hover a{
-    color:#ffffff;
-}
-#menu li.specialMenu {
-    background-color: #446D53;
 }
 
 .pointer{
@@ -992,20 +832,6 @@ div.contentList, div.contentManage {
 	}
 }
 
-/* group */
-tr.group{
-	background: #CCC;
-}
-tr.group td{
-	font-size:15px;
-	font-weight: bold;
-	padding:7px;
-}
-td.content tr.groupspace td {
-	height: 2em;
-	border: none;
-}
-
 ul.ui-autocomplete{
 	width:150px;
 	margin-left:0px;
@@ -1054,10 +880,6 @@ ul.scheduleParameters li {
 }
 
 /* tasks */
-#task #formTask{
-	display:inline-block;
-	width:580px;
-}
 #task div.linked-workflow{
 	display:inline-block;
 	vertical-align:top;

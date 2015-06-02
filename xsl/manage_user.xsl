@@ -2,8 +2,7 @@
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
 	<xsl:import href="templates/main-template.xsl" />
 	
-	<xsl:variable name="javascript">
-	</xsl:variable>
+	<xsl:variable name="topmenu" select="'settings'" />
 	
 	<xsl:template name="content">
 		<p>

@@ -24,7 +24,6 @@
 				</xsl:choose>
 				
 				<link rel="stylesheet" type="text/css" href="{$RELPATH}js/jQuery-Timepicker-Addon/dist/jquery-ui-timepicker-addon.min.css"/>
-				<link rel="stylesheet" type="text/css" href="{$RELPATH}styles/main.css"/>
 				
 				<script type="text/javascript">
 					var relpath = '<xsl:value-of select="$RELPATH" />';
