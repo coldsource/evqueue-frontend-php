@@ -835,7 +835,7 @@
 	
 	
 	<xsl:template match="groups" mode="select_workflow">
-		<xsl:param name="name" select="'workflow_id'" />
+		<xsl:param name="name" select="'wf_name'" />
 		<xsl:param name="id" select="''" />
 		<xsl:param name="selected_value" select="''" />
 		<xsl:param name="value" select="'id'" />

@@ -238,16 +238,18 @@ class WorkflowInst{
 		if (isset($get['searchParams'])) {
 			$searchParams = json_decode($get['searchParams'],true);
 			if ($searchParams !== null) {
+				$condition = array();
 				foreach ($searchParams as $param) {
 					$condition[] = "workflow_instance_parameter = %s AND workflow_instance_parameter_value = %s";
 					$values[] = $param['name'];
 					$values[] = $param['value'];
 				}
-				$query .= ' AND EXISTS (
-					SELECT *
-					FROM t_workflow_instance_parameters wp
-					WHERE wp.workflow_instance_id = wfi.workflow_instance_id
-						AND '.join(' OR ', $condition).')';
+				if (sizeof($condition)>0)
+					$query .= ' AND EXISTS (
+						SELECT *
+						FROM t_workflow_instance_parameters wp
+						WHERE wp.workflow_instance_id = wfi.workflow_instance_id
+							AND '.join(' OR ', $condition).')';
 			}
 		}
 		

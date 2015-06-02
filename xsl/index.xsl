@@ -88,7 +88,7 @@
 							<xsl:apply-templates select="/page/groups" mode="select_workflow">
 								<xsl:with-param name="id" select="'searchByWorkflowSelect'" />
 								<xsl:with-param name="value" select="'name'" />
-								<xsl:with-param name="selected_value" select="/page/get/@workflow_id" />
+								<xsl:with-param name="selected_value" select="/page/get/@wf_name" />
 							</xsl:apply-templates>
 						</td>
 					</tr>
