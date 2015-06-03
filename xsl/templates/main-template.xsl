@@ -45,76 +45,78 @@
 				<title><xsl:value-of select="$title" /></title>
 			</head>
 			<body>
-				<ul class="topmenu">
-					<li class="logo">evQueue</li>
-					<li id="system-state">
-						<xsl:if test="$topmenu='system-state'"><xsl:attribute name="class">selected</xsl:attribute></xsl:if>
-						System state
-					</li>
-					<li id="settings">
-						<xsl:if test="$topmenu='settings'"><xsl:attribute name="class">selected</xsl:attribute></xsl:if>
-						Settings
-					</li>
-					<li id="notifications">
-						<xsl:if test="$topmenu='notifications'"><xsl:attribute name="class">selected</xsl:attribute></xsl:if>
-						Notifications
-					</li>
-					<li id="logging">
-						<xsl:if test="$topmenu='logging'"><xsl:attribute name="class">selected</xsl:attribute></xsl:if>
-						Logging
-					</li>
+				<xsl:if test="$topmenu != ''">
+					<ul class="topmenu">
+						<li class="logo">evQueue</li>
+						<li id="system-state">
+							<xsl:if test="$topmenu='system-state'"><xsl:attribute name="class">selected</xsl:attribute></xsl:if>
+							System state
+						</li>
+						<li id="settings">
+							<xsl:if test="$topmenu='settings'"><xsl:attribute name="class">selected</xsl:attribute></xsl:if>
+							Settings
+						</li>
+						<li id="notifications">
+							<xsl:if test="$topmenu='notifications'"><xsl:attribute name="class">selected</xsl:attribute></xsl:if>
+							Notifications
+						</li>
+						<li id="logging">
+							<xsl:if test="$topmenu='logging'"><xsl:attribute name="class">selected</xsl:attribute></xsl:if>
+							Logging
+						</li>
+						<xsl:choose>
+							<xsl:when test="/page/session/workflow/@original-id = 'new'">
+								<li><a style="color: #51d551;" href="{$RELPATH}manage-workflow-gui.php">Creating workflow</a></li>
+							</xsl:when>
+							<xsl:when test="count(/page/session/workflow/@original-id) > 0">
+								<li><a style="color: #51d551;" href="{$RELPATH}manage-workflow-gui.php?workflow_id={/page/session/workflow/@original-id}">Editing workflow <xsl:value-of select="/page/session/workflow/@original-id" /></a></li>
+							</xsl:when>
+						</xsl:choose>
+					</ul>
+					<ul class="submenu" id="submenu-system-state">
+						<xsl:if test="$topmenu!='system-state'"><xsl:attribute name="style">display:none;</xsl:attribute></xsl:if>
+						<li><a href="{$RELPATH}index.php">Workflows instances</a></li>
+						<li><a href="{$RELPATH}list-workflow-schedules.php?display=state">Scheduled workflows</a></li>
+						<li><a href="{$RELPATH}system_state.php">Queues</a></li>
+						<li><a href="{$RELPATH}system_statistics.php">Statistics</a></li>
+					</ul>
+					<xsl:if test="/page/private/logged-in-user/@profile = 'ADMIN'">
+						<ul class="submenu" id="submenu-settings">
+							<xsl:if test="$topmenu!='settings'"><xsl:attribute name="style">display:none;</xsl:attribute></xsl:if>
+							<li><a href="{$RELPATH}list-tasks.php">Tasks</a></li>
+							<li><a href="{$RELPATH}list-workflows.php">Workflows</a></li>
+							<li><a href="{$RELPATH}list-workflow-schedules.php?display=settings">Scheduled workflows</a></li>
+							<li><a href="{$RELPATH}list-schedules.php">Retry Schedules</a></li>
+							<li><a href="{$RELPATH}list-queues.php">Queues</a></li>
+							<li><a href="{$RELPATH}list-users.php">Users</a></li>
+						</ul>
+						<ul class="submenu" id="submenu-notifications">
+							<xsl:if test="$topmenu!='notifications'"><xsl:attribute name="style">display:none;</xsl:attribute></xsl:if>
+							<li><a href="{$RELPATH}plugins/notifications/">Configure</a></li>
+							<li><a href="{$RELPATH}plugins/notifications/plugins.php">Manage plugins</a></li>
+						</ul>
+						<ul class="submenu" id="submenu-logging">
+							<xsl:if test="$topmenu!='logging'"><xsl:attribute name="style">display:none;</xsl:attribute></xsl:if>
+							<li><a href="{$RELPATH}view-logs.php">Last logs</a></li>
+						</ul>
+					</xsl:if>
+					
 					<xsl:choose>
-						<xsl:when test="/page/session/workflow/@original-id = 'new'">
-							<li><a style="color: #51d551;" href="{$RELPATH}manage-workflow-gui.php">Creating workflow</a></li>
-						</xsl:when>
-						<xsl:when test="count(/page/session/workflow/@original-id) > 0">
-							<li><a style="color: #51d551;" href="{$RELPATH}manage-workflow-gui.php?workflow_id={/page/session/workflow/@original-id}">Editing workflow <xsl:value-of select="/page/session/workflow/@original-id" /></a></li>
+						<xsl:when test="count(/page/private/logged-in-user) > 0">
+							<div id="userInfo">
+								<span><xsl:value-of select="/page/private/logged-in-user/@login" /></span>
+								<xsl:text>&#160;</xsl:text>
+								<a href="{$RELPATH}manage-user.php?user_login={/page/private/logged-in-user/@login}" title="Edit">
+									<img src="{$RELPATH}images/edit.png" />
+								</a>
+								<xsl:text>&#160;</xsl:text>
+								<a href="{$RELPATH}auth.php?action=logout" title="Log out">
+									<img src="{$RELPATH}images/logout.png" />
+								</a>
+							</div>
 						</xsl:when>
 					</xsl:choose>
-				</ul>
-				<ul class="submenu" id="submenu-system-state">
-					<xsl:if test="$topmenu!='system-state'"><xsl:attribute name="style">display:none;</xsl:attribute></xsl:if>
-					<li><a href="{$RELPATH}index.php">Workflows instances</a></li>
-					<li><a href="{$RELPATH}list-workflow-schedules.php?display=state">Scheduled workflows</a></li>
-					<li><a href="{$RELPATH}system_state.php">Queues</a></li>
-					<li><a href="{$RELPATH}system_statistics.php">Statistics</a></li>
-				</ul>
-				<xsl:if test="/page/private/logged-in-user/@profile = 'ADMIN'">
-					<ul class="submenu" id="submenu-settings">
-						<xsl:if test="$topmenu!='settings'"><xsl:attribute name="style">display:none;</xsl:attribute></xsl:if>
-						<li><a href="{$RELPATH}list-tasks.php">Tasks</a></li>
-						<li><a href="{$RELPATH}list-workflows.php">Workflows</a></li>
-						<li><a href="{$RELPATH}list-workflow-schedules.php?display=settings">Scheduled workflows</a></li>
-						<li><a href="{$RELPATH}list-schedules.php">Retry Schedules</a></li>
-						<li><a href="{$RELPATH}list-queues.php">Queues</a></li>
-						<li><a href="{$RELPATH}list-users.php">Users</a></li>
-					</ul>
-					<ul class="submenu" id="submenu-notifications">
-						<xsl:if test="$topmenu!='notifications'"><xsl:attribute name="style">display:none;</xsl:attribute></xsl:if>
-						<li><a href="{$RELPATH}plugins/notifications/">Configure</a></li>
-						<li><a href="{$RELPATH}plugins/notifications/plugins.php">Manage plugins</a></li>
-					</ul>
-					<ul class="submenu" id="submenu-logging">
-						<xsl:if test="$topmenu!='logging'"><xsl:attribute name="style">display:none;</xsl:attribute></xsl:if>
-						<li><a href="{$RELPATH}view-logs.php">Last logs</a></li>
-					</ul>
 				</xsl:if>
-				
-				<xsl:choose>
-					<xsl:when test="count(/page/private/logged-in-user) > 0">
-						<div id="userInfo">
-							<span><xsl:value-of select="/page/private/logged-in-user/@login" /></span>
-							<xsl:text>&#160;</xsl:text>
-							<a href="{$RELPATH}manage-user.php?user_login={/page/private/logged-in-user/@login}" title="Edit">
-								<img src="{$RELPATH}images/edit.png" />
-							</a>
-							<xsl:text>&#160;</xsl:text>
-							<a href="{$RELPATH}auth.php?action=logout" title="Log out">
-								<img src="{$RELPATH}images/logout.png" />
-							</a>
-						</div>
-					</xsl:when>
-				</xsl:choose>
 				
 				<div class="content">
 					<xsl:call-template name="content" />

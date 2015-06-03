@@ -46,23 +46,30 @@
 		<input type="text" name="workflow_comment" id="workflow_comment" value="{/page/post/@workflow_comment | /page/workflow/@comment }" placeholder="Comment" />
 		<br />
 		
-		<label class="formLabel" for="workflow_comment">Notifications:</label>
-		<ul>
-			<xsl:for-each select="/page/notifications/notification">
-				<li>
-					<label>
-						<input type="checkbox" name="notification[]" value="{@id}">
-							<xsl:if test="/page/workflow/notifications/notification = @id">
-								<xsl:attribute name="checked">checked</xsl:attribute>
-							</xsl:if>
-						</input>
-						<xsl:value-of select="/page/notification-types/notification-type[@id = current()/type-id]/name" />
-						<xsl:text>&#160;</xsl:text>
-						<i><xsl:value-of select="name" /></i>
-					</label>
-				</li>
-			</xsl:for-each>
-		</ul>
+		<br />
+		<fieldset style="border-radius:10px;width:536px;">
+			<legend>Notifications subscribed</legend>
+			<table>
+				<xsl:for-each select="/page/notification-types/notification-type">
+					<xsl:variable name="notification_type_id" select="@id" />
+					<tr class="group">
+						<td colspan="2">
+							<xsl:value-of select="name" />
+						</td>
+					</tr>
+					<xsl:for-each select="/page/notifications/notification[type-id=$notification_type_id]">
+						<tr>
+							<td style="width:20px;">
+								<input type="checkbox" name="notification[]" value="{@id}" />
+							</td>
+							<td>
+								<xsl:value-of select="name" />
+							</td>
+						</tr>
+					</xsl:for-each>
+				</xsl:for-each>
+			</table>
+		</fieldset>
 	</xsl:template>
 	
 	<xsl:template name="escapeQuote">
