@@ -182,6 +182,15 @@ button.blue, input[type=button], input[type=submit] {
   height: 20px;
   font-size: 11px; }
 
+/* Login page */
+form.loginFields {
+  margin-top: 100px;
+  margin-bottom: 100px;
+  width: 250px;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center; }
+
 /*   "Microformats"   */
 span.time {
   font-size: 70%; }
@@ -584,7 +593,7 @@ div.infoBloc input[type=text] {
 
 p.formtitle {
   font-weight: bold;
-  background: linear-gradient(#7FAFEF, #6382B0) repeat scroll 0 0 #7FAFEF;
+  background: linear-gradient(#7fafef, #6382b0) repeat scroll 0 0 #7fafef;
   color: #FFFFFF;
   /*height: 31px;*/
   padding: 5px; }
@@ -963,5 +972,3 @@ div.lightTreeJob .taskLoop {
   font-size: 110%; }
 
 /* END LIGHT-TREE DISPLAY */
-
-/*# sourceMappingURL=style.css.map */
