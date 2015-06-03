@@ -593,7 +593,7 @@ div.infoBloc input[type=text] {
 
 p.formtitle {
   font-weight: bold;
-  background: linear-gradient(#7fafef, #6382b0) repeat scroll 0 0 #7fafef;
+  background: linear-gradient(#7FAFEF, #6382B0) repeat scroll 0 0 #7FAFEF;
   color: #FFFFFF;
   /*height: 31px;*/
   padding: 5px; }
@@ -972,3 +972,5 @@ div.lightTreeJob .taskLoop {
   font-size: 110%; }
 
 /* END LIGHT-TREE DISPLAY */
+
+/*# sourceMappingURL=style.css.map */
