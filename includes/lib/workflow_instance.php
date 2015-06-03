@@ -200,8 +200,27 @@ class WorkflowInstance {
 	/*
 	 * Reloads the lists of tasks, workflows and workflow schedules.
 	 */
-	public static function ReloadEvqueue () {
-		system('killall -HUP evqueue');
+	public static function ReloadEvqueue ($host=QUEUEING_HOST,$port=QUEUEING_PORT) {
+		$s = @fsockopen($host,$port);
+		if ($s === false)
+			return false;
+		
+		fwrite($s,"<control action='reload' />\n");
+		$output = stream_get_contents($s);
+		fclose($s);
+		
+		if(!$s)
+			return false;
+		
+		try {
+			$sxe = new SimpleXMLElement($output);
+			if (count($sxe->xpath("/return[@status='OK']")) != 1)
+				return false;
+		} catch (Exception $e) {
+			return false;
+		}
+		
+		return true;
 	}
 	
 	/*
@@ -251,6 +270,45 @@ class WorkflowInstance {
 		fclose($s);
 		
 		return $xml;  // for now we return the XML directly, since it will be used in the XSL only
+	}
+	
+	/*
+	 * Asks evqueue to store a file on its machine.
+	 */
+	public static function StoreFile ($filename,$data,$host=QUEUEING_HOST,$port=QUEUEING_PORT) {
+		return self::put_or_remove_file('put',$filename,$data,$host,$port);
+	}
+	
+	/*
+	 * Asks evqueue to delete a file, previously stored via SendFile, on its machine.
+	 */
+	public static function DeleteFile ($filename,$host=QUEUEING_HOST,$port=QUEUEING_PORT) {
+		return self::put_or_remove_file('remove',$filename,'',$host,$port);
+	}
+	
+	private static function put_or_remove_file ($action,$filename,$data,$host=QUEUEING_HOST,$port=QUEUEING_PORT) {
+		$s = @fsockopen($host,$port);
+		if ($s === false)
+			return false;
+		
+		$filename = htmlspecialchars($filename);
+		$data = base64_encode($data);
+		fwrite($s,"<notification action='$action' filename='$filename' data='$data' />\n");
+		$output = stream_get_contents($s);
+		fclose($s);
+		
+		if(!$s)
+			return false;
+		
+		try {
+			$sxe = new SimpleXMLElement($output);
+			if (count($sxe->xpath("/return[@status='OK']")) != 1)
+				return false;
+		} catch (Exception $e) {
+			return false;
+		}
+		
+		return true;
 	}
 	
 }

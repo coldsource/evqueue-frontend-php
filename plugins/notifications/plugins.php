@@ -25,8 +25,30 @@ require_once 'inc/logger.php';
 require_once 'lib/XSLEngine.php';
 require_once 'bo/BO_notification.php';
 require_once 'bo/BO_notificationType.php';
+require_once 'lib/plugin.php';
+
 
 $xsl = new XSLEngine();
+
+// INSTALL
+if (isset($_FILES['plugin_file'])) {
+	$plugin = new NotificationPlugin();
+	$errors = $plugin->Install($_FILES['plugin_file']['tmp_name']);
+	if ($errors === true)
+		$xsl->AddNotice('Installed plugin successfully!');
+	else
+		$xsl->AddError('error',$errors[0]);
+}
+
+// UNINSTALL
+if (isset($_POST['action']) && $_POST['action'] == 'delete') {
+	$plugin = new NotificationPlugin($_POST['plugin_id']);
+	$errors = $plugin->Delete();
+	if ($errors === true)
+		$xsl->AddNotice('Uninstalled plugin successfully!');
+	else
+		$xsl->AddError('error',$errors[0]);
+}
 
 $xsl->AddFragment(Notification::getAllXml());
 $xsl->AddFragment(NotificationType::getAllXml());

@@ -26,6 +26,7 @@ class NotificationType {
 	
 	private $id;
 	private $name;
+	private $description;
 	private $binary;
 	
 	function __construct($id = false){
@@ -44,6 +45,7 @@ class NotificationType {
 		
 		$this->id = $row['notification_type_id'];
 		$this->name = $row['notification_type_name'];
+		$this->description = $row['notification_type_description'];
 		$this->binary = $row['notification_type_binary'];
 		
 	}
@@ -64,10 +66,10 @@ class NotificationType {
 			
 			$this->db->QueryPrintf("
 				INSERT INTO t_notification_type (
-					notification_type_name, notification_type_binary
+					notification_type_name, notification_type_description, notification_type_binary
 				) VALUES (
-					%s, %i, %s
-				)",	$this->name, $this->binary);
+					%s, %s, %s
+				)",	$this->name, $this->description, $this->binary);
 				
 			$this->id = $this->db->GetInsertID();
 			
@@ -76,10 +78,12 @@ class NotificationType {
 					UPDATE t_notification_type
 					SET
 						notification_type_name = %s,
+						notification_type_description = %s,
 						notification_type_binary = %s
 					WHERE notification_type_id = %i
 					",
 					$this->name,
+					$this->description,
 					$this->binary,
 					$this->id);
 		}
@@ -98,6 +102,10 @@ class NotificationType {
 			$errors["notification_type_name"] = "The notification type name can only be 32 characters long maximum.";
 		}else if ($setvals === true){
 			$this->name = $vals["notification_type_name"];
+		}
+		
+		if ($setvals === true){
+			$this->description = $vals["notification_type_description"];
 		}
 		
 		if (!isset($vals["notification_type_binary"]) || $vals["notification_type_binary"] == ""){
@@ -122,10 +130,15 @@ class NotificationType {
 		return $this->name;
 	}
 	
+	public function getBinary () {
+		return $this->binary;
+	}
+	
 	public function getGeneratedXml(){
 		$xml = "<notification-type id='$this->id'>";
-		$xml .= "<name>$this->name</name>";
-		$xml .= "<binary>$this->binary</binary>";
+		$xml .= '<name>'.htmlspecialchars($this->name).'</name>';
+		$xml .= '<description>'.htmlspecialchars($this->description).'</description>';
+		$xml .= '<binary>'.htmlspecialchars($this->binary).'</binary>';
 		return "$xml</notification-type>";
 	}
 	
@@ -152,11 +165,14 @@ class NotificationType {
 	public function delete(){
 		if ($this->id !== false) {
 			$this->connectDB(DatabaseMySQL::$MODE_RDRW);
-			$this->db->QueryPrintf("
-					DELETE FROM t_notification_type
-					WHERE notification_type_id = %i
-					",
-					$this->id);
+			$this->db->QueryPrintf('SELECT notification_id FROM t_notification WHERE notification_type_id = %i', $this->id);
+			
+			while (list($notif_id) = $this->db->FetchArray()) {
+				$notif = new Notification($notif_id);
+				$notif->delete();  // this will delete appropriate entries from t_notification and t_workflow_notification
+			}
+			
+			$this->db->QueryPrintf("DELETE FROM t_notification_type WHERE notification_type_id = %i", $this->id);
 			return true;
 		}else{
 			return false;

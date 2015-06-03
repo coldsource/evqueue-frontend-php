@@ -26,6 +26,9 @@ select {
 input, select {
   border: 1px solid darkgray; }
 
+input[type=image] {
+  border: none; }
+
 input[type="text"], input[type="password"] {
   border: 1px solid darkgray;
   margin: 1px;

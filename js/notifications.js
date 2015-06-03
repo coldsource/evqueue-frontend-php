@@ -2,7 +2,7 @@
 
 function createNotif () {
 	removeActionButtons();
-	$('#notifications').find('tr:last').html($('#editNotifSample').html());
+	$('#notificationsTable').find('tr:last').html($('#editNotifSample').html());
 	$('tr.createNotif select[name=type_id]').change();
 }
 
@@ -12,7 +12,7 @@ $(document).delegate('select[name=type_id]', 'change', function () {
 
 function editNotif (button) {
 	var tr = button.parents('tr:first');
-	$('#notifications tr:not(.header)').not(tr).hide('fast');
+	$('#notificationsTable tr:not(.header)').not(tr).hide('fast');
 	
 	removeActionButtons();
 	
@@ -20,7 +20,7 @@ function editNotif (button) {
 	var type_id = tr.find('td[data-param=type_id]').data('value');
 	var name = tr.find('td[data-param=name]').data('value');
 	
-	$('#notifications').find('tr:last').replaceWith($('#editNotifSample').show());
+	$('#notificationsTable').find('tr:last').replaceWith($('#editNotifSample').show());
 	
 	$('#editNotifSample input[name=id]').val(id).before('<b>Edit notification '+id+'</b>');
 	$('#editNotifSample select[name=type_id]').prop('disabled',true).find('option[value='+type_id+']').attr('selected','selected');
@@ -56,7 +56,7 @@ function saveNotif (button) {
 
 
 $(document).ready( function () {
-	$('#notifications tr:not(#editNotifSample)').each( function () {
+	$('#notificationsTable tr:not(#editNotifSample)').each( function () {
 		var id = $(this).find('td[data-param=id]').data('value');
 		$(this).find('td[data-param="parameters"]').load('ajax/notification.php?action=view&id='+id);
 	});
@@ -64,6 +64,6 @@ $(document).ready( function () {
 
 
 function removeActionButtons () {
-	$('#notifications tr')    .not('#editNotifSample')    .find('.tdActions img').remove();
+	$('#notificationsTable tr')    .not('#editNotifSample')    .find('.tdActions img').remove();
 	$('#notificationTypes tr').not('#editNotifTypeSample').find('.tdActions img').remove();
 }

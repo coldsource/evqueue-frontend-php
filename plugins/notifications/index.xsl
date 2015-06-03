@@ -18,7 +18,7 @@
 				<span class="title">Notifications</span>
 				<img class="action" src="{$RELPATH}images/plus3.png" onclick="createNotif();" />
 			</div>
-			<table id="notifications">
+			<table id="notificationsTable">
 				<tr class="header">
 					<th>ID</th>
 					<th>Type</th>
