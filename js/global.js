@@ -5,10 +5,4 @@ $(document).ready( function() {
 			$('ul.submenu#submenu-'+event.target.id).show();
 		}
 	);
-	
-	$('ul.submenu').mouseleave(function(events) { 
-			$('ul.submenu').hide();
-			$('ul.submenu#submenu-'+menu_selected).show();
-		}
-	);
 });
