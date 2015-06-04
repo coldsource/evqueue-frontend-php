@@ -60,7 +60,11 @@
 					<xsl:for-each select="/page/notifications/notification[type-id=$notification_type_id]">
 						<tr>
 							<td style="width:20px;">
-								<input type="checkbox" name="notification[]" value="{@id}" />
+								<input type="checkbox" name="notification[]" value="{@id}">
+									<xsl:if test="/page/workflow/notifications/notification = @id">
+										<xsl:attribute name="checked">checked</xsl:attribute>
+									</xsl:if>
+								</input>
 							</td>
 							<td>
 								<xsl:value-of select="name" />
