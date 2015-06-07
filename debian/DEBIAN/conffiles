@@ -1,1 +1,5 @@
 /etc/evqueue/apache.conf
+/etc/evqueue/conf/databases.php
+/etc/evqueue/conf/logger.php
+/etc/evqueue/conf/queueing.php
+/etc/evqueue/conf/sites_base.php
