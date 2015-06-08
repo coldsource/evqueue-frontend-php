@@ -89,6 +89,7 @@
 							<li><a href="{$RELPATH}list-schedules.php">Retry Schedules</a></li>
 							<li><a href="{$RELPATH}list-queues.php">Queues</a></li>
 							<li><a href="{$RELPATH}list-users.php">Users</a></li>
+							<li><a href="{$RELPATH}system_configuration.php">Running configuration</a></li>
 						</ul>
 						<ul class="submenu" id="submenu-notifications">
 							<xsl:if test="$topmenu!='notifications'"><xsl:attribute name="style">display:none;</xsl:attribute></xsl:if>

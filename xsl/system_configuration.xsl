@@ -3,6 +3,8 @@
 	<xsl:import href="templates/main-template.xsl" />
 	<xsl:import href="templates/workflow.xsl" />
 	
+	<xsl:variable name="topmenu" select="'settings'" />
+	
 	<xsl:variable name="javascript">
 	</xsl:variable>
 	
@@ -11,7 +13,7 @@
 			<div class="boxTitle statistics">
 				<span class="title">Configuration</span>
 			</div>
-			<table class="statistics">
+			<table class="statistics" style="width:100%;">
 				<xsl:for-each select="/page/global/configuration/entry">
 					<tr class="evenOdd">
 						<td class="txtcenter">
