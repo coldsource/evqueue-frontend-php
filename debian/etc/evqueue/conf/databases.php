@@ -17,13 +17,4 @@
   * 
   * Authors: Nicolas Jean, Christophe Marti 
   */
-
-global $DATABASES_CONFIG;
-$DATABASES_CONFIG = array();
-
-$DATABASES_CONFIG['queueing'] = array(
-		DatabaseMySQL::$MODE_RDONLY=>'mysql://evqueue:evqueue@127.0.0.1/evqueue',
-		DatabaseMySQL::$MODE_RDRW=>'mysql://evqueue:evqueue@127.0.0.1/evqueue',
-		DatabaseMySQL::$MODE_SUPERUSER=>false
-);
 ?>

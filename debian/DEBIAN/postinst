@@ -15,22 +15,6 @@ if [ "$1" = "configure" ]; then
 		/etc/init.d/apache2 restart
 	fi
 	
-	if [ ! -f /etc/evqueue/conf/databases.php ]; then
-		touch /etc/evqueue/conf/databases.php
-	fi
-	
-	if [ ! -f /etc/evqueue/conf/logger.php ]; then
-		touch /etc/evqueue/conf/logger.php
-	fi
-	
-	if [ ! -f /etc/evqueue/conf/queueing.php ]; then
-		touch /etc/evqueue/conf/queueing.php
-	fi
-	
-	if [ ! -f /etc/evqueue/conf/sites_base.php ]; then
-		touch /etc/evqueue/conf/sites_base.php
-	fi
-	
 	chown -R www-data:www-data /etc/evqueue/conf
 	chown -R www-data:www-data /usr/share/evqueue
 
