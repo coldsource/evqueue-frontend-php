@@ -39,7 +39,6 @@ require_once 'bo/BO_notificationType.php';
 
 
 if (isset($_POST) && !empty($_POST)){
-	
 	if (!isset($_POST['form_id']) || $_POST['form_id']=='')
 		die("<error>Technical error</error>");
 	

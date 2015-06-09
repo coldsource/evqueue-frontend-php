@@ -18,20 +18,18 @@
   * Authors: Nicolas Jean, Christophe Marti 
   */
 
-if(is_file('install.php'))
-{
-	echo "<div>install.php file is present, you cannot login</div>";
-	echo "<div>If you have already done the configuration, remove install.php</div>";
-	echo "<div>If you have not yet configured the web board go to <a href='install.php'>the installation page</a></div>";
-	die();
-}
-  
+
 require_once 'inc/logger.php';
 require_once 'lib/XSLEngine.php';
 require_once 'lib/DatabaseMySQL.php';
 require_once 'bo/BO_user.php';
 
-
+if(!isset($DATABASES_CONFIG['queueing']))
+{
+	// Not yet configured
+	header('Location: install.php');
+	die();
+}
 
 if (isset($_GET['action']))
 	switch ($_GET['action']) {
@@ -46,7 +44,6 @@ if (isset($_GET['action']))
 
 
 $xsl = new XSLEngine();
-
 
 if (isset($_POST['login']) && isset($_POST['password'])) {
 	$db = new DatabaseMySQL('queueing');

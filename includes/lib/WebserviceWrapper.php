@@ -18,13 +18,11 @@
   * Authors: Nicolas Jean, Christophe Marti 
   */
 
-require_once 'lib/Logger.php';
 require_once 'conf/sites_base.php';
-
+require_once 'lib/Logger.php';
 
 class WebserviceWrapper
 {
-	protected $ws_base_url;
 	protected $ws_name;
 	protected $ws_parameters;
 	protected $post;
@@ -35,17 +33,6 @@ class WebserviceWrapper
 	
 	public function __construct($node_name,$ws_name,$ws_parameters = array(),$post=false)
 	{
-		$project = 'queueing';
-		
-		switch ($project) {
-			case 'queueing':
-				$this->ws_base_url = QUEUEING_WS_URL;
-				break;
-			
-			default:
-				Logger::GetInstance()->Log(LOG_ERR,'WebserviceWrapper.php',"Unknown project $project");
-		}
-		
 		$this->node_name = $node_name;
 		$this->ws_name = $ws_name;
 		$this->ws_parameters = $ws_parameters;
@@ -66,7 +53,8 @@ class WebserviceWrapper
 		
 		$this->ws_parameters['user_login'] = $_SESSION['user_login'];
 		
-		$url = "{$this->ws_base_url}ws/{$this->ws_name}/{$this->node_name}";
+		$url = SITE_BASE.'ajax/send_datas.php';
+		
 		$cr = curl_init();
 		
 		if ($this->log_level !== null)

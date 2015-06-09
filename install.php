@@ -24,6 +24,13 @@ session_destroy();
 require_once 'inc/logger.php';
 require_once 'lib/XSLEngine.php';
 require_once 'lib/workflow_instance.php';
+require_once 'lib/DatabaseMySQL.php';
+
+if(isset($DATABASES_CONFIG['queueing']))
+{
+	// Already configured
+	die("evQueue has already been configured, if you want to re-configure it, please remove the content of the configuration files (but keep files in place)");
+}
 
 $xsl = new XSLEngine();
 
@@ -64,11 +71,10 @@ if(isset($_POST['db_host']) && isset($_POST['db_user']) && isset($_POST['db_pass
 		
 		fclose($f);
 		
-		$url_parts = parse_url(isset($_SERVER['SCRIPT_URI'])?$_SERVER['SCRIPT_URI']:"{$_SERVER['REQUEST_SCHEME']}://{$_SERVER['HTTP_HOST']}{$_SERVER['REQUEST_URI']}");
-		$path = dirname($url_parts['path']);
-		if($path!='/')
-			$path .= '/';
-		$site_base = "{$url_parts['scheme']}://{$url_parts['host']}$path";
+		$site_base = dirname($_SERVER['REQUEST_URI']);
+		if($site_base!="/")
+			$site_base .= '/';
+		$site_base = "http://{$_SERVER['HTTP_HOST']}$site_base";
 		
 		$f = @fopen("$path_to_conf/sites_base.php",'w',true);
 		if($f===false)

@@ -46,12 +46,12 @@
 				
 				<div>
 					<label class="formLabel" for="engine_host">Hostname :</label>
-					<input type="text" name="engine_host" value="{/page/post/@engine_host}" />
+					<input type="text" name="engine_host" value="{/page/post/@engine_host}" placeholder="localhost" />
 				</div>
 				
 				<div>
 					<label class="formLabel" for="engine_port">Port :</label>
-					<input type="text" name="engine_port" value="{/page/post/@engine_port}" />
+					<input type="text" name="engine_port" value="{/page/post/@engine_port}" placeholder="5000" />
 				</div>
 				
 				<br />
