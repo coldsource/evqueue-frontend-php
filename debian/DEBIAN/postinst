@@ -9,12 +9,26 @@ if [ "$1" = "configure" ]; then
 		/usr/sbin/a2enconf evqueue
 	fi
 	
-	a2enmod rewrite
-	
 	if [ -x /usr/sbin/invoke-rc.d ]; then
 		invoke-rc.d apache2 restart
 	else
 		/etc/init.d/apache2 restart
+	fi
+	
+	if [ ! -f /etc/evqueue/conf/databases.php ]; then
+		touch /etc/evqueue/conf/databases.php
+	fi
+	
+	if [ ! -f /etc/evqueue/conf/logger.php ]; then
+		touch /etc/evqueue/conf/logger.php
+	fi
+	
+	if [ ! -f /etc/evqueue/conf/queueing.php ]; then
+		touch /etc/evqueue/conf/queueing.php
+	fi
+	
+	if [ ! -f /etc/evqueue/conf/sites_base.php ]; then
+		touch /etc/evqueue/conf/sites_base.php
 	fi
 	
 	chown -R www-data:www-data /etc/evqueue/conf
