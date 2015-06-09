@@ -11,6 +11,9 @@
 		<div class="contentList">
 			<div class="boxTitle">
 				<span class="title">Users list</span>
+				<a href="manage-user.php">
+					<img class="action" src="{$RELPATH}images/plus3.png" onclick="createNotif();" />
+				</a>
 			</div>
 			<table>
 				<tr>
@@ -31,8 +34,6 @@
 							<a href="manage-user.php?user_login={@login}">
 								<img src="images/edit.gif"  />
 							</a>
-							<xsl:text>&#160;</xsl:text>
-							<!--<img src="images/delete.gif" onclick="deleteTask({@id})" class="pointer" />-->
 						</td>
 					</tr>
 				</xsl:for-each>

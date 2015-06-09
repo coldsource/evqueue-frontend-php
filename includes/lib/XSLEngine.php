@@ -141,7 +141,12 @@ class XSLEngine
 	public function GetParameter($name)
 	{
 		return isset($this->parameters[$name])?$this->parameters[$name]:false;
-	}	
+	}
+	
+	public function AddErrors ($errors) {
+		foreach ($errors as $id => $msg)
+			$this->AddError($id,$msg);
+	}
 	
 	public function AddError($id,$message='',$param=null)
 	{
