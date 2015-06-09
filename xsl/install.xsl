@@ -3,6 +3,8 @@
 	<xsl:import href="templates/workflow.xsl" />
 	<xsl:import href="templates/main-template.xsl" />
 	
+	<xsl:variable name="topmenu" select="''" />
+	
 	<xsl:variable name="title" select="'Board'" />
 	<xsl:param name="ERROR" />
 	
