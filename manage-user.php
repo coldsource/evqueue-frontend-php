@@ -30,64 +30,35 @@ $xsl = new XSLEngine();
 
 
 if (isset($_POST['action'])) {
-	switch ($_POST['action']) {
-		case 'chpwd':
-			
-			if (strlen($_POST['password']) < 8) {
-				$xsl->AddError('pwd-too-short');
-			
-			} else if ($_POST['password'] != $_POST['password2']) {
-				$xsl->AddError('pwd-confirm-wrong');
-			
-			} else {
-				$db = new DatabaseMySQL('queueing', DatabaseMySQL::$MODE_RDRW);
-				$db->QueryPrintf('
-					SELECT user_login, user_profile
-					FROM t_user
-					WHERE user_login = %s
-						AND user_password = %s
-				',
-								$_SESSION['user_login'],
-								sha1($_POST['current_password'])
-				);
+	
+	if (isset($_POST['rights'])) {
+		$rights = array();
+		foreach ($_POST['rights'] as $right) {
+			preg_match('/^(edit|read|exec|kill|del)(\d+)$/', $right, $m);
+			list($m, $action, $wfid) = $m;
 
-				if ($db->NumRows() == 1) {
-					$db->QueryPrintf("
-						UPDATE t_user
-						SET user_password = %s
-						WHERE user_login = %s
-					",
-									sha1($_POST['password']),
-									$_SESSION['user_login']
-					);
-
-				} else {
-					$xsl->AddError('chpwd-wrong-creds');
-				}
-			}
-			
-			break;
-		
-		case 'editRights':
-			$rights = array();
-			
-			foreach ($_POST['rights'] as $right) {
-				preg_match('/^(edit|read|exec|kill|del)(\d+)$/', $right, $m);
-				list($m, $action, $wfid) = $m;
-				
-				$rights[$wfid][$action] = 1;
-			}
-			
-			$user = new User($_POST['login']);
-			$user->SetRights($rights);
-			$user->CommitObject();
-			
-			break;
+			$rights[$wfid][$action] = 1;
+		}
+		$_POST['rights'] = $rights;
+	}
+	
+	// Force posted login to session login while editing one's password
+	if ($_POST['action'] == 'chpwd')
+		$_POST['login'] = $_SESSION['user_login'];
+	
+	$user = new User($_POST['action']=='createUser' ? false : $_POST['login']);
+	$errors = $user->check_values($_POST,true);
+	
+	if ($errors === true) {
+		header('Location: list-users.php');
+		die();
+	} else {
+		$xsl->AddErrors($errors);
 	}
 }
 
 
-$user = new User($_GET['user_login']);
+$user = new User(isset($_GET['user_login']) ? $_GET['user_login'] : false);
 $xsl->AddFragment($user->getXML());
 
 $xsl->AddFragment(Workflow::getAllXml());
