@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
 	<xsl:import href="templates/main-template.xsl" />
-    <xsl:import href="templates/workflow.xsl" />
-		<xsl:import href="templates/edit_workflow.xsl" />
+	<xsl:import href="templates/workflow.xsl" />
+	<xsl:import href="templates/edit_workflow.xsl" />
+		
+	<xsl:variable name="topmenu" select="'settings'" />
 
-    <xsl:variable name="javascript">
+	<xsl:variable name="javascript">
 		<src>js/plan-wf.js</src>
 	</xsl:variable>
 
