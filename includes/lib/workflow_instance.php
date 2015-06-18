@@ -201,33 +201,46 @@ class WorkflowInstance {
 	 * Reloads the lists of tasks, workflows and workflow schedules.
 	 */
 	public static function ReloadEvqueue ($host=QUEUEING_HOST,$port=QUEUEING_PORT) {
-		$s = @fsockopen($host,$port);
+		$wfi = new WorkflowInstance($host,$port);
+		return $wfi->ask_evqueue("<control action='reload' />\n", "count(/return[@status='OK']) = 1");
+	}
+	
+	/*
+	 * Asks all tasks having a retry schedule, and that failed, to try again immediately.
+	 */
+	public static function RetryAll ($host=QUEUEING_HOST,$port=QUEUEING_PORT) {
+		$wfi = new WorkflowInstance($host,$port);
+		return $wfi->ask_evqueue("<control action='retry' />\n", "count(/return[@status='OK']) = 1");
+	}
+	
+	
+	private function ask_evqueue ($query, $xpath=null) {
+		$s = @fsockopen($this->evqueue_ip,$this->evqueue_port);
 		if ($s === false)
 			return false;
 		
-		fwrite($s,"<control action='reload' />\n");
+		fwrite($s,$query);
 		$output = stream_get_contents($s);
 		fclose($s);
 		
 		if(!$s)
 			return false;
 		
+		if (!$xpath)
+			return $output;
+		
+		// dig into the XML and return whatever value matching the XPath expression given
 		try {
-			$sxe = new SimpleXMLElement($output);
-			if (count($sxe->xpath("/return[@status='OK']")) != 1)
+			$dom = new DOMDocument();
+			if (!@$dom->loadXML($output))
 				return false;
+			
+			$xp = new DOMXPath($dom);
+			return $xp->evaluate($xpath);
+			
 		} catch (Exception $e) {
 			return false;
 		}
-		
-		return true;
-	}
-	
-	/*
-	 * Asks all tasks having a retry schedule, and that failed, to try again immediately.
-	 */
-	public static function RetryAll () {
-		system('killall -USR1 evqueue');
 	}
 	
 	
@@ -273,42 +286,45 @@ class WorkflowInstance {
 	}
 	
 	/*
-	 * Asks evqueue to store a file on its machine.
+	 * Asks evqueue to store a notification binary on its machine.
 	 */
 	public static function StoreFile ($filename,$data,$host=QUEUEING_HOST,$port=QUEUEING_PORT) {
-		return self::put_or_remove_file('put',$filename,$data,$host,$port);
+		$wfi = new WorkflowInstance($host,$port);
+		return $wfi->put_or_remove_file('put',$filename,$data,$host,$port);
 	}
 	
 	/*
-	 * Asks evqueue to delete a file, previously stored via SendFile, on its machine.
+	 * Asks evqueue to delete a notification binary, previously stored via StoreFile, on its machine.
 	 */
 	public static function DeleteFile ($filename,$host=QUEUEING_HOST,$port=QUEUEING_PORT) {
-		return self::put_or_remove_file('remove',$filename,'',$host,$port);
+		$wfi = new WorkflowInstance($host,$port);
+		return $wfi->put_or_remove_file('remove',$filename,'',$host,$port);
 	}
 	
-	private static function put_or_remove_file ($action,$filename,$data,$host=QUEUEING_HOST,$port=QUEUEING_PORT) {
-		$s = @fsockopen($host,$port);
-		if ($s === false)
-			return false;
-		
+	/*
+	 * Asks evqueue to store a notification configuration file on its machine.
+	 */
+	public static function StoreConfFile ($filename,$data,$host=QUEUEING_HOST,$port=QUEUEING_PORT) {
+		$wfi = new WorkflowInstance($host,$port);
+		return $wfi->put_or_remove_file('putconf',$filename,$data,$host,$port);
+	}
+	
+	/*
+	 * Asks evqueue to delete a file configuration, previously stored via StoreConfFile, on its machine.
+	 */
+	public static function DeleteConfFile ($filename,$host=QUEUEING_HOST,$port=QUEUEING_PORT) {
+		$wfi = new WorkflowInstance($host,$port);
+		return $wfi->put_or_remove_file('removeconf',$filename,'',$host,$port);
+	}
+	
+	private function put_or_remove_file ($action,$filename,$data) {
 		$filename = htmlspecialchars($filename);
 		$data = base64_encode($data);
-		fwrite($s,"<notification action='$action' filename='$filename' data='$data' />\n");
-		$output = stream_get_contents($s);
-		fclose($s);
 		
-		if(!$s)
-			return false;
-		
-		try {
-			$sxe = new SimpleXMLElement($output);
-			if (count($sxe->xpath("/return[@status='OK']")) != 1)
-				return false;
-		} catch (Exception $e) {
-			return false;
-		}
-		
-		return true;
+		return $this->ask_evqueue(
+						"<notification action='$action' filename='$filename' data='$data' />\n",
+						"count(/return[@status='OK']) = 1"
+						);
 	}
 	
 }
