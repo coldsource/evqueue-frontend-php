@@ -327,6 +327,21 @@ class WorkflowInstance {
 						);
 	}
 	
+	/*
+	 * Asks evqueue to return the content of a file configuration, previously stored via StoreConfFile.
+	 */
+	public static function GetConfFile ($filename,$host=QUEUEING_HOST,$port=QUEUEING_PORT) {
+		$filename = htmlspecialchars($filename);
+		
+		$wfi = new WorkflowInstance($host,$port);
+		$data = $wfi->ask_evqueue(
+						"<notification action='getconf' filename='$filename' />\n",
+						"string(/return[@status='OK']/@data)"
+						);
+		
+		return $data===false ? false : base64_decode($data);
+	}
+	
 }
 
 ?>
