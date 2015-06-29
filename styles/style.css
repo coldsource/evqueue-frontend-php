@@ -541,6 +541,9 @@ img.viewmore {
 .tdActions {
   text-align: center; }
 
+.tdActions > img, .tdActions > a {
+  margin-right: 3px; }
+
 img.showmemore {
   cursor: pointer;
   position: absolute;

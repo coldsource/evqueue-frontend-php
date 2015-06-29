@@ -75,7 +75,7 @@
 						<td>
 							<xsl:value-of select="@comment" />
 						</td>
-						<td>
+						<td class="tdActions" style="min-width: 80px;">
 							<xsl:choose>
 								<xsl:when test="@has-bound-task='no'">
 									<a href="manage-workflow.php?workflow_id={@id}" title="Text edit">
