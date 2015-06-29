@@ -29,26 +29,53 @@
 				
 				<!-- Sample -->
 				<tr id="editNotifSample" style="display: none;">
-					<td colspan="4">
-						<input type="hidden" name="id" autocomplete="off" />
-						<div>
-							<label class="formLabel">Type</label>
-							<select name="type_id">
-								<xsl:for-each select="/page/notification-types/notification-type">
-									<option value="{@id}"><xsl:value-of select="name" /></option>
-								</xsl:for-each>
-							</select>
-						</div>
-						<div>
-							<label class="formLabel">Name</label>
-							<input name="name" autocomplete="off" />
-						</div>
-						<label class="formLabel">Parameters</label>
-						<div class="parameters">
-							...
-						</div>
+					<td colspan="4" style="padding:0;">
+						<table class="edit_notif">
+							<tr>
+								<td colspan="2"> <input type="hidden" name="id" autocomplete="off" /> </td>
+							</tr>
+							<tr>
+								<td class="formLabel">
+										<label class="formLabel">Type </label>
+								</td>
+								
+								<td>
+										<select name="type_id">
+											<xsl:for-each select="/page/notification-types/notification-type">
+												<option value="{@id}"><xsl:value-of select="name" /></option>
+											</xsl:for-each>
+										</select>
+								</td>
+							</tr>
+							<tr>
+								<td>
+								
+										<label class="formLabel">Name</label>
+								</td>
+								<td>
+										<input name="name" autocomplete="off" />
+								</td>
+							</tr>
+							
+							<tr>
+								<td colspan="2">
+									<label class="formLabel" style="font-size: 13px;"><b>Parameters :</b></label>
+								</td>
+							</tr>
+								
+							<tr>
+								<td colspan="2" style="border-spacing: 0; padding:0;" >
+									<div class="parameters" style="margin:0; padding:0;">
+										...
+									</div>
+								</td>
+							</tr>
+							
+						</table>
+						
 					</td>
-					<td class="tdActions">
+					
+					<td class="tdActions" style="padding:0;">
 						<img class="action" src="{$RELPATH}images/ok.png" onclick="saveNotif($(this));" title="Save" />
 						<img class="action" src="{$RELPATH}images/cancel.png" onclick="window.location.reload();" title="Cancel" />
 					</td>

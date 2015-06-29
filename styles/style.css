@@ -947,6 +947,16 @@ div.install_content div.error {
 div.install_content div.submit {
   text-align: center; }
 
+table.edit_notif {
+  border-collapse: collapse;
+  border-spacing: 0; }
+
+table.edit_notif .formLabel {
+  width: 130px; }
+
+table.edit_notif input {
+  width: 393px; }
+
 /* BEGIN LIGHT-TREE DISPLAY */
 div.lightTreeJob {
   display: inline-block;

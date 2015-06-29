@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin type="notification">
+	<name>email</name>
+	<description>Send an email to one or several recipients</description>
+	<binary>email.php</binary>
+</plugin>
