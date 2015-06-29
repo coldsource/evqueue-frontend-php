@@ -23,9 +23,12 @@ require_once 'lib/DatabaseMySQL.php';
 require_once 'lib/workflow_instance.php';
 require_once 'utils/string_utils.php';
 require_once 'bo/BO_user.php';
+require_once 'bo/BO_task.php';
 
 
 class Workflow{
+	
+	const WORKFLOW_IMPORT_EXPORT_VERSION = 1.4;
 	
 	private $db;
 	
@@ -42,6 +45,7 @@ class Workflow{
 	function __construct($id = false){
 		
 		$this->connectDB();
+		$this->notifications = array();
 		
 		if ($id === false or $id == ""){
 			$this->id = false;
@@ -62,7 +66,6 @@ class Workflow{
 		$this->workflow_bound = $row['workflow_bound'];
 		
 		$this->db->QueryPrintf("SELECT notification_id FROM t_workflow_notification WHERE workflow_id = %i", $this->id);
-		$this->notifications = array();
 		while (list($notif_id) = $this->db->FetchArray())
 			$this->notifications[] = $notif_id;
 	}
@@ -169,6 +172,7 @@ class Workflow{
 			$this->db->QueryPrintf('INSERT INTO t_workflow_notification (workflow_id, notification_id) VALUES (%i,%i)', $this->id, (int)$notif);
 		
 		WorkflowInstance::ReloadEvqueue();
+		return true;
 	}
 	
 	
@@ -215,7 +219,7 @@ class Workflow{
 		if (!isset($vals["workflow_name"]) || $vals["workflow_name"] == ""){
 			$errors["workflow_name"]="Please fill the workflow name field";
 		}else if($this->existWorkflowName($vals["workflow_name"],$workflowid)){
-			$errors["workflow_name"]="A workflow has already the same name. Please change your workflow name.";
+			$errors["workflow_name"]="A workflow has already the same name '{$vals["workflow_name"]}'. Please change your workflow name.";
 		}else if (!preg_match('/^[0-9a-zA-Z-_]+$/',$vals["workflow_name"])){
 			$errors["workflow_name"]="The workflow name can only have letters, numbers and dashes. Please change your workflow name.";
 		}else{
@@ -281,7 +285,7 @@ class Workflow{
 			$this->set_comment($vals["workflow_comment"]);
 		}
 		
-		if ($setvals === true){
+		if (isset($vals["workflow_notifications"]) && $setvals === true){
 			$this->set_notifications(explode(',', $vals["workflow_notifications"]));
 		}
 		
@@ -316,7 +320,11 @@ class Workflow{
 			return array('invalid-xml' => "Given XML is not valid XML: <br/><ul>".join('',array_map(function($e){return '<li>Line '.$e->line.': '.htmlspecialchars($e->message).'</li>';}, $output))."</ul>");
 		}
 		
-		if (!$dom->schemaValidate('../xsd/workflow.xsd')) {
+		$fh = fopen('xsd/workflow.xsd','r',true);
+		$xsd = stream_get_contents($fh);
+		fclose($fh);
+		
+		if (!$dom->schemaValidateSource($xsd)) {
 			$output = libxml_get_errors();
 			return array('xsd-check' => "Given XML does not validate against workflow.xsd: <br/><ul>".join('',array_map(function($e){return '<li>Line '.$e->line.': '.htmlspecialchars($e->message).'</li>';}, $output))."</ul>");
 		}
@@ -425,6 +433,173 @@ class Workflow{
 		
 		return $xml;
 	}
+	
+	
+	public function Export ($filename) {
+		$zip = new ZipArchive();
+		$zip->open($filename, ZipArchive::CREATE);  // TODO: test if it worked
+		
+		// ADD WORKFLOW XML DEFINITION, AS-IS
+		$zip->addFromString('workflow.xml', $this->xml);
+		
+		$manifest = new DOMDocument();
+		$manifest->encoding = 'UTF-8';
+		
+		// CREATE A MANIFEST FILE CONTAINING BASIC WORKFLOW INFORMATION...
+		$manifest->appendChild($manifest->createElement('workflow'));
+		$manifest->documentElement->setAttribute('name', $this->name);
+		$manifest->documentElement->setAttribute('export-version', self::WORKFLOW_IMPORT_EXPORT_VERSION);
+		
+		$manifest->documentElement->appendChild($manifest->createElement('comment'))->appendChild($manifest->createTextNode($this->comment));
+		$manifest->documentElement->appendChild($manifest->createElement('group'))->appendChild($manifest->createTextNode($this->group));
+		
+		$wf = new DOMDocument();
+		$wf->loadXML($this->xml);
+		$wfx = new DOMXPath($wf);
+		
+		// ... AND THE COMPREHENSIVE LIST OF TASKS
+		$tasks = $manifest->createElement('tasks');
+		$manifest->documentElement->appendChild($tasks);
+		
+		foreach ($wfx->query('//task') as $t) {
+			$name = $t->getAttribute('name');
+			$id = Task::existsTaskName($name);
+			if ($id === false)
+				return array("There is no task named '$name'");
+			
+			$bo_task = new Task($id);
+			$binary = $bo_task->get_binary_path();
+			if (strpos($binary,'/') === 0) {
+				// "system task" (ls, ps, wc, cat...), nothing to export, the task should be present on the system for the workflow to run
+			} else {
+				// specific, user-defined task: we package it with the workflow so it can be run anywhere else
+				$bin = WorkflowInstance::GetTaskFile($binary);
+				if ($bin === false)
+					return array("I can't get the binary $binary. EvQueue not running?");
+				$zip->addFromString($binary,$bin);
+			}
+			
+			$taskdom = new DOMDocument();
+			$taskdom->loadXML($bo_task->getGeneratedXml());
+			
+			$tasks->appendChild($manifest->importNode($taskdom->documentElement,true));
+		}
+		
+		$zip->addFromString('manifest.xml', $manifest->saveXML());
+		
+		$zip->close();
+		return true;
+	}
+	
+	
+	public static function Import ($zip_filename) {
+		$errors = array();
+		
+		$zip = new ZipArchive();
+		$zip->open($zip_filename);
+		
+		$manifest = new DOMDocument();
+		if (!@$manifest->loadXML($zip->getFromName('manifest.xml')))
+			$errors[] = array('File manifest.xml was not found or is not valid XML');
+		
+		$manifest = new DOMXPath($manifest);
+		
+		$export_version = $manifest->evaluate('number(/workflow/@export-version)');
+		if (!is_numeric($export_version))
+			$errors[] = array("Can't find the version with which the workflow was exported");
+		
+		if (empty($errors)) {
+			switch ($export_version) {
+				case 1.4:
+					$errors = self::import_v1_4($zip,$manifest);
+					break;
+
+				default:
+					$errors = array("Can't import workflow, export version $export_version is unknown (current version is ".self::WORKFLOW_IMPORT_EXPORT_VERSION.")");
+					break;
+			}
+		}
+		
+		$zip->close();
+		return ($errors === true || empty($errors)) ? true : $errors;
+	}
+	
+	private static function import_v1_4 (ZipArchive $zip,$manifest) {
+		
+		// CHECK WORKFLOW
+		$wfxml = new DomDocument();
+		if (!@$wfxml->loadXML($zip->getFromName('workflow.xml')))
+			return array('File workflow.xml was not found or is not valid XML');
+		
+		$workflow_params = array(
+				'workflow_id' => false,
+				'workflow_name' => $manifest->evaluate('string(/workflow/@name)'),
+				'workflow_xml' => $zip->getFromName('workflow.xml'),
+				'workflow_group' => $manifest->evaluate('string(/workflow/group)'),
+				'workflow_comment' => $manifest->evaluate('string(/workflow/comment)'),
+		);
+		
+		$workflow = new Workflow();
+		$ret = $workflow->check_values($workflow_params);
+		if ($ret !== true)
+			return $ret;
+		
+		// CHECK TASKS
+		$tasks = array();
+		foreach ($manifest->query('/workflow/tasks/task') as $task) {
+			$binary = $manifest->evaluate('string(task_binary)',$task);
+			
+			$task_params = array(
+					'task_name' => $manifest->evaluate('string(task_name)',$task),
+					'task_user' => $manifest->evaluate('string(task_user)',$task),
+					'task_host' => $manifest->evaluate('string(task_host)',$task),
+					'task_binary_path' => $binary,
+					'task_parameters_mode' => $manifest->evaluate('string(task_parameters_mode)',$task),
+					'task_output_method' => $manifest->evaluate('string(task_output_method)',$task),
+					'task_wd' => $manifest->evaluate('string(task_wd)',$task),
+					'task_xsd' => $manifest->evaluate('string(task_xsd)',$task),
+					'task_group' => $manifest->evaluate('string(task_group)',$task),
+			);
+			
+			if (substr($binary,0,1) != '/') {
+				$task_params['binary_content'] = $zip->getFromName($binary);
+				if ($task_params['binary_content'] === false)
+					return array('binary-not-found',"The file '$binary' was not found in the workflow archive, not installing");
+			}
+			
+			if (Task::TaskExists($task_params))
+				continue;  // we don't have to create it!
+			
+			$task = new Task();
+			$ret = $task->check_values($task_params);
+			if ($ret !== true)
+				return $ret;
+			
+			$tasks[] = array('bo'=>$task,'params'=>$task_params);
+		}
+		
+		// ACTUALLY CREATE (not existing) TASKS AND WORKFLOW
+		$tasks_to_rollback = array();
+		foreach ($tasks as $task) {
+			$task['bo']->check_values($task['params'], true);
+			$ret = $task['bo']->CommitObject();
+			if ($ret !== true) {
+				self::rollback_v1_4($tasks_to_rollback);
+				return $ret;
+			}
+			$tasks_to_rollback[] = $task;
+		}
+		
+		$workflow->check_values($workflow_params, true);
+		$workflow->CommitObject();
+		return true;
+	}
+	
+	private static function rollback_v1_4 ($tasks_to_rollback) {
+		foreach ($tasks_to_rollback as $task)
+			$task['bo']->delete();
+	}
+	
 }
 
 ?>

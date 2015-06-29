@@ -490,6 +490,16 @@ div.infoBloc input[type=text] {
 	min-width: 400px;
 }
 
+#errors {
+	color: red;
+	text-align: center;
+}
+
+#notices {
+	color: green;
+	text-align: center;
+}
+
 #formQueue{
     text-align: center;
 }

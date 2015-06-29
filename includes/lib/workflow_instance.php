@@ -290,7 +290,7 @@ class WorkflowInstance {
 	 */
 	public static function StoreFile ($filename,$data,$host=QUEUEING_HOST,$port=QUEUEING_PORT) {
 		$wfi = new WorkflowInstance($host,$port);
-		return $wfi->put_or_remove_file('put',$filename,$data,$host,$port);
+		return $wfi->put_or_remove_file('notification','put',$filename,$data);
 	}
 	
 	/*
@@ -298,7 +298,7 @@ class WorkflowInstance {
 	 */
 	public static function DeleteFile ($filename,$host=QUEUEING_HOST,$port=QUEUEING_PORT) {
 		$wfi = new WorkflowInstance($host,$port);
-		return $wfi->put_or_remove_file('remove',$filename,'',$host,$port);
+		return $wfi->put_or_remove_file('notification','remove',$filename);
 	}
 	
 	/*
@@ -306,7 +306,7 @@ class WorkflowInstance {
 	 */
 	public static function StoreConfFile ($filename,$data,$host=QUEUEING_HOST,$port=QUEUEING_PORT) {
 		$wfi = new WorkflowInstance($host,$port);
-		return $wfi->put_or_remove_file('putconf',$filename,$data,$host,$port);
+		return $wfi->put_or_remove_file('notification','putconf',$filename,$data);
 	}
 	
 	/*
@@ -314,16 +314,18 @@ class WorkflowInstance {
 	 */
 	public static function DeleteConfFile ($filename,$host=QUEUEING_HOST,$port=QUEUEING_PORT) {
 		$wfi = new WorkflowInstance($host,$port);
-		return $wfi->put_or_remove_file('removeconf',$filename,'',$host,$port);
+		return $wfi->put_or_remove_file('notification','removeconf',$filename);
 	}
 	
-	private function put_or_remove_file ($action,$filename,$data) {
+	private function put_or_remove_file ($type,$action,$filename,$data='') {
 		$filename = htmlspecialchars($filename);
 		$data = base64_encode($data);
 		
+		$return_xpath = "count(/return[@status='OK']) = 1";
+		
 		return $this->ask_evqueue(
-						"<notification action='$action' filename='$filename' data='$data' />\n",
-						"count(/return[@status='OK']) = 1"
+						"<$type action='$action' filename='$filename' data='$data' />\n",
+						$return_xpath
 						);
 	}
 	
@@ -340,6 +342,37 @@ class WorkflowInstance {
 						);
 		
 		return $data===false ? false : base64_decode($data);
+	}
+	
+	/*
+	 * Asks evqueue to return the content of a task file.
+	 */
+	public static function GetTaskFile ($filename,$host=QUEUEING_HOST,$port=QUEUEING_PORT) {
+		$filename = htmlspecialchars($filename);
+		
+		$wfi = new WorkflowInstance($host,$port);
+		$data = $wfi->ask_evqueue(
+						"<task action='get' filename='$filename' />\n",
+						"string(/return[@status='OK']/@data)"
+						);
+		
+		return $data===false ? false : base64_decode($data);
+	}
+	
+	/*
+	 * Asks evqueue to store given task file.
+	 */
+	public static function PutTaskFile ($filename,$data,$host=QUEUEING_HOST,$port=QUEUEING_PORT) {
+		$wfi = new WorkflowInstance($host,$port);
+		return $wfi->put_or_remove_file('task','put',$filename,$data);
+	}
+	
+	/*
+	 * Asks evqueue to delete a task file.
+	 */
+	public static function DeleteTaskFile ($filename,$host=QUEUEING_HOST,$port=QUEUEING_PORT) {
+		$wfi = new WorkflowInstance($host,$port);
+		return $wfi->put_or_remove_file('task','remove',$filename);
 	}
 	
 }

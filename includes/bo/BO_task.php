@@ -38,6 +38,7 @@ class Task{
 	private $wd;
 	private $group;
 	private $workflow_id = null;  // bounds a task to a particular, simple workflow (e.g. the task needs to be deleted with it)
+	private $binary_content;
 	
 	function __construct($id = false){
 		
@@ -163,11 +164,18 @@ class Task{
 		return $this->workflow_id;
 	}
 	
+	public function set_binary_content ($binary_content) {
+		$this->binary_content = $binary_content;
+	}
+	
 	public function CommitObject()
 	{
 		$this->connectDB(DatabaseMySQL::$MODE_RDRW);
 		
 		if ($this->id === false) {
+			
+			if ($this->binary_content && !WorkflowInstance::PutTaskFile($this->binary_path, $this->binary_content))
+				return array('cant-put-task' => "The binary '$this->binary_path' could not be saved by evqueue (evqueue not running? binary with same name already exists?)");
 			
 			$this->db->QueryPrintf("
 					INSERT INTO t_task (
@@ -206,22 +214,57 @@ class Task{
 		}
 		
 		WorkflowInstance::ReloadEvqueue();
+		return true;
 	}
 	
-	public function existTaskName($name, $id=null){
+	public static function existsTaskName($name, $id=null){
+		$db = new DatabaseMySQL('queueing');
 		
 		if ($id == null){
-			$this->db->QueryPrintf("SELECT * FROM t_task WHERE task_name = %s ;",$name);
+			$db->QueryPrintf("SELECT * FROM t_task WHERE task_name = %s ;",$name);
 		}else{
-			$this->db->QueryPrintf("SELECT * FROM t_task WHERE task_name = %s and task_id != %i  ;",$name,$id);
+			$db->QueryPrintf("SELECT * FROM t_task WHERE task_name = %s and task_id != %i  ;",$name,$id);
 		}
 		
-		if ($this->db->NumRows() > 0){
-			return true;
+		if ($db->NumRows() > 0){
+			$task = $db->FetchAssoc();
+			return $task['task_id'];
 		}else{
 			return false;
 		}
-	}	
+	}
+	
+	public static function TaskExists($params) {
+		$db = new DatabaseMySQL('queueing');
+		
+		$db->QueryPrintf('SELECT * FROM t_task WHERE task_name = %s', $params['task_name']);
+		if ($db->NumRows() == 0)
+			return false;
+		
+		$task = $db->FetchAssoc();
+		
+		$db_params_ok =
+			$task['task_binary']          == $params['task_binary_path'] &&
+			$task['task_wd']              == $params['task_wd'] &&
+			$task['task_host']            == $params['task_host'] &&
+			$task['task_user']            == $params['task_user'] &&
+			$task['task_parameters_mode'] == $params['task_parameters_mode'] &&
+			$task['task_output_method']   == $params['task_output_method'];
+//			$task['task_xsd']             == $params['task_xsd'] &&   // (2015-06-24) not really used yet, let's not block on this
+//			$task['task_group']           == $params['task_group'];   // the group of a task is just a plain text comment, it does not matter while comparing two tasks
+		
+		if (!$db_params_ok)
+			return false;
+		
+		// also check the binary stored by evQueue
+		if (isset($params['binary_content'])) {
+			$evqueue_bin = WorkflowInstance::GetTaskFile($task['task_binary']);
+			if ($evqueue_bin != $params['binary_content'])
+				return false;
+		}
+		
+		return true;
+	}
 	
 	public function check_values($vals, $setvals=false, $confirmed=false){
 		$errors = array();
@@ -239,8 +282,8 @@ class Task{
 		if (!isset($vals["task_name"]) || $vals["task_name"] == ""){
 			$errors["task_name"]="Please fill the task name field";
 			
-		}else if($this->existTaskName($vals["task_name"],$taskid)){
-			$errors["task_name"]="A task has already the same name. Please change your task's name.";
+		}else if(self::existsTaskName($vals["task_name"],$taskid)){
+			$errors["task_name"]="Another task already has the same name '{$vals["task_name"]}'. Please change your task's name.";
 			
 		}else if (!preg_match('/^[0-9a-zA-Z-_]+$/',$vals["task_name"])){
 			$errors["task_name"]="The task name can only have letters, numbers and dashes. Please change your task's name.";
@@ -317,6 +360,10 @@ class Task{
 		if (isset($vals['workflow_id']))
 			$this->set_workflow_id($vals['workflow_id']);
 		
+		if (isset($vals["binary_content"])){
+			$this->set_binary_content($vals["binary_content"]);
+		}
+		
 		if (count($errors)>0)
 			return $errors;
 
@@ -390,7 +437,7 @@ class Task{
 		return $xml;
 	}
 	
-	public function delete($confirmed=false){
+	public function delete($confirmed=false,$delete_binary=false){
 		
 		if ($this->id !== false) {
 			
@@ -398,11 +445,14 @@ class Task{
 				$wfs = $this->GetLinkedWorkflows();
 				if (count($wfs) > 0)
 					return array('confirm'=>"Following workflows use this task and will error if you delete it: [".join(', ',array_map(function ($wf) {return $wf->get_name();}, $wfs)).']');
-
+					
 				$wfs = $this->GetLinkedWorkflowInstances();
 				if (count($wfs) > 0)
 					return array('confirm'=>"Following RUNNING workflows use this task and will error if you delete it: [".join(', ',array_map(function ($wf) {return $wf->get_workflow_instance_id().':'.$wf->getWorkflowName();}, $wfs)).']');
 			}
+			
+			if ($delete_binary)
+				WorkflowInstance::DeleteTaskFile($this->binary_path);
 			
 			$this->connectDB(DatabaseMySQL::$MODE_RDRW);
 			$this->db->QueryPrintf("

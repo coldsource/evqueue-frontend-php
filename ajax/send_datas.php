@@ -87,7 +87,7 @@ if (isset($_POST) && !empty($_POST)){
 		
 		case "deleteTask":
 			$Task = new Task($_POST['id']);
-			writeEnd($Task->delete($confirmed));
+			writeEnd($Task->delete($confirmed,$_POST['deleteBinary']==1));
 			break;
 		case "deleteWorkflow":
 			$WorkFlow = new WorkFlow($_POST['id']);

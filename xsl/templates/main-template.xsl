@@ -152,5 +152,17 @@
 			</div>
 		</xsl:if>
 	</xsl:template>
+	
+	<xsl:template name="displayNotices">
+		<xsl:if test="count(/page/notices/notice) > 0">
+			<div id="notices">
+				<xsl:for-each select="/page/notices/notice">
+					<p>
+						<xsl:value-of select="." />
+					</p>
+				</xsl:for-each>
+			</div>
+		</xsl:if>
+	</xsl:template>
 
 </xsl:stylesheet>

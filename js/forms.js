@@ -79,11 +79,13 @@ function ajaxDelete(objAction,id,newurl,params){
 				}
 			}else {
 				$(content).find('error').each( function () {
-					if ($(this).attr('name') == 'confirm') {
-						if (confirm($(this).text()))
-							ajaxDelete(objAction,id,newurl,{confirm: 'yes'});
+					if ($(this).attr('id') == 'confirm') {
+						if (confirm($(this).text())) {
+							params.confirm = 'yes';
+							ajaxDelete(objAction,id,newurl,params);
+						}
 						
-					} else if ($(this).attr('name') == 'no-right') {
+					} else if ($(this).attr('id') == 'no-right') {
 						alert("You don't have the right to perform this action");
 						
 					} else {

@@ -8,6 +8,16 @@
 	
 	<xsl:template name="list_workflows">
 		
+		<div style="text-align: center; margin-top: 2em;">
+			<form method="post" enctype="multipart/form-data">
+				<input type="file" name="workflow_zip_file" onchange="$(this).parents('form:eq(0)').submit();" />
+				Drag-and-drop or browse for a zip file to add a new workflow.
+				<input type="submit" value="Install" />
+			</form>
+			<xsl:call-template name="displayNotices" />
+			<xsl:call-template name="displayErrors" />
+		</div>
+		
 		<div id="workflow_edit_select" style="display:none;">Select workflow edition mode</div>
 		<div class="boxTitle">
 			<span class="title">Workflows List</span>
@@ -30,7 +40,7 @@
 					<tr class="groupspace"><td></td></tr>
 				</xsl:if>
 				<tr class="group">
-					<td colspan="5" >
+					<td colspan="5">
 						<xsl:choose>
 							<xsl:when test="$groupName != ''">
 								<xsl:value-of select="$groupName" />
@@ -73,6 +83,9 @@
 									</a>
 									<a href="manage-workflow-gui.php?workflow_id={@id}" title="Graphical edit">
 										<img src="images/edition/edit-gui.png" />
+									</a>
+									<a href="export.php?workflow_id={@id}" title="Export (zip file)">
+										<img src="images/zip.png" />
 									</a>
 								</xsl:when>
 								<xsl:otherwise>

@@ -27,6 +27,18 @@ require_once 'bo/BO_task.php';
 
 
 $xsl = new XSLEngine();
+
+
+// INSTALL WORKFLOW
+if (isset($_FILES['workflow_zip_file'])) {
+	$errors = Workflow::Import($_FILES['workflow_zip_file']['tmp_name']);
+	if ($errors === true)
+		$xsl->AddNotice('Installed workflow successfully!');
+	else
+		$xsl->AddErrors($errors);
+}
+
+
 $xsl->AddFragment(Workflow::getAllXml());
 $xsl->AddFragment(Task::getAllXml($filter='only-tied-task'));
 $xsl->DisplayXHTML('xsl/list_workflows.xsl');
