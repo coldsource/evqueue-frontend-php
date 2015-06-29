@@ -11,7 +11,7 @@
 					<label class="formLabel"><i>From:</i> field</label>
 					<input type="text" name="email_from" value="{/page/notification-type/email}" placeholder="E-mail From" /> <br/>
 					<label class="formLabel">Command to use:</label>
-					<input type="text" name="commande_mail" value="{/page/notification-type/commande-mail}" placeholder="Sending Control Mail" /><br/>
+					<input type="text" name="commande_mail" value="{/page/notification-type/mail-command}" placeholder="Sending Control Mail" /><br/>
 					<label class="formLabel">SMTP config:</label>
 					<input type="text" name="smtp" value="{page/notification-type/smtp}" placeholder="SMTP" />
 				</td>

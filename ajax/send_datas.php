@@ -166,7 +166,7 @@ if (isset($_POST) && !empty($_POST)){
 			
 			$params = $_POST;
 			unset($params['id'],$params['type_id'],$params['name'],$params['form_id']);
-			require_once '../plugins/notifications/'.$type->getName().'/notification.php';
+			require_once '../plugins/notifications/'.$type->getName().'/notification-parameters.php';
 			$_POST['parameters'] = NotificationParameters::serialise($params);
 			
 			$errors = NotificationParameters::check_parameters($params);

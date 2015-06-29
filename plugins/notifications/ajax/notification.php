@@ -38,12 +38,12 @@ if ($type === false)
 	die("Unknown notification '{$_GET['id']}'");
 
 
-require_once '../'.$type->getName().'/notification.php';  // required for access to NotificationParameters::(de)serialise()
+require_once '../'.$type->getName().'/notification-parameters.php';  // required for access to NotificationParameters::(de)serialise()
 
 $xsl = new XSLEngine();
 if ($notif) $xsl->AddFragment($notif->getGeneratedXml());
 $xsl->AddFragment($type->getGeneratedXml());
-$xsl->DisplayXHTML('../'.$type->getName().'/notification.xsl');
+$xsl->DisplayXHTML('../'.$type->getName().'/notification-parameters.xsl');
 
 
 ?>

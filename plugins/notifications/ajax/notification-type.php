@@ -28,9 +28,9 @@ require_once 'lib/workflow_instance.php';
 $action = $_GET['action'];
 $type = $_GET['type'];
 
-require_once '../'.$type.'/writeConf.php';
+require_once '../'.$type.'/plugin-configuration.php';
 
-$conf = new writeConf;
+$conf = new PluginConfiguration();
 $xsl = new XSLEngine();
 
 
@@ -44,7 +44,7 @@ if( $action == 'edit'){
 	WorkflowInstance::StoreConfFile($type.'.php', $texte); // Ecriture des données dans le serveur
 }
 
-$xsl->DisplayXHTML('../'.$type.'/notification-type.xsl');
+$xsl->DisplayXHTML('../'.$type.'/plugin-configuration.xsl');
 
 
 ?>

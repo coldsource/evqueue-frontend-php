@@ -59,7 +59,7 @@ class NotificationPlugin {
 			return array('Could not open zip file');
 		
 		$this->files = array();
-		foreach (array('manifest.xml', 'notification.php', 'notification.xsl') as $file) {
+		foreach (array('manifest.xml', 'notification-parameters.php', 'notification-parameters.xsl') as $file) {
 			$this->files[$file] = $this->zip->getFromName($file);
 			if ($this->files[$file] === false)
 				return array("Could not find the '$file' file");
@@ -97,8 +97,8 @@ class NotificationPlugin {
 		if ($this->binary === false)
 			return array("Could not find the binary file '$this->binary_name'");
 		
-		// TODO: check that notification.php contains the appropriate functions?
-		// TODO: check that notification.xsl contains the appropriate templates?
+		// TODO: check that notification-parameters.php contains the appropriate functions?
+		// TODO: check that notification-parameters.xsl contains the appropriate templates?
 		
 		
 		/**** WRITE information, everything should have been checked before ****/
@@ -162,7 +162,7 @@ class NotificationPlugin {
 		
 		// 3. Delete local files
 		$plugin_folder = "$this->relpath/plugins/notifications/$name/";
-		foreach (array('manifest.xml','notification.php','notification.xsl') as $file)
+		foreach (array('manifest.xml','notification-parameters.php','notification-parameters.xsl') as $file)
 			system("rm $plugin_folder/$file");
 		system("rmdir $plugin_folder");
 		
