@@ -18,7 +18,10 @@ a, a:visited {
 }
 
 select {
-	width:400px;
+	width: 400px;
+}
+select.ui-timepicker-select {
+	width: auto;
 }
 
 input, select {
