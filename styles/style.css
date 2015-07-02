@@ -23,6 +23,9 @@ a, a:visited {
 select {
   width: 400px; }
 
+select.ui-timepicker-select {
+  width: auto; }
+
 input, select {
   border: 1px solid darkgray; }
 
@@ -155,9 +158,9 @@ table.highlight_row tr:hover {
 tr.group {
   background: #CCC; }
 
-tr.group td {
-  font-size: 15px;
-  font-weight: bold;
+  tr.group td {
+    font-size: 15px;
+    font-weight: bold;
   padding: 7px; }
 
 tr.groupspace td {
