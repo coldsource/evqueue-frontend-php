@@ -118,8 +118,8 @@ class XSLEngine
 		
 		$this->SetParameter('NOW', date('Y-m-d H:i:s'));
 		$this->SetParameter('EDITION', '0');
-		if (defined('RELPATH'))
-			$this->SetParameter('RELPATH', constant('RELPATH'));
+		if (defined('SITE_BASE'))
+			$this->SetParameter('SITE_BASE', constant('SITE_BASE'));
 		
 		@session_start();
 		

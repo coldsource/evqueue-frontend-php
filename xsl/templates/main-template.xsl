@@ -3,7 +3,6 @@
 	<xsl:output method="xml" indent="no" omit-xml-declaration="yes" encoding="utf-8" doctype-public="-//W3C//DTD XHTML 1.0 Transitional//EN" doctype-system="http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd" />
 	
 	<xsl:param name="CSS" select="''" />
-	<xsl:param name="RELPATH" select="'./'" />
 	<xsl:param name="javascript" select="''" />
 	
 	<xsl:template match="/">
@@ -12,33 +11,33 @@
 			<head>
 				<meta http-equiv="Content-Type" content="application/xhtml+xml; charset=utf-8" />
 				
-				<link rel="stylesheet" type="text/css" href="{$RELPATH}js/jquery-ui-1.11.4.custom/jquery-ui.min.css"/>
+				<link rel="stylesheet" type="text/css" href="{$SITE_BASE}js/jquery-ui-1.11.4.custom/jquery-ui.min.css"/>
 				
 				<xsl:choose>
 					<xsl:when test="$CSS = 'GUI'">
-						<link rel="stylesheet" type="text/css" href="{$RELPATH}styles/gui.css"/>
+						<link rel="stylesheet" type="text/css" href="{$SITE_BASE}styles/gui.css"/>
 					</xsl:when>
 					<xsl:otherwise>
-						<link rel="stylesheet" type="text/css" href="{$RELPATH}styles/style.css"/>
+						<link rel="stylesheet" type="text/css" href="{$SITE_BASE}styles/style.css"/>
 					</xsl:otherwise>
 				</xsl:choose>
 				
-				<link rel="stylesheet" type="text/css" href="{$RELPATH}js/jQuery-Timepicker-Addon/dist/jquery-ui-timepicker-addon.min.css"/>
+				<link rel="stylesheet" type="text/css" href="{$SITE_BASE}js/jQuery-Timepicker-Addon/dist/jquery-ui-timepicker-addon.min.css"/>
 				
 				<script type="text/javascript">
-					var relpath = '<xsl:value-of select="$RELPATH" />';
+					var site_base = '<xsl:value-of select="$SITE_BASE" />';
 				</script>
 				
-				<script type="text/javascript" src="{$RELPATH}js/jquery-1.7.1.min.js" />
-				<script type="text/javascript" src="{$RELPATH}js/jquery-ui-1.11.4.custom/jquery-ui.min.js" />
-				<script type="text/javascript" src="{$RELPATH}js/forms.js" />
-				<script type="text/javascript" src="{$RELPATH}js/jQuery-Timepicker-Addon/dist/jquery-ui-timepicker-addon.min.js" />
-				<script type="text/javascript" src="{$RELPATH}js/progressbar.js" />
-				<script type="text/javascript" src="{$RELPATH}js/global.js" />
+				<script type="text/javascript" src="{$SITE_BASE}js/jquery-1.7.1.min.js" />
+				<script type="text/javascript" src="{$SITE_BASE}js/jquery-ui-1.11.4.custom/jquery-ui.min.js" />
+				<script type="text/javascript" src="{$SITE_BASE}js/forms.js" />
+				<script type="text/javascript" src="{$SITE_BASE}js/jQuery-Timepicker-Addon/dist/jquery-ui-timepicker-addon.min.js" />
+				<script type="text/javascript" src="{$SITE_BASE}js/progressbar.js" />
+				<script type="text/javascript" src="{$SITE_BASE}js/global.js" />
 				
 				<xsl:if test="$javascript != '' and exsl:node-set($javascript)/src">
 					<xsl:for-each select="exsl:node-set($javascript)/src">
-						<script type="text/javascript" src="{$RELPATH}{.}"><xsl:text><![CDATA[]]></xsl:text></script>
+						<script type="text/javascript" src="{$SITE_BASE}{.}"><xsl:text><![CDATA[]]></xsl:text></script>
 					</xsl:for-each>
 				</xsl:if>
 				
@@ -66,39 +65,39 @@
 						</li>
 						<xsl:choose>
 							<xsl:when test="/page/session/workflow/@original-id = 'new'">
-								<li><a style="color: #51d551;" href="{$RELPATH}manage-workflow-gui.php">Creating workflow</a></li>
+								<li><a style="color: #51d551;" href="{$SITE_BASE}manage-workflow-gui.php">Creating workflow</a></li>
 							</xsl:when>
 							<xsl:when test="count(/page/session/workflow/@original-id) > 0">
-								<li><a style="color: #51d551;" href="{$RELPATH}manage-workflow-gui.php?workflow_id={/page/session/workflow/@original-id}">Editing workflow <xsl:value-of select="/page/session/workflow/@original-id" /></a></li>
+								<li><a style="color: #51d551;" href="{$SITE_BASE}manage-workflow-gui.php?workflow_id={/page/session/workflow/@original-id}">Editing workflow <xsl:value-of select="/page/session/workflow/@original-id" /></a></li>
 							</xsl:when>
 						</xsl:choose>
 					</ul>
 					<ul class="submenu" id="submenu-system-state">
 						<xsl:if test="$topmenu!='system-state'"><xsl:attribute name="style">display:none;</xsl:attribute></xsl:if>
-						<li><a href="{$RELPATH}index.php">Workflows instances</a></li>
-						<li><a href="{$RELPATH}list-workflow-schedules.php?display=state">Scheduled workflows</a></li>
-						<li><a href="{$RELPATH}system_state.php">Queues</a></li>
-						<li><a href="{$RELPATH}system_statistics.php">Statistics</a></li>
+						<li><a href="{$SITE_BASE}index.php">Workflows instances</a></li>
+						<li><a href="{$SITE_BASE}list-workflow-schedules.php?display=state">Scheduled workflows</a></li>
+						<li><a href="{$SITE_BASE}system_state.php">Queues</a></li>
+						<li><a href="{$SITE_BASE}system_statistics.php">Statistics</a></li>
 					</ul>
 					<xsl:if test="/page/private/logged-in-user/@profile = 'ADMIN'">
 						<ul class="submenu" id="submenu-settings">
 							<xsl:if test="$topmenu!='settings'"><xsl:attribute name="style">display:none;</xsl:attribute></xsl:if>
-							<li><a href="{$RELPATH}list-tasks.php">Tasks</a></li>
-							<li><a href="{$RELPATH}list-workflows.php">Workflows</a></li>
-							<li><a href="{$RELPATH}list-workflow-schedules.php?display=settings">Scheduled workflows</a></li>
-							<li><a href="{$RELPATH}list-schedules.php">Retry Schedules</a></li>
-							<li><a href="{$RELPATH}list-queues.php">Queues</a></li>
-							<li><a href="{$RELPATH}list-users.php">Users</a></li>
-							<li><a href="{$RELPATH}system_configuration.php">Running configuration</a></li>
+							<li><a href="{$SITE_BASE}list-tasks.php">Tasks</a></li>
+							<li><a href="{$SITE_BASE}list-workflows.php">Workflows</a></li>
+							<li><a href="{$SITE_BASE}list-workflow-schedules.php?display=settings">Scheduled workflows</a></li>
+							<li><a href="{$SITE_BASE}list-schedules.php">Retry Schedules</a></li>
+							<li><a href="{$SITE_BASE}list-queues.php">Queues</a></li>
+							<li><a href="{$SITE_BASE}list-users.php">Users</a></li>
+							<li><a href="{$SITE_BASE}system_configuration.php">Running configuration</a></li>
 						</ul>
 						<ul class="submenu" id="submenu-notifications">
 							<xsl:if test="$topmenu!='notifications'"><xsl:attribute name="style">display:none;</xsl:attribute></xsl:if>
-							<li><a href="{$RELPATH}plugins/notifications/">Configure</a></li>
-							<li><a href="{$RELPATH}plugins/notifications/plugins.php">Manage plugins</a></li>
+							<li><a href="{$SITE_BASE}plugins/notifications/">Configure</a></li>
+							<li><a href="{$SITE_BASE}plugins/notifications/plugins.php">Manage plugins</a></li>
 						</ul>
 						<ul class="submenu" id="submenu-logging">
 							<xsl:if test="$topmenu!='logging'"><xsl:attribute name="style">display:none;</xsl:attribute></xsl:if>
-							<li><a href="{$RELPATH}view-logs.php">Last logs</a></li>
+							<li><a href="{$SITE_BASE}view-logs.php">Last logs</a></li>
 						</ul>
 					</xsl:if>
 					
@@ -107,12 +106,12 @@
 							<div id="userInfo">
 								<span><xsl:value-of select="/page/private/logged-in-user/@login" /></span>
 								<xsl:text>&#160;</xsl:text>
-								<a href="{$RELPATH}manage-user.php?user_login={/page/private/logged-in-user/@login}" title="Edit">
-									<img src="{$RELPATH}images/edit.png" />
+								<a href="{$SITE_BASE}manage-user.php?user_login={/page/private/logged-in-user/@login}" title="Edit">
+									<img src="{$SITE_BASE}images/edit.png" />
 								</a>
 								<xsl:text>&#160;</xsl:text>
-								<a href="{$RELPATH}auth.php?action=logout" title="Log out">
-									<img src="{$RELPATH}images/logout.png" />
+								<a href="{$SITE_BASE}auth.php?action=logout" title="Log out">
+									<img src="{$SITE_BASE}images/logout.png" />
 								</a>
 							</div>
 						</xsl:when>

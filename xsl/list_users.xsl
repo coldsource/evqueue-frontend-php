@@ -12,7 +12,7 @@
 			<div class="boxTitle">
 				<span class="title">Users list</span>
 				<a href="manage-user.php">
-					<img class="action" src="{$RELPATH}images/plus3.png" onclick="createNotif();" />
+					<img class="action" src="{$SITE_BASE}images/plus3.png" onclick="createNotif();" />
 				</a>
 			</div>
 			<table>

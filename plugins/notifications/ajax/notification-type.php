@@ -18,7 +18,6 @@
   * Authors: Nicolas Jean, Christophe Marti, Brahim Louridi
   */
 
-define('RELPATH','../../../');
 require_once 'inc/auth_check.php';
 
 require_once 'inc/logger.php';

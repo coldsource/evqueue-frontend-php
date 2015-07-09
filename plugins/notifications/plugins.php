@@ -18,7 +18,6 @@
   * Authors: Nicolas Jean, Christophe Marti 
   */
 
-define('RELPATH', '../../');
 require_once 'inc/auth_check.php';
 
 require_once 'inc/logger.php';
@@ -32,7 +31,7 @@ $xsl = new XSLEngine();
 
 // INSTALL
 if (isset($_FILES['plugin_file'])) {
-	$plugin = new NotificationPlugin();
+	$plugin = new NotificationPlugin(false,'../../');
 	$errors = $plugin->Install($_FILES['plugin_file']['tmp_name']);
 	if ($errors === true)
 		$xsl->AddNotice('Installed plugin successfully!');
@@ -42,7 +41,7 @@ if (isset($_FILES['plugin_file'])) {
 
 // UNINSTALL
 if (isset($_POST['action']) && $_POST['action'] == 'delete') {
-	$plugin = new NotificationPlugin($_POST['plugin_id']);
+	$plugin = new NotificationPlugin($_POST['plugin_id'],'../../');
 	$errors = $plugin->Delete();
 	if ($errors === true)
 		$xsl->AddNotice('Uninstalled plugin successfully!');

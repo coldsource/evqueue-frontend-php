@@ -21,13 +21,11 @@ function saveNotifType (button) {
 		url: 'ajax/notification-type.php?action=save&type='+type_notif.val(),
 		type: 'post',
 		data: params,
-//		async: false,
-		success: function (content) {
-			console.log(content);
+		async: false,
+		success: function () {
+			window.location.reload();
 		}
 	});
-	
-	window.location.reload(); // rechargement de la page
 }
 
 function removeActionButtons () {

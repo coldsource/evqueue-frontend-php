@@ -16,7 +16,7 @@
 			
 			<div class="boxTitle">
 				<span class="title">Notifications</span>
-				<img class="action" src="{$RELPATH}images/plus3.png" onclick="createNotif();" />
+				<img class="action" src="{$SITE_BASE}images/plus3.png" onclick="createNotif();" />
 			</div>
 			<table id="notificationsTable">
 				<tr class="header">
@@ -76,8 +76,8 @@
 					</td>
 					
 					<td class="tdActions" style="padding:0;">
-						<img class="action" src="{$RELPATH}images/ok.png" onclick="saveNotif($(this));" title="Save" />
-						<img class="action" src="{$RELPATH}images/cancel.png" onclick="window.location.reload();" title="Cancel" />
+						<img class="action" src="{$SITE_BASE}images/ok.png" onclick="saveNotif($(this));" title="Save" />
+						<img class="action" src="{$SITE_BASE}images/cancel.png" onclick="window.location.reload();" title="Cancel" />
 					</td>
 				</tr>
 				
@@ -97,9 +97,9 @@
 							...
 						</td>
 						<td class="tdActions">
-							<img class="action" src="{$RELPATH}images/edit.gif" onclick="editNotif($(this));" title="Edit Notification" />
+							<img class="action" src="{$SITE_BASE}images/edit.gif" onclick="editNotif($(this));" title="Edit Notification" />
 							<xsl:text>&#160;</xsl:text>
-							<img class="action" src="{$RELPATH}images/delete.gif" onclick="deleteNotif({@id});" title="Delete Notification" />
+							<img class="action" src="{$SITE_BASE}images/delete.gif" onclick="deleteNotif({@id});" title="Delete Notification" />
 						</td>
 					</tr>
 				</xsl:for-each>

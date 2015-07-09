@@ -7,7 +7,7 @@ function createNotif () {
 }
 
 $(document).delegate('select[name=type_id]', 'change', function () {
-	$(this).parents('tr:first').find('div.parameters').load('ajax/notification.php?action=edit&type_id='+$(this).val());
+	$(this).parents('table:first').find('div.parameters').load('ajax/notification.php?action=edit&type_id='+$(this).val());
 });
 
 function editNotif (button) {

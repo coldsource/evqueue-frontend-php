@@ -10,7 +10,7 @@ function ajaxPost(form_id,newurl,submit_form,confirmed){
 	
 	$.ajax({
 		type: 'POST',
-		url: relpath+'ajax/wsfwd.php',
+		url: site_base+'ajax/wsfwd.php',
 		data: params,
 		dataType: 'xml',
 		success: function(content){
@@ -69,7 +69,7 @@ function ajaxDelete(objAction,id,newurl,params){
 	
 	$.ajax({
 		type: 'POST',
-		url: relpath+'ajax/wsfwd.php',
+		url: site_base+'ajax/wsfwd.php',
 		data: params,
 		dataType: 'xml',
 		success: function(content){
@@ -107,7 +107,7 @@ function ajaxDelete(objAction,id,newurl,params){
 function wsfwd (options) {
 	$.ajax({
 		type: 'POST',
-		url: relpath+'ajax/wsfwd.php',
+		url: site_base+'ajax/wsfwd.php',
 		data: options.params,
 		dataType: 'xml',
 		success: function(content){

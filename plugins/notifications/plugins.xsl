@@ -5,7 +5,7 @@
 	<xsl:variable name="topmenu" select="'notifications'" />
 	
 	<xsl:variable name="javascript">
-		<src><xsl:value-of select="$RELPATH" />js/notifications-type.js</src>
+		<src>js/notifications-type.js</src>
 	</xsl:variable>
 	
 	<xsl:template name="content">
@@ -52,9 +52,9 @@
 							<form method="post">
 								<input type="hidden" name="action" value="delete" />
 								<input type="hidden" name="plugin_id" value="{@id}" />
-								<img class="action" src="{$RELPATH}images/edit.gif" onclick="editNotifType($(this));" title="Edit Notification type" />
+								<img class="action" src="{$SITE_BASE}images/edit.gif" onclick="editNotifType($(this));" title="Edit Notification type" />
 								<xsl:text>&#160;</xsl:text> 
-								<input type="image" src="{$RELPATH}images/delete.gif" class="action" title="Uninstall this notification plugin" />
+								<input type="image" src="{$SITE_BASE}images/delete.gif" class="action" title="Uninstall this notification plugin" />
 							</form>
 						</td>
 					</tr>

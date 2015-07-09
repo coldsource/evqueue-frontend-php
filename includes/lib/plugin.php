@@ -35,12 +35,9 @@ class NotificationPlugin {
 	private $description;
 	private $binary_name;
 	
-	public function __construct ($id = false) {
+	public function __construct ($id=false,$relpath='./') {
 		$this->id = $id;
-		$this->relpath = defined('RELPATH') ? constant('RELPATH') : './';
-		
-		if (!defined('RELPATH'))
-			Logger::GetInstance()->Log(LOG_WARNING,'plugin.php',"Constant 'RELPATH' is not defined, using './' instead");
+		$this->relpath = $relpath;
 	}
 	
 	public function Install ($filename) {

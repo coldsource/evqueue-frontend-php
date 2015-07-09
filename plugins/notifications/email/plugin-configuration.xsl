@@ -16,8 +16,8 @@
 					<input type="text" name="smtp" value="{page/notification-type/smtp}" placeholder="SMTP" />
 				</td>
 				<td>
-					<img class="action" src="{$RELPATH}images/ok.png" onclick="saveNotifType($(this));" title="Save" />
-					<img class="action" src="{$RELPATH}images/cancel.png" onclick="window.location.reload();" title="Cancel" />
+					<img class="action" src="{$SITE_BASE}images/ok.png" onclick="saveNotifType($(this));" title="Save" />
+					<img class="action" src="{$SITE_BASE}images/cancel.png" onclick="window.location.reload();" title="Cancel" />
 				</td>
 			</tr>
 		</table>

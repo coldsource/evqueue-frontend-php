@@ -18,13 +18,13 @@
   * Authors: Nicolas Jean, Christophe Marti 
   */
 
+require_once 'conf/sites_base.php';
 require_once 'bo/BO_user.php';
 
 session_start();
 
 if (!isset($_SESSION['user_login'])) {
-	$relpath = defined('RELPATH') ? constant('RELPATH') : '';
-	header("Location: {$relpath}auth.php");
+	header('Location: '.SITE_BASE.'auth.php');
 	session_write_close();
 	die();
 }

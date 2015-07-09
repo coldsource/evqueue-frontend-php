@@ -76,7 +76,7 @@
 					<input type="text" class="parameter" name="#PARAMETER_NAME#" value="" />
 				</div>
 			</div>
-			<form id="searchform" action="{$RELPATH}index.php">
+			<form id="searchform" action="{$SITE_BASE}index.php">
 				<input type="hidden" name="searchParams" value="{/page/get/@searchParams}" />
 				<table id="filters" style="width:100%;">
 					<tr>
@@ -112,7 +112,7 @@
 						<td colspan="2" class="center">
 							<input type="submit" value="Filter workflows" />
 							<xsl:text>&#160;</xsl:text>
-							<a href="{$RELPATH}index.php"><button type="button" class="blue">Clear filters</button></a>
+							<a href="{$SITE_BASE}index.php"><button type="button" class="blue">Clear filters</button></a>
 						</td>
 					</tr>
 				</table>
