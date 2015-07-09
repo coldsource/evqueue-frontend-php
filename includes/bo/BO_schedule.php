@@ -185,7 +185,7 @@ class Schedule{
 			return array('invalid-xml' => "Given XML is not valid XML: <br/><ul>".join('',array_map(function($e){return '<li>Line '.$e->line.': '.htmlspecialchars($e->message).'</li>';}, $output))."</ul>");
 		}
 		
-		$fh = fopen('../xsd/retry-schedule.xsd','r',true);
+		$fh = fopen('xsd/retry-schedule.xsd','r',true);
 		$xsd = stream_get_contents($fh);
 		fclose($fh);
 		
