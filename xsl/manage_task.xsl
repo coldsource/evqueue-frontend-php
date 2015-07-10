@@ -27,12 +27,12 @@
 			<div class="boxTitle">
 				<span class="title">
 					<xsl:choose>
-					<xsl:when test="/page/task/@id">
-						Update Task
-					</xsl:when>
-					<xsl:otherwise>
-						Create Task
-					</xsl:otherwise>
+						<xsl:when test="/page/task/@id">
+							Update Task
+						</xsl:when>
+						<xsl:otherwise>
+							Create Task
+						</xsl:otherwise>
 					</xsl:choose>
 				</span>
 			</div>
@@ -81,7 +81,18 @@
 					<input type="text" name="task_host" id="task_host" value="{/page/task/task_host}" />
 
 					<br />
-					<input type="submit" name="submitFormTask" id="submitFormTask" class="submitFormButton submitFormButtonSmall" value="Create task" />
+					<input type="submit" name="submitFormTask" id="submitFormTask" class="submitFormButton submitFormButtonSmall">
+						<xsl:attribute name="value">
+							<xsl:choose>
+								<xsl:when test="/page/task/@id">
+									<xsl:text>Update Task</xsl:text>
+								</xsl:when>
+								<xsl:otherwise>
+									<xsl:text>Create Task</xsl:text>
+								</xsl:otherwise>
+							</xsl:choose>
+						</xsl:attribute>
+					</input>
 				</form>
 				<xsl:if test="/page/linked-workflows/workflow">
 					<div class="linked-workflow">
