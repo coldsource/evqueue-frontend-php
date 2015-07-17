@@ -24,7 +24,7 @@ require_once 'bo/BO_user.php';
 session_start();
 
 if (!isset($_SESSION['user_login'])) {
-	header('Location: '.SITE_BASE.'auth.php');
+	header('Location: '.(defined('SITE_BASE')?constant('SITE_BASE'):'').'auth.php');
 	session_write_close();
 	die();
 }
