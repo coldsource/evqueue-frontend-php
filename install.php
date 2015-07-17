@@ -94,9 +94,6 @@ if(isset($_POST['db_host']) && isset($_POST['db_user']) && isset($_POST['db_pass
 		
 		fclose($f);
 		
-		// everything went smooth, my job is done here
-		unlink('install.php');
-		
 		header("Location: auth.php");
 		die();
 		
