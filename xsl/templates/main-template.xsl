@@ -4,6 +4,7 @@
 	
 	<xsl:param name="CSS" select="''" />
 	<xsl:param name="javascript" select="''" />
+	<xsl:param name="SITEBASE" select="''" />
 	
 	<xsl:template match="/">
 		<xsl:param name="title" select="'Workflow'" />
