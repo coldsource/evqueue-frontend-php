@@ -94,6 +94,9 @@ if(isset($_POST['db_host']) && isset($_POST['db_user']) && isset($_POST['db_pass
 		
 		fclose($f);
 		
+		if (is_callable(opcache_reset))
+			opcache_reset();  // this is necessary because the databases.php conf file is going to change, and opcache will keep the previous (empty) version if we don't prevent it
+		
 		header("Location: auth.php");
 		die();
 		
