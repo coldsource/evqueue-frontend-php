@@ -333,7 +333,8 @@ class Workflow{
 	}
 	
 	public function getGeneratedXml($nodename='workflow'){
-		$xml = "<$nodename id='".$this->get_id()."' name='".$this->get_name()."' group=\"".$this->get_group()."\" comment=\"".$this->get_comment()."\" has-bound-task='".($this->has_bound_task() ? 'yes' : 'no')."' bound-to-schedule='".$this->get_workflow_bound()."'>";
+		$xml = "<$nodename id='$this->id' name='".htmlspecialchars($this->get_name())."'
+						group=\"".htmlspecialchars($this->get_group())."\" comment=\"".htmlspecialchars($this->get_comment())."\" has-bound-task='".($this->has_bound_task() ? 'yes' : 'no')."' bound-to-schedule='".$this->get_workflow_bound()."'>";
 		$xml .= $this->get_xml();
 		
 		// notifications
