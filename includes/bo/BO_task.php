@@ -421,17 +421,17 @@ class Task{
 		$xml = "<tasks>";
 		for($i=0;$i<count($res);$i++){
 			$xml .= '<task id="'.$res[$i]["task_id"].'">';
-			$xml .= '<task_name>'.$res[$i]["task_name"].'</task_name>';
-			$xml .= '<task_binary>'.$res[$i]["task_binary"].'</task_binary>';
+			$xml .= '<task_name>'.htmlspecialchars($res[$i]["task_name"]).'</task_name>';
+			$xml .= '<task_binary>'.htmlspecialchars($res[$i]["task_binary"]).'</task_binary>';
 			$xml .= '<task_parameters_mode>'.$res[$i]["task_parameters_mode"].'</task_parameters_mode>';
 			$xml .= '<task_output_method>'.$res[$i]["task_output_method"].'</task_output_method>';
 			$xml .= '<task_xsd>'.$res[$i]["task_xsd"].'</task_xsd>';
 			$xml .= '<task_user>'.$res[$i]["task_user"].'</task_user>';
 			$xml .= '<task_host>'.$res[$i]["task_host"].'</task_host>';
 			$xml .= '<task_wd>'.$res[$i]["task_wd"].'</task_wd>';
-			$xml .= '<task_group>'.$res[$i]["task_group"].'</task_group>';
+			$xml .= '<task_group>'.htmlspecialchars($res[$i]["task_group"]).'</task_group>';
 			$xml .= '<workflow_id>'.$res[$i]["workflow_id"].'</workflow_id>';
-			$xml .= '</task>';			
+			$xml .= '</task>';
 		}
 		$xml .= "</tasks>";
 		return $xml;
