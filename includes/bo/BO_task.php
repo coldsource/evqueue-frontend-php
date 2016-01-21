@@ -376,15 +376,15 @@ class Task{
 	
 	public function getGeneratedXml(){
 		$xml = '<task id="'.$this->get_id().'">';
-		$xml .= '<task_name>'.$this->get_name().'</task_name>';
-		$xml .= '<task_binary>'.$this->get_binary_path().'</task_binary>';
+		$xml .= '<task_name>'.htmlspecialchars($this->get_name()).'</task_name>';
+		$xml .= '<task_binary>'.htmlspecialchars($this->get_binary_path()).'</task_binary>';
 		$xml .= '<task_parameters_mode>'.$this->get_parameters_mode().'</task_parameters_mode>';
 		$xml .= '<task_output_method>'.$this->get_output_method().'</task_output_method>';
 		$xml .= '<task_xsd>'.$this->get_xsd().'</task_xsd>';
 		$xml .= '<task_user>'.$this->user.'</task_user>';
 		$xml .= '<task_host>'.$this->host.'</task_host>';
 		$xml .= '<task_wd>'.$this->wd.'</task_wd>';
-		$xml .= '<task_group>'.$this->group.'</task_group>';
+		$xml .= '<task_group>'.htmlspecialchars($this->group).'</task_group>';
 		$xml .= '<workflow_id>'.$this->get_workflow_id().'</workflow_id>';
 		$xml .= '</task>';
 		return $xml;
