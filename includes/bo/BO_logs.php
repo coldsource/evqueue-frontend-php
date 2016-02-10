@@ -30,7 +30,7 @@ class Logs{
 	
 	public static function getLastLogs($limit){
 		$db = new DatabaseMySQL('queueing');
-		$db->Query("SELECT log_level,log_message,log_timestamp FROM t_log ORDER BY log_id DESC LIMIT $limit");
+		$db->Query("SELECT log_level,log_message,log_timestamp,node_name FROM t_log ORDER BY log_id DESC LIMIT $limit");
 		
 		$xml = '<logs>';
 		while(($row = $db->FetchAssoc()) !== false){
@@ -45,7 +45,7 @@ class Logs{
 				case LOG_INFO: $level = 'LOG_INFO';break;
 				case LOG_DEBUG: $level = 'LOG_DEBUG';break;
 			}
-			$xml.= "<log level='$level' message=\"".htmlspecialchars($row['log_message'])."\" timestamp='{$row['log_timestamp']}' />";
+			$xml.= "<log level='$level' message=\"".htmlspecialchars($row['log_message'])."\" timestamp='{$row['log_timestamp']}' node='{$row['node_name']}' />";
 		}
 		$xml .= '</logs>';
 		

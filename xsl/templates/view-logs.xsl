@@ -16,6 +16,7 @@
 			<tr>
 				<th style="width:150px;">Timestamp</th>
 				<th style="width:100px;">Severity</th>
+				<th style="width:100px;">Node</th>
 				<th>Message</th>
 			</tr>
 			
@@ -40,6 +41,9 @@
 							</xsl:choose>
 						</xsl:attribute>
 						<b><xsl:value-of select="@level" /></b>
+					</td>
+					<td class="center">
+						<xsl:value-of select="@node" />
 					</td>
 					<td>
 						<xsl:value-of select="@message" />
