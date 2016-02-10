@@ -47,7 +47,7 @@
 			<body>
 				<xsl:if test="$topmenu != ''">
 					<ul class="topmenu">
-						<li class="logo">evQueue</li>
+						<li class="logo"><a href="{$SITE_BASE}index.php">evQueue</a></li>
 						<li id="system-state">
 							<xsl:if test="$topmenu='system-state'"><xsl:attribute name="class">selected</xsl:attribute></xsl:if>
 							System state

@@ -68,6 +68,10 @@ ul.topmenu li.logo {
   font-weight: bold;
   font-size: 16px; }
 
+ul.topmenu li.logo a {
+	color:#000000;
+}
+
 ul.topmenu li.selected {
   background-color: #EEEEEE; }
 
