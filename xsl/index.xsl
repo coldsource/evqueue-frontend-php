@@ -49,8 +49,11 @@
 		</xsl:if>
 		
 		<div id="workflows" class="contentList">
-		
-			<xsl:apply-templates select="/page/workflows[count(@status)=0]" />
+			
+			<xsl:call-template name="workflows">
+				<xsl:with-param name="workflows" select="/page/workflows[count(@status)=0]/workflow" />
+				<xsl:with-param name="status" select="'EXECUTING'" />
+			</xsl:call-template>
 			
 			<br />
 			
@@ -118,7 +121,10 @@
 				</table>
 			</form>
 			
-			<xsl:apply-templates select="/page/workflows[@status='TERMINATED']" />
+			<xsl:call-template name="workflows">
+				<xsl:with-param name="workflows" select="/page/workflows[@status='TERMINATED']/workflow" />
+				<xsl:with-param name="status" select="'TERMINATED'" />
+			</xsl:call-template>
 		</div>
 	</xsl:template>
 	

@@ -67,6 +67,7 @@ if (!empty($_POST)) {
 			if ($errors !== false)
 				$xml_error = $errors;
 			else
+				// TODO: bug: how to get the new/updated workflow id?
 				$_POST['workflow_id'] = $ws->FetchResult()->documentElement->attributes->getNamedItem('id')->nodeValue;
 			break;
 		
@@ -82,6 +83,7 @@ if (!empty($_POST)) {
 				'schedule' => $_POST['schedule'],
 				'onfailure' => $_POST['onfailure'],
 				'schedule_user' => $_POST['schedule_user'],
+				'node_name' => $_POST['node_name'],
 				'schedule_host' => $_POST['schedule_host'],
 				'active' => (isset($_POST['active']) && $_POST['active'] == 'on') ? 1 : 0,
 				'schedule_comment' => $_POST['schedule_comment'],

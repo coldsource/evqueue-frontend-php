@@ -145,7 +145,8 @@ if (isset($_POST) && !empty($_POST)){
 			
 			unset($_POST["user"],$_POST["host"]);
 			
-			$wfi = new WorkflowInstance();
+			$wfi = new WorkflowInstance($_POST['node']);
+			unset($_POST['node']);
 			$id = $wfi->LaunchWorkflowInstance($name, $_POST, 'asynchronous', $user_host);
 			
 			if ($id === false){

@@ -27,17 +27,19 @@ require_once 'lib/WebserviceWrapper.php';
 
 $xsl = new XSLEngine();
 
-$wfi = new WorkflowInstance();
-
-if (isset($_GET['action']) && $_GET['action'] == 'reset') {
-	$ws = new WebserviceWrapper('reset-stats', 'resetStats', array(), true);
-	$ws->FetchResult();
+require 'conf/queueing.php';
+foreach ($QUEUEING as $node_name => $conf) {
+	$wfi = new WorkflowInstance($node_name);
 	
-	header('Location: system_statistics.php');
-	die();
+	if (isset($_GET['action']) && $_GET['action'] == 'reset') {
+		$ws = new WebserviceWrapper('reset-stats', 'resetStats', array(), true);
+		$ws->FetchResult();
+		header('Location: system_statistics.php');
+		die();
+	}
+	
+	$xsl->AddFragment('<global node_name="'.htmlspecialchars($node_name).'">'.$wfi->GetStatistics("global").'</global>');
 }
-
-$xsl->AddFragment('<global>'.$wfi->GetStatistics("global").'</global>');
 
 $xsl->DisplayXHTML('xsl/system_statistics.xsl');
 

@@ -121,6 +121,17 @@ class XSLEngine
 		if (defined('SITE_BASE'))
 			$this->SetParameter('SITE_BASE', constant('SITE_BASE'));
 		
+		// Add node(s) information
+		require 'conf/queueing.php';
+		$nodes = $this->xmldoc->createElement('evqueue-nodes');
+		$this->root_node->appendChild($nodes);
+		foreach ($QUEUEING as $node_name => $conf) {
+			$node = $this->xmldoc->createElement('node');
+			$node->setAttribute('name', $node_name);
+			$node->appendChild($this->xmldoc->createTextNode($conf));
+			$nodes->appendChild($node);
+		}
+		
 		@session_start();
 		
 		if (isset($_SESSION['user_login'])) {

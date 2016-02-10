@@ -26,9 +26,11 @@ require_once 'lib/workflow_instance.php';
 
 $xsl = new XSLEngine();
 
-$wfi = new WorkflowInstance();
-
-$xsl->AddFragment($wfi->GetStatistics("queue"));
+require 'conf/queueing.php';
+foreach ($QUEUEING as $node_name => $conf) {
+	$wfi = new WorkflowInstance($node_name);
+	$xsl->AddFragment('<stats node_name="'.htmlspecialchars($node_name).'">'.$wfi->GetStatistics("queue").'</stats>');
+}
 
 $xsl->DisplayXHTML('xsl/system_state.xsl');
 

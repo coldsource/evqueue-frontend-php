@@ -28,6 +28,9 @@
 						<th>Workflow</th>
 						<xsl:if test="$DISPLAY = 'settings'">
 							<th>On failure</th>
+						</xsl:if>
+						<th>Node</th>
+						<xsl:if test="$DISPLAY = 'settings'">
 							<th>Host</th>
 						</xsl:if>
 						<xsl:if test="$DISPLAY = 'state'">
@@ -51,7 +54,7 @@
 								<tr class="groupspace"><td></td></tr>
 							</xsl:if>
 							<tr class="group">
-								<td colspan="7" >
+								<td colspan="8" >
 									<xsl:choose>
 										<xsl:when test="$groupName != ''">
 											<xsl:value-of select="$groupName" />  <!-- /page/workflows/workflow[@id = current()/workflow_id]/@group -->
@@ -87,6 +90,11 @@
 										<td class="center">
 											<xsl:value-of select="onfailure" />
 										</td>
+									</xsl:if>
+									<td class="center">
+										<xsl:value-of select="@node_name" />
+									</td>
+									<xsl:if test="$DISPLAY = 'settings'">
 										<td class="center">
 											<xsl:choose>
 												<xsl:when test="host != ''"><xsl:value-of select="host" /></xsl:when>

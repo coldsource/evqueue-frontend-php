@@ -38,10 +38,13 @@ $xsl->AddFragment(WorkflowSchedule::GetAllLastExecution());
 
 $xsl->AddFragment(Workflow::getAllXml());
 
-$wfi = new WorkflowInstance();
-$next_exec_time = $wfi->GetNextExecutionTime();
-if ($next_exec_time)
-	$xsl->AddFragment($next_exec_time);
+require 'conf/queueing.php';
+foreach ($QUEUEING as $node_name => $conf) {
+	$wfi = new WorkflowInstance($node_name);
+	$next_exec_time = $wfi->GetNextExecutionTime();
+	if ($next_exec_time)
+		$xsl->AddFragment($next_exec_time);
+}
 
 $xsl->DisplayXHTML('xsl/list_workflow_schedules.xsl');
 

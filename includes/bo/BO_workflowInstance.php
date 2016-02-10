@@ -184,7 +184,7 @@ class WorkflowInst{
 	public static function GetTerminatedWorkflows($params, $user_mgmt=true) {
 		// TERMINATED workflows
 		$query = "
-			SELECT SQL_CALC_FOUND_ROWS workflow_name,workflow_instance_id,workflow_instance_host,workflow_instance_start,workflow_instance_end,workflow_instance_status,workflow_instance_errors
+			SELECT SQL_CALC_FOUND_ROWS workflow_name,workflow_instance_id,node_name,workflow_instance_host,workflow_instance_start,workflow_instance_end,workflow_instance_status,workflow_instance_errors
 			FROM t_workflow_instance wfi
 			LEFT JOIN t_workflow wf ON(wf.workflow_id=wfi.workflow_id)
 		";
@@ -271,7 +271,15 @@ class WorkflowInst{
 		
 		$xml = "<workflows status='TERMINATED' first='$first' last='$last' page='$page' total='$n'>";
 		while ( ($row = $db->FetchAssoc()) !== false )
-			$xml .= '<workflow id="'.$row['workflow_instance_id'].'" errors="'.$row['workflow_instance_errors'].'" start_time="'.$row['workflow_instance_start'].'" end_time="'.$row['workflow_instance_end'].'" name="'.htmlspecialchars($row['workflow_name']).'" status="'.$row['workflow_instance_status'].'" host="'.htmlspecialchars($row['workflow_instance_host']).'"/>';
+			$xml .= "<workflow
+				id='{$row['workflow_instance_id']}'
+				node_name='{$row['node_name']}'
+				errors='{$row['workflow_instance_errors']}'
+				start_time='{$row['workflow_instance_start']}'
+				end_time='{$row['workflow_instance_end']}'
+				name='".htmlspecialchars($row['workflow_name'])."'
+				status='{$row['workflow_instance_status']}'
+				host='".htmlspecialchars($row['workflow_instance_host'])."' />";
 		$xml .= '</workflows>';
 		
 		return $xml;

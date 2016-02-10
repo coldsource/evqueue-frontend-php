@@ -33,6 +33,7 @@ class WorkflowSchedule {
 	private $schedule;
 	private $onfailure;
 	private $active;
+	private $node_name;
 	private $host;
 	private $user;
 	private $parameters = array();
@@ -57,6 +58,7 @@ class WorkflowSchedule {
 		$this->schedule = $row['workflow_schedule'];
 		$this->onfailure = $row['workflow_schedule_onfailure'];
 		$this->active = $row['workflow_schedule_active'];
+		$this->node_name = $row['node_name'];
 		$this->host = $row['workflow_schedule_host'];
 		$this->user = $row['workflow_schedule_user'];
 		$this->comment = $row['workflow_schedule_comment'];
@@ -118,6 +120,14 @@ class WorkflowSchedule {
 		return $this->active;
 	}
 	
+	public function set_node_name($node_name){
+		$this->node_name = $node_name;
+	}
+	
+	public function get_node_name(){
+		return $this->node_name;
+	}
+	
 	public function set_host($host){
 		$host = empty($host)? NULL:$host;
 		$this->host = $host;
@@ -159,11 +169,11 @@ class WorkflowSchedule {
 		if ($this->id === false) {
 			$this->db->QueryPrintf("
 					INSERT INTO t_workflow_schedule (
-						workflow_id, workflow_schedule, workflow_schedule_onfailure, workflow_schedule_user, workflow_schedule_host, workflow_schedule_active, workflow_schedule_comment
+						workflow_id, workflow_schedule, workflow_schedule_onfailure, workflow_schedule_user, node_name, workflow_schedule_host, workflow_schedule_active, workflow_schedule_comment
 				) VALUES (
 						%i, %s, %s, %s, %s, %i, %s
 				)",
-							$this->workflow_id, $this->schedule, $this->onfailure, $this->user, $this->host, $this->active, $this->comment
+							$this->workflow_id, $this->schedule, $this->onfailure, $this->user, $this->node_name, $this->host, $this->active, $this->comment
 			);
 				
 			$this->id = $this->db->GetInsertID();
@@ -176,6 +186,7 @@ class WorkflowSchedule {
 						workflow_schedule = %s,
 						workflow_schedule_onfailure = %s,
 						workflow_schedule_user = %s,
+						node_name = %s,
 						workflow_schedule_host = %s,
 						workflow_schedule_active = %i,
 						workflow_schedule_comment = %s
@@ -185,6 +196,7 @@ class WorkflowSchedule {
 							$this->schedule,
 							$this->onfailure,
 							$this->user,
+							$this->node_name,
 							$this->host,
 							$this->active,
 							$this->comment,
@@ -214,6 +226,7 @@ class WorkflowSchedule {
 		$this->set_schedule($vals['schedule']);
 		$this->set_onfailure($vals['onfailure']);
 		$this->set_user($vals['schedule_user']);
+		$this->set_node_name($vals['node_name']);
 		$this->set_host($vals['schedule_host']);
 		$this->set_active($vals['active']);
 		$this->set_comment($vals['schedule_comment']);
@@ -226,7 +239,6 @@ class WorkflowSchedule {
 			$parameters = array();
 		
 		$this->set_parameters($parameters);
-			
 		
 		if (count($errors)>0)
 			return $errors;
@@ -254,6 +266,7 @@ class WorkflowSchedule {
 		$xml .= '<schedule>'.$schedule->get_schedule().'</schedule>';
 		$xml .= '<onfailure>'.$schedule->get_onfailure().'</onfailure>';
 		$xml .= '<active>'.$schedule->get_active().'</active>';
+		$xml .= '<node_name>'.$schedule->get_node_name().'</node_name>';
 		$xml .= '<host>'.$schedule->get_host().'</host>';
 		$xml .= '<user>'.$schedule->get_user().'</user>';
 		$xml .= '<comment>'.$schedule->get_comment().'</comment>';

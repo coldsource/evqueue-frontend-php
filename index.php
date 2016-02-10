@@ -29,13 +29,16 @@ $PAGESIZE = 30;
 
 
 // EXECUTING workflows
-$wfi = new WorkflowInstance();
-$wfs = $wfi->GetRunningWorkflows();
-if ($wfs != '')
-	$xsl->AddFragment($wfs);
-else {
-	$xsl->AddError('evqueue-not-running');
-	$xsl->AddFragment('<workflows status="EXECUTING" />"');
+require 'conf/queueing.php';
+foreach ($QUEUEING as $node_name => $conf) {
+	$wfi = new WorkflowInstance($node_name);
+	$wfs = $wfi->GetRunningWorkflows();
+	if ($wfs != '')
+		$xsl->AddFragment($wfs);
+	else {
+		$xsl->AddError('evqueue-not-running');  // TODO: add which node is not running
+		$xsl->AddFragment('<workflows status="EXECUTING" />"');
+	}
 }
 
 

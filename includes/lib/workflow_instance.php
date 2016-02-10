@@ -18,18 +18,22 @@
   * Authors: Nicolas Jean, Christophe Marti 
   */
 
-require_once "conf/queueing.php";
 require_once "lib/Logger.php";
 
 
 class WorkflowInstance {
+	private $node_name;
 	private $evqueue_ip;
 	private $evqueue_port;
 	
 	
-	public function __construct($evqueue_ip=QUEUEING_HOST, $evqueue_port=QUEUEING_PORT) {
-		$this->evqueue_ip = $evqueue_ip;
-		$this->evqueue_port = $evqueue_port;
+	public function __construct($node_name) {
+		require 'conf/queueing.php';
+		if (!isset($QUEUEING[$node_name]))
+			Logger::GetInstance()->Log(LOG_ERR,'WorkflowInstance',"Unknown evqueue node '$node_name'");
+		
+		$this->node_name = $node_name;
+		list($this->evqueue_ip,$this->evqueue_port) = explode(':', $QUEUEING[$node_name]);
 	}
 	
 	/**
@@ -200,9 +204,14 @@ class WorkflowInstance {
 	/*
 	 * Reloads the lists of tasks, workflows and workflow schedules.
 	 */
-	public static function ReloadEvqueue ($host=QUEUEING_HOST,$port=QUEUEING_PORT) {
-		$wfi = new WorkflowInstance($host,$port);
-		return $wfi->ask_evqueue("<control action='reload' />\n", "count(/return[@status='OK']) = 1");
+	public static function ReloadEvqueue () {
+		$ret = true;
+		require 'conf/queueing.php';
+		foreach ($QUEUEING as $node => $conf) {
+			$wfi = new WorkflowInstance($node);
+			$ret = $ret && $wfi->ask_evqueue("<control action='reload' />\n", "count(/return[@status='OK']) = 1");
+		}
+		return $ret;
 	}
 	
 	/*
@@ -281,6 +290,12 @@ class WorkflowInstance {
 		@fwrite($s,'<status type="workflows" />');
 		$xml = stream_get_contents($s);
 		fclose($s);
+		
+		// Temporary: not necessary any more when evqueue returns the node_name itself.
+		$dom = new DOMDocument();
+		$dom->loadXML($xml);
+		$dom->documentElement->setAttribute('node_name', $this->node_name);
+		$xml = $dom->saveXML();
 		
 		return $xml;  // for now we return the XML directly, since it will be used in the XSL only
 	}

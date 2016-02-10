@@ -30,7 +30,7 @@ if (!isset($_GET['id']))
 
 $xsl = new XSLEngine();
 
-$wfi = new WorkflowInstance();
+$wfi = new WorkflowInstance($_GET['node_name']);
 $wf = $wfi->GetWorkflowOutput($_GET['id']);
 
 $xsl->AddFragment($wf);

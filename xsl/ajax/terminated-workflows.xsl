@@ -4,7 +4,10 @@
 	<xsl:output method="xml" indent="yes" omit-xml-declaration="yes" encoding="utf-8" doctype-public="-//W3C//DTD XHTML 1.0 Transitional//EN" doctype-system="http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd" />
 	
 	<xsl:template match="/page">
-		<xsl:apply-templates select="/page/workflows" />
+		<xsl:call-template name="workflows">
+			<xsl:with-param name="workflows" select="/page/workflows/workflow" />
+			<xsl:with-param name="status" select="'TERMINATED'" />
+		</xsl:call-template>
 	</xsl:template>
 	
 </xsl:stylesheet>

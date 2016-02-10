@@ -20,6 +20,7 @@
 				<div id="tabs" class="">
 					<ul>
 						<li><a href="#generalTab">General</a></li>
+						<li><a href="#nodeTab">Node</a></li>
 						<li class="paramsTab"><a href="#paramsTab">Parameters</a></li>
 						<li><a href="#hostTab">Host</a></li>
 					</ul>
@@ -194,6 +195,16 @@
 					<div id="paramsTab">
 						<input type="hidden" name="schedule_parameters" value="" />
 						<div id="paramsTabForm"></div>
+					</div>
+					<div id="nodeTab">
+						<select name="node_name">
+							<xsl:for-each select="/page/evqueue-nodes/node">
+								<option value="{@name}">
+									<xsl:if test="@name = /page/schedule/node_name"><xsl:attribute name="selected">selected</xsl:attribute></xsl:if>
+									<xsl:value-of select="@name" />
+								</option>
+							</xsl:for-each>
+						</select>
 					</div>
 					<div id="hostTab">
 						<br />

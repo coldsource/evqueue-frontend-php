@@ -42,7 +42,7 @@
 			</td>
 
 			<td>
-				<span class="action" data-id="{@id}">
+				<span class="action" data-id="{@id}" data-node-name="{@node_name | ../@node_name}">
 					<img src="images/plus.png" />
 					<xsl:text> </xsl:text>
 					<xsl:value-of select="@id" />
@@ -59,6 +59,9 @@
 					<xsl:with-param name="seconds" select="$seconds" />
 				</xsl:call-template>
 				<xsl:text>)</xsl:text>
+			</td>
+			<td class="tdHost">
+				<xsl:value-of select="@node_name | ../@node_name" />
 			</td>
 			<td class="tdHost">
 				<xsl:choose>
@@ -94,7 +97,7 @@
 			</td>		
 		</tr>
 		<tr id="tr{@id}" class="hidden">
-			<td colspan="6" class="details">
+			<td colspan="7" class="details">
 			</td>
 		</tr>
 	</xsl:template>
@@ -157,6 +160,7 @@
 				<div id="tabs_{$identifier}" class="makeMeTabz">
 					<ul>
 						<li><a href="#paramsTab_{$identifier}">Parameters</a></li>
+						<li><a href="#nodeTab_{$identifier}">Node</a></li>
 						<li><a href="#hostTab_{$identifier}">Host</a></li>
 					</ul>
 					
@@ -169,6 +173,14 @@
 						<xsl:apply-templates select="parameters" mode="edit"></xsl:apply-templates>
 					</div>
 					
+					
+					<div id="nodeTab_{$identifier}">
+						<select name="node">
+							<xsl:for-each select="/page/evqueue-nodes/node">
+								<option value="{@name}"><xsl:value-of select="@name" /></option>
+							</xsl:for-each>
+						</select>
+					</div>
 					
 					<div id="hostTab_{$identifier}">
 						<table>
@@ -563,17 +575,13 @@
 	</xsl:template>
 	
 	
-	<xsl:template match="workflows">
-		<xsl:variable name="status">
-			<xsl:choose>
-				<xsl:when test="count(@status) > 0"><xsl:value-of select="@status" /></xsl:when>
-				<xsl:otherwise>EXECUTING</xsl:otherwise>
-			</xsl:choose>
-		</xsl:variable>
+	<xsl:template name="workflows">
+		<xsl:param name="workflows" />
+		<xsl:param name="status" />
 		
 		<div id="{$status}-workflows" class="workflow-list">
 			<xsl:choose>
-				<xsl:when test="count(workflow)=0">
+				<xsl:when test="count(exsl:node-set($workflows))=0">
 					<div style="text-align: center">
 						<div class="boxTitle workflowTitle titleNoResults">
 							<span class="workflowPages">No <xsl:value-of select="$status" /> workflow.</span>
@@ -597,7 +605,7 @@
 								<span class="prevPage action" data-status="{$status}">&lt;</span>
 							</xsl:if>
 							<xsl:if test="$status = 'EXECUTING'">
-								<xsl:value-of select="count(workflow)" />
+								<xsl:value-of select="count(exsl:node-set($workflows))" />
 							</xsl:if>
 							<xsl:text> </xsl:text>
 							<xsl:value-of select="$status" />
@@ -620,6 +628,7 @@
 						<tr>
 							<th class="thState">State</th>
 							<th>ID &#8211; Name</th>
+							<th>Node</th>
 							<th class="thStarted">Host</th>
 							<th class="thStarted">Started</th>
 							<xsl:if test="$status = 'TERMINATED'">
@@ -627,7 +636,7 @@
 							</xsl:if>
 							<th class="thActions">Actions</th>
 						</tr>
-						<xsl:apply-templates select="workflow[@status = $status]">
+						<xsl:apply-templates select="exsl:node-set($workflows)[@status = $status]">
 							<xsl:sort select="@end_time" order="descending" />
 							<xsl:sort select="@start_time" order="descending" />
 						</xsl:apply-templates>

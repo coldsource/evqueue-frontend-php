@@ -101,7 +101,10 @@ $(document).ready(function() {
 		
 		$.ajax({
 			url: 'ajax/workflow.php',
-			data: {id: $(this).data('id')},
+			data: {
+				id: $(this).data('id'),
+				node_name: $(this).data('node-name')
+			},
 			beforeSend: function () {
 				nextTrTd.html('').append('<img src="images/ajax-loader.gif" /> Loading');
 			},

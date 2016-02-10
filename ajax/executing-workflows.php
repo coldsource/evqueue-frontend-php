@@ -27,13 +27,16 @@ require_once 'lib/XSLEngine.php';
 $xsl = new XSLEngine();
 
 // EXECUTING workflows
-$wfi = new WorkflowInstance();
-$wfs = $wfi->GetRunningWorkflows($_GET);
-if ($wfs != '')
-	$xsl->AddFragment($wfs);
-else {
-	$xsl->AddError('evqueue-not-running');
-	$xsl->AddFragment('<workflows status="EXECUTING" />"');
+require 'conf/queueing.php';
+foreach ($QUEUEING as $node_name => $conf) {
+	$wfi = new WorkflowInstance($node_name);
+	$wfs = $wfi->GetRunningWorkflows();
+	if ($wfs != '')
+		$xsl->AddFragment($wfs);
+	else {
+		$xsl->AddError('evqueue-not-running');
+		$xsl->AddFragment('<workflows status="EXECUTING" />"');
+	}
 }
 
 $xsl->DisplayXHTML('../xsl/ajax/executing-workflows.xsl');
