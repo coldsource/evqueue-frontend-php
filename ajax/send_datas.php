@@ -123,7 +123,7 @@ if (isset($_POST) && !empty($_POST)){
 			break;
 		
 		case 'resetStats':
-			$wfi = new WorkflowInstance();
+			$wfi = new WorkflowInstance($_POST['node_name']);
 			$wfi->ResetStatistics();
 			writeEnd(true);
 			break;

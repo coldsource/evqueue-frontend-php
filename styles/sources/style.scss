@@ -833,8 +833,14 @@ a.clear{
 }
 
 div.contentList, div.contentManage {
-    margin: auto;
-    width: 80%;
+	margin: auto;
+	width: 80%;
+}
+
+.flexContainer {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: space-around;
 }
 
 .workflowName{

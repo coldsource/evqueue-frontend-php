@@ -8,29 +8,33 @@
 	</xsl:variable>
 	
 	<xsl:template name="content">
-		<div class="contentManage">
-			<div class="boxTitle statistics">
-				<span class="title">Statistics</span>
-				<div class="titleAction">
-					<xsl:if test="/page/private/logged-in-user/@profile = 'ADMIN'">
-						<a href="system_statistics.php?action=reset"><img class="action" src="images/delete.gif" /></a>
-					</xsl:if>
-				</div>
-			</div>
-			<table class="highlight_row">
-				<xsl:for-each select="/page/global/statistics/@*">
-					<tr class="evenOdd">
-						<td>
-							<xsl:variable name="statistic_name" select="local-name(.)" />
-							<xsl:value-of select="document('data/statistics.xml')/statistics/statistic[@id=$statistic_name]" />
-						</td>
-						<td class="txtcenter">
-							<xsl:value-of select="."/>
-						</td>
-					</tr>
-				</xsl:for-each>	
-			</table>
-		</div>	
+		<div class="contentManage flexContainer">
+			<xsl:for-each select="/page/global">
+				<div class="flexContained">
+					<div class="boxTitle statistics">
+						<span class="title">Statistics (node <xsl:value-of select="@node_name" />)</span>
+						<div class="titleAction">
+							<xsl:if test="/page/private/logged-in-user/@profile = 'ADMIN'">
+								<a href="system_statistics.php?action=reset&amp;node_name={@node_name}"><img class="action" src="images/delete.gif" /></a>
+							</xsl:if>
+						</div>
+					</div>
+					<table class="highlight_row">
+						<xsl:for-each select="statistics/@*">
+							<tr class="evenOdd">
+								<td>
+									<xsl:variable name="statistic_name" select="local-name(.)" />
+									<xsl:value-of select="document('data/statistics.xml')/statistics/statistic[@id=$statistic_name]" />
+								</td>
+								<td class="txtcenter">
+									<xsl:value-of select="."/>
+								</td>
+							</tr>
+						</xsl:for-each>
+					</table>
+				</div>	
+			</xsl:for-each>
+		</div>
 	</xsl:template>
 
 </xsl:stylesheet>

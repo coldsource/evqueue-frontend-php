@@ -32,7 +32,7 @@ foreach ($QUEUEING as $node_name => $conf) {
 	$wfi = new WorkflowInstance($node_name);
 	
 	if (isset($_GET['action']) && $_GET['action'] == 'reset') {
-		$ws = new WebserviceWrapper('reset-stats', 'resetStats', array(), true);
+		$ws = new WebserviceWrapper('reset-stats', 'resetStats', ['node_name'=>$_GET['node_name']], true);
 		$ws->FetchResult();
 		header('Location: system_statistics.php');
 		die();

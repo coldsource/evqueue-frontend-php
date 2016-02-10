@@ -158,9 +158,9 @@ table.highlight_row tr:hover {
 tr.group {
   background: #CCC; }
 
-  tr.group td {
-    font-size: 15px;
-    font-weight: bold;
+tr.group td {
+  font-size: 15px;
+  font-weight: bold;
   padding: 7px; }
 
 tr.groupspace td {
@@ -875,6 +875,11 @@ a.clear {
 div.contentList, div.contentManage {
   margin: auto;
   width: 80%; }
+
+.flexContainer {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around; }
 
 .workflowName {
   color: green;
