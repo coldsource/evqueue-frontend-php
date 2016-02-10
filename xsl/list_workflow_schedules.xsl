@@ -92,7 +92,7 @@
 										</td>
 									</xsl:if>
 									<td class="center">
-										<xsl:value-of select="@node_name" />
+										<xsl:value-of select="node_name" />
 									</td>
 									<xsl:if test="$DISPLAY = 'settings'">
 										<td class="center">
