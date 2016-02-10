@@ -24,12 +24,12 @@
 			<table>
 				<tbody>
 					<tr>
-						<th>ID</th>
+						<th style="width:50px;">ID</th>
 						<th>Workflow</th>
 						<xsl:if test="$DISPLAY = 'settings'">
 							<th>On failure</th>
 						</xsl:if>
-						<th>Node</th>
+						<th style="width:100px;">Node</th>
 						<xsl:if test="$DISPLAY = 'settings'">
 							<th>Host</th>
 						</xsl:if>
@@ -72,7 +72,7 @@
 						<xsl:for-each select="/page/schedules/schedule">
 							<xsl:if test="/page/workflows/workflow[@id = current()/workflow_id]/@group = $groupName">
 								<tr class="evenOdd">
-									<td>
+									<td class="center">
 										<xsl:value-of select="@id" />
 									</td>
 									<td>
