@@ -27,9 +27,11 @@ require_once 'lib/WebserviceWrapper.php';
 
 $xsl = new XSLEngine();
 
-$wfi = new WorkflowInstance();
-
-$xsl->AddFragment('<global>'.$wfi->GetConfiguration().'</global>');
+require 'conf/queueing.php';
+foreach ($QUEUEING as $node_name => $conf) {
+	$wfi = new WorkflowInstance($node_name);
+	$xsl->AddFragment('<global node_name="'.htmlspecialchars($node_name).'">'.$wfi->GetConfiguration().'</global>');
+}
 
 $xsl->DisplayXHTML('xsl/system_configuration.xsl');
 

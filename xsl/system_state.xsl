@@ -10,9 +10,9 @@
 	<xsl:template name="content">
 		<div class="contentManage">
 			<div class="boxTitle">
-				<span class="title">Queues States (node <xsl:value-of select="@node_name" />)</span>
+				<span class="title">Queues States</span>
 			</div>
-		
+			
 			<div class="makeMeTabz">
 				<ul>
 					<xsl:for-each select="/page/stats">
@@ -61,7 +61,7 @@
 				</xsl:for-each>
 			</div>
 		</div>
-	<script type="text/javascript">$('div.makeMeTabz:visible').tabs().removeClass('makeMeTabz');</script>
+		<script type="text/javascript">$('div.makeMeTabz:visible').tabs().removeClass('makeMeTabz');</script>
 	</xsl:template>
 
 </xsl:stylesheet>
