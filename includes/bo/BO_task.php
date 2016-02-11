@@ -513,19 +513,21 @@ class Task{
 	 * Return workflow instances (running workflows) that make use of this task.
 	 */
 	public function GetLinkedWorkflowInstances(){
-		$wfs = array();
+		$wfs = [];
 		
-		$dom = new DOMDocument();
-		$wfi = new WorkflowInstance();
-		$running = $wfi->GetRunningWorkflows();
-		if (!$running)  // evqueue not running?
-			return array();
-		
-		$dom->loadXML($running);
-		$xpath = new DOMXPath($dom);
-		$DOMwfs = $xpath->evaluate("//tasks/task[@name='{$this->name}']/ancestor::workflow/@id");
-		foreach ($DOMwfs as $DOMwf) {
-			$wfs[] = new WorkflowInst($DOMwf->nodeValue);
+		require 'conf/queueing.php';
+		foreach ($QUEUEING as $node_name => $conf) {
+			$dom = new DOMDocument();
+			$wfi = new WorkflowInstance($node_name);
+			$running = $wfi->GetRunningWorkflows();
+			if (!$running)  // evqueue not running?
+				break;
+			
+			$dom->loadXML($running);
+			$xpath = new DOMXPath($dom);
+			$DOMwfs = $xpath->evaluate("//tasks/task[@name='{$this->name}']/ancestor::workflow/@id");
+			foreach ($DOMwfs as $DOMwf)
+				$wfs[] = new WorkflowInst($DOMwf->nodeValue);
 		}
 		return $wfs;
 	}
