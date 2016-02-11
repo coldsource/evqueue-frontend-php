@@ -40,6 +40,23 @@
 				</xsl:for-each>
 			</div>
 		</div>
+		
 		<script type="text/javascript">$('div.makeMeTabz:visible').tabs().removeClass('makeMeTabz');</script>
+		
+		<!-- Highlight parameters that have different values on multiple nodes. -->
+		<script type="text/javascript">
+			$('.sysConfTab:eq(0) .paramName').each( function () {
+				var paramName = $(this).text();
+				var valueName = $(this).next('.paramValue').text();
+				
+				var params = $('.paramName').filter( function () { return $(this).text() === paramName; } );
+				var values = params.next('.paramValue');
+				
+				if (values.length !== values.filter( function () { return $(this).text() === valueName; } ).length) {
+					console.log('different values for param',paramName);
+					values.css('font-weight', 'bold');
+				}
+			});
+		</script>
 	</xsl:template>
 </xsl:stylesheet>
