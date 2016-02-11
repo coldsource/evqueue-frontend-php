@@ -34,7 +34,7 @@ foreach ($QUEUEING as $node_name => $conf) {
 	if ($wfs != '')
 		$xsl->AddFragment($wfs);
 	else {
-		$xsl->AddError('evqueue-not-running');
+		$xsl->AddError('evqueue-not-running','',$node_name);
 		$xsl->AddFragment('<workflows status="EXECUTING" />"');
 	}
 }

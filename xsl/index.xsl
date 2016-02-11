@@ -43,8 +43,8 @@
 		
 		<xsl:if test="count(/page/errors/error[@id='evqueue-not-running']) > 0">
 			<div id="evqueue-not-running">
-				Evqueue is not running!!!<br/>
-				If you expect workflows to be launched, you should start the evqueue process urgently!
+				Evqueue is not running on node '<xsl:value-of select="/page/errors/error[@id='evqueue-not-running']/@param" />'!!!<br/>
+				<!--If you expect workflows to be launched, you should start the evqueue process urgently!-->
 			</div>
 		</xsl:if>
 		
