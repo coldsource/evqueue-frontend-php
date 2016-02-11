@@ -129,11 +129,11 @@ class WorkflowInst{
 		}
 	}
 	
-	public function stop(){
+	public function stop($node_name){
 		if ($this->workflow_instance_id === false)
 			return false;
 		
-		$wfi = new WorkflowInstance();
+		$wfi = new WorkflowInstance($node_name);
 		return $wfi->StopWorkflow($this->workflow_instance_id);
 	}
 	

@@ -52,8 +52,9 @@ $(document).ready( function() {
 	
 	$(document).delegate( 'img.stopWFI', 'click', function() {
 		var id = $(this).data("wfiid");
+		var node_name = $(this).data("node-name");
 		if (confirm("Stop the workflow instance n°"+id+"?")){
-			stopWfi(id);
+			stopWfi(id,node_name);
 		}
 	});
 	
@@ -85,6 +86,6 @@ function deleteWfi(id){
 	ajaxDelete('deleteWFI', id, '');
 }
 
-function stopWfi(id){
-	ajaxDelete('stopWFI', id, '');
+function stopWfi(id,node_name){
+	ajaxDelete('stopWFI', id, '', {node_name: node_name});
 }

@@ -86,13 +86,13 @@
 			
 			<td class="tdActions">
 				<xsl:if test="@status='EXECUTING' and (/page/private/logged-in-user/@profile = 'ADMIN' or /page/private/logged-in-user/workflow[@wfname = current()/@name]/right[@action='kill'] = 1)">
-					<img src="images/stop.png" data-wfiid="{@id}" class="stopWFI" alt="Stop execution of this workflow" title="Stop execution of this workflow" />
+					<img src="images/stop.png" data-wfiid="{@id}" data-node-name="{../@node_name}" class="stopWFI" alt="Stop execution of this workflow" title="Stop execution of this workflow" />
 				</xsl:if>
 				
 				<xsl:if test="@status='TERMINATED'">
 					<xsl:call-template name="deleteWFI">
 						<xsl:with-param name="wfiid" select="@id" />
-					</xsl:call-template>				
+					</xsl:call-template>
 				</xsl:if>
 			</td>		
 		</tr>
