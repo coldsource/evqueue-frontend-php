@@ -33,7 +33,21 @@ class WorkflowInstance {
 			Logger::GetInstance()->Log(LOG_ERR,'WorkflowInstance',"Unknown evqueue node '$node_name'");
 		
 		$this->node_name = $node_name;
-		list($this->evqueue_ip,$this->evqueue_port) = explode(':', $QUEUEING[$node_name]);
+		
+
+		
+		preg_match_all("|(.*)://(.*)(:([0-9]*))?|", $QUEUEING[$node_name], $match);
+		
+		if(substr($QUEUEING[$node_name], 0 ,7) == 'unix://'){
+			$this->evqueue_ip = $QUEUEING[$node_name];
+			$this->evqueue_port = -1;
+		}
+		elseif(substr($QUEUEING[$node_name], 0 ,6) == 'tcp://'){
+			list($this->evqueue_ip,$this->evqueue_port) = explode(':', substr($QUEUEING[$node_name], 6));
+		}
+		else
+			Logger::GetInstance()->Log(LOG_ERR,'WorkflowInstance',"Unknown scheme '$QUEUEING[$node_name]'");
+		
 	}
 	
 	/**
