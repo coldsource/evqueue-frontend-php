@@ -225,6 +225,11 @@ class WorkflowInst{
 			$values[] = $get['wf_name'];
 		}
 		
+		if(isset($get['node'])) {
+			$query .= " AND wfi.node_name = %s";
+			$values[] = $get['node'];
+		}
+		
 		if (isset($get['workflow_schedule_id'])) {
 			$query .= ' AND workflow_schedule_id = %i';
 			$values[] = $get['workflow_schedule_id'];
