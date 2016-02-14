@@ -129,7 +129,28 @@ class WorkflowInstance {
 	public static function ReloadEvqueue () {
 		try
 		{
-			return $this->evqueue->ReloadEvqueue();
+			global $QUEUEING;
+			foreach($QUEUEING as $node_name=>$cnx)
+			{
+				$evq = new evQueue($cnx);
+				$evq->ReloadEvqueue();
+			}
+		}
+		catch(Exception $e)
+		{
+			Logger::GetInstance()->Log(LOG_ERR,'WorkflowInstance ',$e->getMessage());
+		}
+	}
+	
+	public static function SyncTasks () {
+		try
+		{
+			global $QUEUEING;
+			foreach($QUEUEING as $node_name=>$cnx)
+			{
+				$evq = new evQueue($cnx);
+				$evq->SyncTasks();
+			}
 		}
 		catch(Exception $e)
 		{
@@ -189,8 +210,9 @@ class WorkflowInstance {
 		return $dom->saveXML();
 	}
 	
-	public static function StoreFile ($filename,$data,$node_name) {
-		$wfi = new WorkflowInstance($node_name);
+	public static function StoreFile ($filename,$data) {
+		global $QUEUEING;
+		$wfi = new WorkflowInstance(array_keys($QUEUEING)[0]);
 		try
 		{
 			return $wfi->evqueue->StoreFile($filename,$data);
@@ -201,8 +223,9 @@ class WorkflowInstance {
 		}
 	}
 	
-	public static function DeleteFile ($filename,$node_name) {
-		$wfi = new WorkflowInstance($node_name);
+	public static function DeleteFile ($filename) {
+		global $QUEUEING;
+		$wfi = new WorkflowInstance(array_keys($QUEUEING)[0]);
 		try
 		{
 			return $wfi->evqueue->DeleteFile($filename);
@@ -213,8 +236,9 @@ class WorkflowInstance {
 		}
 	}
 	
-	public static function StoreConfFile ($filename,$data,$node_name) {
-		$wfi = new WorkflowInstance($node_name);
+	public static function StoreConfFile ($filename,$data) {
+		global $QUEUEING;
+		$wfi = new WorkflowInstance(array_keys($QUEUEING)[0]);
 		try
 		{
 			return $wfi->evqueue->StoreConfFile($filename,$data);
@@ -225,8 +249,9 @@ class WorkflowInstance {
 		}
 	}
 	
-	public static function DeleteConfFile ($filename,$node_name) {
-		$wfi = new WorkflowInstance($node_name);
+	public static function DeleteConfFile ($filename) {
+		global $QUEUEING;
+		$wfi = new WorkflowInstance(array_keys($QUEUEING)[0]);
 		try
 		{
 			return $wfi->evqueue->DeleteConfFile($filename);
@@ -237,8 +262,9 @@ class WorkflowInstance {
 		}
 	}
 	
-	public static function GetConfFile ($filename,$node_name) {
-		$wfi = new WorkflowInstance($node_name);
+	public static function GetConfFile ($filename) {
+		global $QUEUEING;
+		$wfi = new WorkflowInstance(array_keys($QUEUEING)[0]);
 		try
 		{
 			return $wfi->evqueue->GetConfFile($filename);
@@ -249,8 +275,9 @@ class WorkflowInstance {
 		}
 	}
 	
-	public static function GetTaskFile ($filename,$node_name) {
-		$wfi = new WorkflowInstance($node_name);
+	public static function GetTaskFile ($filename) {
+		global $QUEUEING;
+		$wfi = new WorkflowInstance(array_keys($QUEUEING)[0]);
 		try
 		{
 			return $wfi->evqueue->GetTaskFile($filename);
@@ -261,8 +288,9 @@ class WorkflowInstance {
 		}
 	}
 	
-	public static function PutTaskFile ($filename,$data,$node_name) {
-		$wfi = new WorkflowInstance($node_name);
+	public static function PutTaskFile ($filename,$data) {
+		global $QUEUEING;
+		$wfi = new WorkflowInstance(array_keys($QUEUEING)[0]);
 		try
 		{
 			return $wfi->evqueue->PutTaskFile($filename,$data);
@@ -273,8 +301,9 @@ class WorkflowInstance {
 		}
 	}
 	
-	public static function DeleteTaskFile ($filename,$node_name) {
-		$wfi = new WorkflowInstance($node_name);
+	public static function DeleteTaskFile ($filename) {
+		global $QUEUEING;
+		$wfi = new WorkflowInstance(array_keys($QUEUEING)[0]);
 		try
 		{
 			return $wfi->evqueue->DeleteTaskFile($filename);

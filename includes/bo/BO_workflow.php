@@ -24,8 +24,6 @@ require_once 'lib/workflow_instance.php';
 require_once 'utils/string_utils.php';
 require_once 'bo/BO_user.php';
 require_once 'bo/BO_task.php';
-require_once 'conf/queueing.php';
-
 
 class Workflow{
 	
@@ -477,7 +475,7 @@ class Workflow{
 				// "system task" (ls, ps, wc, cat...), nothing to export, the task should be present on the system for the workflow to run
 			} else {
 				// specific, user-defined task: we package it with the workflow so it can be run anywhere else
-				$bin = WorkflowInstance::GetTaskFile($binary,array_keys($QUEUEING)[0]);
+				$bin = WorkflowInstance::GetTaskFile($binary);
 				if ($bin === false)
 					return array("I can't get the binary $binary. EvQueue not running?");
 				$zip->addFromString($binary,$bin);
@@ -525,6 +523,7 @@ class Workflow{
 		}
 		
 		$zip->close();
+		
 		return ($errors === true || empty($errors)) ? true : $errors;
 	}
 	
