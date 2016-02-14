@@ -285,7 +285,10 @@ class Workflow{
 		}
 		
 		if (isset($vals["workflow_notifications"]) && $setvals === true){
-			$this->set_notifications(explode(',', $vals["workflow_notifications"]));
+			if(trim($vals["workflow_notifications"])!='')
+				$this->set_notifications(explode(',', $vals["workflow_notifications"]));
+			else
+				$this->set_notifications(array());
 		}
 		
 		if (count($errors)>0)

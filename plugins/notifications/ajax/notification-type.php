@@ -34,13 +34,13 @@ $xsl = new XSLEngine();
 
 
 if( $action == 'edit'){
-	$fichier = WorkflowInstance::GetConfFile($type.'.php');
+	$fichier = WorkflowInstance::GetConfFile($type.'.conf.php');
 	$contenu = $conf->read($fichier);
 	$xsl->AddFragment( $contenu );
 	
 }else if( $action == 'save' ){
 	$texte = $conf->write($_POST); // récupération des données
-	WorkflowInstance::StoreConfFile($type.'.php', $texte); // Ecriture des données dans le serveur
+	WorkflowInstance::StoreConfFile($type.'.conf.php', $texte); // Ecriture des données dans le serveur
 }
 
 $xsl->DisplayXHTML('../'.$type.'/plugin-configuration.xsl');

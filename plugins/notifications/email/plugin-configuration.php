@@ -3,7 +3,7 @@
 class PluginConfiguration{
 
 	public function write($params){
-		$str = '<?php $email_conf = array ( ';
+		$str = '<?php $EMAIL_CONFIG = array ( ';
 		foreach($params AS $key=>$value){
 			$str .= "'".$key."' => '".$value."',";
 		}
@@ -17,9 +17,7 @@ class PluginConfiguration{
 		@eval('?>'.$str);
 		
 		$xml = '<notification-type>';
-		$xml .= '<email>'.htmlspecialchars($email_conf['email_from']).'</email>';
-		$xml .= '<mail-command>'.htmlspecialchars($email_conf['commande_mail']).'</mail-command>';
-		$xml .= '<smtp>'.htmlspecialchars($email_conf['smtp']).'</smtp>';
+		$xml .= '<email>'.htmlspecialchars($EMAIL_CONFIG['from']).'</email>';
 		$xml .= '</notification-type>';
 		
 		return $xml;
