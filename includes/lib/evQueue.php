@@ -145,6 +145,10 @@ class evQueue {
 		return false;
 	}
 	
+	public function GetWorkflowOutput($workflow_instance_id) {
+		return $this->exec("<workflow id='$workflow_instance_id' />");
+	}
+	
 	
 	public function StopWorkflow ($workflow_instance_id) {
 		
