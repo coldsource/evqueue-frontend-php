@@ -81,7 +81,7 @@ class evQueue {
 		
 		$dom = new DOMDocument();
 		if (!@$dom->loadXML($out))
-			throw new Exception("evQueue : invalud XML returned from engine : $out");
+			throw new Exception("evQueue : invalid XML returned from engine : $out");
 		
 		$xpath = new DOMXPath($dom);
 		$status = $xpath->evaluate("string(/response/@status)");
@@ -124,7 +124,7 @@ class evQueue {
 		
 		$xml = simplexml_load_string($xml_str);
 		
-		$workflow_instance_id = (int)$xml->attributes()->{'workflow-instance-id'};
+		return (int)$xml->attributes()->{'workflow-instance-id'};
 	}
 	
 	
