@@ -200,7 +200,8 @@ class WorkflowInstance {
 		}
 		catch(Exception $e)
 		{
-			Logger::GetInstance()->Log(LOG_ERR,'WorkflowInstance ',$e->getMessage());
+			Logger::GetInstance()->Log(LOG_WARNING,'WorkflowInstance ',$e->getMessage());
+			return;
 		}
 		
 		// Temporary: not necessary any more when evqueue returns the node_name itself.
