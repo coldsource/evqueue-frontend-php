@@ -18,6 +18,7 @@
   * Authors: Nicolas Jean, Christophe Marti 
   */
 
-define('QUEUEING_HOST','127.0.0.1');
-define('QUEUEING_PORT','5000');
+$QUEUEING = [
+	'localhost' => 'tcp://localhost:5000'
+];
 ?>

@@ -174,15 +174,12 @@ class Task{
 		
 		if ($this->id === false) {
 			
-			if ($this->binary_content && !WorkflowInstance::PutTaskFile($this->binary_path, $this->binary_content))
-				return array('cant-put-task' => "The binary '$this->binary_path' could not be saved by evqueue (evqueue not running? binary with same name already exists?)");
-			
 			$this->db->QueryPrintf("
 					INSERT INTO t_task (
-					task_name, task_binary, task_user, task_host, task_parameters_mode, task_output_method, task_xsd, task_wd, task_group, workflow_id
+					task_name, task_binary, task_binary_content, task_user, task_host, task_parameters_mode, task_output_method, task_xsd, task_wd, task_group, workflow_id
 			) VALUES (
-					%s,%s,%s,%s,%s,%s,%s,%s,%s,%i
-			)",	$this->name, $this->binary_path, $this->user, $this->host, $this->parameters_mode, $this->output_method, $this->xsd, $this->wd, $this->group, $this->workflow_id);
+					%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%i
+			)",	$this->name, $this->binary_path, $this->binary_content, $this->user, $this->host, $this->parameters_mode, $this->output_method, $this->xsd, $this->wd, $this->group, $this->workflow_id);
 			
 			$this->id = $this->db->GetInsertID();
 			

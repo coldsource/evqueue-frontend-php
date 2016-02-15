@@ -25,7 +25,6 @@ require_once 'utils/string_utils.php';
 require_once 'bo/BO_user.php';
 require_once 'bo/BO_task.php';
 
-
 class Workflow{
 	
 	const WORKFLOW_IMPORT_EXPORT_VERSION = 1.4;
@@ -286,7 +285,10 @@ class Workflow{
 		}
 		
 		if (isset($vals["workflow_notifications"]) && $setvals === true){
-			$this->set_notifications(explode(',', $vals["workflow_notifications"]));
+			if(trim($vals["workflow_notifications"])!='')
+				$this->set_notifications(explode(',', $vals["workflow_notifications"]));
+			else
+				$this->set_notifications(array());
 		}
 		
 		if (count($errors)>0)
@@ -437,6 +439,8 @@ class Workflow{
 	
 	
 	public function Export ($filename) {
+		global $QUEUEING;
+		
 		$zip = new ZipArchive();
 		$zip->open($filename, ZipArchive::CREATE);  // TODO: test if it worked
 		
@@ -522,6 +526,7 @@ class Workflow{
 		}
 		
 		$zip->close();
+		
 		return ($errors === true || empty($errors)) ? true : $errors;
 	}
 	

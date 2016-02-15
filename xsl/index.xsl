@@ -86,6 +86,20 @@
 						<td colspan="2"><a onclick="$('.filter').toggle();" href="javascript:void(0)">Filters</a> : <xsl:call-template name="explain_search" /></td>
 					</tr>
 					<tr class="filter nodisplay">
+						<td style="width:300px;">Node</td>
+						<td>
+							<select name="node">
+								<option value="all">All</option>
+								<xsl:for-each select="/page/evqueue-nodes/node">
+									<option value="{@name}">
+										<xsl:if test="/page/get/@node = @name"><xsl:attribute name="selected">selected</xsl:attribute></xsl:if>
+										<xsl:value-of select="@name" />
+									</option>
+								</xsl:for-each>
+							</select>
+						</td>
+					</tr>
+					<tr class="filter nodisplay">
 						<td style="width:300px;">Workflow</td>
 						<td>
 							<xsl:apply-templates select="/page/groups" mode="select_workflow">

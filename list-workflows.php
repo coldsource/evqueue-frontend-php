@@ -33,7 +33,10 @@ $xsl = new XSLEngine();
 if (isset($_FILES['workflow_zip_file'])) {
 	$errors = Workflow::Import($_FILES['workflow_zip_file']['tmp_name']);
 	if ($errors === true)
+	{
 		$xsl->AddNotice('Installed workflow successfully!');
+		WorkflowInstance::SyncTasks();
+	}
 	else
 		$xsl->AddErrors($errors);
 }
