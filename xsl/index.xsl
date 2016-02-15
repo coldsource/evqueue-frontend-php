@@ -41,12 +41,12 @@
 			</xsl:choose>
 		</script>
 		
-		<xsl:if test="count(/page/errors/error[@id='evqueue-not-running']) > 0">
+		<xsl:for-each select="/page/errors/error[@id='evqueue-not-running']">
 			<div id="evqueue-not-running">
-				Evqueue is not running on node '<xsl:value-of select="/page/errors/error[@id='evqueue-not-running']/@param" />'!!!<br/>
+				Evqueue is not running on node '<xsl:value-of select="@param" />'!!!<br/>
 				<!--If you expect workflows to be launched, you should start the evqueue process urgently!-->
 			</div>
-		</xsl:if>
+		</xsl:for-each>
 		
 		<div id="workflows" class="contentList">
 			
