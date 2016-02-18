@@ -611,7 +611,7 @@
 							<xsl:value-of select="$status" />
 							Workflows
 							<xsl:if test="$status = 'TERMINATED'">
-								<xsl:value-of select="@first" />-<xsl:value-of select="@last" />&#160;<span style="font-size: 80%">(<xsl:value-of select="@total" /> total)</span>
+								<xsl:value-of select="/page/workflows/@first" />-<xsl:value-of select="/page/workflows/@last" />&#160;<span style="font-size: 80%">(<xsl:value-of select="/page/workflows/@total" /> total)</span>
 							</xsl:if>
 							<xsl:text> </xsl:text>
 							<xsl:if test="$status = 'TERMINATED'">
