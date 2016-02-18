@@ -5,7 +5,9 @@ $(document).ready( function() {
 	
 	$(document).delegate( 'img.relaunch', 'click', function() {
 		var id = $(this).data("wfiid");
-		$("#relaunch_"+id).dialog({ 
+		var node_name = $(this).data("node-name");
+		
+		$("#relaunch_"+id).dialog({
 			minHeight: 300, 
 			minWidth: 650, 
 			modal: true, 
@@ -34,8 +36,19 @@ $(document).ready( function() {
 		event.preventDefault();
 		$(this).parents('[id^=relaunch_]').dialog('close');  // close the dialog box so that the user does not click twice on submit
 		
-		var params = $(this).serializeArray();
-		params.push({name: 'form_id', value: 'launchWorkflow'});
+		var wfparams = {};
+		$(this).find('.paramsTab :input').not('').each( function (i,input) {
+			wfparams[$(input).attr('name')] = $(input).val();
+		});
+		
+		var params = {
+			form_id: 'launchWorkflow',
+			id: $(this).find('input[name=id]').val(),
+			node: $(this).find('.nodeTab select').val(),
+			user: $(this).find('.hostTab input[name=user]').val(),
+			host: $(this).find('.hostTab input[name=host]').val(),
+			wfparams: wfparams
+		};
 		
 		wsfwd({
 			params: params,

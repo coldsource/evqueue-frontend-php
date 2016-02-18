@@ -130,7 +130,6 @@ if (isset($_POST) && !empty($_POST)){
 		
 		case 'launchWorkflow':
 			$id = $_POST["id"];
-			unset($_POST["id"],$_POST['form_id']);
 			
 			if (is_numeric($id)) {
 				$wfi_bo = new WorkflowInst($id);
@@ -143,11 +142,8 @@ if (isset($_POST) && !empty($_POST)){
 			if (trim($_POST['user'].$_POST['host'] != ''))
 				$user_host = $_POST['user'].'@'.$_POST['host'];
 			
-			unset($_POST["user"],$_POST["host"]);
-			
 			$wfi = new WorkflowInstance($_POST['node']);
-			unset($_POST['node']);
-			$id = $wfi->LaunchWorkflowInstance($name, $_POST, 'asynchronous', $user_host);
+			$id = $wfi->LaunchWorkflowInstance($name, $_POST['wfparams'], 'asynchronous', $user_host);
 			
 			if ($id === false){
 				$xml = "<error>Could not launch workflow: the queueing engine is likely not running, or workflow has been deleted/modified?</error>";
