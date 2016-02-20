@@ -24,7 +24,7 @@ require_once 'inc/logger.php';
 require_once 'lib/XSLEngine.php';
 require_once 'bo/BO_notification.php';
 require_once 'bo/BO_notificationType.php';
-require_once 'lib/plugin.php';
+require_once 'lib/NotificationPlugin.php';
 
 
 $xsl = new XSLEngine();
