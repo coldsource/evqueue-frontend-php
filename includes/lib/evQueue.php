@@ -84,8 +84,8 @@ class evQueue {
 			throw new Exception("evQueue : invalid XML returned from engine : $out");
 		
 		$xpath = new DOMXPath($dom);
-		$status = $xpath->evaluate("string(/response/@status)");
-		$error = $xpath->evaluate("string(/response/@error)");
+		$status = $xpath->evaluate("string(/return/@status)");
+		$error = $xpath->evaluate("string(/return/@error)");
 		
 		if($status=='KO')
 			throw new Exception("evQueue : error executing command $cmd. Got error $error from engine.");
