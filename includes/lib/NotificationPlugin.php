@@ -108,22 +108,23 @@ class NotificationPlugin {
 			if (file_put_contents("$this->destination_folder/$file", $data) === false)
 				return array("Could not write file '$file' locally");
 		
-		// ask evqueue to store the binary file (it may be running on a different host)
-		if (!WorkflowInstance::StoreFile($this->binary_name,$this->binary)) {
-			$this->rollback();
-			return array("Could not store the binary file at evqueue's, cancelled installation (rolled back writing files locally)");
-		}
-		
 		$type = new NotificationType();
 		$ret = $type->check_values(array(
 				'notification_type_name' => $this->name,
 				'notification_type_description' => $this->description,
 				'notification_type_binary' => $this->binary_name,
+				'notification_type_binary_content' => $this->binary,
 		), true);
 		
 		if ($ret !== true) {
 			$this->rollback($this->binary_name);
 			return array('Could not save notification type, cancelled installation (rolled back writing files locally and binary storage)');
+		}
+		
+		// ask evqueue to store the binary file (it may be running on a different host)
+		if (!WorkflowInstance::SyncNotifications()) {
+			$this->rollback();
+			return array("Could not store the binary file at evqueue's, cancelled installation (rolled back writing files locally)");
 		}
 		
 		if (!WorkflowInstance::ReloadEvqueue()) {

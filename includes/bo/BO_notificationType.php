@@ -28,6 +28,7 @@ class NotificationType {
 	private $name;
 	private $description;
 	private $binary;
+	private $binary_content;
 	
 	function __construct($id = false){
 		$this->connectDB();
@@ -47,7 +48,7 @@ class NotificationType {
 		$this->name = $row['notification_type_name'];
 		$this->description = $row['notification_type_description'];
 		$this->binary = $row['notification_type_binary'];
-		
+		$this->binary_content = $row['notification_type_binary_content'];
 	}
 	
 	private function connectDB ($mode = null) {
@@ -66,10 +67,10 @@ class NotificationType {
 			
 			$this->db->QueryPrintf("
 				INSERT INTO t_notification_type (
-					notification_type_name, notification_type_description, notification_type_binary
+					notification_type_name, notification_type_description, notification_type_binary, notification_type_binary_content
 				) VALUES (
-					%s, %s, %s
-				)",	$this->name, $this->description, $this->binary);
+					%s, %s, %s, %s
+				)",	$this->name, $this->description, $this->binary, $this->binary_content);
 				
 			$this->id = $this->db->GetInsertID();
 			
@@ -79,12 +80,14 @@ class NotificationType {
 					SET
 						notification_type_name = %s,
 						notification_type_description = %s,
-						notification_type_binary = %s
+						notification_type_binary = %s,
+						notification_type_binary_content = %s
 					WHERE notification_type_id = %i
 					",
 					$this->name,
 					$this->description,
 					$this->binary,
+					$this->binary_content,
 					$this->id);
 		}
 	}
@@ -116,6 +119,9 @@ class NotificationType {
 			$this->binary = $vals["notification_type_binary"];
 		}
 		
+		if($setvals===true)
+			$this->binary_content =  $vals["notification_type_binary_content"];
+		
 		if (count($errors)>0)
 			return $errors;
 
@@ -132,6 +138,10 @@ class NotificationType {
 	
 	public function getBinary () {
 		return $this->binary;
+	}
+	
+	public function getBinaryContent () {
+		return $this->binary_content;
 	}
 	
 	public function getGeneratedXml(){

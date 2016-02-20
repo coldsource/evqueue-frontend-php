@@ -191,6 +191,14 @@ class evQueue {
 	}
 	
 	/*
+	 * Write all notifications stored in database to disk
+	 */
+	public function SyncNotifications ()
+	{
+		$this->exec("<control action='syncnotifications' />");
+	}
+	
+	/*
 	 * Asks all tasks having a retry schedule, and that failed, to try again immediately.
 	 */
 	public function RetryAll () {

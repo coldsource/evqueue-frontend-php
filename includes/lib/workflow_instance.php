@@ -139,6 +139,7 @@ class WorkflowInstance {
 		catch(Exception $e)
 		{
 			Logger::GetInstance()->Log(LOG_WARNING,'WorkflowInstance ',$e->getMessage());
+			return false;
 		}
 		
 		return true;
@@ -156,8 +157,30 @@ class WorkflowInstance {
 		}
 		catch(Exception $e)
 		{
-			Logger::GetInstance()->Log(LOG_ERR,'WorkflowInstance ',$e->getMessage());
+			Logger::GetInstance()->Log(LOG_WARNING,'WorkflowInstance ',$e->getMessage());
+			return false;
 		}
+		
+		return  true;
+	}
+	
+	public static function SyncNotifications () {
+		try
+		{
+			global $QUEUEING;
+			foreach($QUEUEING as $node_name=>$cnx)
+			{
+				$evq = new evQueue($cnx);
+				$evq->SyncNotifications();
+			}
+		}
+		catch(Exception $e)
+		{
+			Logger::GetInstance()->Log(LOG_WARNING,'WorkflowInstance ',$e->getMessage());
+			return  false;
+		}
+		
+		return true;
 	}
 	
 	public static function RetryAll () {
@@ -223,6 +246,7 @@ class WorkflowInstance {
 		catch(Exception $e)
 		{
 			Logger::GetInstance()->Log(LOG_WARNING,'WorkflowInstance ',$e->getMessage());
+			return  false;
 		}
 		
 		return true;
@@ -238,6 +262,7 @@ class WorkflowInstance {
 		catch(Exception $e)
 		{
 			Logger::GetInstance()->Log(LOG_WARNING,'WorkflowInstance ',$e->getMessage());
+			return false;
 		}
 		
 		return  true;
