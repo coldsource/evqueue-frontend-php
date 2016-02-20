@@ -56,7 +56,7 @@ class NotificationPlugin {
 			return array('Could not open zip file');
 		
 		$this->files = array();
-		foreach (array('manifest.xml', 'notification-parameters.php', 'notification-parameters.xsl') as $file) {
+		foreach (array('manifest.xml', 'notification-parameters.php', 'notification-parameters.xsl', 'plugin-configuration.php', 'plugin-configuration.xsl') as $file) {
 			$this->files[$file] = $this->zip->getFromName($file);
 			if ($this->files[$file] === false)
 				return array("Could not find the '$file' file");

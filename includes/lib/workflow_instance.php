@@ -138,8 +138,10 @@ class WorkflowInstance {
 		}
 		catch(Exception $e)
 		{
-			Logger::GetInstance()->Log(LOG_ERR,'WorkflowInstance ',$e->getMessage());
+			Logger::GetInstance()->Log(LOG_WARNING,'WorkflowInstance ',$e->getMessage());
 		}
+		
+		return true;
 	}
 	
 	public static function SyncTasks () {
@@ -216,12 +218,14 @@ class WorkflowInstance {
 		$wfi = new WorkflowInstance(array_keys($QUEUEING)[0]);
 		try
 		{
-			return $wfi->evqueue->StoreFile($filename,$data);
+			$wfi->evqueue->StoreFile($filename,$data);
 		}
 		catch(Exception $e)
 		{
-			Logger::GetInstance()->Log(LOG_ERR,'WorkflowInstance ',$e->getMessage());
+			Logger::GetInstance()->Log(LOG_WARNING,'WorkflowInstance ',$e->getMessage());
 		}
+		
+		return true;
 	}
 	
 	public static function DeleteFile ($filename) {
@@ -229,12 +233,14 @@ class WorkflowInstance {
 		$wfi = new WorkflowInstance(array_keys($QUEUEING)[0]);
 		try
 		{
-			return $wfi->evqueue->DeleteFile($filename);
+			$wfi->evqueue->DeleteFile($filename);
 		}
 		catch(Exception $e)
 		{
-			Logger::GetInstance()->Log(LOG_ERR,'WorkflowInstance ',$e->getMessage());
+			Logger::GetInstance()->Log(LOG_WARNING,'WorkflowInstance ',$e->getMessage());
 		}
+		
+		return  true;
 	}
 	
 	public static function StoreConfFile ($filename,$data) {
