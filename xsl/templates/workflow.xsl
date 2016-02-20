@@ -164,25 +164,29 @@
 						<li><a href="#hostTab_{$identifier}">Host</a></li>
 					</ul>
 					
+					<input type="hidden" name="id" value="{$identifier}" />
 					
-					<div id="paramsTab_{$identifier}">
-						<input type="hidden" name="id" value="{$identifier}" />
+					<div id="paramsTab_{$identifier}" class="paramsTab">
 						<xsl:if test="count(parameters/parameter) = 0">
 							No parameters for this workflow
 						</xsl:if>
 						<xsl:apply-templates select="parameters" mode="edit"></xsl:apply-templates>
 					</div>
 					
-					
-					<div id="nodeTab_{$identifier}">
+					<div id="nodeTab_{$identifier}" class="nodeTab">
 						<select name="node">
 							<xsl:for-each select="/page/evqueue-nodes/node">
-								<option value="{@name}"><xsl:value-of select="@name" /></option>
+								<option value="{@name}">
+									<xsl:if test="@name = /page/get/@node_name">
+										<xsl:attribute name="selected">selected</xsl:attribute>
+									</xsl:if>
+									<xsl:value-of select="@name" />
+								</option>
 							</xsl:for-each>
 						</select>
 					</div>
 					
-					<div id="hostTab_{$identifier}">
+					<div id="hostTab_{$identifier}" class="hostTab">
 						<table>
 							<tr class="evenOdd">
 								<td>User</td>
@@ -216,7 +220,7 @@
 		<div class="workflow {$editionClass}" id="workflow{@id}">
 			<img src="images/listli.png" class="formattedXml" /> 
 			<xsl:text>&#160;</xsl:text>
-			<img src="images/re-launch.png" data-wfiid="{@id}" class="relaunch" alt="Re-launch workflow instance" title="Re-launch workflow instance" ></img>
+			<img src="images/re-launch.png" data-wfiid="{@id}" data-node-name="{../@node_name}" class="relaunch" alt="Re-launch workflow instance" title="Re-launch workflow instance" ></img>
 			<xsl:text>&#160;</xsl:text>
 			<img class="viewXML" src="images/bigger.png" title="View workflow XML" onclick="$('#xmlcontent{@id}').dialog({{width:800}});" />
 			<div id="xmlcontent{@id}" style="display:none;">
@@ -611,7 +615,7 @@
 							<xsl:value-of select="$status" />
 							Workflows
 							<xsl:if test="$status = 'TERMINATED'">
-								<xsl:value-of select="@first" />-<xsl:value-of select="@last" />&#160;<span style="font-size: 80%">(<xsl:value-of select="@total" /> total)</span>
+								<xsl:value-of select="/page/workflows/@first" />-<xsl:value-of select="/page/workflows/@last" />&#160;<span style="font-size: 80%">(<xsl:value-of select="/page/workflows/@total" /> total)</span>
 							</xsl:if>
 							<xsl:text> </xsl:text>
 							<xsl:if test="$status = 'TERMINATED'">

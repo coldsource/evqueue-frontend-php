@@ -225,7 +225,7 @@ class WorkflowInst{
 			$values[] = $get['wf_name'];
 		}
 		
-		if(isset($get['node'])) {
+		if(isset($get['node']) && $get['node']!='all') {
 			$query .= " AND wfi.node_name = %s";
 			$values[] = $get['node'];
 		}
