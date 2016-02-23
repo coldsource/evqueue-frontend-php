@@ -22,7 +22,11 @@ require_once 'inc/auth_check.php';
 require_once 'inc/logger.php';
 require_once 'lib/workflow_instance.php';
 
-$wfi = new WorkflowInstance();
-$wfi->RetryAll();
+require 'conf/queueing.php';
+foreach ($QUEUEING as $node_name => $conf) {
+	$wfi = new WorkflowInstance($node_name);
+	$wfi->RetryAll();
+}
+
 
 ?>
