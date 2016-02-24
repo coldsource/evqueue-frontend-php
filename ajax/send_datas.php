@@ -117,7 +117,7 @@ if (isset($_POST) && !empty($_POST)){
 			break;
 		
 		case 'killTask':
-			$wfi = new WorkflowInstance();
+			$wfi = new WorkflowInstance($_POST['node_name']);
 			$wfi->KillTask($_POST['id'], $_POST['task_pid']);
 			writeEnd(true);
 			break;

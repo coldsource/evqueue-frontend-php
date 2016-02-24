@@ -180,13 +180,14 @@ $(document).ready(function() {
 });
 
 
-function killTask (workflow_instance_id, task_pid) {
+function killTask (node_name, workflow_instance_id, task_pid) {
 	if (confirm('Do you really want to immediately stop the execution of this task?'))
 		wsfwd({
 			params: {
 				form_id: 'killTask',
 				id: workflow_instance_id,
-				task_pid: task_pid
+				task_pid: task_pid,
+				node_name: node_name
 			},
 			success: function () {
 				$('img.refreshWorkflows').click();

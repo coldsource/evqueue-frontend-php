@@ -433,7 +433,7 @@
 								<xsl:when test="@status='EXECUTING'">
 									EXECUTING
 									<xsl:if test="@status='EXECUTING' and (/page/private/logged-in-user/@profile = 'ADMIN' or /page/private/logged-in-user/workflow[@wfname = current()/ancestor::workflow[1]/@name]/right[@action='kill'] = 1)">
-										<img class="killTask" src="images/bomb.png" title="Kill Task" onclick="killTask({ancestor::workflow[1]/@id}, {@pid});" />
+										<img class="killTask" src="images/bomb.png" title="Kill Task" onclick="killTask('{/page/get/@node_name}', {ancestor::workflow[1]/@id}, {@pid});" />
 									</xsl:if>
 								</xsl:when>
 								<xsl:when test="@status='QUEUED'">
