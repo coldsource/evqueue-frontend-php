@@ -26,6 +26,9 @@ select {
 select.ui-timepicker-select {
   width: auto; }
 
+.planChoice select {
+  width: 100%; }
+
 input, select {
   border: 1px solid darkgray; }
 
@@ -69,8 +72,7 @@ ul.topmenu li.logo {
   font-size: 16px; }
 
 ul.topmenu li.logo a {
-	color:#000000;
-}
+  color: #000000; }
 
 ul.topmenu li.selected {
   background-color: #EEEEEE; }
@@ -951,7 +953,7 @@ ul.scheduleParameters li {
   padding: 0; }
 
 div.install_content {
-  width: 341px;
+  width: 340px;
   margin: auto; }
 
 div.install_content div.error {
@@ -1005,5 +1007,3 @@ div.lightTreeJob .taskLoop {
   font-size: 110%; }
 
 /* END LIGHT-TREE DISPLAY */
-
-/*# sourceMappingURL=style.css.map */
