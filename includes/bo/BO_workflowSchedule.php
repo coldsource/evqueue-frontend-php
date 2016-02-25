@@ -171,11 +171,11 @@ class WorkflowSchedule {
 					INSERT INTO t_workflow_schedule (
 						workflow_id, workflow_schedule, workflow_schedule_onfailure, workflow_schedule_user, node_name, workflow_schedule_host, workflow_schedule_active, workflow_schedule_comment
 				) VALUES (
-						%i, %s, %s, %s, %s, %i, %s
+						%i, %s, %s, %s, %s, %s, %i, %s
 				)",
 							$this->workflow_id, $this->schedule, $this->onfailure, $this->user, $this->node_name, $this->host, $this->active, $this->comment
 			);
-				
+			
 			$this->id = $this->db->GetInsertID();
 			
 		} else {
