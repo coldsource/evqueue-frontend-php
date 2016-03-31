@@ -42,7 +42,7 @@ class evQueue {
 		
 		$this->socket = @fsockopen($this->evqueue_ip,$this->evqueue_port);
 		if ($this->socket === false)
- 			throw new Exception("evQueue : unable to conect to core engine with IP $this->evqueue_ip and port $this->evqueue_port");
+ 			throw new Exception("evQueue : unable to connect to core engine with IP $this->evqueue_ip and port $this->evqueue_port");
 	}
 	
 	protected function disconnect()
