@@ -19,6 +19,8 @@
   */
 
 use \Exception as Exception;
+use \DOMDocument as DOMDocument;
+use \DOMXPath as DOMXPath;
 
 class evQueue {
 	protected $evqueue_ip;
