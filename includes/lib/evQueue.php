@@ -18,6 +18,8 @@
   * Author: Thibault Kummer
   */
 
+use \Exception as Exception;
+
 class evQueue {
 	protected $evqueue_ip;
 	protected $evqueue_port;
