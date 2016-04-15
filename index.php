@@ -32,7 +32,7 @@ $PAGESIZE = 30;
 require 'conf/queueing.php';
 foreach ($QUEUEING as $node_name => $conf) {
 	$wfi = new WorkflowInstance($node_name);
-	$wfs = $wfi->GetRunningWorkflows();
+	$wfs = $wfi->GetRunningWorkflows(50);
 	if ($wfs != '')
 		$xsl->AddFragment($wfs);
 	else {

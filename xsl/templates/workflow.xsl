@@ -609,11 +609,14 @@
 								<span class="prevPage action" data-status="{$status}">&lt;</span>
 							</xsl:if>
 							<xsl:if test="$status = 'EXECUTING'">
-								<xsl:value-of select="count(exsl:node-set($workflows))" />
+								<xsl:value-of select="sum(/page/workflows/@total-running)" />
 							</xsl:if>
 							<xsl:text> </xsl:text>
 							<xsl:value-of select="$status" />
 							Workflows
+							<xsl:if test="$status = 'EXECUTING' and count(exsl:node-set($workflows)) != sum(/page/workflows/@total-running)">
+								(<xsl:value-of select="count(exsl:node-set($workflows))" /> displayed)
+							</xsl:if>
 							<xsl:if test="$status = 'TERMINATED'">
 								<xsl:value-of select="/page/workflows/@first" />-<xsl:value-of select="/page/workflows/@last" />&#160;<span style="font-size: 80%">(<xsl:value-of select="/page/workflows/@total" /> total)</span>
 							</xsl:if>

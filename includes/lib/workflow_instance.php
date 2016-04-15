@@ -218,7 +218,7 @@ class WorkflowInstance {
 	}
 	
 	
-	public function GetRunningWorkflows() {
+	public function GetRunningWorkflows($limit=null) {
 		try
 		{
 			$xml = $this->evqueue->GetRunningWorkflows();
@@ -229,10 +229,26 @@ class WorkflowInstance {
 			return;
 		}
 		
-		// Temporary: not necessary any more when evqueue returns the node_name itself.
 		$dom = new DOMDocument();
 		$dom->loadXML($xml);
-		$dom->documentElement->setAttribute('node_name', $this->node_name);
+		$dom->documentElement->setAttribute('node_name', $this->node_name);  // Temporary: not necessary any more when evqueue returns the node_name itself.
+		
+		if ($limit) {
+			$xp = new DOMXPath($dom);
+			
+			$dom->documentElement->setAttribute('total-running', $xp->query('/workflows/workflow')->length);
+			$l = (int)$limit + 1;
+			$wf = $xp->query("/workflows/workflow[position()=$l]");  // delete workflows from limit+1
+			if ($wf->length > 0) {
+				$wf = $wf->item(0);
+				while ($wf) {
+					$nextwf = $wf->nextSibling;
+					$wf->parentNode->removeChild($wf);
+					$wf = $nextwf;
+				}
+			}
+		}
+		
 		return $dom->saveXML();
 	}
 	
