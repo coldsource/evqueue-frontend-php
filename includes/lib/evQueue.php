@@ -35,6 +35,11 @@ class evQueue {
 			throw new Exception("evQueue : Unknown scheme '$cnx_string'");
 	}
 	
+	public function __sleep()
+	{
+		$this->socket = false;
+	}
+	
 	protected function connect()
 	{
 		if($this->socket!==false)
