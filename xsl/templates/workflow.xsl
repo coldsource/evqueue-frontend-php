@@ -434,7 +434,7 @@
 								<xsl:when test="@status='EXECUTING'">
 									EXECUTING
 									<xsl:if test="@status='EXECUTING' and (/page/private/logged-in-user/@profile = 'ADMIN' or /page/private/logged-in-user/workflow[@wfname = current()/ancestor::workflow[1]/@name]/right[@action='kill'] = 1)">
-										<img class="killTask" src="images/bomb.png" title="Kill Task" onclick="killTask({ancestor::workflow[1]/@id}, {@pid});" />
+										<img class="killTask" src="images/bomb.png" title="Kill Task" onclick="killTask('{/page/get/@node_name}', {ancestor::workflow[1]/@id}, {@pid});" />
 									</xsl:if>
 								</xsl:when>
 								<xsl:when test="@status='QUEUED'">
@@ -610,11 +610,14 @@
 								<span class="prevPage action" data-status="{$status}">&lt;</span>
 							</xsl:if>
 							<xsl:if test="$status = 'EXECUTING'">
-								<xsl:value-of select="count(exsl:node-set($workflows))" />
+								<xsl:value-of select="sum(/page/workflows/@total-running)" />
 							</xsl:if>
 							<xsl:text> </xsl:text>
 							<xsl:value-of select="$status" />
 							Workflows
+							<xsl:if test="$status = 'EXECUTING' and count(exsl:node-set($workflows)) != sum(/page/workflows/@total-running)">
+								(<xsl:value-of select="count(exsl:node-set($workflows))" /> displayed)
+							</xsl:if>
 							<xsl:if test="$status = 'TERMINATED'">
 								<xsl:value-of select="/page/workflows/@first" />-<xsl:value-of select="/page/workflows/@last" />&#160;<span style="font-size: 80%">(<xsl:value-of select="/page/workflows/@total" /> total)</span>
 							</xsl:if>

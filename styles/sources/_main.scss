@@ -23,6 +23,9 @@ select {
 select.ui-timepicker-select {
 	width: auto;
 }
+.planChoice select {
+	width: 100%;
+}
 
 input, select {
 	border: 1px solid darkgray;

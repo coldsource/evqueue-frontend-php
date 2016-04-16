@@ -117,7 +117,7 @@
 							</div>
 							<div class="cb"></div>
 							
-							<div class="item planChoice" data-group="what">
+							<div class="item" data-group="what">
 								<label class="formLabel" >Workflow to run : </label>
 								
 								<xsl:choose>

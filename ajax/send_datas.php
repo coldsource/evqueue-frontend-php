@@ -117,7 +117,7 @@ if (isset($_POST) && !empty($_POST)){
 			break;
 		
 		case 'killTask':
-			$wfi = new WorkflowInstance();
+			$wfi = new WorkflowInstance($_POST['node_name']);
 			$wfi->KillTask($_POST['id'], $_POST['task_pid']);
 			writeEnd(true);
 			break;
@@ -143,7 +143,7 @@ if (isset($_POST) && !empty($_POST)){
 				$user_host = $_POST['user'].'@'.$_POST['host'];
 			
 			$wfi = new WorkflowInstance($_POST['node']);
-			$id = $wfi->LaunchWorkflowInstance($name, $_POST['wfparams'], 'asynchronous', $user_host);
+			$id = $wfi->LaunchWorkflowInstance($name, isset($_POST['wfparams']) ? $_POST['wfparams'] : [], 'asynchronous', $user_host);
 			
 			if ($id === false){
 				$xml = "<error>Could not launch workflow: the queueing engine is likely not running, or workflow has been deleted/modified?</error>";
