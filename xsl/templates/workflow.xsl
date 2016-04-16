@@ -344,6 +344,7 @@
 						<xsl:value-of select="$skipped2" />
 					</xsl:with-param>
 				</xsl:apply-templates>
+				<div style="clear:both;"><xsl:comment /></div>
 			</div>
 			
 			<xsl:apply-templates select="subjobs/job">

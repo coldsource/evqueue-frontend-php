@@ -381,7 +381,7 @@ label.forTextarea {
   margin-left: 42em; }
 
 textarea.large {
-  width: 68.8%;
+  width: 100%;
   height: 500px; }
 
 textarea.small {
@@ -799,7 +799,6 @@ div.editionWorkflow div.jobInfos {
   margin: 0 10px;
   padding: 1px 5px;
   border-radius: 5px;
-  background-color: #EAEAEA;
   z-index: 10; }
 
 div.editionWorkflow span.jobCondition {

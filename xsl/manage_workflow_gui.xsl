@@ -105,7 +105,7 @@
 		    </div>
 				
 		    <div class="actionItem" style="float: right; padding: 10px;">
-				<a class="action" onclick="cancelEdition(); return false;"><button type="button">Cancel changes</button></a>
+				<a class="action" onclick="cancelEdition(); return false;"><button type="button" class="blue">Cancel changes</button></a>
 				<form onsubmit="return false;" style="display: inline;">
 					<xsl:choose>
 						<xsl:when test="/page/workflow/@id">  <!-- edition -->

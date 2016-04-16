@@ -6,7 +6,8 @@
 		<form name="formWorkflow" id="formWorkflow" action="manage-workflow.php?workflow_id={/page/get/@workflow_id}" method="post">
 			<xsl:call-template name="form_workflow_header"/>
 			<br />
-			<label class="formLabel forTextarea" for="workflow_xml">Workflow xml:</label>
+			Workflow xml:
+			<br />
 			<textarea id="workflow_xml" name="workflow_xml" class="large">
 				<xsl:choose>
 					<xsl:when test="/page/post/@workflow_xml != ''">
@@ -18,7 +19,7 @@
 				</xsl:choose>
 			</textarea>
 			<br />
-			<input type="submit" name="submitFormWorkflow" class="submitFormButton submitFormButtonLarge" value="Submit" />
+			<input type="submit" name="submitFormWorkflow" class="submitFormButton submitFormButtonLarge" value="Save workflow" />
 		</form>
 	</xsl:template>
 	
@@ -47,33 +48,30 @@
 		<br />
 		
 		<br />
-		<fieldset style="border-radius:10px;width:536px;">
-			<legend>Notifications subscribed</legend>
-			<table>
-				<xsl:for-each select="/page/notification-types/notification-type">
-					<xsl:variable name="notification_type_id" select="@id" />
-					<tr class="group">
-						<td colspan="2">
+		<table style="width:560px;">
+			<xsl:for-each select="/page/notification-types/notification-type">
+				<xsl:variable name="notification_type_id" select="@id" />
+				<tr>
+					<td colspan="2">
+						Notifications <xsl:value-of select="name" />
+					</td>
+				</tr>
+				<xsl:for-each select="/page/notifications/notification[type-id=$notification_type_id]">
+					<tr>
+						<td style="width:20px;">
+							<input type="checkbox" name="notification[]" value="{@id}">
+								<xsl:if test="/page/workflow/notifications/notification = @id">
+									<xsl:attribute name="checked">checked</xsl:attribute>
+								</xsl:if>
+							</input>
+						</td>
+						<td>
 							<xsl:value-of select="name" />
 						</td>
 					</tr>
-					<xsl:for-each select="/page/notifications/notification[type-id=$notification_type_id]">
-						<tr>
-							<td style="width:20px;">
-								<input type="checkbox" name="notification[]" value="{@id}">
-									<xsl:if test="/page/workflow/notifications/notification = @id">
-										<xsl:attribute name="checked">checked</xsl:attribute>
-									</xsl:if>
-								</input>
-							</td>
-							<td>
-								<xsl:value-of select="name" />
-							</td>
-						</tr>
-					</xsl:for-each>
 				</xsl:for-each>
-			</table>
-		</fieldset>
+			</xsl:for-each>
+		</table>
 	</xsl:template>
 	
 	<xsl:template name="escapeQuote">
