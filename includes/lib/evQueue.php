@@ -42,6 +42,7 @@ class evQueue {
 	public function __sleep()
 	{
 		$this->socket = false;
+		return array('evqueue_ip', 'evqueue_port', 'socket');
 	}
 	
 	protected function connect()
@@ -81,7 +82,7 @@ class evQueue {
 		return $data	;
 	}
 	
-	protected function exec($cmd)
+	protected function exec($cmd, $return_dom=false)
 	{
 		$this->connect();
 		$this->send($cmd);
@@ -98,6 +99,9 @@ class evQueue {
 		
 		if($status=='KO')
 			throw new Exception("evQueue : error executing command $cmd. Got error $error from engine.");
+		
+		if($return_dom)
+			return  $dom;
 		
 		return $out;
 	}
@@ -158,6 +162,17 @@ class evQueue {
 		return $this->exec("<workflow id='$workflow_instance_id' />");
 	}
 	
+	public  function GetRunningTasks($workflow_instance_id) {
+		$dom = $this->exec("<workflow id='$workflow_instance_id' />",true);
+		$xpath = new DOMXpath($dom);
+		
+		$nodes = $xpath->query("//task[@status='EXECUTING']/@name");
+		$tasks = array();
+		foreach($nodes as $node)
+			$tasks[] = $node->nodeValue;
+		
+		return $tasks;
+	}
 	
 	public function StopWorkflow ($workflow_instance_id) {
 		
