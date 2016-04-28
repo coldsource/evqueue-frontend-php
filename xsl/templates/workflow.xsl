@@ -23,20 +23,23 @@
 					<xsl:copy-of select="." />
 				</xsl:variable>
 				<xsl:choose>
-					<xsl:when test="@errors>0">
+					<xsl:when test="@running_tasks - @queued_tasks > 0">
+						<img src="images/ajax-loader.gif" alt="Running" title="Task(s) running" />
+					</xsl:when>
+					<xsl:when test="@queued_tasks > 0">
+						<img src="images/waitpoint.gif" alt="Queued" title="Task(s) queued" />
+					</xsl:when>
+					<xsl:when test="@retrying_tasks > 0">
+						<img src="images/alarm_clock.png" alt="Retrying" title="A task ended badly and will retry" />
+					</xsl:when>
+					<xsl:when test="@errors > 0">
 						<img src="images/exclamation.png" alt="Errors" title="Errors" />
 					</xsl:when>
-					<xsl:when test="count(exsl:node-set($current-node)//task[@retry_at != '']) > 0">
-						<img src="images/alarm_clock.png" title="A task ended badly and will retry" />
-					</xsl:when>
-					<xsl:when test="count(exsl:node-set($current-node)//task[@status = 'QUEUED']) > 0">
-						<img src="images/waitpoint.gif" />
-					</xsl:when>
 					<xsl:when test="count(@end_time) > 0">
-						<img src="images/ok.png" />
+						<img src="images/ok.png" alt="Terminated" title="Workflow terminated" />
 					</xsl:when>
 					<xsl:otherwise>
-						<img src="images/ajax-loader.gif" />
+						<b>?</b>
 					</xsl:otherwise>
 				</xsl:choose>
 			</td>
