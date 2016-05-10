@@ -370,7 +370,7 @@
 			</xsl:choose>
 		</xsl:variable>
 		
-		<div data-name="{@name}" data-type="task" data-queue="{@queue}" data-retry-schedule="{@retry_schedule}" data-loop="{@loop}">
+		<div data-name="{@name}" data-type="task" data-queue="{@queue}" data-retry-schedule="{@retry_schedule}" data-loop="{@loop}" data-condition="{@condition}">
 			<xsl:attribute name="class">
 				task actionItem
 				<xsl:if test="position() = 1">
@@ -384,6 +384,9 @@
 			<xsl:variable name="nbtasks" select="count(../../subjobs/job/tasks/task)" />
 			
 			<span class="tasktitle">
+				<xsl:if test="@condition != ''">
+					<span title="Condition: {@condition}" class="taskCondition">[?]</span>
+				</xsl:if>
 				<xsl:if test="@loop != ''">
 					<span title="Loop on: {@loop}" class="taskLoop">⟲</span>
 				</xsl:if>

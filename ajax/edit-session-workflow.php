@@ -167,6 +167,11 @@ switch ($_POST['action']) {
 		else
 			$location->removeAttribute ('loop');
 		
+		if ($_POST['condition'] != '')
+			$location->setAttribute('condition', $_POST['condition']);
+		else
+			$location->removeAttribute ('condition');
+		
 		break;
 	
 	case 'editTaskInput':

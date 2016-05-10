@@ -33,12 +33,16 @@
 					<label class="taskLoopLabel">Task loop expression: </label>
 					<input name="loop" class="taskLoop" title="loop expression" placeholder="loop expression" />
 					<img class="action startXPathHelp" src="images/edition/help.png" />
+					<label class="taskConditionLabel">Task condition: </label>
+					<input name="condition" class="taskCondition" title="condition" placeholder="condition" />
+					<img class="action startXPathHelp" src="images/edition/help.png" />
 				</form>
 			</div>
 			<div style="display: none;">
 				<form id="editJob" onsubmit="executeAction('editJob',$(this)); return false;">
 					<input name="name" placeholder="job name" />
 					<input name="condition" title="execution condition" placeholder="execution condition" />
+					<img class="action startXPathHelp" src="images/edition/help.png" />
 					<input name="loop" title="loop expression" placeholder="loop expression" />
 					<img class="action startXPathHelp" src="images/edition/help.png" />
 					<input type="submit" value="Save" />

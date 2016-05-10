@@ -102,6 +102,7 @@ function editTask (clicked) {
 	$('form#editTask').find('select[name=queue_name]').find('option[value="'+task.data('queue')+'"]').attr('selected', 'selected');
 	$('form#editTask').find('select[name=retry_schedule]').find('option[value="'+task.data('retry-schedule')+'"]').attr('selected', 'selected');
 	$('form#editTask').find('input[name=loop]').val(task.data('loop'));
+	$('form#editTask').find('input[name=condition]').val(task.data('condition'));
 	
 	removeEditButtons();
 	task.html($('form#editTask'));
