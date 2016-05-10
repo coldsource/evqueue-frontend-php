@@ -362,6 +362,10 @@
 	<xsl:template match="task">
 		<xsl:param name="skipped" select="0" />
 		
+		<xsl:variable name="skippedJobOrTask">
+			<xsl:if test="$skipped or @status = 'SKIPPED'">1</xsl:if>
+		</xsl:variable>
+		
 		<xsl:variable name="nbErrorsMsg">
 			<xsl:choose>
 				<xsl:when test="count(@errors)=1">1 error</xsl:when>
@@ -375,6 +379,9 @@
 				task actionItem
 				<xsl:if test="position() = 1">
 					firstJobTask
+				</xsl:if>
+				<xsl:if test="@status='SKIPPED'">
+					skipped
 				</xsl:if>
 			</xsl:attribute>
 			<xsl:attribute name="data-xpath">
@@ -450,7 +457,7 @@
 						</xsl:when>
 						<xsl:otherwise>
 							<xsl:choose>
-								<xsl:when test="$skipped=0">
+								<xsl:when test="not($skippedJobOrTask)">
 									<img src="images/waitpoint.gif" title="Waiting for the previous job to finish" alt="Waiting for the previous job to finish" class="waitpoint" />
 									<span class="taskStats">Waiting for the previous job to finish</span>
 								</xsl:when>
