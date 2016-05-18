@@ -332,7 +332,7 @@ class WorkflowInstance {
 		}
 		catch(Exception $e)
 		{
-			Logger::GetInstance()->Log(LOG_ERR,'WorkflowInstance ',$e->getMessage());
+			return false;
 		}
 	}
 	
