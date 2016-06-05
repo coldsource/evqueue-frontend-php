@@ -501,16 +501,6 @@
 			
 			<xsl:if test="@status='TERMINATED'">
 				<div class="taskOutput hidden">
-					<xsl:if test="@retval and @retval != 0">
-						<xsl:variable name="retval">
-							<xsl:value-of select="@retval" />
-						</xsl:variable>
-						<ul class="errors">
-							<li>
-								return value: <xsl:value-of select="@retval" />
-							</li>
-						</ul>
-					</xsl:if>
 					<xsl:variable name="not-tied-task-binary">
 						<xsl:value-of select="/page/tasks/task[workflow_id = '' and task_name = current()/@name]/task_binary" />
 					</xsl:variable>
@@ -783,26 +773,76 @@
 	
 	
 	<xsl:template name="node">
-		<span class="taskStats">
-			Task returned code <xsl:value-of select="@retval" /> at <xsl:value-of select="@exit_time" /> (execution took <xsl:value-of select="php:function('strtotime',string(@exit_time))-php:function('strtotime',string(@execution_time))" />&#160;s). Output :
-		</span>
+		<xsl:variable name="output-id" select="generate-id()" />
 		
-		<div class="taskOutputContent">
-			<xsl:if test="@retval != 0">
-				<div class="error "><xsl:value-of select="." /></div>
-			</xsl:if>
-			<xsl:if test="@retval = 0">
-				<xsl:choose>
-					<xsl:when test="@method = 'text'">
-						<xsl:attribute name="style">white-space:pre-wrap;</xsl:attribute>
-						<xsl:value-of select="." />
-					</xsl:when>
-					<xsl:when test="@method = 'xml'">
-						<xsl:apply-templates select="." mode="xml_display" />
-					</xsl:when>
-				</xsl:choose>
-			</xsl:if>
+		<a href="javascript:void(0)" onclick="javascript:jQuery('#output-{$output-id}').toggle();">
+			<span class="taskStats">
+				<img src="images/minus.png" />
+				&#160;<b><xsl:value-of select="@exit_time" /></b> : Task returned code <xsl:value-of select="@retval" /> (execution took <xsl:value-of select="php:function('strtotime',string(@exit_time))-php:function('strtotime',string(@execution_time))" />&#160;s)
+			</span>
+		</a>
+		
+		<div id="output-{$output-id}" style="display:none;">
+			<ul>
+				<li>
+					<a href="output-stdout-{$output-id}">
+						<xsl:if test=". != ''"><xsl:attribute name="style">font-weight:bold;</xsl:attribute></xsl:if>
+						<xsl:text>stdout</xsl:text>
+					</a>
+				</li>
+				<li>
+					<a href="output-stderr-{$output-id}">
+						<xsl:if test="following-sibling::*[1][name() = 'stderr'] != ''"><xsl:attribute name="style">font-weight:bold;</xsl:attribute></xsl:if>
+						<xsl:text>stderr</xsl:text>
+					</a>
+				</li>
+				<li>
+					<a href="output-log-{$output-id}">
+						<xsl:if test="following-sibling::*[1][name() = 'log'] | following-sibling::*[2][name() = 'log'] != ''"><xsl:attribute name="style">font-weight:bold;</xsl:attribute></xsl:if>
+						<xsl:text>log</xsl:text>
+					</a>
+				</li>
+			</ul>
+			
+			<div class="taskOutputContent" id="output-stdout-{$output-id}">
+				<xsl:if test="@retval != 0">
+					<div class="error "><xsl:value-of select="." /></div>
+				</xsl:if>
+				<xsl:if test="@retval = 0">
+					<xsl:choose>
+						<xsl:when test="@method = 'text'">
+							<xsl:attribute name="style">white-space:pre-wrap;</xsl:attribute>
+							<xsl:value-of select="." />
+						</xsl:when>
+						<xsl:when test="@method = 'xml'">
+							<xsl:apply-templates select="." mode="xml_display" />
+						</xsl:when>
+					</xsl:choose>
+				</xsl:if>
+			</div>
+			
+			<div class="taskOutputContent" id="output-stderr-{$output-id}">
+				<xsl:value-of select="following-sibling::*[1][name() = 'stderr']" />
+			</div>
+			
+			<div class="taskOutputContent" id="output-log-{$output-id}">
+				<xsl:value-of select="following-sibling::*[1][name() = 'log'] | following-sibling::*[2][name() = 'log']" />
+			</div>
 		</div>
+		<script type="text/javascript">
+		$('#output-<xsl:value-of select="$output-id" /> '+String.fromCharCode(62)+' div').hide();
+		$('#output-<xsl:value-of select="$output-id" /> ul li a').bind('click',function(event) {
+			event.preventDefault();
+			$('#output-<xsl:value-of select="$output-id" /> '+String.fromCharCode(62)+' div').hide();
+			target_id = event.target.getAttribute('href');
+			$('#'+target_id).show();
+			
+			$('#output-<xsl:value-of select="$output-id" /> ul li').css('background-color','');
+			$(event.target).parent().css('background-color','#B9F0BC');
+		});
+		
+		$('#output-<xsl:value-of select="$output-id" /> ul li:first-child a').click();
+		</script>
 	</xsl:template>
 	
 	

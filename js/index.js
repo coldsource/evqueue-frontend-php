@@ -129,7 +129,7 @@ $(document).ready(function() {
 	});	
 	
 	$(document).delegate( 'span.tasktitle', 'click', function() {
-		toggleJob($(this).parents('div.job:eq(0)').find('img.showmemore:eq(0)'));
+		$(this).nextAll('div.taskOutput').toggleClass('hidden');
 	});
 	
 	$(document).delegate( 'img.showmemore', 'click', function() {
