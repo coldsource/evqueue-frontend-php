@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf8"?>
 <statistics>
 	<statistic id="accepted_connections">Accepted connections</statistic>
+	<statistic id="current_connections">Current connections</statistic>
 	<statistic id="input_errors">Errors parsing request</statistic>
 	<statistic id="statistics_queries">Number of statistics queries</statistic>
 	<statistic id="workflow_cancel_queries">Number of cancel queries</statistic>
