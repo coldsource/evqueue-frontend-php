@@ -11,8 +11,6 @@
 
 	<xsl:template name="content">
 		<div id="queue" class="contentList">
-			<br />
-			<div class="center"><i>Note : You need to restart evQueue engine after adding or removing a queue</i></div>
 			<xsl:call-template name="list_queues"/>
 		</div>
     </xsl:template>

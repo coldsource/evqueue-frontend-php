@@ -115,6 +115,8 @@ class Queue{
 					$this->concurrency,
 					$this->id);
 		}
+
+		WorkflowInstance::ReloadEvqueue();
 	}
 	
 	public function existQueueName($name, $id=null){
@@ -222,6 +224,9 @@ class Queue{
 					WHERE queue_id = %i
 					",
 					$this->id);
+
+			WorkflowInstance::ReloadEvqueue();
+
 			return true;
 		}else{
 			return false;
