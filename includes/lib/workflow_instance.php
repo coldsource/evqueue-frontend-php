@@ -186,7 +186,7 @@ class WorkflowInstance {
 		return true;
 	}
 	
-	public static function RetryAll () {
+	public function RetryAll () {
 		try
 		{
 			return $this->evqueue->RetryAll();
