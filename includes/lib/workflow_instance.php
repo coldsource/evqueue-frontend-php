@@ -66,12 +66,15 @@ class WorkflowInstance {
 	public function StopWorkflow ($workflow_instance_id) {
 		try
 		{
-			return $this->evqueue->StopWorkflow($workflow_instance_id);
+			$this->evqueue->StopWorkflow($workflow_instance_id);
 		}
 		catch(Exception $e)
 		{
 			Logger::GetInstance()->Log(LOG_ERR,'WorkflowInstance ',$e->getMessage());
+			return false;
 		}
+
+		return true;
 	}
 	
 	
