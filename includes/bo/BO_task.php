@@ -37,6 +37,8 @@ class Task{
 	private $host=null;
 	private $wd;
 	private $group;
+	private $use_agent;
+	private $merge_stderr;
 	private $workflow_id = null;  // bounds a task to a particular, simple workflow (e.g. the task needs to be deleted with it)
 	private $binary_content;
 	
@@ -64,6 +66,8 @@ class Task{
 		$this->host = $row['task_host'];
 		$this->wd = $row['task_wd'];
 		$this->group = $row['task_group'];
+		$this->use_agent = $row['task_use_agent'];
+		$this->merge_stderr = $row['task_merge_stderr'];
 
 	}
 	
@@ -152,6 +156,14 @@ class Task{
 		$this->group = $group;
 	}
 	
+	public function set_use_agent($use_agent){
+		$this->use_agent = $use_agent;
+	}
+	
+	public function set_merge_stderr($merge_stderr){
+		$this->merge_stderr = $merge_stderr;
+	}
+	
 	public function get_group(){
 		return $this->group;
 	}
@@ -176,10 +188,10 @@ class Task{
 			
 			$this->db->QueryPrintf("
 					INSERT INTO t_task (
-					task_name, task_binary, task_binary_content, task_user, task_host, task_parameters_mode, task_output_method, task_xsd, task_wd, task_group, workflow_id
+					task_name, task_binary, task_binary_content, task_user, task_host, task_parameters_mode, task_output_method, task_xsd, task_wd, task_group, workflow_id, task_use_agent, task_merge_stderr
 			) VALUES (
-					%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%i
-			)",	$this->name, $this->binary_path, $this->binary_content, $this->user, $this->host, $this->parameters_mode, $this->output_method, $this->xsd, $this->wd, $this->group, $this->workflow_id);
+					%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%i,%i,%i
+			)",	$this->name, $this->binary_path, $this->binary_content, $this->user, $this->host, $this->parameters_mode, $this->output_method, $this->xsd, $this->wd, $this->group, $this->workflow_id, $this->use_agent, $this->merge_stderr);
 			
 			$this->id = $this->db->GetInsertID();
 			
@@ -195,7 +207,9 @@ class Task{
 						task_output_method = %s,
 						task_xsd = %s,
 						task_wd = %s,
-						task_group = %s
+						task_group = %s,
+						task_use_agent = %i,
+						task_merge_stderr = %i
 					WHERE task_id = %i
 					",
 					$this->name,
@@ -207,6 +221,8 @@ class Task{
 					$this->xsd,
 					$this->wd,
 					$this->group,
+					$this->use_agent,
+					$this->merge_stderr,
 					$this->id);
 		}
 		
@@ -354,6 +370,22 @@ class Task{
 			}
 		}
 		
+		if (isset($vals["task_use_agent"])){
+			if ($setvals === true){
+				$this->set_use_agent($vals["task_use_agent"] ? 1 : 0);
+			}
+		} else {
+			$this->set_use_agent(0);
+		}
+		
+		if (isset($vals["task_merge_stderr"])){
+			if ($setvals === true){
+				$this->set_merge_stderr($vals["task_merge_stderr"] ? 1 : 0);
+			}
+		} else {
+			$this->set_merge_stderr(0);
+		}
+		
 		if (isset($vals['workflow_id']))
 			$this->set_workflow_id($vals['workflow_id']);
 		
@@ -382,6 +414,8 @@ class Task{
 		$xml .= '<task_host>'.$this->host.'</task_host>';
 		$xml .= '<task_wd>'.$this->wd.'</task_wd>';
 		$xml .= '<task_group>'.htmlspecialchars($this->group).'</task_group>';
+		$xml .= "<task_use_agent>$this->use_agent</task_use_agent>";
+		$xml .= "<task_merge_stderr>$this->merge_stderr</task_merge_stderr>";
 		$xml .= '<workflow_id>'.$this->get_workflow_id().'</workflow_id>';
 		$xml .= '</task>';
 		return $xml;

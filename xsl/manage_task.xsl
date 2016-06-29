@@ -69,18 +69,31 @@
 						</xsl:call-template>
 					</select>				
 					<br />
-					<label class="formLabel" for="task_xsd">Task XSD</label>
-					<input type="text" name="task_xsd" id="task_xsd" value="{/page/task/task_xsd}" />
-
-					<br />
+					
 					<label class="formLabel" for="task_user">Task user</label>
 					<input type="text" name="task_user" id="task_user" value="{/page/task/task_user}" />
-
 					<br />
+
 					<label class="formLabel" for="task_host">Task host</label>
 					<input type="text" name="task_host" id="task_host" value="{/page/task/task_host}" />
-
 					<br />
+					
+					<label class="formLabel" for="task_use_agent">Use evqueue agent</label>
+					<input type="checkbox" name="task_use_agent" id="task_use_agent">
+						<xsl:if test="/page/task/task_use_agent = 1">
+							<xsl:attribute name="checked">checked</xsl:attribute>
+						</xsl:if>
+					</input>
+					<br />
+					
+					<label class="formLabel" for="task_merge_stderr">Merge stderr with stdout</label>
+					<input type="checkbox" name="task_merge_stderr" id="task_merge_stderr">
+						<xsl:if test="/page/task/task_merge_stderr = 1">
+							<xsl:attribute name="checked">checked</xsl:attribute>
+						</xsl:if>
+					</input>
+					<br />
+					
 					<input type="submit" name="submitFormTask" id="submitFormTask" class="submitFormButton submitFormButtonSmall">
 						<xsl:attribute name="value">
 							<xsl:choose>
