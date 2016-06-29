@@ -476,6 +476,15 @@
 						</xsl:otherwise>
 					</xsl:choose>
 				</span>
+				
+				<!--<xsl:variable name="pct">20</xsl:variable>-->
+				
+				<xsl:if test="@progression != 0 and @progression != 100">
+					<div class="progressbar-wrapper">
+						<div class="progressbar" style="width: {@progression}%;"></div>
+						<span><xsl:value-of select="@progression" />%</span>
+					</div>
+				</xsl:if>
 			</xsl:if>
 			
 			<xsl:if test="@error">

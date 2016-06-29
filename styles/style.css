@@ -159,7 +159,8 @@ table th, td {
   padding: 2px 3px; }
 
 table.highlight_row tr:hover {
-  background-color: #C6D0F7; }
+  border-left: 3px solid #647FE0;
+  border-right: 3px solid #647FE0; }
 
 tr.group {
   background: #CCC; }
@@ -297,21 +298,19 @@ div.statistics {
 
 div.job {
   padding-top: 2px;
-  padding-left: 22px; }
+  padding-left: 30px; }
 
 div.job.hovered {
   background-color: lightblue; }
 
+/*div.tasks:hover > div.task {
+	background-color: lightblue;
+}*/
 div.job.noLeftPadding {
   padding-left: 0; }
 
 div.tasks {
-  position: relative;
-   background-image: url("../images/arbo.gif");
-  background-position: -3px -10px;
-  background-repeat: no-repeat;
-  margin:2px;
-}
+  position: relative; }
 
 div.indicators {
   display: inline;
@@ -385,7 +384,7 @@ label.forTextarea {
   margin-left: 42em; }
 
 textarea.large {
-  width: 100%;
+  width: 68.8%;
   height: 500px; }
 
 textarea.small {
@@ -393,11 +392,28 @@ textarea.small {
   height: 300px; }
 
 div.task {
-  margin-left: 30px;
-	padding-left:5px;
-	border-width: 0px 0px 0px 1px;
-	border-style: solid;
-}
+  padding-left: 30px; }
+
+div.task.firstJobTask {
+  background-image: url("../images/arbo.gif");
+  background-position: -3px -10px;
+  background-repeat: no-repeat; }
+
+.progressbar-wrapper {
+  position: relative;
+  display: inline-block;
+  margin-left: 1em;
+  font-size: 70%;
+  line-height: 150%;
+  text-align: center;
+  border: 1px solid lightgray;
+  width: 5em; }
+
+.progressbar {
+  position: absolute;
+  background-color: lightgreen;
+  height: 100%;
+  z-index: -1; }
 
 ul li {
   word-wrap: break-word; }
@@ -585,27 +601,8 @@ span.nberror {
 
 div.taskOutput {
   border: 1px solid gray;
-  margin-bottom: 0px;
+  margin-bottom: 5px;
   margin-right: 5px; }
-
-div.taskOutput ul {
-	display:table;
-	margin:0px 0px 0px 7px;
-}
-
-div.taskOutput li {
-	list-style: none;
-	float:left;
-	padding:0px 2px 0px 2px;
-	border:1px solid;
-	margin:2px;
-	border-radius:5px;
-}
-
-div.taskOutput li a {
-	color:#000000;
-	text-decoration:none;
-}
 
 img.killTask {
   cursor: pointer; }
@@ -821,6 +818,7 @@ div.editionWorkflow div.jobInfos {
   margin: 0 10px;
   padding: 1px 5px;
   border-radius: 5px;
+  background-color: #EAEAEA;
   z-index: 10; }
 
 div.editionWorkflow span.jobCondition {
@@ -1026,3 +1024,5 @@ div.lightTreeJob .taskLoop {
   font-size: 110%; }
 
 /* END LIGHT-TREE DISPLAY */
+
+/*# sourceMappingURL=style.css.map */

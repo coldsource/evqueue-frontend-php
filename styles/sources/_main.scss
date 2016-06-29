@@ -185,7 +185,8 @@ table th, td {
 }
 
 table.highlight_row tr:hover {
-	background-color:#C6D0F7;
+	border-left: 3px solid #647FE0;
+	border-right: 3px solid #647FE0;
 }
 
 tr.group {

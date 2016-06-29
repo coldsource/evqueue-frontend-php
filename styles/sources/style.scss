@@ -250,6 +250,25 @@ div.task.firstJobTask {
     background-repeat: no-repeat;
 }
 
+.progressbar-wrapper {
+	position: relative;
+	display: inline-block;
+	margin-left: 1em;
+	font-size: 70%;
+	line-height: 150%;
+	text-align: center;
+	
+	border: 1px solid lightgray;
+	width: 5em;
+}
+
+.progressbar {
+	position: absolute;
+	background-color: lightgreen;
+	height: 100%;
+	z-index: -1;
+}
+
 ul li{
     word-wrap:break-word;
 }
