@@ -25,6 +25,7 @@
 						<table>
 							<tr>
 								<th>Name</th>
+								<th>Scheduler</th>
 								<th>Concurrency</th>
 								<th>Running tasks</th>
 								<th>Queued tasks</th>
@@ -34,6 +35,9 @@
 								<tr class="evenOdd">
 									<td>
 										<xsl:value-of select="@name" />
+									</td>
+									<td class="txtcenter">
+										<xsl:value-of select="@scheduler" />
 									</td>
 									<td class="txtcenter">
 										<xsl:value-of select="@concurrency" />

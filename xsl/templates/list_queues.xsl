@@ -12,6 +12,7 @@
 			<tr>
 				<th style="width:40px;">Id</th>
 				<th>Name</th>
+				<th style="width:100px;">Scheduler</th>
 				<th style="width:50px;">Concurrency</th>
 				<th class="thActions">Actions</th>
 			</tr>
@@ -23,6 +24,9 @@
 					</td>
 					<td>
 						<xsl:value-of select="queue_name" />
+					</td>
+					<td class="txtcenter">
+						<xsl:value-of select="queue_scheduler" />
 					</td>
 					<td class="center">
 						<xsl:value-of select="queue_concurrency" />

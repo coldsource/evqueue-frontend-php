@@ -12,6 +12,13 @@
 			<label class="formLabel" for="queue_concurrency">Queue concurrency:</label>
 			<input type="text" name="queue_concurrency" id="queue_concurrency" value="{/page/queue/queue_concurrency}" />
 			<br />
+			<label class="formLabel" for="queue_scheduler">Queue scheduler:</label>
+			<select name="queue_scheduler">
+				<option value="default"><xsl:if test="/page/queue/queue_scheduler = 'default'"><xsl:attribute name="selected">selected</xsl:attribute></xsl:if>default</option>
+				<option value="fifo"><xsl:if test="/page/queue/queue_scheduler = 'fifo'"><xsl:attribute name="selected">selected</xsl:attribute></xsl:if>fifo</option>
+				<option value="prio"><xsl:if test="/page/queue/queue_scheduler = 'prio'"><xsl:attribute name="selected">selected</xsl:attribute></xsl:if>prio</option>
+			</select>
+			<br />
 			<input type="submit" name="submitFormQueue" id="submitFormQueue" class="submitFormButton submitFormButtonSmall" value="Submit" />
 		</form>	
 	</xsl:template>

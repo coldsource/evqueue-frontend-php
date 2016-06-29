@@ -28,6 +28,7 @@ class Queue{
 	private $id;
 	private $name;
 	private $concurrency;
+	private $scheduler;
 	
 	function __construct($id = false){
 		
@@ -45,7 +46,8 @@ class Queue{
 		
 		$this->id = $row['queue_id'];
 		$this->name = $row['queue_name'];
-		$this->concurrency = $row['queue_concurrency'];		
+		$this->concurrency = $row['queue_concurrency'];
+		$this->scheduler = $row['queue_scheduler'];
 		
 	}
 	
@@ -81,6 +83,14 @@ class Queue{
 	public function get_concurrency(){
 		return $this->concurrency;
 	}
+
+	public function set_scheduler($scheduler){
+		$this->scheduler=$scheduler;
+	}
+
+	public function get_scheduler(){
+		return $this->scheduler;
+	}
 	
 	public function CommitObject()
 	{
@@ -90,10 +100,10 @@ class Queue{
 			
 			$this->db->QueryPrintf("
 					INSERT INTO t_queue (
-					queue_name, queue_concurrency
+					queue_name, queue_concurrency, queue_scheduler
 			) VALUES (
-					%s,%s
-			)",	$this->name, $this->concurrency);
+					%s,%s,%s
+			)",	$this->name, $this->concurrency,$this->scheduler);
 				
 			$this->id = $this->db->GetInsertID();
 		}else{
@@ -108,11 +118,13 @@ class Queue{
 					UPDATE t_queue
 					SET
 						queue_name = %s,
-						queue_concurrency = %s
+						queue_concurrency = %s,
+						queue_scheduler = %s
 					WHERE queue_id = %i
 					",
 					$this->name,
 					$this->concurrency,
+					$this->scheduler,
 					$this->id);
 		}
 
@@ -169,6 +181,18 @@ class Queue{
 			}
 		}
 
+		if(!isset($vals['queue_scheduler']) || $vals['queue_scheduler'] == "") {
+			$errors["queue_scheduler"]="Please fill the queue scheduler field";
+		}else{
+			if($vals['queue_scheduler']!='default' && $vals['queue_scheduler']!='fifo' && $vals['queue_scheduler']!='prio')
+				$errors["queue_scheduler"]="Invalid scheduler name";
+			else{
+				if ($setvals===true){
+					$this->set_scheduler($vals['queue_scheduler']);
+				}
+			}
+		}
+
 		if (count($errors)>0)
 			return $errors;
 
@@ -183,6 +207,7 @@ class Queue{
 		$xml = '<queue id="'.$this->get_id().'">';
 		$xml .= '<queue_name>'.$this->get_name().'</queue_name>';
 		$xml .= '<queue_concurrency>'.$this->get_concurrency().'</queue_concurrency>';
+		$xml .= '<queue_scheduler>'.$this->get_scheduler().'</queue_scheduler>';
 		$xml .= '</queue>';
 		return $xml;
 	}
@@ -206,6 +231,7 @@ class Queue{
 			$xml .= '<queue id="'.$res[$i]["queue_id"].'">';
 			$xml .= '<queue_name>'.$res[$i]["queue_name"].'</queue_name>';
 			$xml .= '<queue_concurrency>'.$res[$i]["queue_concurrency"].'</queue_concurrency>';
+			$xml .= '<queue_scheduler>'.$res[$i]["queue_scheduler"].'</queue_scheduler>';
 			$xml .= "</queue>";
 		}
 		$xml .= "</queues>";
