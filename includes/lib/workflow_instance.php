@@ -39,15 +39,26 @@ class WorkflowInstance {
 		$this->evqueue = new evQueue($QUEUEING[$node_name]);
 	}
 	
-	public function LaunchWorkflowInstance($workflow_name, $parameters = array(), $mode = 'asynchronous', $user_host = false) {
+	public function Launch($workflow_name, $parameters=[], $options=[]) {
 		try
 		{
-			return $this->evqueue->LaunchWorkflowInstance($workflow_name,$parameters,$mode,$user_host);
+			return $this->evqueue->Launch($workflow_name,$parameters,$options);
 		}
 		catch(Exception $e)
 		{
 			Logger::GetInstance()->Log(LOG_ERR,'WorkflowInstance ',$e->getMessage());
 		}
+	}
+	
+	/*
+	 * Retro-compatibility.
+	 * Use of the Launch function is advised.
+	 */
+	public function LaunchWorkflowInstance($workflow_name, $parameters = array(), $mode = 'asynchronous', $user_host = false) {
+		return $this->Launch($workflow_name,$parameters,[
+			'mode' => $mode,
+			'user_host' => $user_host,
+		]);
 	}
 	
 	
