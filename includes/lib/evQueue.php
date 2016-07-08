@@ -106,38 +106,54 @@ class evQueue {
 		return $out;
 	}
 	
-	/**
-	 * 
-	 * @param type $workflow_name
-	 * @param array $parameters (<string> => </string>)
-	 * @param type $mode 'synchronous'/'asynchronous'
-	 * @return boolean
-	 */
-	public function LaunchWorkflowInstance($workflow_name, $parameters = array(), $mode = 'asynchronous', $user_host = false) {
-		$params_xml = '';
+	public function Launch($workflow_name, $parameters=[], $options=[]) {
+		$default_options = [
+			'mode' => 'asynchronous',
+			'timeout' => false,
+			'user_host' => false,
+		];
+		$options = array_replace($default_options,$options);
+		
+		$wf = new \DOMDocument();
+		$wf->loadXML('<?xml version="1.0" encoding="UTF-8"?><workflow/>');
+		$wf->documentElement->setAttribute('name',$workflow_name);
+		$wf->documentElement->setAttribute('action','info');
+		$wf->documentElement->setAttribute('mode',$options['mode']);
+		
+		if ($options['timeout'] !== false)
+			$wf->documentElement->setAttribute('timeout',$options['timeout']);
+		
 		foreach ($parameters as $param => $value) {
-			$param = htmlspecialchars($param);
-			$value = htmlspecialchars($value);
-			$params_xml .= "<parameter name=\"$param\" value=\"$value\" />";
+			$parameter = $wf->createElement('parameter');
+			$parameter->setAttribute('name', $param);
+			$parameter->setAttribute('value', $value);
+			$wf->documentElement->appendChild($parameter);
 		}
 		
-		$workflow_name = htmlspecialchars($workflow_name);
-		if ($user_host) {
-			list($user,$host) = split('@', $user_host);
-			$user = htmlspecialchars($user);
-			$host = htmlspecialchars($host);
-			$user_host = $user ? "user='$user' host='$host'" : "host='$host'";
-		} else {
-			$user_host = '';
+		if ($options['user_host']) {
+			list($user,$host) = split('@', $options['user_host']);
+			$wf->documentElement->setAttribute('user',$user);
+			$wf->documentElement->setAttribute('host',$host);
 		}
 		
-		$wf = "<workflow name='$workflow_name' action='info' mode='$mode' $user_host>$params_xml</workflow>\n";
+		$wf = $wf->saveXML();
 		
 		$xml_str = $this->exec($wf);
 		
 		$xml = simplexml_load_string($xml_str);
 		
 		return (int)$xml->attributes()->{'workflow-instance-id'};
+	}
+	
+	/*
+	 * Retro-compatibility.
+	 * Use of the Launch function is advised.
+	 */
+	public function LaunchWorkflowInstance($workflow_name, $parameters = array(), $mode = 'asynchronous', $user_host = false) {
+		$this->Launch($workflow_name, $parameters, [
+			'mode' => $mode,
+			'user_host' => $user_host,
+		]);
 	}
 	
 	
