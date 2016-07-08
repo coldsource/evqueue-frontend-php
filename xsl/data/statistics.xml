@@ -11,4 +11,5 @@
 	<statistic id="workflow_instance_launched">Number of workflow instances launched</statistic>
 	<statistic id="workflow_queries">Number of workflow launch queries</statistic>
 	<statistic id="workflow_status_queries">Number of workflow status queries</statistic>
+	<statistic id="waiting_threads">Number of waiting threads</statistic>
 </statistics>
