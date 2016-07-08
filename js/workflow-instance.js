@@ -88,9 +88,10 @@ $(document).delegate('img.refreshWorkflows, span.prevPage, span.nextPage', 'clic
 	refreshWorkflows(status);
 });
 
-function refreshWorkflows (status) {
-	$.get('ajax/'+status.toLowerCase()+'-workflows.php',get,function (content) {
-		$('div#'+status+'-workflows').replaceWith(content);
+function refreshWorkflows (status,callback) {
+	$.get('ajax/'+status.toLowerCase()+'-workflows.php', get, function (content) {
+		$('div#'+status.toUpperCase()+'-workflows').replaceWith(content);
+		if (callback) callback();
 	});
 }
 
