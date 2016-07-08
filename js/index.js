@@ -74,7 +74,7 @@ $(document).ready(function() {
 	});
 	
 	// Manage autorefresh
-	var interval = 5000;
+	var interval = 2000;
 	setTimeout(autoRefresh,interval);
 	
 	function autoRefresh() {
@@ -83,7 +83,6 @@ $(document).ready(function() {
 	
 	function autoRefreshStatuses (statuses) {
 		if (statuses.length === 0) {
-			console.log('done refreshing, setting timer');
 			setTimeout(autoRefresh,interval);
 			return;
 		}
@@ -95,7 +94,6 @@ $(document).ready(function() {
 			chkbx.is(':checked');
 		
 		if (!doRefresh) {
-			console.log("don't need to refresh status "+status);
 			autoRefreshStatuses(statuses);
 		} else {
 			refreshWorkflows(status, function () {
