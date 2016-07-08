@@ -74,15 +74,35 @@ $(document).ready(function() {
 	});
 	
 	// Manage autorefresh
+	var interval = 5000;
+	setTimeout(autoRefresh,interval);
+	
 	function autoRefresh() {
-		$('input.autorefresh:checked').each(function() {
-			$(this).parent().parent().find('img.refreshWorkflows').click();
-		});
-		
-		if ( $('div#EXECUTING-workflows input.autorefresh').length == 0 )  // executing workflows list is not displayed (no executing workflows, or evqueue not running)
-			refreshWorkflows('EXECUTING');
+		autoRefreshStatuses(['executing','terminated']);
 	}
-	setInterval(autoRefresh,2000 );
+	
+	function autoRefreshStatuses (statuses) {
+		if (statuses.length === 0) {
+			console.log('done refreshing, setting timer');
+			setTimeout(autoRefresh,interval);
+			return;
+		}
+		
+		var status = statuses.shift();
+		var chkbx = $('div#'+status.toUpperCase()+'-workflows input.autorefresh');
+		var doRefresh =
+			chkbx.length === 0 ||  // workflows for this status are not displayed (there aren't any)
+			chkbx.is(':checked');
+		
+		if (!doRefresh) {
+			console.log("don't need to refresh status "+status);
+			autoRefreshStatuses(statuses);
+		} else {
+			refreshWorkflows(status, function () {
+				autoRefreshStatuses(statuses);
+			});
+		}
+	}
 	
 	$(document).delegate( 'span.action', 'click', function() {
 		var img = $(this).children('img');
