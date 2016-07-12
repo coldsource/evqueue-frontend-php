@@ -78,12 +78,17 @@ $(document).ready(function() {
 	setTimeout(autoRefresh,interval);
 	
 	function autoRefresh() {
-		autoRefreshStatuses(['executing','terminated']);
+		autoRefreshStatuses(['executing','terminated'], function () {
+			var wfs = $('div#EXECUTING-workflows div.workflow');
+			autoRefreshOpenWFs(wfs, function () {
+				setTimeout(autoRefresh,interval);
+			});
+		});
 	}
 	
-	function autoRefreshStatuses (statuses) {
+	function autoRefreshStatuses (statuses,callback) {
 		if (statuses.length === 0) {
-			setTimeout(autoRefresh,interval);
+			if (callback) callback();
 			return;
 		}
 		
@@ -94,12 +99,24 @@ $(document).ready(function() {
 			chkbx.is(':checked');
 		
 		if (!doRefresh) {
-			autoRefreshStatuses(statuses);
+			autoRefreshStatuses(statuses,callback);
 		} else {
 			refreshWorkflows(status, function () {
-				autoRefreshStatuses(statuses);
+				autoRefreshStatuses(statuses,callback);
 			});
 		}
+	}
+	
+	function autoRefreshOpenWFs (wfs,callback) {
+		if (wfs.length === 0) {
+			if (callback) callback();
+			return;
+		}
+		
+		var wf = wfs.eq(0);
+		refreshWorkflowHTML(wf.data('id'), wf.data('node-name'), wf.parent('td.details'), function () {
+			autoRefreshOpenWFs(wfs.slice(1),callback);
+		});
 	}
 	
 	$(document).delegate( 'span.action', 'click', function() {
@@ -117,20 +134,7 @@ $(document).ready(function() {
 		
 		$(this).parents('div.workflow-list').find('input.autorefresh').attr('checked', false);
 		
-		$.ajax({
-			url: 'ajax/workflow.php',
-			data: {
-				id: $(this).data('id'),
-				node_name: $(this).data('node-name')
-			},
-			beforeSend: function () {
-				nextTrTd.html('').append('<img src="images/ajax-loader.gif" /> Loading');
-			},
-			success: function (content) {
-				nextTrTd.html(content);
-			}
-		});
-		
+		refreshWorkflowHTML($(this).data('id'),$(this).data('node-name'),nextTrTd);
 		nextTr.toggle('fast');
 	});
 	

@@ -101,6 +101,7 @@
 		</tr>
 		<tr id="tr{@id}" class="hidden">
 			<td colspan="7" class="details">
+				<img src="images/ajax-loader.gif" />
 			</td>
 		</tr>
 	</xsl:template>
@@ -220,7 +221,7 @@
 			<xsl:if test="$EDITION = 1">editionWorkflow</xsl:if>
 		</xsl:variable>
 		
-		<div class="workflow {$editionClass}" id="workflow{@id}">
+		<div class="workflow {$editionClass}" id="workflow{@id}" data-id="{@id}" data-node-name="{../@node_name}">
 			<img src="images/listli.png" class="formattedXml" /> 
 			<xsl:text>&#160;</xsl:text>
 			<img src="images/re-launch.png" data-wfiid="{@id}" data-node-name="{../@node_name}" class="relaunch" alt="Re-launch workflow instance" title="Re-launch workflow instance" ></img>

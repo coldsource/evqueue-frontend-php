@@ -95,6 +95,20 @@ function refreshWorkflows (status,callback) {
 	});
 }
 
+function refreshWorkflowHTML (id,node_name,container,callback) {
+	$.ajax({
+		url: 'ajax/workflow.php',
+		data: {
+			id: id,
+			node_name: node_name
+		},
+		success: function (content) {
+			container.html(content);
+			if (callback) callback();
+		}
+	});
+}
+
 
 function deleteWfi(id){
 	ajaxDelete('deleteWFI', id, '');
