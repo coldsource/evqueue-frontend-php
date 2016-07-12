@@ -543,9 +543,9 @@
 							</li>
 						</xsl:if>
 					</ul>
-					<xsl:for-each select="output">
-						<xsl:call-template name="node" />
-					</xsl:for-each>
+					<ul>
+						<xsl:apply-templates select="output" />
+					</ul>
 				</div>
 			</xsl:if>
 			
@@ -782,7 +782,7 @@
 	</xsl:template>
 	
 	
-	<xsl:template name="node">
+	<xsl:template match="output">
 		<xsl:variable name="output-id" select="generate-id()" />
 		
 		<a href="javascript:void(0)" onclick="javascript:jQuery('#output-{$output-id}').toggle();">
@@ -793,7 +793,7 @@
 		</a>
 		
 		<div id="output-{$output-id}" style="display:none;">
-			<ul>
+			<ul class="pipes">
 				<li>
 					<a href="output-stdout-{$output-id}">
 						<xsl:if test=". != ''"><xsl:attribute name="style">font-weight:bold;</xsl:attribute></xsl:if>
