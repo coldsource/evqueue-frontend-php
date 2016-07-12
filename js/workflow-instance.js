@@ -96,6 +96,14 @@ function refreshWorkflows (status,callback) {
 }
 
 function refreshWorkflowHTML (id,node_name,container,callback) {
+	
+	// don't refresh workflow if user has opened extra infos
+	var extraInfos = container.find('div.taskOutput, ul.inputs').filter(':visible');
+	if ( extraInfos.length > 0 ) {
+		if (callback) callback();
+		return;
+	}
+	
 	$.ajax({
 		url: 'ajax/workflow.php',
 		data: {
