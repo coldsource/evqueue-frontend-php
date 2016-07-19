@@ -281,7 +281,7 @@
 				<xsl:variable name="another">
 					<xsl:if test="count(/page/session/workflow/workflow/subjobs) > 0">another </xsl:if>
 				</xsl:variable>
-				<input type="button" onclick="executeAction('addTask');" value="Add {$another}root task" />
+				<input id="addRootTask" type="button" class="spaced" onclick="executeAction('addTask');" value="Add {$another}root task" />
 			</xsl:if>
 		</div>
 	</xsl:template>
@@ -576,15 +576,15 @@
 						<li class="taskInput" data-name="stdin" data-type="stdin">
 							<span class="taskInputName taskInputNameSTDIN">STDIN</span>
 							<div class="taskInputValues">
-								<span data-type="text" data-value="" title="text">not used yet</span>
+								<span class="spaced-h" data-type="text" data-value="" title="text">not used yet</span>
 							</div>
 							<xsl:call-template name="inputActions" />
 						</li>
 					</xsl:if>
 						
-					<li>
+					<li class="addTaskInput">
 						<form>
-							<input type="button" onclick="executeAction('addTaskInput',$(this));" value="Add input" />
+							<input class="spaced-v" type="button" onclick="executeAction('addTaskInput',$(this));" value="Add input" />
 						</form>
 					</li>
 				</ul>
@@ -692,10 +692,10 @@
 				</li>
 			</xsl:for-each>
 			<xsl:if test="$EDITION=1">
-				<li class="actionItem">
+				<li id="addParameter" class="actionItem">
 					<form onsubmit="executeAction('addParameter',$(this)); return false;">
 						<input name="parameter_name" placeholder="new parameter" autocomplete="off" />
-						<input type="submit" value="Add parameter" />
+						<input type="submit" class="spaced-h" value="Add parameter" />
 					</form>
 				</li>
 			</xsl:if>

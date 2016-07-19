@@ -20,9 +20,6 @@ a {
 a, a:visited {
   color: #4996ce; }
 
-select {
-  width: 400px; }
-
 select.ui-timepicker-select {
   width: auto; }
 
@@ -154,7 +151,6 @@ table {
 
 table th, td {
   border: 1px solid #DEE0E3;
-  font-size: 0.9em;
   line-height: 20px;
   padding: 2px 3px; }
 
@@ -177,7 +173,6 @@ tr.groupspace td {
 /* Global styles for buttons */
 button.blue, input[type=button], input[type=submit] {
   display: inline-block;
-  margin: 5px;
   padding: 2px;
   border: 0;
   background-color: #4993CE;
@@ -191,6 +186,37 @@ button.blue, input[type=button], input[type=submit] {
   cursor: pointer;
   height: 20px;
   font-size: 11px; }
+
+button.blue:disabled, input[type=button]:disabled, input[type=submit]:disabled {
+  background-color: lightgray;
+  color: gray;
+  box-shadow: rgba(255, 255, 255, 0.6) 0 1px 0;
+  text-shadow: rgba(255, 255, 255, 0.4) 0 1px 0; }
+
+.spaced {
+  margin: 5px; }
+
+.spaced-v {
+  margin: 5px 0; }
+
+.spaced-h {
+  margin: 0 5px; }
+
+input.large, div.formdiv input[type=text],
+div.infoBloc input[type=text] {
+  min-width: 400px; }
+
+.w100 {
+  width: 100%; }
+
+table.unstyled tr, table.unstyled td {
+  border: none; }
+
+.hint {
+  color: gray; }
+
+.vat {
+  vertical-align: top; }
 
 /* Login page */
 form.loginFields {
@@ -299,9 +325,6 @@ div.statistics {
 div.job {
   padding-top: 2px;
   padding-left: 22px; }
-
-div.job.hovered {
-  background-color: lightblue; }
 
 div.job.noLeftPadding {
   padding-left: 0; }
@@ -491,9 +514,6 @@ li.fakeTask {
 .clearSearch:visited {
   color: #000; }
 
-.clearSearch:hover {
-  /*text-decoration:none;*/ }
-
 #searchWithinWorkflowParams {
   margin-top: 1em;
   text-align: left; }
@@ -628,10 +648,6 @@ img.exclamationdetails {
 form p {
   font-size: 0.9em; }
 
-div.formdiv input[type=text],
-div.infoBloc input[type=text] {
-  min-width: 400px; }
-
 #errors {
   color: red;
   text-align: center; }
@@ -748,17 +764,9 @@ div.editionWorkflow .taskInputs {
 div.editionWorkflow .taskInput {
   margin-top: 8px; }
 
-div.editionWorkflow .taskInput * {
-  vertical-align: top;
-  margin: 0 5px; }
-
 div.editionWorkflow .taskInput img {
   height: 16px;
   cursor: pointer; }
-
-div.editionWorkflow .taskInput input[name="value[]"] {
-  width: 400px;
-  padding-right: 18px; }
 
 div.editionWorkflow .taskInputName {
   font-weight: bold;
@@ -771,15 +779,17 @@ div.editionWorkflow .taskInputNameSTDIN {
   padding: 0 2px; }
 
 div.editionWorkflow .taskInputValues {
-  min-width: 50px;
   color: #878787;
   display: inline-block;
   vertical-align: top;
   position: relative; }
 
-div.editionWorkflow .taskInput:hover .taskInputValues {
-  border: 1px dotted #3F3F3F;
-  margin: -1px 4px; }
+div.editionWorkflow .taskInputValues.editing {
+  display: block;
+  margin: 0; }
+
+div.taskInputValue {
+  margin: 5px 0; }
 
 .taskInputValueXPath, .taskInputValueCopy {
   font-style: italic; }
@@ -787,14 +797,16 @@ div.editionWorkflow .taskInput:hover .taskInputValues {
 .taskInputValueText {
   font-weight: bold; }
 
-div.editionWorkflow .addTaskInputValue {
-  position: absolute;
-  bottom: -15px;
-  right: 20px; }
+td.xPathAble {
+  position: relative; }
 
 div.editionWorkflow img.startXPathHelp {
   margin-left: -8px;
   z-index: 1; }
+  div.editionWorkflow img.startXPathHelp.embedded {
+    position: absolute;
+    top: 4px;
+    right: 1px; }
 
 div.editionWorkflow .xpathSelectable {
   text-shadow: 1px 1px 4px lightgreen; }
@@ -828,13 +840,19 @@ div.editionWorkflow img.addTaskArrowLeft {
 div.retrySchedule {
   display: inline-block; }
 
+div.editionWorkflow .editing {
+  width: 90%;
+  padding: 2px 5px;
+  background-color: #F0F0F0;
+  border: 1px solid lightgray; }
+
 div.editionWorkflow div.jobInfos {
   float: right;
   margin: 0 10px;
-  padding: 1px 5px;
-  border-radius: 5px;
-  background-color: #EAEAEA;
   z-index: 10; }
+
+div.editionWorkflow div.jobInfos.editing {
+  float: none; }
 
 div.editionWorkflow span.jobCondition {
   font-size: 90%; }
@@ -842,10 +860,6 @@ div.editionWorkflow span.jobCondition {
 div.editionWorkflow span.jobLoop,
 div.editionWorkflow span.taskLoop {
   font-size: 120%; }
-
-div.editionWorkflow input[name=loop].taskLoop {
-  margin-bottom: 10px;
-  width: 50%; }
 
 div.editionWorkflow img.editJob {
   float: right;

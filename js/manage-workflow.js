@@ -105,7 +105,7 @@ function editTask (clicked) {
 	$('form#editTask').find('input[name=condition]').val(task.data('condition'));
 	
 	removeEditButtons();
-	task.html($('form#editTask'));
+	task.addClass('editing').html($('form#editTask'));
 }
 
 
@@ -129,9 +129,10 @@ function editTaskInput (clicked) {
 	if (input.find('.taskInputName').is('.taskInputNameSTDIN')) {  // stdin: name can't be changed, disable input
 		$('form#editTaskInput input[name=name]').attr('disabled', true).val('STDIN');
 		$('form#editTaskInput select[name=mode]').show().find('option[value='+input.data('mode')+']').attr('selected','selected');
+		$('form#editTaskInput select[name=mode]').change();  // trigger event to show hint
 	} else {
 		$('form#editTaskInput input[name=name]').attr('disabled', false).val(input.data('name'));
-		$('form#editTaskInput select[name=mode]').hide().find('option').removeAttr('selected');
+		$('form#editTaskInput tr.stdinMode').hide().find('option').removeAttr('selected');
 	}
 	
 	// clear values
@@ -148,15 +149,14 @@ function editTaskInput (clicked) {
 	});
 	
 	removeEditButtons();
-	input.html($('form#editTaskInput'));
+	input.addClass('editing').html($('form#editTaskInput'));
 }
 
 
 function addTaskInputValue (clicked) {
 	if (isInXPathHelp) return;
 	
-	var values = clicked.parent('.taskInputValues');
-	values.append($('#taskInputValueSample').html());
+	$('.taskInput.editing .taskInputValues').append($('#taskInputValueSample').html());
 }
 
 function deleteTaskInputValue (clicked) {
@@ -176,7 +176,7 @@ function editJob (clicked) {
 	$('form#editJob').find('input[name=condition]').val(job.data('condition'));
 	
 	removeEditButtons();
-	job.find('div.jobInfos:eq(0)').html($('form#editJob'));
+	job.find('div.jobInfos:eq(0)').addClass('editing').html($('form#editJob'));
 }
 
 
@@ -191,7 +191,12 @@ function removeEditButtons() {
 		img.deleteTaskInput,\n\
 		img.addTaskArrowDown,\n\
 		img.deleteWorkflowParameter,\n\
-		div.addTaskContainer').remove();
+		div.addTaskContainer,\n\
+		.addTaskInput,\n\
+		#addParameter,\n\
+		#addRootTask').remove();
+	
+	$('input#saveWorkflow').attr('disabled',true);
 }
 
 
@@ -282,17 +287,3 @@ function stopXPathHelp (input) {
 	
 	isInXPathHelp = false;
 }
-
-
-$(document).ready( function() {
-	$('div.job').mouseover( function (event) {
-		// hover in
-		event.stopPropagation();
-		$('div.job.hovered').removeClass('hovered');
-		$(this).add( $(this).find('div.job') ).addClass('hovered');	
-	});
-	
-	$('div.job').mouseleave( function () {
-		$('div.job.hovered').removeClass('hovered');
-	});
-});

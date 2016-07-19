@@ -134,9 +134,6 @@ div.job {
 	padding-top: 2px;
 	padding-left: 22px;
 }
-div.job.hovered {
-	background-color: lightblue;
-}
 div.job.noLeftPadding {
 	padding-left: 0;
 }
@@ -268,71 +265,71 @@ div.task{
 }
 
 ul li{
-    word-wrap:break-word;
+	word-wrap:break-word;
 }
 
 ul.inputs {
-    list-style-image: url('../images/input.png');
-    margin-left:28px;
-    padding-left: 0;
+	list-style-image: url('../images/input.png');
+	margin-left:28px;
+	padding-left: 0;
 }
 
 ul.outputs {
-    list-style-image: url('../images/output.png');
-    margin-left:28px;
-    padding-left: 0;
+	list-style-image: url('../images/output.png');
+	margin-left:28px;
+	padding-left: 0;
 }
 
 ul.errors {
-    list-style-image: url('../images/exclamation.png');
+	list-style-image: url('../images/exclamation.png');
 }
 
 ul.reload {
-    list-style-image: url('../images/reload.png');
+	list-style-image: url('../images/reload.png');
 }
 
 ul.file {
-    list-style-image: url('../images/bin.png');
+	list-style-image: url('../images/bin.png');
 }
 
 ul.outputs ul,
 ul.inputs ul {
-    margin: 0;
-    padding-left: 15px;
+	margin: 0;
+	padding-left: 15px;
 }
 
 ul.inputs li {
-    padding-bottom: 5px;
+	padding-bottom: 5px;
 }
 
 sup.attribute {
-    color: red;
+	color: red;
 }
 
 li.fakeTask {
-    color: gray;
-    font-style: italic;
+	color: gray;
+	font-style: italic;
 }
 
 .hidden {
-    display: none;
+	display: none;
 }
 
 .action:hover {
 	text-decoration: none;
 }
 #container {
-    width : 600px;
-    height: 384px;
-    margin: 8px auto;
-    display: inline-block;
+	width : 600px;
+	height: 384px;
+	margin: 8px auto;
+	display: inline-block;
 }
 
 .content_xml{
-    display:none;
-    height:300px;
-    width:600px;
-    overflow: scroll;
+	display:none;
+	height:300px;
+	width:600px;
+	overflow: scroll;
 }
 
 #searchByWorkflow,
@@ -353,15 +350,12 @@ li.fakeTask {
 }
 
 .clearSearch {
-    margin-left:5px;
-		font-weight: normal;
-		font-size: 80%;
+	margin-left:5px;
+	font-weight: normal;
+	font-size: 80%;
 }
 .clearSearch:visited {
     color:#000;
-}
-.clearSearch:hover {
-    /*text-decoration:none;*/
 }
 #searchWithinWorkflowParams {
     margin-top:1em;
@@ -528,7 +522,7 @@ form p{
 
 div.formdiv input[type=text],
 div.infoBloc input[type=text] {
-	min-width: 400px;
+	@extend input.large;
 }
 
 #errors {
@@ -657,14 +651,14 @@ div.editionWorkflow img.viewXML {
 /* edition-specific extra elements (add/remove buttons, etc. */
 
 div.editionWorkflow div.actions {
-    display: inline-block;
-    opacity: 0.2;
-    margin: 0 5px;
+	display: inline-block;
+	opacity: 0.2;
+	margin: 0 5px;
 }
 
 div.editionWorkflow ul.inputs li:hover div.actions,
 div.editionWorkflow div.task:hover div.actions {
-    opacity: 1;
+	opacity: 1;
 }
 
 div.editionWorkflow select[name=task_name] {
@@ -672,25 +666,17 @@ div.editionWorkflow select[name=task_name] {
 }
 
 div.editionWorkflow .taskInputs {
-    display: none;
-    font-size: 90%;
-    list-style-image: url("../images/input.png");
+	display: none;
+	font-size: 90%;
+	list-style-image: url("../images/input.png");
 }
 
 div.editionWorkflow .taskInput {
 	margin-top: 8px;
 }
-div.editionWorkflow .taskInput * {
-    vertical-align: top;
-    margin: 0 5px;
-}
 div.editionWorkflow .taskInput img {
 	height: 16px;
 	cursor: pointer;
-}
-div.editionWorkflow .taskInput input[name="value[]"] {
-	width: 400px;
-	padding-right: 18px;
 }
 
 div.editionWorkflow .taskInputName {
@@ -705,30 +691,36 @@ div.editionWorkflow .taskInputNameSTDIN {
 }
 
 div.editionWorkflow .taskInputValues {
-	min-width: 50px;
 	color: #878787;
 	display: inline-block;
 	vertical-align: top;
 	position: relative;
 }
+div.editionWorkflow .taskInputValues.editing {
+	display: block;
+	margin: 0;
+}
 
-div.editionWorkflow .taskInput:hover .taskInputValues {
-	border: 1px dotted #3F3F3F;
-	margin: -1px 4px;
+div.taskInputValue {
+	margin: 5px 0;
 }
 
 .taskInputValueXPath, .taskInputValueCopy { font-style: italic; }
 .taskInputValueText { font-weight: bold; }
 
-div.editionWorkflow .addTaskInputValue {
-	position: absolute;
-	bottom: -15px;
-	right: 20px;
+td.xPathAble {
+	position: relative;
 }
 
 div.editionWorkflow img.startXPathHelp {
-    margin-left: -8px;
-    z-index: 1;
+	margin-left: -8px;
+	z-index: 1;
+	
+	&.embedded {
+		position: absolute;
+		top: 4px;
+		right: 1px;
+	}
 }
 
 div.editionWorkflow .xpathSelectable {
@@ -771,13 +763,20 @@ div.retrySchedule {
     display: inline-block;
 }
 
+div.editionWorkflow .editing {
+	width: 90%;
+	padding: 2px 5px;
+	background-color: #F0F0F0;
+	border: 1px solid lightgray;
+}
+
 div.editionWorkflow div.jobInfos {
 	float: right;
 	margin: 0 10px;
-	padding: 1px 5px;
-	border-radius: 5px;
-	background-color: #EAEAEA;
 	z-index: 10;
+}
+div.editionWorkflow div.jobInfos.editing {
+	float: none;
 }
 
 div.editionWorkflow span.jobCondition {
@@ -786,11 +785,6 @@ div.editionWorkflow span.jobCondition {
 div.editionWorkflow span.jobLoop,
 div.editionWorkflow span.taskLoop {
 	font-size: 120%;
-}
-
-div.editionWorkflow input[name=loop].taskLoop {
-	margin-bottom: 10px;
-	width: 50%;
 }
 
 div.editionWorkflow img.editJob {
@@ -845,19 +839,19 @@ div.selectMode span:last-child {
 
 
 nav {
-    cursor: pointer;
-    position: fixed;
-    right: 5px;
-    top: 5px;
+	cursor: pointer;
+	position: fixed;
+	right: 5px;
+	top: 5px;
 }
 nav a{
-    margin-top:2px;
-    padding:5px;
-    text-decoration:none;
+	margin-top:2px;
+	padding:5px;
+	text-decoration:none;
 }
 
 nav a :hover{
-    opacity:0.5;
+	opacity:0.5;
 }
 #menu, #menu ul {
     text-align: center;
@@ -881,11 +875,11 @@ div.contentList, div.contentManage {
 }
 
 .workflowName{
-    color: green;
-    font-size: 16px;
-    font-weight: bold;
-    text-align: center;
-		margin-top: 30px;
+	color: green;
+	font-size: 16px;
+	font-weight: bold;
+	text-align: center;
+	margin-top: 30px;
 }
 
 @media (max-width: 1280px) {
@@ -895,7 +889,7 @@ div.contentList, div.contentManage {
 	}
 	
 	.submitFormButtonMedium {
-			margin-left: 0;
+		margin-left: 0;
 	}
 }
 

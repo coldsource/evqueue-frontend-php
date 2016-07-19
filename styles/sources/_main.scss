@@ -17,9 +17,6 @@ a, a:visited {
 	color: #4996ce;
 }
 
-select {
-	width: 400px;
-}
 select.ui-timepicker-select {
 	width: auto;
 }
@@ -179,7 +176,6 @@ table {
 
 table th, td {
 	border: 1px solid #DEE0E3;
-	font-size: 0.9em;
 	line-height: 20px;
 	padding: 2px 3px;
 }
@@ -204,7 +200,6 @@ tr.groupspace td {
 /* Global styles for buttons */
 button.blue, input[type=button], input[type=submit] {
 	display: inline-block;
-	margin: 5px;
 	padding: 2px;
 	border: 0;
 	background-color: #4993CE;
@@ -219,3 +214,29 @@ button.blue, input[type=button], input[type=submit] {
 	height:20px;
 	font-size:11px;
 }
+button.blue:disabled, input[type=button]:disabled, input[type=submit]:disabled {
+	background-color: lightgray;
+	color: gray;
+	box-shadow: rgba(255, 255, 255, 0.6) 0 1px 0;
+	text-shadow: rgba(255, 255, 255, 0.4) 0 1px 0;
+}
+
+.spaced { margin: 5px; }
+.spaced-v { margin: 5px 0; }
+.spaced-h { margin: 0 5px; }
+
+input.large {
+	min-width: 400px;
+}
+.w100 {
+	width: 100%;
+}
+
+table.unstyled {
+	tr,td {
+		border: none;
+	}
+}
+
+.hint { color: gray; }
+.vat { vertical-align: top; }

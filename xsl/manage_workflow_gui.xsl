@@ -20,33 +20,85 @@
 		<div class="contentManage">
 			<div style="display: none;">
 				<form id="editTask">
-					<xsl:apply-templates select="/page/tasks-groups" mode="tasks-select">
-						<xsl:with-param name="name" select="'task_name'" />
-						<xsl:with-param name="value" select="'name'" />
-					</xsl:apply-templates>
-					
-					<xsl:call-template name="queues-select" />
-					<xsl:call-template name="schedules-select" />
-					<input type="button" value="Save" onclick="executeAction('editTask',$(this));" />
-					<a class="action" onclick="window.location.reload(); return false;">Cancel</a>
-					<br/>
-					<label class="taskLoopLabel">Task loop expression: </label>
-					<input name="loop" class="taskLoop" title="loop expression" placeholder="loop expression" />
-					<img class="action startXPathHelp" src="images/edition/help.png" />
-					<label class="taskConditionLabel">Task condition: </label>
-					<input name="condition" class="taskCondition" title="condition" placeholder="condition" />
-					<img class="action startXPathHelp" src="images/edition/help.png" />
+					<table class="unstyled">
+						<tbody>
+							<tr>
+								<td>Task name</td>
+								<td>
+									<xsl:apply-templates select="/page/tasks-groups" mode="tasks-select">
+										<xsl:with-param name="name" select="'task_name'" />
+										<xsl:with-param name="value" select="'name'" />
+									</xsl:apply-templates>
+								</td>
+							</tr>
+							<tr>
+								<td>Queue</td>
+								<td>
+									<xsl:call-template name="queues-select" />
+								</td>
+							</tr>
+							<tr>
+								<td>Retry schedule</td>
+								<td>
+									<xsl:call-template name="schedules-select" />
+								</td>
+							</tr>
+							<tr>
+								<td>Task loop expression</td>
+								<td class="xPathAble">
+									<input name="loop" class="taskLoop w100" title="loop expression" placeholder="loop expression" />
+									<img class="action startXPathHelp embedded" src="images/edition/help.png" />
+								</td>
+							</tr>
+							<tr>
+								<td>Task condition</td>
+								<td class="xPathAble">
+									<input name="condition" class="taskCondition w100" title="condition" placeholder="condition" />
+									<img class="action startXPathHelp embedded" src="images/edition/help.png" />
+								</td>
+							</tr>
+							<tr colspan="2">
+								<td>
+									<input type="button" class="spaced-v" value="Save" onclick="executeAction('editTask',$(this));" />
+									<a class="action spaced" onclick="window.location.reload(); return false;">Cancel</a>
+								</td>
+							</tr>
+						</tbody>
+					</table>
 				</form>
 			</div>
 			<div style="display: none;">
 				<form id="editJob" onsubmit="executeAction('editJob',$(this)); return false;">
-					<input name="name" placeholder="job name" />
-					<input name="condition" title="execution condition" placeholder="execution condition" />
-					<img class="action startXPathHelp" src="images/edition/help.png" />
-					<input name="loop" title="loop expression" placeholder="loop expression" />
-					<img class="action startXPathHelp" src="images/edition/help.png" />
-					<input type="submit" value="Save" />
-					<a class="action" onclick="window.location.reload(); return false;">Cancel</a>
+					<table class="unstyled">
+						<tbody>
+							<tr>
+								<td>Job name</td>
+								<td>
+									<input name="name" placeholder="job name" />
+								</td>
+							</tr>
+							<tr>
+								<td>Job condition</td>
+								<td class="xPathAble">
+									<input name="condition" class="w100" title="execution condition" placeholder="execution condition" />
+									<img class="action startXPathHelp embedded" src="images/edition/help.png" />
+								</td>
+							</tr>
+							<tr>
+								<td>Job loop</td>
+								<td class="xPathAble">
+									<input name="loop" class="w100" title="loop expression" placeholder="loop expression" />
+									<img class="action startXPathHelp embedded" src="images/edition/help.png" />
+								</td>
+							</tr>
+							<tr>
+								<td colspan="2">
+									<input type="submit" class="spaced-v" value="Save" />
+									<a class="action spaced" onclick="window.location.reload(); return false;">Cancel</a>
+								</td>
+							</tr>
+						</tbody>
+					</table>
 				</form>
 			</div>
 			<div style="display: none;">
@@ -57,7 +109,7 @@
 							<option value="xpath">xpath value</option>
 							<option value="copy">xpath copy</option>
 						</select>
-						<input name="value[]" />
+						<input name="value[]" class="large" />
 						<img class="action startXPathHelp" src="images/edition/help.png" />
 						<img onclick="deleteTaskInputValue($(this));" title="Delete this value" src="images/edition/delete.png" />
 						<br/>
@@ -66,18 +118,51 @@
 				
 				<form id="editTaskInput" onsubmit="executeAction('editTaskInput',$(this)); return false;">
 					<input type="hidden" name="type" />
-					<input name="name" placeholder="input name" />
-					<select name="mode">
-						<option value="xml" title="Texts, values and copies here on the right will be concatenated and serialised as XML, including the stdin node.">xml</option>
-						<option value="text" title="Texts, values and copies here on the right will be concatenated as a simple text value. Any encountered XML node will be stripped.">text</option>
-					</select>
 					
-					<div class="taskInputValues">
-						<!-- value/copy/text lines will be appended here by the javascript -->
-						<img class="addTaskInputValue" src="images/edition/addTask.png" onclick="addTaskInputValue($(this));" />
-					</div>
-					<input type="submit" value="Save" />
-					<a class="action" onclick="window.location.reload(); return false;">Cancel</a>
+					<table class="unstyled">
+						<tbody>
+							<tr>
+								<td>
+									Input name
+								</td>
+								<td>
+									<input name="name" placeholder="input name" />
+									<span class="hint spaced-h">(only useful when passing ENV parameters, but does not hurt the command line)</span>
+								</td>
+							</tr>
+							<tr class="stdinMode">
+								<td>
+									Stdin mode
+								</td>
+								<td>
+									<select name="mode" onchange="$(this).next('span').text( $(this).children('option:selected').attr('title') );">
+										<option value="xml" title="Texts, values and copies here after will be concatenated and serialised as XML, including the stdin node.">xml</option>
+										<option value="text" title="Texts, values and copies here after will be concatenated as a simple text value. XML nodes will be stripped.">text</option>
+									</select>
+									<span class="hint spaced-h"></span>
+								</td>
+							</tr>
+							<tr class="vat">
+								<td>
+									Input value
+								</td>
+								<td>
+									<div class="taskInputValues">
+										<!-- value/copy/text lines will be appended here by the javascript -->
+									</div>
+									<div class="spaced-v">
+										<img class="addTaskInputValue" src="images/edition/addTask.png" onclick="addTaskInputValue($(this));" />
+									</div>
+								</td>
+							</tr>
+							<tr>
+								<td colspan="2">
+									<input class="spaced-v" type="submit" value="Save" />
+									<a class="action spaced" onclick="window.location.reload(); return false;">Cancel</a>
+								</td>
+							</tr>
+						</tbody>
+					</table>
 				</form>
 			</div>
 			<div class="boxTitle" style="width: 100%;">		
@@ -109,17 +194,19 @@
 		    </div>
 				
 		    <div class="actionItem" style="float: right; padding: 10px;">
-				<a class="action" onclick="cancelEdition(); return false;"><button type="button" class="blue">Cancel changes</button></a>
-				<form onsubmit="return false;" style="display: inline;">
-					<xsl:choose>
-						<xsl:when test="/page/workflow/@id">  <!-- edition -->
-							<input type="button" value="Overwrite workflow {/page/workflow/@id}" onclick="executeAction('saveWorkflow',$('.reference'));" />
-						</xsl:when>
-						<xsl:otherwise>  <!-- creation [TODO] -->
-							<input type="button" value="Create and save workflow" onclick="executeAction('saveWorkflow',$('.reference'));" />
-						</xsl:otherwise>
-					</xsl:choose>
-				</form>
+					<a class="action" onclick="cancelEdition(); return false;">
+						<button type="button" class="blue spaced-h">Cancel changes</button>
+					</a>
+					<form onsubmit="return false;" style="display: inline;">
+						<xsl:choose>
+							<xsl:when test="/page/workflow/@id">  <!-- edition -->
+								<input id="saveWorkflow" type="button" value="Overwrite workflow {/page/workflow/@id}" onclick="executeAction('saveWorkflow',$('.reference'));" autocomplete="off" />
+							</xsl:when>
+							<xsl:otherwise>  <!-- creation [TODO] -->
+								<input id="saveWorkflow" type="button" value="Create and save workflow" onclick="executeAction('saveWorkflow',$('.reference'));" autocomplete="off" />
+							</xsl:otherwise>
+						</xsl:choose>
+					</form>
 		    </div>
 				
 		    <p id="statusBar"></p>
