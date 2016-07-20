@@ -109,7 +109,7 @@
 							<option value="xpath">xpath value</option>
 							<option value="copy">xpath copy</option>
 						</select>
-						<input name="value[]" class="large" />
+						<input name="value[]" class="large spaced-h" />
 						<img class="action startXPathHelp" src="images/edition/help.png" />
 						<img onclick="deleteTaskInputValue($(this));" title="Delete this value" src="images/edition/delete.png" />
 						<br/>
