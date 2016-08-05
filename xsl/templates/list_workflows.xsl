@@ -4,7 +4,7 @@
 	<xsl:import href="xmlhighlight.xsl" />
 	<xsl:import href="workflow.xsl" />
 	
-	<xsl:key name="groups" match="/page/workflows/workflow/@group" use="." />
+	<xsl:key name="groups" match="/page/response/workflow/@group" use="." />
 	
 	<xsl:template name="list_workflows">
 		
@@ -31,7 +31,7 @@
 				<th class="thActions">Actions</th>
 			</tr>
 			
-			<xsl:for-each select="/page/workflows/workflow/@group[generate-id(.) = generate-id(key('groups', .))]">
+			<xsl:for-each select="/page/response/workflow/@group[generate-id(.) = generate-id(key('groups', .))]">
 				<xsl:sort select="." />
 				
 				<xsl:variable name="groupName" select="." />
@@ -52,24 +52,24 @@
 					</td>
 				</tr>
 				
-				<xsl:for-each select="/page/workflows/workflow[@group = $groupName]">
+				<xsl:for-each select="/page/response/workflow[@group = $groupName]">
 					<tr class="evenOdd">
 						<td>
 							<xsl:value-of select="@id" />
 						</td>
 						<td>
 							<xsl:value-of select="@name" />
-							<xsl:if test="@has-bound-task = 'yes'">
+							<xsl:if test="@has-bound-task = 1">
 								<span style="font-size: 80%; color: darkgray;"> (simple)</span>
 							</xsl:if>
 							<xsl:text>&#160;</xsl:text>
 							<img src="images/bigger.png" title="View workflow XML" class="pointer" onclick = "$('#xmlcontent{@id}').dialog({{width:800}});" />
 							<div id="xmlcontent{@id}" style="display:none;">
-								<xsl:apply-templates select="workflow" mode="xml_display" />
+								<xsl:apply-templates select="." mode="xml_display" />
 							</div>
 							<img src="images/workflow.png" title="Tree Visualisation" class="pointer" onclick="$('#lightTree{@id}').dialog({{width: 'auto'}});" />
 							<div id="lightTree{@id}" style="display:none;">
-								<xsl:apply-templates select="workflow" mode="light-tree" />
+								<xsl:apply-templates select="." mode="light-tree" />
 							</div>
 						</td>
 						<td>
@@ -77,7 +77,7 @@
 						</td>
 						<td class="tdActions" style="min-width: 80px;">
 							<xsl:choose>
-								<xsl:when test="@has-bound-task='no'">
+								<xsl:when test="@has-bound-task = 0">
 									<a href="manage-workflow.php?workflow_id={@id}" title="Text edit">
 										<img src="images/edition/edit-txt.png" />
 									</a>
@@ -116,7 +116,7 @@
 	</xsl:template>
 	
 	
-	<xsl:template match="workflow[@has-bound-task='yes']//task" mode="minimal" priority="1">
+	<xsl:template match="workflow[@has-bound-task = 1]//task" mode="minimal" priority="1">
 		<xsl:value-of select="/page/tasks/task[task_name = current()/@name]/task_binary" />
 		<br/>
 	</xsl:template>

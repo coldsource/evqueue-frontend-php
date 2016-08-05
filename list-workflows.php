@@ -25,6 +25,8 @@ require_once 'lib/XSLEngine.php';
 require_once 'bo/BO_workflow.php';
 require_once 'bo/BO_task.php';
 
+require 'inc/evqueue.php';
+
 
 $xsl = new XSLEngine();
 
@@ -41,8 +43,7 @@ if (isset($_FILES['workflow_zip_file'])) {
 		$xsl->AddErrors($errors);
 }
 
-
-$xsl->AddFragment(Workflow::getAllXml());
+$xsl->AddDOMFragment($evqueue->GetWorkflows()->documentElement);
 $xsl->AddFragment(Task::getAllXml($filter='only-tied-task'));
 $xsl->DisplayXHTML('xsl/list_workflows.xsl');
 

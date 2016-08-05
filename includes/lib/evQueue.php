@@ -199,6 +199,7 @@ class evQueue {
 	public function GetStatistics($type)
 	{
 		return $this->exec("<statistics type='$type' />");
+		// TODO: encapsulated in a <response> tag
 	}
 	
 	public function GetConfiguration()
@@ -260,6 +261,35 @@ class evQueue {
 	
 	public function GetRunningWorkflows() {
 		return $this->exec('<status type="workflows" />');
+	}
+	
+	/* TODO: passer GetWorkflows, GetWorkflow et SaveWorkflow (+ les nouvelles méthodes)
+	 * dans un evQueueAPI qui utilise les méthodes nécessaires d'evQueue.
+	 */
+	public function GetWorkflows () {
+		return $this->exec("<workflows action='list' />", true);
+	}
+	
+	public function GetWorkflow ($id) {
+		$id = (int)$id;
+		return $this->exec("<workflow action='get' id='$id' />", true);
+	}
+	
+	public function SaveWorkflow ($parameters) {
+		$dom = new DOMDocument();
+		$dom->loadXML('<workflow action="edit"/>');
+		
+		unset($parameters['reference']);  // TODO: c'est quoi ça ?
+		
+		unset($parameters['action']);
+		foreach ($parameters as $p => $v)
+			$dom->documentElement->setAttribute($p,$v);
+		
+		Logger::GetInstance()->Log(LOG_WARNING,__FILE__.':'.__LINE__,  htmlspecialchars($dom->saveXML()));
+		
+		$response = $this->exec($dom->saveXML(), true);
+		Logger::GetInstance()->Log(LOG_WARNING,__FILE__.':'.__LINE__,  htmlspecialchars($response->saveXML()));
+		return $response;
 	}
 	
 	private function put_or_remove_file ($type,$action,$filename,$data='') {
