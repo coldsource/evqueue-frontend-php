@@ -21,14 +21,7 @@
 //require_once 'inc/auth_check.php';
 require_once 'inc/logger.php';
 
-require_once 'bo/BO_workflow.php';
-require_once 'bo/BO_workflowInstance.php';
-require_once 'bo/BO_task.php';
-require_once 'bo/BO_queue.php';
-require_once 'bo/BO_schedule.php';
-require_once 'bo/BO_workflowSchedule.php';
-require_once 'bo/BO_notification.php';
-require_once 'bo/BO_notificationType.php';
+
 
 
 /*
@@ -44,12 +37,13 @@ if (isset($_POST) && !empty($_POST)){
 	
 	if (!isset($_POST['user_login']))
 		die("<error>No user</error>");
-	
-	$user = new User($_POST['user_login']);
-	if (!is_object($user))
-		die("<error>Wrong user</error>");
+		
+	$_SESSION['user_login'] = $_POST['user_login'];
+	$_SESSION['user_pwd'] = $_POST['user_pwd'];
+	require_once 'inc/evqueue.php';
 	
 	unset($_POST['user_login']);
+	unset($_POST['user_pwd']);
 	
 	$setVals=false;
 	if (isset($_POST['setVals']) && $_POST['setVals']==="1")
@@ -57,11 +51,6 @@ if (isset($_POST) && !empty($_POST)){
 	unset($_POST['setVals']);
 	
 	$confirmed = isset($_POST['confirm']) && $_POST['confirm'] == 'yes';
-	
-	if(!$user->CheckRights($_POST)) {
-		writeEnd(array('no-right' => ''));
-		die();
-	}
 	
 	switch ($_POST['form_id']){
 		case "formWorkflow":
@@ -132,8 +121,8 @@ if (isset($_POST) && !empty($_POST)){
 			$id = $_POST["id"];
 			
 			if (is_numeric($id)) {
-				$wfi_bo = new WorkflowInst($id);
-				$name = $wfi_bo->getWorkflowName();
+				//$wfi_bo = new WorkflowInst($id);
+				//$name = $wfi_bo->getWorkflowName();
 			} else {
 				$name = $id;
 			}
@@ -142,9 +131,10 @@ if (isset($_POST) && !empty($_POST)){
 			if (trim($_POST['user'].$_POST['host'] != ''))
 				$user_host = $_POST['user'].'@'.$_POST['host'];
 			
-			$wfi = new WorkflowInstance($_POST['node']);
-			$id = $wfi->LaunchWorkflowInstance($name, isset($_POST['wfparams']) ? $_POST['wfparams'] : [], 'asynchronous', $user_host);
-			
+			$evqueue_node = getevQueue($_POST['node']);
+			$id = $evqueue_node->Launch($name, [],  isset($_POST['wfparams']) ? $_POST['wfparams'] : []);
+		
+		
 			if ($id === false){
 				$xml = "<error>Could not launch workflow: the queueing engine is likely not running, or workflow has been deleted/modified?</error>";
 			}else{

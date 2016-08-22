@@ -24,7 +24,7 @@ require_once 'lib/WebserviceWrapper.php';
 
 
 if (!isset($_POST['form_id']))
-	Logger::GetInstance()->Log(LOG_ERR,'wsfwd.php',"form_id not or badly set");
+	Logger::Log(LOG_ERR,'wsfwd.php',"form_id not or badly set");
 
 
 $ws = new WebserviceWrapper($_POST['form_id'], $_POST['form_id'], $_POST, true);

@@ -26,17 +26,46 @@ class evQueue {
 	protected $evqueue_ip;
 	protected $evqueue_port;
 	protected $socket = false;
+	protected $connected = false;
 	
-	public function __construct($cnx_string) {
+	protected $parser;
+	protected $parser_level ;
+	protected $parser_ready;
+	protected $parser_root_tag;
+	protected $parser_root_attributes;
+	protected $user_login;
+	protected $user_pwd;
+	protected $authentified = false;
+	
+	const ERROR_AUTH_REQUIRED = 1;
+	const ERROR_AUTH_FAILED = 2;
+	const ERROR_RESPONSE_KO = 3;
+	
+	
+	public function __construct($cnx_string, $user_login = null, $user_pwd = null) {
 		if(substr($cnx_string, 0 ,7) == 'unix://'){
 			$this->evqueue_ip =$cnx_string;
 			$this->evqueue_port = -1;
+			$this->socket = socket_create(AF_UNIX, SOCK_STREAM, SOL_TCP);
 		}
 		elseif(substr($cnx_string, 0 ,6) == 'tcp://'){
 			list($this->evqueue_ip,$this->evqueue_port) = explode(':', substr($cnx_string, 6));
+			$this->socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
 		}
 		else
 			throw new Exception("evQueue : Unknown scheme '$cnx_string'");
+		
+		socket_set_option($this->socket, SOL_SOCKET, SO_RCVTIMEO, ['sec' => 10, 'usec' => 0]);
+		socket_set_option($this->socket, SOL_SOCKET, SO_SNDTIMEO, ['sec' => 10, 'usec' => 0]);
+		
+		$this->user_login = $user_login;
+		$this->user_pwd = $user_pwd;
+	}
+	
+	public function __destruct() {
+		if($this->authentified)
+			$xml = $this->Api('quit');
+		$this->disconnect(); 
 	}
 	
 	public function __sleep()
@@ -45,26 +74,65 @@ class evQueue {
 		return array('evqueue_ip', 'evqueue_port', 'socket');
 	}
 	
+	public function setUserLogin($login){
+		$this->user_login = $login;
+	}
+	
+	public function setUserPwd($pwd){
+		$this->user_pwd = $pwd;
+	}
+	
 	protected function connect()
 	{
-		if($this->socket!==false)
+		if($this->socket!==false && $this->connected !== false)
 			return; // Already connected
 		
-		$this->socket = @fsockopen($this->evqueue_ip,$this->evqueue_port);
-		if ($this->socket === false)
- 			throw new Exception("evQueue : unable to connect to core engine with IP $this->evqueue_ip and port $this->evqueue_port");
+		socket_set_nonblock($this->socket);
+		socket_connect($this->socket, $this->evqueue_ip,$this->evqueue_port);
+		
+		$read_fd = [];
+		$write_fd = [$this->socket];
+		$excpt_fd = [];
+		if(socket_select($read_fd,$write_fd,$excpt_fd,2)==0)
+			throw new Exception("evQueue : unable to connect to core engine with IP $this->evqueue_ip and port $this->evqueue_port");
+		
+		socket_set_block($this->socket);
+ 			
+		$this->connected = true;
+		
+		$xml = $this->recv();
+		if($this->parser_root_tag == "READY")
+			$this->authentified = true;
+	}
+	
+	protected function authentication(){
+		$hmac = hash_hmac("sha1",hex2bin($this->parser_root_attributes['CHALLENGE']),$this->user_pwd);
+		$dom = $this->build_query('auth', false, ["response" => $hmac, "user" => $this->user_login]);
+		$xml = $this->exec($dom->saveXML());
+		
+		if($this->parser_root_tag == "READY"){
+			$this->authentified = true;
+			return true;
+		}
+		else{
+			var_dump($this->parser_root_attributes);
+			//die("ss".$this->parser_root_tag);
+		}
+		return false;
 	}
 	
 	protected function disconnect()
 	{
-		fclose($this->socket);
-		$this->socket=false;
+		if($this->socket!==false){
+			socket_close($this->socket);
+			$this->socket=false;
+			$this->connected=false;
+		}
 	}
 	
 	protected function send($data)
 	{
-		$written = @fwrite($this->socket,$data);
-		
+		$written = socket_write($this->socket,$data);
 		if($written===false)
 			throw new Exception("evQueue : could not write data to socket");
 		
@@ -74,86 +142,54 @@ class evQueue {
 	
 	protected function recv()
 	{
-		$data = stream_get_contents($this->socket);
-		
+		$xml = "";
+		$this->ParserInit();
+		while(socket_recv($this->socket, $data, 1600, 0)){
+			$xml .= $data;
+			$this->ParserParse($data);
+			if($this->parser_ready === true )
+				break;
+		}
+
 		if($data===false)
 			throw new Exception("evQueue : error reading data");
-		
-		return $data	;
+
+		return $xml	;
 	}
 	
 	protected function exec($cmd, $return_dom=false)
 	{
-		$this->connect();
-		$this->send($cmd);
+		$this->send("$cmd\n");
 		$out = $this->recv();
-		$this->disconnect();
-		
-		$dom = new DOMDocument();
-		if (!@$dom->loadXML($out))
-			throw new Exception("evQueue : invalid XML returned from engine : $out");
-		
-		$xpath = new DOMXPath($dom);
-		$status = $xpath->evaluate("string(/return/@status)");
-		$error = $xpath->evaluate("string(/return/@error)");
-		
-		if($status=='KO')
-			throw new Exception("evQueue : error executing command $cmd. Got error $error from engine.");
-		
-		if($return_dom)
-			return  $dom;
 		
 		return $out;
 	}
 	
-	public function Launch($workflow_name, $parameters=[], $options=[]) {
-		$default_options = [
-			'mode' => 'asynchronous',
-			'timeout' => false,
-			'user_host' => false,
-		];
-		$options = array_replace($default_options,$options);
+	protected function build_query($name, $action = false, $attributes = [], $parameters = []){
+		$dom = new \DOMDocument("1.0", "utf-8");
+		$root = $dom->createElement($name);
+		if($action)
+			$root->setAttribute('action', $action);
 		
-		$wf = new \DOMDocument();
-		$wf->loadXML('<?xml version="1.0" encoding="UTF-8"?><workflow/>');
-		$wf->documentElement->setAttribute('name',$workflow_name);
-		$wf->documentElement->setAttribute('action','info');
-		$wf->documentElement->setAttribute('mode',$options['mode']);
-		
-		if ($options['timeout'] !== false)
-			$wf->documentElement->setAttribute('timeout',$options['timeout']);
-		
-		foreach ($parameters as $param => $value) {
-			$parameter = $wf->createElement('parameter');
-			$parameter->setAttribute('name', $param);
-			$parameter->setAttribute('value', $value);
-			$wf->documentElement->appendChild($parameter);
+		foreach ($attributes as $key => $value) {
+			$root->setAttribute($key, $value);
 		}
-		
-		if ($options['user_host']) {
-			list($user,$host) = split('@', $options['user_host']);
-			$wf->documentElement->setAttribute('user',$user);
-			$wf->documentElement->setAttribute('host',$host);
+		foreach ($parameters as $parameter => $value) {
+			$param = $dom->createElement('parameter');
+			$param->setAttribute('name', $parameter);
+			$param->setAttribute('value', $value);
+			$root->appendChild($param);
 		}
+		$dom->appendChild($root);
 		
-		$wf = $wf->saveXML();
-		
-		$xml_str = $this->exec($wf);
-		
-		$xml = simplexml_load_string($xml_str);
-		
-		return (int)$xml->attributes()->{'workflow-instance-id'};
+		return $dom;
 	}
 	
-	/*
-	 * Retro-compatibility.
-	 * Use of the Launch function is advised.
-	 */
-	public function LaunchWorkflowInstance($workflow_name, $parameters = array(), $mode = 'asynchronous', $user_host = false) {
-		$this->Launch($workflow_name, $parameters, [
-			'mode' => $mode,
-			'user_host' => $user_host,
-		]);
+	public function Launch($name, $attributes=[], $parameters=[]) {
+		$attributes['name'] = $name;
+		$xml = $this->Api('instance', 'launch', $attributes, $parameters);
+		
+		return (int)$this->parser_root_attributes['WORKFLOW-INSTANCE-ID'];
 	}
 	
 	
@@ -173,10 +209,7 @@ class evQueue {
 		
 		return false;
 	}
-	
-	public function GetWorkflowOutput($workflow_instance_id) {
-		return $this->exec("<workflow id='$workflow_instance_id' />");
-	}
+
 	
 	public  function GetRunningTasks($workflow_instance_id) {
 		$dom = $this->exec("<workflow id='$workflow_instance_id' />",true);
@@ -189,189 +222,65 @@ class evQueue {
 		
 		return $tasks;
 	}
-	
-	public function StopWorkflow ($workflow_instance_id) {
+
 		
-		$this->exec("<workflow id='$workflow_instance_id' action='cancel' />");
+	public function Api($name, $action = false, $attributes = [], $parameters = []){
+		if(!$this->connected)
+			$this->connect();
+			
+		if(!$this->authentified){
+			if($this->user_login === null)
+				throw new Exception("evQueue : login and password required", evQueue::ERROR_AUTH_REQUIRED);
+			
+			if(!$this->authentication())
+				throw new Exception("evQueue : authentication failed", evQueue::ERROR_AUTH_FAILED);
+		}
+		
+		$dom = $this->build_query($name,$action,$attributes,$parameters);
+		
+		$xml = $this->exec($dom->saveXML());
+		
+		if(!isset($this->parser_root_attributes['STATUS']) || $this->parser_root_attributes['STATUS']!='OK')
+			throw new Exception("evQueue : error returned from engine : {$this->parser_root_attributes['ERROR']}", evQueue::ERROR_RESPONSE_KO);
+		
+		return trim($xml);		
 	}
 	
 	
-	public function GetStatistics($type)
+	protected function ParserInit()	{
+		$this->parser_level = 0;
+		$this->parser_ready = false;
+		$this->parser = xml_parser_create();
+	
+		xml_set_object($this->parser, $this);
+		xml_set_element_handler($this->parser, "ParserOpen", "ParserClose");
+	}
+	
+	protected function ParserParse($data) 
 	{
-		return $this->exec("<statistics type='$type' />");
-		// TODO: encapsulated in a <response> tag
+		xml_parse($this->parser, $data);
 	}
 	
-	public function GetConfiguration()
+	protected function ParserOpen($parser, $tag, $attributes) 
 	{
-		return $this->exec("<status type='configuration' />");
+		if($this->parser_level == 0){
+			$this->parser_root_tag = $tag;
+			$this->parser_root_attributes = $attributes;
+		}
+		$this->parser_level++;
 	}
 	
-	
-	public function ResetStatistics()
+	protected function ParserClose($parser, $tag) 
 	{
-		return $this->exec("<statistics type='global' action='reset' />");
+		$this->parser_level--;
+		if($this->parser_level == 0)
+			$this->parser_ready = true;
 	}
-	
-	
-	/*
-	 * Reloads the lists of tasks, workflows and workflow schedules.
-	 */
-	public function ReloadEvqueue ()
-	{
-		$this->exec("<control action='reload' />");
-	}
-	
-	
-	/*
-	 * Write all tasks stored in database to disk
-	 */
-	public function SyncTasks ()
-	{
-		$this->exec("<control action='synctasks' />");
-	}
-	
-	/*
-	 * Write all notifications stored in database to disk
-	 */
-	public function SyncNotifications ()
-	{
-		$this->exec("<control action='syncnotifications' />");
-	}
-	
-	/*
-	 * Asks all tasks having a retry schedule, and that failed, to try again immediately.
-	 */
-	public function RetryAll () {
-		$this->exec("<control action='retry' />");
-	}
-	
-	/*
-	 * Immediately stops the execution of a task.
-	 */
-	public function KillTask ($workflow_instance_id, $task_pid) {
-		$this->exec("<workflow id='$workflow_instance_id' action='killtask' pid='$task_pid' />");
-	}
-	
-	
-	public function GetNextExecutionTime() {
-		return $this->exec('<status type="scheduler" />');
-	}
-	
-	
-	public function GetRunningWorkflows() {
-		return $this->exec('<status type="workflows" />');
-	}
-	
-	/* TODO: passer GetWorkflows, GetWorkflow et SaveWorkflow (+ les nouvelles méthodes)
-	 * dans un evQueueAPI qui utilise les méthodes nécessaires d'evQueue.
-	 */
-	public function GetWorkflows () {
-		return $this->exec("<workflows action='list' />", true);
-	}
-	
-	public function GetWorkflow ($id) {
-		$id = (int)$id;
-		return $this->exec("<workflow action='get' id='$id' />", true);
-	}
-	
-	public function SaveWorkflow ($parameters) {
-		$dom = new DOMDocument();
-		$dom->loadXML('<workflow action="edit"/>');
-		
-		unset($parameters['reference']);  // TODO: c'est quoi ça ?
-		
-		unset($parameters['action']);
-		foreach ($parameters as $p => $v)
-			$dom->documentElement->setAttribute($p,$v);
-		
-		Logger::GetInstance()->Log(LOG_WARNING,__FILE__.':'.__LINE__,  htmlspecialchars($dom->saveXML()));
-		
-		$response = $this->exec($dom->saveXML(), true);
-		Logger::GetInstance()->Log(LOG_WARNING,__FILE__.':'.__LINE__,  htmlspecialchars($response->saveXML()));
-		return $response;
-	}
-	
-	private function put_or_remove_file ($type,$action,$filename,$data='') {
-		$filename = htmlspecialchars($filename);
-		$data = base64_encode($data);
-		
-		$this->exec("<$type action='$action' filename='$filename' data='$data' />");
-	}
-	
-	/*
-	 * Asks evqueue to store a notification binary on its machine.
-	 */
-	public function StoreFile ($filename,$data) {
-		$this->put_or_remove_file('notification','put',$filename,$data);
-	}
-	
-	/*
-	 * Asks evqueue to delete a notification binary, previously stored via StoreFile, on its machine.
-	 */
-	public function DeleteFile ($filename) {
-		$this->put_or_remove_file('notification','remove',$filename);
-	}
-	
-	/*
-	 * Asks evqueue to store a notification configuration file on its machine.
-	 */
-	public function StoreConfFile ($filename,$data) {
-		$this->put_or_remove_file('notification','putconf',$filename,$data);
-	}
-	
-	/*
-	 * Asks evqueue to delete a file configuration, previously stored via StoreConfFile, on its machine.
-	 */
-	public function DeleteConfFile ($filename) {
-		$this->put_or_remove_file('notification','removeconf',$filename);
-	}
-	
-	/*
-	 * Asks evqueue to return the content of a file configuration, previously stored via StoreConfFile.
-	 */
-	public function GetConfFile ($filename) {
-		$filename = htmlspecialchars($filename);
-		
-		$out = $this->exec("<notification action='getconf' filename='$filename' />");
-		$dom = new DOMDocument();
-		$dom->loadXML($out);
-		$xpath = new DOMXPath($dom);
-		$data = $xpath->evaluate("string(/return/@data)");
-		
-		return $data===false ? false : base64_decode($data);
-	}
-	
-	/*
-	 * Asks evqueue to return the content of a task file.
-	 */
-	public function GetTaskFile ($filename) {
-		$filename = htmlspecialchars($filename);
-		
-		$out = $this->exec("<task action='get' filename='$filename' />");
-		$dom = new DOMDocument();
-		$dom->loadXML($out);
-		$xpath = new DOMXPath($dom);
-		
-		$data = $xpath->evaluate("string(/return/@data)");
-		
-		return $data===false ? false : base64_decode($data);
-	}
-	
-	/*
-	 * Asks evqueue to store given task file.
-	 */
-	public function PutTaskFile ($filename,$data) {
-		$this->put_or_remove_file('task','put',$filename,$data);
-	}
-	
-	/*
-	 * Asks evqueue to delete a task file.
-	 */
-	public function DeleteTaskFile ($filename) {
-		$this->put_or_remove_file('task','remove',$filename);
-	}
-	
 }
+
+
+
+//fonction pour ecrire dans les logs
+// fonction pour augmenter le %
 
 ?>

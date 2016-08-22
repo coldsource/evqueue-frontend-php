@@ -21,8 +21,6 @@
 require_once 'inc/auth_check.php';
 require_once 'inc/logger.php';
 require_once 'lib/XSLEngine.php';
-require_once 'lib/workflow_instance.php';
-require_once 'bo/BO_workflowInstance.php';
 
 
 if (!isset($_GET['id']))
@@ -30,10 +28,8 @@ if (!isset($_GET['id']))
 
 $xsl = new XSLEngine();
 
-$wfi = new WorkflowInstance($_GET['node_name']);
-$wf = $wfi->GetWorkflowOutput($_GET['id']);
-
-$xsl->AddFragment($wf);
+$xml = $evqueue->Api("instance", "query", ["id" => $_GET['id']]);
+$xsl->AddFragment(["instance" => $xml]);
 echo $xsl->DisplayXHTML('../xsl/ajax/workflow.xsl');
 
 

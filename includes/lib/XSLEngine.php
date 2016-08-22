@@ -17,8 +17,6 @@
   * 
   * Authors: Nicolas Jean, Christophe Marti 
   */
-require_once 'bo/BO_user.php';
-
 
 function sumExecTimes ($nodes) {
 	$total_time = 0;
@@ -40,88 +38,57 @@ function sumRetryTimes ($nodes) {
 	}
 	return $total_time;
 }
-
-
+  
 class XSLEngine
 {
 	protected $xmldoc;
 	protected $root_node;
-	protected $private_node;
-	protected $notices_node;
-	protected $errors_node;
 	protected $metas_node;
-	protected $parameters;
-	
-	
+	protected $parameters = [];
+	protected $display_xml;
+	protected $instruction = "<!doctype html>"; //doctype, xml...
+
+
 	public function __construct()
-	{	
-		$this->xmldoc = new DOMDocument();
-		
+	{
+		$this->xmldoc = new \DOMDocument();
+
 		$this->root_node = $this->xmldoc->createElement('page');
 		foreach ($_GET as $param => $value) {
-			if (!is_array($value))
+			if (!is_array($value) && preg_match('/^[a-zA-Z0-9-_]+$/',$param))
 				$this->root_node->setAttribute($param, $value);
 		}
-		
-		
-		$this->get_node = $this->xmldoc->createElement('get');
-		$this->root_node->appendChild($this->get_node);
-		foreach ($_GET as $param => $value) {
-			if (!is_array($value)){
-				$this->get_node->setAttribute($param, $value);
-			}else{
-				$this->get_array_node_list = $this->xmldoc->createElement('list');
-				$this->get_array_node_list->setAttribute("name", $param);
-				foreach($value as $key=>$val){
-					if (!is_array($val)){
-						$this->get_array_node = $this->xmldoc->createElement('value', $val);
-						$this->get_array_node_list->appendChild($this->get_array_node);
-					}
+
+		// GET et POST
+		$get_node = $this->xmldoc->createElement('get');
+		$this->root_node->appendChild($get_node);
+		$post_node = $this->xmldoc->createElement('post');
+		$this->root_node->appendChild($post_node);
+
+		foreach ([
+				[$_GET,  $this->root_node],
+				[$_GET,  $get_node],
+				[$_POST, $post_node]
+		] as list($params,$node)) {
+
+			foreach ($params as $param => $value) {
+				if (!is_array($value)){
+					if(preg_match('/^[a-zA-Z0-9-_]+$/',$param))
+						$node->setAttribute($param, $value);
+				}else if ($node !== $this->root_node) {
+					$list = $this->xmldoc->createElement('list');
+					$list->setAttribute('name', $param);
+					foreach($value as $val)
+						if (!is_array($val))
+							$list->appendChild($this->xmldoc->createElement('value'))->appendChild($this->xmldoc->createTextNode($val));
+					$node->appendChild($list);
 				}
-				$this->get_node->appendChild($this->get_array_node_list);
-			}
-		}		
-		
-		
-		$this->post_node = $this->xmldoc->createElement('post');
-		$this->root_node->appendChild($this->post_node);
-		foreach ($_POST as $param => $value) {
-			if (!is_array($value)){
-				$this->post_node->setAttribute($param, $value);
-			}else{
-				$this->post_array_node_list = $this->xmldoc->createElement('list');
-				$this->post_array_node_list->setAttribute("name", $param);
-				foreach($value as $key=>$val){
-					if (!is_array($val)){
-						$this->post_array_node = $this->xmldoc->createElement('value', $val);
-						$this->post_array_node_list->appendChild($this->post_array_node);
-					}
-				}
-				$this->post_node->appendChild($this->post_array_node_list);
 			}
 		}
-		
-		$this->root_node->setAttribute('url', $_SERVER['SCRIPT_NAME']);
+
 		$this->xmldoc->appendChild($this->root_node);
-		
-		$this->errors_node = $this->xmldoc->createElement('errors');
-		$this->root_node->appendChild($this->errors_node);
-		
-		$this->metas_node = $this->xmldoc->createElement('metas');
-		$this->root_node->appendChild($this->metas_node);
-		
-		$this->notices_node = $this->xmldoc->createElement('notices');
-		$this->root_node->appendChild($this->notices_node);
-		
-		$this->private_node = $this->xmldoc->createElement('private');
-		$this->root_node->appendChild($this->private_node);
-		
-		$this->SetParameter('NOW', date('Y-m-d H:i:s'));
-		$this->SetParameter('EDITION', '0');
-		if (defined('SITE_BASE'))
-			$this->SetParameter('SITE_BASE', constant('SITE_BASE'));
-		
-		// Add node(s) information
+
+		 // Add node(s) information
 		require 'conf/queueing.php';
 		$nodes = $this->xmldoc->createElement('evqueue-nodes');
 		$this->root_node->appendChild($nodes);
@@ -131,138 +98,76 @@ class XSLEngine
 			$node->appendChild($this->xmldoc->createTextNode($conf));
 			$nodes->appendChild($node);
 		}
-		
-		@session_start();
-		
-		if (isset($_SESSION['user_login'])) {
-			$user = new User($_SESSION['user_login']);
-			$this->AddPrivateFragment($user->getXML('logged-in-user'));
-		}
-		
-		if (isset($_SESSION['edition']['workflow'])) {
-			$this->AddFragment("<session><workflow id='session' name='session' original-id='{$_SESSION['edition']['original_workflow_id']}'>{$_SESSION['edition']['workflow']}</workflow></session>");
-		}
+		$this->SetParameter('NOW', date('Y-m-d H:i:s'));
+		$this->SetParameter('EDITION', '0');
+
+
+		$this->display_xml = isset($_GET['display_xml']);
 	}
+
 	
+
 	public function SetParameter($name,$value)
 	{
 		$this->parameters[$name] = $value;
 	}
-	
+
 	public function GetParameter($name)
 	{
 		return isset($this->parameters[$name])?$this->parameters[$name]:false;
 	}
-	
-	public function AddErrors ($errors) {
-		foreach ($errors as $id => $msg)
-			$this->AddError($id,$msg);
-	}
-	
-	public function AddError($id,$message='',$param=null)
-	{
-		$fragment = $this->xmldoc->createDocumentFragment();
-		$param = $param ? " param='$param'" : '';
-		$xml = "<error id='$id'$param>$message</error>";
-		if(!@$fragment->appendXML($xml))
-		{
-			Logger::GetInstance()->Log(LOG_ERR,'XSLEngine',"Error importing PrivateFragment : ".htmlspecialchars($xml));
-		}
-		
-		$this->errors_node->appendChild($fragment);
-	}
-	
-	public function AddMeta($name,$content)
-	{
-		$fragment = $this->xmldoc->createDocumentFragment();
-		$xml = "<meta name='$name' content='$content' />";
-		if(!@$fragment->appendXML($xml))
-		{
-			Logger::GetInstance()->Log(LOG_ERR,'XSLEngine',"Error importing PrivateFragment : ".htmlspecialchars($xml));
-		}
-		
-		$this->metas_node->appendChild($fragment);
-	}
-	
-	public function AddNotice($message,$type=null)
-	{
-		$fragment = $this->xmldoc->createDocumentFragment();
-		$type = $type ? " type='$type'" : '';
-		$xml = "<notice$type>$message</notice>";
-		if(!@$fragment->appendXML($xml))
-			Logger::GetInstance()->Log(LOG_ERR,'XSLEngine',"Error importing PrivateFragment : ".htmlspecialchars($xml));
-		
-		$this->notices_node->appendChild($fragment);
-	}
-	
-	public function AddWebserviceResult(WebserviceWrapper $ws)
-	{
-		$fragment = $ws->FetchResult();
 
-		$node = $this->xmldoc->importNode($fragment->firstChild,true);
-		$this->root_node->appendChild($node);
-	}
-
-	public function AddBulkWebserviceResult(WebserviceWrapper $ws)
+	/*
+	 * @param $fragment is either an XML string, a DOMDocument, or a WebserviceWrapperGeneric.
+	 */
+	public function AddFragment($xml, $parent_node = false)
 	{
-		$fragment = $ws->FetchResult();
-		$bulknode = $this->xmldoc->importNode($fragment->firstChild,true);
-		$children = array();
-		foreach ($bulknode->childNodes as $child)
-			$children[] = $child;  // it is necessary to have a separate, temporary array to store nodes; the PHP DOMNodeList class does not allow to iterate over ->childNodes properly (see http://www.php.net/manual/en/class.domnodelist.php#83178)
-		foreach ($children as $child)
-			$this->root_node->appendChild($child);
-	}
-
-	//TODO : utiliser le meme principe que AddFragment pour ne pas tenir compte de l'entete xml
-	public function AddPrivateFragment($xml)
-	{
-		$fragment = $this->xmldoc->createDocumentFragment();
-		if(!@$fragment->appendXML($xml))
+		$rootName = false;
+		if(is_array($xml))
 		{
-			Logger::GetInstance()->Log(LOG_ERR,'XSLEngine',"Error importing PrivateFragment : ".htmlspecialchars($xml));
+			$rootName = key($xml);
+			$xml = $xml[$rootName];
 		}
 
-		$this->private_node->appendChild($fragment);
-	}
-	
-	public function AddPrivateDOMFragment($xmldoc)
-	{
-		$fragment = $this->xmldoc->importNode($xmldoc,true);
-		if($fragment===false)
-		{
-			Logger::GetInstance()->Log(LOG_ERR,'XSLEngine',"Error importing Fragment");
+		if($parent_node===false)
+			$parent_node = $this->root_node;
+
+		$added_node = false;
+
+		if (is_string($xml)) {
+			$fragment = $this->xmldoc->createDocumentFragment();
+			if (stripos($xml, '<?xml') === 0) {
+				$dom = new \DomDocument();
+				$dom->loadXML($xml);
+				$xml = $dom->saveXML($dom->documentElement);
+			}
+			if(!@$fragment->appendXML($xml))
+				Logger::Log(LOG_ERR,'XSLEngine',"Error importing Fragment : ".htmlspecialchars($xml));
+
+			$added_node = $parent_node->appendChild($fragment);
+
+		} else if ($xml instanceof \DOMDocument) {
+			$node = $this->xmldoc->importNode($xml->firstChild,true);
+			$added_node = $parent_node->appendChild($node);
+
+		} else if ($xml instanceof WebserviceWrapperGeneric) {
+
+			$dom = $xml->FetchResult();
+			$node = $this->xmldoc->importNode($dom->firstChild,true);
+			$added_node = $parent_node->appendChild($node);
+
+		} else {
+			Logger::Log(LOG_ERR, 'XSLEngine.php', '$xml is neither an XML string, a DOMDocument nor a WebserviceWrapper');
 		}
-		$this->private_node->appendChild($fragment);
-	}
-	
-	public function AddFragment($xml)
-	{
-		$fragment = $this->xmldoc->createDocumentFragment();
-		if (stripos($xml, '<?xml') === 0) {
-			$dom = new DomDocument();
-			$dom->loadXML($xml);
-			$xml = $dom->saveXML($dom->documentElement);
+
+		if($added_node !== false && $rootName !== false && $added_node->nodeName != $rootName){
+			$added_node = XSLEngine::RenameElement($added_node,$rootName);
 		}
-		if(!@$fragment->appendXML($xml))
-		{
-			Logger::GetInstance()->Log(LOG_ERR,'XSLEngine',"Error importing Fragment : ".htmlspecialchars($xml));
-		}
-		
-		$this->root_node->appendChild($fragment);
+
+		return $added_node;
 	}
-	
-	public function AddDOMFragment($xmldoc)
-	{
-		$fragment = $this->xmldoc->importNode($xmldoc,true);
-		if($fragment===false)
-		{
-			Logger::GetInstance()->Log(LOG_ERR,'XSLEngine',"Error importing Fragment");
-		}
-		
-		$this->root_node->appendChild($fragment);
-	}
-	
+
+
 	public function GetXML () {
 		return $this->xmldoc;
 	}
@@ -275,31 +180,57 @@ class XSLEngine
 
 	public function GetXHTML($xsl_filename)
 	{
-		$xsltproc = new XSLTProcessor();
-		$xsltproc->registerPHPFunctions('strtolower');
-		$xsltproc->registerPHPFunctions('sprintf');
-		$xsltproc->registerPHPFunctions('addslashes');
-		$xsltproc->registerPHPFunctions('strtotime');
-		$xsltproc->registerPHPFunctions(array('sumExecTimes','sumRetryTimes'));
-
+		$xsltproc = new \XSLTProcessor();
+		$xsltproc->registerPHPFunctions(['urlencode','strtotime','ucfirst', 'sumExecTimes', 'sumRetryTimes']);
 		// Set static parameters
 		foreach($this->parameters as $name=>$value)
 			$xsltproc->setParameter('',$name,$value);
-		
-		$xsldoc = new DOMDocument();
+
+		$xsldoc = new \DOMDocument();
 		$xsldoc->load($xsl_filename);
 		$xsltproc->importStylesheet($xsldoc);
 
-		return $xsltproc->transformToXML($this->xmldoc);
+		if(Logger::GetFilterPriority()>=LOG_INFO)
+			$t1 = microtime(true);
+
+		$dom = $xsltproc->transformToDoc($this->xmldoc);
+		if ($dom === false)
+			Logger::Log(LOG_ERR,'XSLEngine.php',"Transformation XSL en échec");
+
+		if(Logger::GetFilterPriority()>=LOG_INFO)
+			Logger::Log(LOG_INFO,'WebserviceWrapper',"XSL transformation took ".number_format((microtime(true)-$t1)*1000,1)."ms");
+
+		$dom->formatOutput = false;
+		
+		return $this->instruction.$dom->saveXML($dom->documentElement);
 	}
-	
-	public function DisplayXHTML($xsl_filename)
+
+	public function DisplayXHTML($xsl_filename, $content_type = 'text/html')
 	{
-		if(isset($_GET['display_xml'])) // Debugging tool
+		if($this->display_xml) // Debugging tool
 			return $this->DisplayXML();
 
-		header('Content-type: text/html');
+		header('Content-type: '.$content_type);
+
 		echo $this->GetXHTML($xsl_filename);
+	}
+
+	
+
+	public static function RenameElement(\DOMElement $node, $name) {
+		$renamed = $node->ownerDocument->createElement($name);
+		foreach ($node->attributes as $attribute) {
+			$renamed->setAttribute($attribute->nodeName, $attribute->nodeValue);
+		}
+		while ($node->firstChild) {
+			$renamed->appendChild($node->firstChild);
+		}
+		$node->parentNode->replaceChild($renamed, $node);
+		return $renamed;
+	}
+
+	public function SetInstruction($instruction){
+		$this->instruction = $instruction;
 	}
 }
 ?>

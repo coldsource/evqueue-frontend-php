@@ -52,6 +52,7 @@ class WebserviceWrapper
 			return $this->xmldoc;
 		
 		$this->ws_parameters['user_login'] = $_SESSION['user_login'];
+		$this->ws_parameters['user_pwd'] = "";
 		
 		$url = SITE_BASE.'ajax/send_datas.php';
 		
@@ -73,24 +74,25 @@ class WebserviceWrapper
 		curl_setopt($cr, CURLOPT_URL, $url);
 		curl_setopt($cr, CURLOPT_RETURNTRANSFER, true);
 		
-		if(Logger::GetInstance()->GetFilterPriority()>=LOG_INFO)
+		if(Logger::GetFilterPriority()>=LOG_INFO)
 			$t1 = microtime(true);
 		
 		$result = curl_exec($cr);
 		
-		if(Logger::GetInstance()->GetFilterPriority()>=LOG_INFO)
+		if(Logger::GetFilterPriority()>=LOG_INFO)
 		{
 			$t = number_format((microtime(true) - $t1)*1000,1);
-			Logger::GetInstance()->Log(LOG_INFO,'WebserviceWrapper',"Called $url in $t ms");
+			Logger::Log(LOG_INFO,'WebserviceWrapper',"Called $url in $t ms");
 		}
 		
 		$result = trim($result);
 		if($result=='')
-			Logger::GetInstance()->Log(LOG_ERR,'WebserviceWrapper',"Empty result while calling {$this->ws_name}");
+			Logger::Log(LOG_ERR,'WebserviceWrapper',"Empty result while calling {$this->ws_name}");
 		
 		$this->xmldoc = new DOMDocument();
-		if (!@$this->xmldoc->loadXML($result))
-			Logger::GetInstance()->Log(LOG_ERR,'WebserviceWrapper',"Invalid xml returned while calling {$this->ws_name}: ".htmlspecialchars($result));
+		if (!@$this->xmldoc->loadXML($result)){
+			Logger::Log(LOG_ERR,'WebserviceWrapper',"Invalid xml returned while calling {$this->ws_name}: ".htmlspecialchars($result));
+		}
 		
 		return $this->xmldoc;
 	}
@@ -138,7 +140,7 @@ class WebserviceWrapper
 			);
 		
 		if (count($this->errors) > 0)
-			Logger::GetInstance()->Log(LOG_NOTICE,'WebserviceWrapper.php',"Webservice $this->ws_name has errors: ".htmlspecialchars ($this->xmldoc->saveXML()));
+			Logger::Log(LOG_NOTICE,'WebserviceWrapper.php',"Webservice $this->ws_name has errors: ".htmlspecialchars ($this->xmldoc->saveXML()));
 	}
 }
 ?>

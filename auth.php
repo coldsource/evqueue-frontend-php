@@ -22,10 +22,10 @@
 require_once 'conf/sites_base.php';
 require_once 'inc/logger.php';
 require_once 'lib/XSLEngine.php';
-require_once 'lib/DatabaseMySQL.php';
-require_once 'bo/BO_user.php';
+require_once 'inc/evqueue.php';
 
-if(!isset($DATABASES_CONFIG['queueing']))
+
+if(count($QUEUEING) == 0)
 {
 	// Not yet configured
 	header('Location: install.php');
@@ -45,32 +45,35 @@ if (isset($_GET['action']))
 
 
 $xsl = new XSLEngine();
-
 if (isset($_POST['login']) && isset($_POST['password'])) {
-	$db = new DatabaseMySQL('queueing');
-	$db->QueryPrintf('
-		SELECT user_login, user_profile
-		FROM t_user
-		WHERE user_login = %s
-			AND user_password = %s
-	',
-					$_POST['login'],
-					sha1($_POST['password'])
-	);
+
+	$pwd = sha1($_POST['password'], true);
+	$evqueue->setUserLogin($_POST['login']);
+	$evqueue->setUserPwd($pwd);
 	
-	if ($db->NumRows() == 1) {
-		list($user,$profile) = $db->FetchArray();
-		
-		@session_start();
-		$_SESSION['user_login'] = $user;
-		$_SESSION['user_profile'] = $profile;
-		session_write_close();
-		header('Location: index.php');
-		die();
-		
-	} else {
-		$xsl->AddError('wrong-creds');
+	try
+	{
+		$xml = $evqueue->Api('ping');
 	}
+	catch(Exception $e)
+	{
+		if($e->getCode() != evQueue::ERROR_AUTH_FAILED){
+			$xsl->AddFragment('<error>evqueue-ko</error>');
+		}
+		else{
+			$xsl->AddFragment('<error>wrong-creds</error>');
+		}
+		$xsl->DisplayXHTML('xsl/auth.xsl');
+		die();
+	}
+	
+
+	@session_start();
+	$_SESSION['user_login'] = $_POST['login'];
+	$_SESSION['user_pwd'] = $pwd;
+	session_write_close();
+	header('Location: index.php');
+	die();
 }
 
 

@@ -3,6 +3,8 @@
 	<xsl:import href="datetime.xsl" />
 	<xsl:import href="xmlhighlight.xsl" />
 	
+	<xsl:param name="EDITION">0</xsl:param>
+	
 	<xsl:template match="workflow">
 		<xsl:variable name="trClass">
 			<xsl:choose>
@@ -107,7 +109,7 @@
 	</xsl:template>
 	
 	
-	<xsl:template match="workflow" mode="total-time">
+	<xsl:template match="instance|workflow" mode="total-time">
 		<xsl:choose>
 			<xsl:when test="count(@end_time) > 0">
 				<xsl:value-of select="php:function('strtotime',string(@end_time))-php:function('strtotime',string(@start_time))" />
@@ -142,7 +144,7 @@
 	<xsl:template match="workflow" mode="launch">
 		<xsl:apply-templates select="." mode="launchbox">
 			<xsl:with-param name="prefix" select="''" />
-			<xsl:with-param name="identifier" select="../@name" />
+			<xsl:with-param name="identifier" select="@name" />
 		</xsl:apply-templates>
 	</xsl:template>
 	
@@ -210,79 +212,81 @@
 	
 	
 	<xsl:template match="workflow" mode="tree">
-		<xsl:apply-templates select="." mode="relaunch" />
-		
-		<xsl:variable name="hiddenClass">
-			<xsl:if test="$EDITION = 0">
-				<xsl:text> hidden</xsl:text>
-			</xsl:if>
-		</xsl:variable>
-		<xsl:variable name="editionClass">
-			<xsl:if test="$EDITION = 1">editionWorkflow</xsl:if>
-		</xsl:variable>
-		
-		<div class="workflow {$editionClass}" id="workflow{@id}" data-id="{@id}" data-node-name="{../@node_name}">
-			<img src="images/listli.png" class="formattedXml" /> 
-			<xsl:text>&#160;</xsl:text>
-			<img src="images/re-launch.png" data-wfiid="{@id}" data-node-name="{../@node_name}" class="relaunch" alt="Re-launch workflow instance" title="Re-launch workflow instance" ></img>
-			<xsl:text>&#160;</xsl:text>
-			<img class="viewXML" src="images/bigger.png" title="View workflow XML" onclick="$('#xmlcontent{@id}').dialog({{width:800}});" />
-			<div id="xmlcontent{@id}" style="display:none;">
-				<xsl:apply-templates select="." mode="xml_display" />
-			</div>
+		<div>
+			<xsl:apply-templates select="." mode="relaunch" />
 			
-			<xsl:if test="@version != '' and $EDITION = 0">
-				(version <xsl:value-of select="@version" />)
-			</xsl:if>
+			<xsl:variable name="hiddenClass">
+				<xsl:if test="$EDITION = 0">
+					<xsl:text> hidden</xsl:text>
+				</xsl:if>
+			</xsl:variable>
+			<xsl:variable name="editionClass">
+				<xsl:if test="$EDITION = 1">editionWorkflow</xsl:if>
+			</xsl:variable>
 			
-			<xsl:if test="$EDITION = 0">
-				<xsl:variable name="totalTime">
-					<xsl:apply-templates select="." mode="total-time" />
-				</xsl:variable>
-				
-				<xsl:variable name="execTime" select="php:function('sumExecTimes', .//task/output)" />
-				<xsl:variable name="retryTime" select="php:function('sumRetryTimes', .//task/output)" />
-				<xsl:variable name="queueTime" select="$totalTime - $execTime - $retryTime" />
-				
-				<span class="exectime" style="margin-left: 5px; background-color: rgba(0,255,0,0.1); padding: 2px 5px; /* TODO: move to stylesheet */">
-					<xsl:text>real time </xsl:text>
-					<xsl:call-template name="display-split-time">
-						<xsl:with-param name="seconds" select="$execTime" />
-					</xsl:call-template>
-				</span>
-				<span class="queuetime" style="margin-left: 5px; background-color: rgba(0,0,255,0.1); padding: 2px 5px; /* TODO: move to stylesheet */">
-					<xsl:text>queued for </xsl:text>
-					<xsl:call-template name="display-split-time">
-						<xsl:with-param name="seconds" select="$queueTime" />
-					</xsl:call-template>
-				</span>
-				<span class="retrytime" style="margin-left: 5px; background-color: rgba(255,0,0,0.1); padding: 2px 5px; /* TODO: move to stylesheet */">
-					<xsl:text>waited </xsl:text>
-					<xsl:call-template name="display-split-time">
-						<xsl:with-param name="seconds" select="$retryTime" />
-					</xsl:call-template>
-					<xsl:text> for retrials</xsl:text>
-				</span>
-			</xsl:if>
-			
-			<div id="xml_{@id}" class="xml">
-				<div class="okxml{$hiddenClass}">
-					<xsl:apply-templates select="parameters" />
+			<div class="workflow {$editionClass}" id="workflow{@id}" data-id="{@id}" data-node-name="{../@node_name}">
+				<img src="images/listli.png" class="formattedXml" /> 
+				<xsl:text>&#160;</xsl:text>
+				<img src="images/re-launch.png" data-wfiid="{@id}" data-node-name="{../@node_name}" class="relaunch" alt="Re-launch workflow instance" title="Re-launch workflow instance" ></img>
+				<xsl:text>&#160;</xsl:text>
+				<img class="viewXML" src="images/bigger.png" title="View workflow XML" onclick="$('#xmlcontent{@id}').dialog({{width:800}});" />
+				<div id="xmlcontent{@id}" style="display:none;">
+					<xsl:apply-templates select="." mode="xml_display" />
 				</div>
+				
+				<xsl:if test="@version != '' and $EDITION = 0">
+					(version <xsl:value-of select="@version" />)
+				</xsl:if>
+				
+				<xsl:if test="$EDITION = 0">
+					<xsl:variable name="totalTime">
+						<xsl:apply-templates select="." mode="total-time" />
+					</xsl:variable>
+					
+					<xsl:variable name="execTime" select="php:function('sumExecTimes', .//task/output)" />
+					<xsl:variable name="retryTime" select="php:function('sumRetryTimes', .//task/output)" />
+					<xsl:variable name="queueTime" select="$totalTime - $execTime - $retryTime" />
+					
+					<span class="exectime" style="margin-left: 5px; background-color: rgba(0,255,0,0.1); padding: 2px 5px; /* TODO: move to stylesheet */">
+						<xsl:text>real time </xsl:text>
+						<xsl:call-template name="display-split-time">
+							<xsl:with-param name="seconds" select="$execTime" />
+						</xsl:call-template>
+					</span>
+					<span class="queuetime" style="margin-left: 5px; background-color: rgba(0,0,255,0.1); padding: 2px 5px; /* TODO: move to stylesheet */">
+						<xsl:text>queued for </xsl:text>
+						<xsl:call-template name="display-split-time">
+							<xsl:with-param name="seconds" select="$queueTime" />
+						</xsl:call-template>
+					</span>
+					<span class="retrytime" style="margin-left: 5px; background-color: rgba(255,0,0,0.1); padding: 2px 5px; /* TODO: move to stylesheet */">
+						<xsl:text>waited </xsl:text>
+						<xsl:call-template name="display-split-time">
+							<xsl:with-param name="seconds" select="$retryTime" />
+						</xsl:call-template>
+						<xsl:text> for retrials</xsl:text>
+					</span>
+				</xsl:if>
+				
+				<div id="xml_{@id}" class="xml">
+					<div class="okxml{$hiddenClass}">
+						<xsl:apply-templates select="parameters" />
+					</div>
+				</div>
+				
+				<div id="jobs_{@id}">
+					<xsl:apply-templates select="subjobs/job">
+						<xsl:with-param name="first" select="1" />
+					</xsl:apply-templates>
+				</div>
+				
+				<xsl:if test="$EDITION = 1">
+					<xsl:variable name="another">
+						<xsl:if test="count(/page/session/workflow/workflow/subjobs) > 0">another </xsl:if>
+					</xsl:variable>
+					<input id="addRootTask" type="button" class="spaced" onclick="executeAction('addTask');" value="Add {$another}root task" />
+				</xsl:if>
 			</div>
-			
-			<div id="jobs_{@id}">
-				<xsl:apply-templates select="subjobs/job">
-					<xsl:with-param name="first" select="1" />
-				</xsl:apply-templates>
-			</div>
-			
-			<xsl:if test="$EDITION = 1">
-				<xsl:variable name="another">
-					<xsl:if test="count(/page/session/workflow/workflow/subjobs) > 0">another </xsl:if>
-				</xsl:variable>
-				<input id="addRootTask" type="button" class="spaced" onclick="executeAction('addTask');" value="Add {$another}root task" />
-			</xsl:if>
 		</div>
 	</xsl:template>
 	
@@ -593,13 +597,13 @@
 	</xsl:template>
 	
 	
-	<xsl:template name="workflows">
-		<xsl:param name="workflows" />
+	<xsl:template name="instances">
+		<xsl:param name="instances" />
 		<xsl:param name="status" />
 		
 		<div id="{$status}-workflows" class="workflow-list">
 			<xsl:choose>
-				<xsl:when test="count(exsl:node-set($workflows))=0">
+				<xsl:when test="count(exsl:node-set($instances))=0">
 					<div style="text-align: center">
 						<div class="boxTitle workflowTitle titleNoResults">
 							<span class="workflowPages">No <xsl:value-of select="$status" /> workflow.</span>
@@ -628,8 +632,8 @@
 							<xsl:text> </xsl:text>
 							<xsl:value-of select="$status" />
 							Workflows
-							<xsl:if test="$status = 'EXECUTING' and count(exsl:node-set($workflows)) != sum(/page/workflows/@total-running)">
-								(<xsl:value-of select="count(exsl:node-set($workflows))" /> displayed)
+							<xsl:if test="$status = 'EXECUTING' and count(exsl:node-set($instances)) != sum(/page/workflows/@total-running)">
+								(<xsl:value-of select="count(exsl:node-set($instances))" /> displayed)
 							</xsl:if>
 							<xsl:if test="$status = 'TERMINATED'">
 								<xsl:value-of select="/page/workflows/@first" />-<xsl:value-of select="/page/workflows/@last" />&#160;<span style="font-size: 80%">(<xsl:value-of select="/page/workflows/@total" /> total)</span>
@@ -657,7 +661,7 @@
 							</xsl:if>
 							<th class="thActions">Actions</th>
 						</tr>
-						<xsl:apply-templates select="exsl:node-set($workflows)[@status = $status]">
+						<xsl:apply-templates select="exsl:node-set($instances)[@status = $status]">
 							<xsl:sort select="@end_time" order="descending" />
 							<xsl:sort select="@start_time" order="descending" />
 						</xsl:apply-templates>
@@ -1006,5 +1010,110 @@
 	</xsl:template>
 	<!-- END LIGHT-TREE MODE -->
 	
+	
+	
+	
+	<xsl:template match="instance">
+		<xsl:variable name="trClass">
+			<xsl:choose>
+				<xsl:when test="position() mod(2) = 1">evenTr</xsl:when>
+				<xsl:otherwise>oddTr</xsl:otherwise>
+			</xsl:choose>
+		</xsl:variable>
+		<xsl:variable name="nbErrorsMsg">
+			<xsl:choose>
+				<xsl:when test="count(@errors)=1">1 error</xsl:when>
+				<xsl:otherwise>
+					<xsl:value-of select="count(@errors)" /> errors</xsl:otherwise>
+			</xsl:choose>
+		</xsl:variable>
+		<tr class="{$trClass}">
+			<td class="workflowStatus">
+				<xsl:variable name="current-node">
+					<xsl:copy-of select="." />
+				</xsl:variable>
+				<xsl:choose>
+					<xsl:when test="@running_tasks - @queued_tasks > 0">
+						<img src="images/ajax-loader.gif" alt="Running" title="Task(s) running" />
+					</xsl:when>
+					<xsl:when test="@queued_tasks > 0">
+						<img src="images/waitpoint.gif" alt="Queued" title="Task(s) queued" />
+					</xsl:when>
+					<xsl:when test="@retrying_tasks > 0">
+						<img src="images/alarm_clock.png" alt="Retrying" title="A task ended badly and will retry" />
+					</xsl:when>
+					<xsl:when test="@errors > 0">
+						<img src="images/exclamation.png" alt="Errors" title="Errors" />
+					</xsl:when>
+					<xsl:when test="count(@end_time) > 0">
+						<img src="images/ok.png" alt="Terminated" title="Workflow terminated" />
+					</xsl:when>
+					<xsl:otherwise>
+						<b>?</b>
+					</xsl:otherwise>
+				</xsl:choose>
+			</td>
+
+			<td>
+				<span class="action" data-id="{@id}" data-node-name="{@node_name | ../@node_name}">
+					<img src="images/plus.png" />
+					<xsl:text> </xsl:text>
+					<xsl:value-of select="@id" />
+					&#8211; 
+					<xsl:value-of select="@name" />
+				</span>
+				<xsl:text>&#160;</xsl:text>
+				<xsl:variable name="seconds">
+					<xsl:apply-templates select="." mode="total-time" />
+				</xsl:variable>
+				
+				<xsl:text>(</xsl:text>
+				<xsl:call-template name="display-split-time">
+					<xsl:with-param name="seconds" select="$seconds" />
+				</xsl:call-template>
+				<xsl:text>)</xsl:text>
+			</td>
+			<td class="tdHost">
+				<xsl:value-of select="@node_name | ../@node_name" />
+			</td>
+			<td class="tdHost">
+				<xsl:choose>
+					<xsl:when test="@host != ''"><xsl:value-of select="@host" /></xsl:when>
+					<xsl:otherwise>localhost</xsl:otherwise>
+				</xsl:choose>
+			</td>
+			<td class="tdStarted">
+				<xsl:call-template name="displayDateAndTime">
+					<xsl:with-param name="datetime_start" select="@start_time" />
+				</xsl:call-template>
+			</td>
+			<xsl:if test="count(@end_time) > 0">
+				<td class="tdFinished">
+					<xsl:if test="@end_time != '0000-00-00 00:00:00'">
+						<xsl:call-template name="displayDateAndTime">
+							<xsl:with-param name="datetime_end" select="@end_time" />
+						</xsl:call-template>
+					</xsl:if>		
+				</td>
+			</xsl:if>
+			
+			<td class="tdActions">
+				<xsl:if test="@status='EXECUTING' and (/page/private/logged-in-user/@profile = 'ADMIN' or /page/private/logged-in-user/workflow[@wfname = current()/@name]/right[@action='kill'] = 1)">
+					<img src="images/stop.png" data-wfiid="{@id}" data-node-name="{../@node_name}" class="stopWFI" alt="Stop execution of this workflow" title="Stop execution of this workflow" />
+				</xsl:if>
+				
+				<xsl:if test="@status='TERMINATED'">
+					<xsl:call-template name="deleteWFI">
+						<xsl:with-param name="wfiid" select="@id" />
+					</xsl:call-template>
+				</xsl:if>
+			</td>		
+		</tr>
+		<tr id="tr{@id}" class="hidden">
+			<td colspan="7" class="details">
+				<img src="images/ajax-loader.gif" />
+			</td>
+		</tr>
+	</xsl:template>
 	
 </xsl:stylesheet>

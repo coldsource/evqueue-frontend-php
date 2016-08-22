@@ -49,14 +49,8 @@
 		</xsl:for-each>
 		
 		<div id="workflows" class="contentList">
-			
-			<xsl:call-template name="workflows">
-				<xsl:with-param name="workflows" select="/page/workflows[count(@status)=0]/workflow" />
-				<xsl:with-param name="status" select="'EXECUTING'" />
-			</xsl:call-template>
-			
-			<br />
-			
+			<div id="EXECUTING-workflows" class="workflow-list" />		
+
 			<table style="width:100%;">
 				<tr>
 					<td style="width:300px;">Launch a new workflow</td>
@@ -67,7 +61,7 @@
 						</xsl:apply-templates>
 						
 						<xsl:for-each select="/page/available-workflows/workflow">
-								<xsl:apply-templates select="workflow" mode="launch" />
+								<xsl:apply-templates select="." mode="launch" />
 						</xsl:for-each>
 					</td>
 				</tr>
@@ -134,11 +128,7 @@
 					</tr>
 				</table>
 			</form>
-			
-			<xsl:call-template name="workflows">
-				<xsl:with-param name="workflows" select="/page/workflows[@status='TERMINATED']/workflow" />
-				<xsl:with-param name="status" select="'TERMINATED'" />
-			</xsl:call-template>
+			<div id="TERMINATED-workflows" class="workflow-list" />		
 		</div>
 	</xsl:template>
 	

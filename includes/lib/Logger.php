@@ -18,8 +18,6 @@
   * Authors: Nicolas Jean, Christophe Marti 
   */
 
-require_once 'conf/logger.php';
-
 class Logger
 {
 	static private $instance = null;
@@ -28,19 +26,24 @@ class Logger
 	private $filter_context;
 
 	private $file;
+	private $run_env;
 
 	public function __construct($app_name)
 	{
-		if(Logger::$instance!=null)
+		if(self::$instance!=null)
 		{
-			$log = Logger::GetInstance();
-			$log->Log(LOG_NOTICE,"Logger","Replacing Logger");
+			$log = self::$instance;
+			$log->Log(LOG_NOTICE,"Logger","Replacing Logger",true);
 		}
 
-		Logger::$instance = $this;
+		self::$instance = $this;
+
+		$this->run_env = 'web';
+		if (preg_match('/^cli/',php_sapi_name()))
+			$this->run_env = 'cli';
 
 		// Initiate log file
-		$basepath = $this->GetBasePath()."/$app_name";
+		$basepath = dirname(dirname(dirname(__FILE__)))."/logs";
 		if(!is_dir($basepath))
 			mkdir($basepath,0700,true);
 		$this->file = fopen("$basepath/log.html",'a+');
@@ -48,17 +51,23 @@ class Logger
 		// Initiate syslog
 		openlog($app_name,LOG_ODELAY,LOG_LOCAL0);
 
-		$this->ResetFilter();
-		Logger::GetInstance()->setFilter(LOG_WARNING);
+		self::$instance->ResetFilter();
+
+		self::$instance->setFilter(LOG_WARNING);
+
+		if(isset($_SERVER['HTTP_X_LOGGER_FILTER']))
+		{
+			$filters = explode(',',$_SERVER['HTTP_X_LOGGER_FILTER']);
+			if(sizeof($filters)==1)
+				self::$instance->setFilter($filters[0]);
+			else
+				self::$instance->setFilter($filters[0],$filters[1]);
+		}
 	}
 
-	public static function GetBasePath () {
-		return QUEUEING_BASEPATH;
-	}
-
-	static public function GetInstance()
+	static private function ensure_instance()
 	{
-		if (Logger::$instance === null) {
+		if (self::$instance === null) {
 			new Logger('default');
 			$dbg = array_map(function ($elt) {
 				$fu = isset($elt['function']) ? $elt['function'] : '%unknown-function%';
@@ -66,16 +75,15 @@ class Logger
 				$fi = isset($elt['file']) ? $elt['file'] : '%unknown-file%';
 				return "method $fu @line $li of file $fi";
 			}, debug_backtrace());
-			Logger::$instance->Log(LOG_WARNING,'Logger',"Wrong answer! Every project should instanciate its own Logger, and this one does not... Backtrace: ".print_r($dbg,true));
+			self::$instance->Log(LOG_WARNING,'Logger',"Wrong answer! Every project should instanciate its own Logger, and this one does not... Backtrace: ".print_r($dbg,true));
 		}
-		
-		return Logger::$instance;
 	}
 
-	public function Log($priority,$context,$message)
+	public static function Log($priority,$context,$message,$include_backtrace=false)
 	{
-		if($priority <= $this->filter_priority && ($this->filter_context == '*' || $this->filter_context == $context)) {
-			// Log in file
+		self::ensure_instance();
+
+		if($priority <= self::$instance->filter_priority && (self::$instance->filter_context == '*' || self::$instance->filter_context == $context)) {
 			switch($priority)
 			{
 				case LOG_EMERG: $priority_text = 'Emergency'; $color = '#FF0000'; break;
@@ -86,8 +94,23 @@ class Logger
 				case LOG_NOTICE: $priority_text = 'Notice'; $color = '#FFFF55'; break;
 				case LOG_INFO: $priority_text = 'Info'; $color = '#BCFF78'; break;
 				case LOG_DEBUG: $priority_text = 'Debug'; $color = '#FFFFFF'; break;
+				default: die(-1);
 			}
 
+			// Log on screen
+			$msg = "[ $context ] $priority_text : $message";
+			if (isset($_SERVER['HTTP_X_LOGGER_FILTER'])) {
+				switch (self::$instance->run_env) {
+					case 'cli':
+						echo "$msg\n";
+						break;
+					case 'web':
+						echo "<pre><br/>$msg<br/></pre>";
+						break;
+				}
+			}
+
+			// Log in file
 			$log = '';
 			$log .= "<table style='border:1px solid;width:100%;'>";
 			$log .= "<tr><td colspan='2' style='background:$color'>Logger</td></tr>";
@@ -100,14 +123,16 @@ class Logger
 							."</td></tr>";
 			$log .= "<tr><td>Priority</td><td>$priority_text</td></tr>";
 			$log .= "<tr><td>Context</td><td>$context</td></tr>";
+			if(isset($_SERVER['HTTP_X_UNIQUE_ID']))
+				$log .= "<tr><td>Unique ID</td><td>{$_SERVER['HTTP_X_UNIQUE_ID']}</td></tr>";
 			if (is_object($message))
-				$this->Log (LOG_ERR, 'Logger.php', "Trying to log [$context:$priority] an object (you should log a string): ".print_r($message,true));
+				self::Log(LOG_ERR, 'Logger.php', "Trying to log [$context:$priority] an object (you should log a string): ".print_r($message,true));
 			$log .= "<tr><td colspan='2'><pre>$message</pre></td></tr>";
 
-			if($priority<=LOG_ERR)
+			if($priority<=LOG_ERR || $include_backtrace)
 			{
 				$log .= "<tr><td colspan='2'>Backtrace :</td></tr>";
-				$bt = debug_backtrace(false);
+				$bt = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
 				foreach($bt as $el)
 				{
 					if(isset($el['file']) && isset($el['line']))
@@ -116,44 +141,73 @@ class Logger
 			}
 
 			$log .= "</table>\n";
-			fwrite($this->file,$log);
+			fwrite(self::$instance->file,$log);
 
 			// Log in syslog
-			syslog($priority,"[ $context ] $message");
+			if(isset($_SERVER['HTTP_X_UNIQUE_ID']))
+				syslog($priority,"[ {$_SERVER['HTTP_X_UNIQUE_ID']} $context ] $message");
+			else
+				syslog($priority,"[ $context ] $message");
 		}
-		
+
 		if($priority<=LOG_ERR)
+		{
+			if(isset($_SERVER['SERVER_PROTOCOL']))
+				header($_SERVER['SERVER_PROTOCOL'] . ' 503 Temporarily unavailable', true, 500);
+
 			die(123);
+		}
 	}
 
-	public function SetFilter($priority,$context='*')
+	public static function SetFilter($priority,$context='*')
 	{
-		$this->filter_priority = $priority;
-		$this->filter_context = $context;
-	}
-	
-	public function GetFilterPriority () {
-		return $this->filter_priority;
+		if(is_string($priority))
+		{
+			switch($priority)
+			{
+				case 'LOG_EMERG': $priority = LOG_EMERG; break;
+				case 'LOG_ALERT': $priority = LOG_ALERT; break;
+				case 'LOG_CRIT': $priority = LOG_CRIT; break;
+				case 'LOG_ERR': $priority = LOG_ERR; break;
+				case 'LOG_WARNING': $priority = LOG_WARNING; break;
+				case 'LOG_NOTICE': $priority = LOG_NOTICE; break;
+				case 'LOG_INFO': $priority = LOG_NOTICE; break;
+				case 'LOG_DEBUG': $priority = LOG_DEBUG; break;
+				default: die(-1);
+			}
+		}
+
+		self::ensure_instance();
+		self::$instance->filter_priority = $priority;
+		self::$instance->filter_context = $context;
 	}
 
-	public function ResetFilter()
+	public static function GetFilterPriority ()
 	{
-		$this->filter_priority = LOG_NOTICE;
-		$this->filter_context = '*';
+		self::ensure_instance();
+		return self::$instance->filter_priority;
 	}
 
-	public function LogPHPNotice ($errno, $errstr, $errfile, $errline) {
-		$this->Log(LOG_NOTICE,'Unknown Context',"Notice ($errno) in $errfile line $errline:<br/>$errstr");
+	public static function ResetFilter()
+	{
+		self::ensure_instance();
+		self::$instance->filter_priority = LOG_NOTICE;
+		self::$instance->filter_context = '*';
 	}
 
-	public function ShutDown ()
+	public static function LogPHPNotice ($errno, $errstr, $errfile, $errline)
+	{
+		self::Log(LOG_NOTICE,'Unknown Context',"Notice ($errno) in $errfile line $errline:<br/>$errstr");
+	}
+
+	public static function ShutDown ()
 	{
 		$output = ob_get_contents();
 		ob_clean();
 
 		global $ended_correctly;
 		if (!$ended_correctly) {
-			$this->Log(LOG_ERR, 'Unknown context', "Webservice did not finish execution correctly.<br/>".htmlspecialchars($output));
+			self::Log(LOG_ERR, 'Unknown context', "Webservice did not finish execution correctly.<br/>".htmlspecialchars($output));
 			echo $output;
 		} else {
 			echo $output;

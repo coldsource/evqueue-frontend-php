@@ -21,35 +21,12 @@
 require_once 'inc/auth_check.php';
 require_once 'inc/logger.php';
 require_once 'lib/XSLEngine.php';
-require_once 'bo/BO_task.php';
-require_once 'bo/BO_workflowInstance.php';
 
 $xsl = new XSLEngine();
-$PAGESIZE = 30;
 
-
-// EXECUTING workflows
-require 'conf/queueing.php';
-foreach ($QUEUEING as $node_name => $conf) {
-	$wfi = new WorkflowInstance($node_name);
-	$wfs = $wfi->GetRunningWorkflows(50);
-	if ($wfs != '')
-		$xsl->AddFragment($wfs);
-	else {
-		$xsl->AddError('evqueue-not-running','',$node_name);  // TODO: add which node is not running
-		$xsl->AddFragment('<workflows status="EXECUTING" />"');
-	}
-}
-
-
-// TERMINATED workflows
-$xsl->AddFragment(WorkflowInst::GetTerminatedWorkflows($_GET));
-
-
-// workflows available for launching
-$xsl->AddFragment(Workflow::getAllGroupXml());
-$xsl->AddFragment(Workflow::getAllXml(false,'available-workflows'));
+$xml = $evqueue->Api("workflows", "list");
+$xsl->AddFragment(["available-workflows" => $xml]);
+$xsl->AddFragment(getAllGroupXml());
 
 $xsl->DisplayXHTML('xsl/index.xsl');
-
 ?>

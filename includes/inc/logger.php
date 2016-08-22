@@ -21,5 +21,5 @@
 require_once 'lib/Logger.php';
 
 new Logger('queueing');
-Logger::GetInstance()->SetFilter(LOG_WARNING);
+Logger::SetFilter(LOG_WARNING);
 ?>

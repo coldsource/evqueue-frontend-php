@@ -18,15 +18,34 @@
   * Authors: Nicolas Jean, Christophe Marti 
   */
 
-require_once 'conf/sites_base.php';
-require_once 'bo/BO_user.php';
-
 session_start();
+require_once 'conf/sites_base.php';
+require_once 'inc/evqueue.php';
+
 
 if (!isset($_SESSION['user_login'])) {
-	header('Location: '.(defined('SITE_BASE')?constant('SITE_BASE'):'').'auth.php');
-	session_write_close();
-	die();
+	try{
+		$evqueue->Api('ping');
+		$_SESSION['user_login'] = "anonymous";
+	}
+	catch(Exception $e){
+		if($e->getCode() == evQueue::ERROR_AUTH_REQUIRED){
+			header('Location: '.(defined('SITE_BASE')?constant('SITE_BASE'):'').'auth.php');
+			session_write_close();
+		}
+		else{
+			echo $e->getMessage();
+		}
+		die();
+	}
+}
+else{
+	try{
+		$evqueue->Api('ping');
+	}
+	catch(Exception $e){
+		echo $e->getMessage();die();
+	}
 }
 
 ?>

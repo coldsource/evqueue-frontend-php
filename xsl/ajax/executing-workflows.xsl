@@ -4,8 +4,8 @@
 	<xsl:output method="xml" indent="yes" omit-xml-declaration="yes" encoding="utf-8" doctype-public="-//W3C//DTD XHTML 1.0 Transitional//EN" doctype-system="http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd" />
 	
 	<xsl:template match="/page">
-		<xsl:call-template name="workflows">
-			<xsl:with-param name="workflows" select="/page/workflows[@status='EXECUTING'] | /page/workflows[count(@status)=0]/workflow" />
+		<xsl:call-template name="instances">
+			<xsl:with-param name="instances" select="/page/instances/workflow" />
 			<xsl:with-param name="status" select="'EXECUTING'" />
 		</xsl:call-template>
 	</xsl:template>

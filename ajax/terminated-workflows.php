@@ -19,13 +19,13 @@
   */
 
 require_once 'inc/auth_check.php';
-require_once 'bo/BO_workflowInstance.php';
 require_once 'inc/logger.php';
 require_once 'lib/XSLEngine.php';
 
 
 $xsl = new XSLEngine();
-$xsl->AddFragment(WorkflowInst::GetTerminatedWorkflows($_GET));
+$xml = $evqueue->Api('instances', 'list');
+$xsl->AddFragment(["instances" => $xml]);
 
 $xsl->DisplayXHTML('../xsl/ajax/terminated-workflows.xsl');
 

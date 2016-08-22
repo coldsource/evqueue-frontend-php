@@ -23,6 +23,8 @@ function get_parameters() {
 
 
 $(document).ready(function() {
+	refreshWorkflows("terminated");
+	
 	$("#dt_inf, #dt_sup").datepicker({dateFormat : "yy-mm-dd", maxDate: new Date(), showAnim: 'slideDown'});
 	$("#hr_inf, #hr_sup").timepicker();
 	
