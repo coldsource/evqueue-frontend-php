@@ -63,15 +63,15 @@
 			<xsl:otherwise>
 				<p>
 					<label class="formLabel">Login: </label>
-					<xsl:value-of select="/page/user/@login" />
+					<xsl:value-of select="/page/response-user/user/@name" />
 				</p>
 				<p>
 					<label class="formLabel">Profile: </label>
-					<xsl:value-of select="/page/user/@profile" />
+					<xsl:value-of select="/page/response-user/user/@profile" />
 				</p>
 				
 				<!-- Change Password Form -->
-				<xsl:if test="/page/user/@login = /page/private/logged-in-user/@login">
+				<xsl:if test="/page/response-user/user/@name = $LOGIN">
 					<p>
 						<b>Change password</b>
 					</p>
@@ -84,7 +84,7 @@
 						
 						<form method="post">
 							<input type="hidden" name="action" value="chpwd" />
-							<input type="hidden" name="login" value="{/page/private/logged-in-user/@login}" />
+							<input type="hidden" name="login" value="{$LOGIN}" />
 							<label class="formLabel">Current Password: </label>
 							<input type="password" name="current_password" placeholder="Current Password" />
 							<br/>
@@ -113,16 +113,16 @@
 			</xsl:if>
 		</div>
 		
-		<!-- REGULAR_EVERYDAY_NORMAL_GUY -->
+		<!-- PROFILE USER -->
 		<div id="specificRights">
 			<xsl:choose>
 				<xsl:when test="$creation = 1">
 					<xsl:call-template name="rightsTable" />
 				</xsl:when>
-				<xsl:when test="/page/user/@profile != 'ADMIN' and /page/private/logged-in-user/@profile = 'ADMIN'">
+				<xsl:when test="/page/response-user/user/@profile != 'ADMIN' and $PROFILE = 'ADMIN'">
 					<form method="post">
 						<input type="hidden" name="action" value="editRights" />
-						<input type="hidden" name="login" value="{/page/user/@login}" />
+						<input type="hidden" name="login" value="{/page/response-user/user/@name}" />
 						<xsl:call-template name="rightsTable" />
 						<input type="submit" value="Save Rights" />
 					</form>
@@ -145,7 +145,7 @@
 			<tbody>
 				<tr>
 					<th>Workflow</th>
-					<xsl:for-each select="/page/private/rights/right">
+					<xsl:for-each select="/page/ rights/right">
 						<th>
 							<xsl:value-of select="@action" />
 						</th>
@@ -156,7 +156,7 @@
 					
 					<tr>
 						<td><xsl:value-of select="@name" /></td>
-						<xsl:for-each select="/page/private/rights/right">
+						<xsl:for-each select="/page/rights/right">
 							<td>
 								<input type="checkbox" name="rights[]" value="{@action}{$wfid}">
 									<xsl:if test="/page/user/workflow[@wfid = $wfid]/right[@action = current()/@action] = 1">

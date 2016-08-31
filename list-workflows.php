@@ -19,13 +19,8 @@
   */
 
 require_once 'inc/auth_check.php';
-
 require_once 'inc/logger.php';
 require_once 'lib/XSLEngine.php';
-require_once 'bo/BO_workflow.php';
-require_once 'bo/BO_task.php';
-
-require 'inc/evqueue.php';
 
 
 $xsl = new XSLEngine();
@@ -43,8 +38,12 @@ if (isset($_FILES['workflow_zip_file'])) {
 		$xsl->AddErrors($errors);
 }
 
-$xsl->AddDOMFragment($evqueue->GetWorkflows()->documentElement);
-$xsl->AddFragment(Task::getAllXml($filter='only-tied-task'));
+$evqueue->Api("git", "pull");
+
+$xsl->AddFragment(["workflows" => $evqueue->Api("workflows", "list")]);
+$xsl->AddFragment(["git-workflows" => $evqueue->Api("git", "list_workflows")]);
+
+//$xsl->AddFragment(Task::getAllXml($filter='only-tied-task'));
 $xsl->DisplayXHTML('xsl/list_workflows.xsl');
 
 ?>

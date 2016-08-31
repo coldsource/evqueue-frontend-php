@@ -52,7 +52,7 @@ if (isset($_POST) && (count($_POST)>1)){
 if ($xml_error)
 	$xsl->AddFragment($xml_error);
 
-$xsl->AddFragment(Workflow::getAllGroupXml());
+$xsl->AddFragment(getAllGroupXml());
 $xsl->AddFragment(Notification::getAllXml());
 $xsl->AddFragment(NotificationType::getAllXml());
 

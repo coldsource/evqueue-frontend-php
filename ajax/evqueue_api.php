@@ -20,20 +20,22 @@
 
 require_once 'inc/auth_check.php';
 require_once 'inc/logger.php';
-require_once 'lib/XSLEngine.php';
 
-
-if (!isset($_POST['id']))
-	die('<error/>');
-
-$xsl = new XSLEngine();
-
-$xml = $evqueue->Api("instance", "query", ["id" => $_POST['id']]);
-$dom = new DOMDocument();
-$dom->loadXML($xml);
-$dom->documentElement->setAttribute("node", $_POST['node']);
-$xsl->AddFragment(["instance" => $dom]);
-echo $xsl->DisplayXHTML('../xsl/ajax/workflow.xsl');
-
-
-?>
+if(isset($_POST['group'])){
+	$action = isset($_POST['action']) ? $_POST['action']:false;
+	$attributes = isset($_POST['attributes']) ? $_POST['attributes']:[];
+	$parameters = isset($_POST['parameters']) ? $_POST['parameters']:[];
+	
+	header('content-type: text/xml');
+	
+	try
+	{
+		$xml = $evqueue->Api($_POST['group'], $action, $attributes, $parameters);
+	}
+	catch(Exception $e)
+	{
+		echo "<error>".htmlspecialchars($e->getMessage())."</error>";
+		die(-1);
+	}
+	echo $xml;
+}

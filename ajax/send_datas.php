@@ -30,7 +30,6 @@ require_once 'inc/logger.php';
  * for access control checks.
  */
 
-
 if (isset($_POST) && !empty($_POST)){
 	if (!isset($_POST['form_id']) || $_POST['form_id']=='')
 		die("<error>Technical error</error>");
@@ -78,10 +77,6 @@ if (isset($_POST) && !empty($_POST)){
 			$Task = new Task($_POST['id']);
 			writeEnd($Task->delete($confirmed,$_POST['deleteBinary']==1));
 			break;
-		case "deleteWorkflow":
-			$WorkFlow = new WorkFlow($_POST['id']);
-			writeEnd($WorkFlow->delete());
-			break;
 		case "deleteQueue":
 			$Queue = new Queue($_POST['id']);
 			writeEnd($Queue->delete());
@@ -100,48 +95,10 @@ if (isset($_POST) && !empty($_POST)){
 			writeEnd($wfi->delete());
 			break;
 		
-		case "stopWFI":
-			$wfi = new WorkflowInst($_POST['id']);
-			writeEnd($wfi->stop($_POST['node_name']));
-			break;
-		
-		case 'killTask':
-			$wfi = new WorkflowInstance($_POST['node_name']);
-			$wfi->KillTask($_POST['id'], $_POST['task_pid']);
-			writeEnd(true);
-			break;
-		
 		case 'resetStats':
 			$wfi = new WorkflowInstance($_POST['node_name']);
 			$wfi->ResetStatistics();
 			writeEnd(true);
-			break;
-		
-		case 'launchWorkflow':
-			$id = $_POST["id"];
-			
-			if (is_numeric($id)) {
-				//$wfi_bo = new WorkflowInst($id);
-				//$name = $wfi_bo->getWorkflowName();
-			} else {
-				$name = $id;
-			}
-			
-			$user_host = false;
-			if (trim($_POST['user'].$_POST['host'] != ''))
-				$user_host = $_POST['user'].'@'.$_POST['host'];
-			
-			$evqueue_node = getevQueue($_POST['node']);
-			$id = $evqueue_node->Launch($name, [],  isset($_POST['wfparams']) ? $_POST['wfparams'] : []);
-		
-		
-			if ($id === false){
-				$xml = "<error>Could not launch workflow: the queueing engine is likely not running, or workflow has been deleted/modified?</error>";
-			}else{
-				$xml = "<success wfid='$id'></success>";
-			}
-			
-			echo $xml;
 			break;
 		
 		case 'saveNotif':

@@ -22,9 +22,31 @@ require_once 'inc/auth_check.php';
 require_once 'inc/logger.php';
 require_once 'lib/XSLEngine.php';
 
-
+if(isset($_GET['wf_name'])){
+	$filters = [
+		"filter_node" => $_GET['node'],
+		"filter_workflow" => $_GET['wf_name'],
+		"filter_launched_from" => trim($_GET['dt_inf']." ".$_GET['hr_inf']),
+		"filter_launched_until" => trim($_GET['dt_sup']." ".$_GET['hr_sup']),
+		"filter_status" => "",
+		//"limit" => "",
+		//"offset" => "",
+	];
+}
+else
+	$filters = [];
+if(isset($_GET['searchParams'])){
+	$getParams = json_decode($_GET['searchParams'], 1);
+	$parameters = [];
+	foreach($getParams as $value){
+		$parameters[$value['name']] = $value['value'];
+	}
+}
+else
+	$parameters = [];
+	
 $xsl = new XSLEngine();
-$xml = $evqueue->Api('instances', 'list');
+$xml = $evqueue->Api('instances', 'list', $filters, $parameters);
 $xsl->AddFragment(["instances" => $xml]);
 
 $xsl->DisplayXHTML('../xsl/ajax/terminated-workflows.xsl');

@@ -4,7 +4,9 @@
 	<xsl:output method="xml" indent="yes" omit-xml-declaration="yes" encoding="utf-8" doctype-public="-//W3C//DTD XHTML 1.0 Transitional//EN" doctype-system="http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd" />
 	
 	<xsl:template match="/">
-		<xsl:call-template name="last-logs" />
+		<div>
+			<xsl:call-template name="last-logs" />
+		</div>
 	</xsl:template>
 
 </xsl:stylesheet>

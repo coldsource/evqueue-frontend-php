@@ -24,10 +24,10 @@
 		<script type="text/javascript">
 			var workflows = [];
 			<xsl:for-each select="/page/available-workflows/workflow">
-				<xsl:if test="count(workflow/parameters/parameter) &gt;= 1">
+				<xsl:if test="count(parameters/parameter) &gt;= 1">
 					workflows['<xsl:value-of select="@name" />'] = [];
-					<xsl:for-each select="workflow/parameters/parameter">
-						workflows['<xsl:value-of select="../../../@name" />'][<xsl:value-of select="position() - 1" />] = '<xsl:value-of select="@name" />';
+					<xsl:for-each select="parameters/parameter">
+						workflows['<xsl:value-of select="../../@name" />'][<xsl:value-of select="position() - 1" />] = '<xsl:value-of select="@name" />';
 					</xsl:for-each>
 				</xsl:if>
 			</xsl:for-each>
@@ -83,7 +83,7 @@
 						<td style="width:300px;">Node</td>
 						<td>
 							<select name="node">
-								<option value="all">All</option>
+								<option value="">All</option>
 								<xsl:for-each select="/page/evqueue-nodes/node">
 									<option value="{@name}">
 										<xsl:if test="/page/get/@node = @name"><xsl:attribute name="selected">selected</xsl:attribute></xsl:if>

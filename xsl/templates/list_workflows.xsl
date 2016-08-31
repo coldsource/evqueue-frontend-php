@@ -4,7 +4,7 @@
 	<xsl:import href="xmlhighlight.xsl" />
 	<xsl:import href="workflow.xsl" />
 	
-	<xsl:key name="groups" match="/page/response/workflow/@group" use="." />
+	<xsl:key name="groups" match="/page/workflows/workflow/@group" use="." />
 	
 	<xsl:template name="list_workflows">
 		
@@ -31,7 +31,7 @@
 				<th class="thActions">Actions</th>
 			</tr>
 			
-			<xsl:for-each select="/page/response/workflow/@group[generate-id(.) = generate-id(key('groups', .))]">
+			<xsl:for-each select="/page/workflows/workflow/@group[generate-id(.) = generate-id(key('groups', .))]">
 				<xsl:sort select="." />
 				
 				<xsl:variable name="groupName" select="." />
@@ -52,7 +52,7 @@
 					</td>
 				</tr>
 				
-				<xsl:for-each select="/page/response/workflow[@group = $groupName]">
+				<xsl:for-each select="/page/workflows/workflow[@group = $groupName]">
 					<tr class="evenOdd">
 						<td>
 							<xsl:value-of select="@id" />
@@ -76,6 +76,23 @@
 							<xsl:value-of select="@comment" />
 						</td>
 						<td class="tdActions" style="min-width: 80px;">
+							<xsl:if test="@modified = 1 or @lastcommit = ''">
+								<xsl:choose>
+									<xsl:when test="count(/page/git-workflows/entry[@name=current()/@name]) > 0 and
+									(count(/page/git-workflows/entry[@lastcommit=current()/@lastcommit]) > 0 or @lastcommit = '')">
+										<img src="images/database_go.png" onclick="commit(this,'{@name}')" class="pointer"/>
+									</xsl:when>
+									<xsl:when test="count(/page/git-workflows/entry[@name=current()/@name]) = 0">
+										<img src="images/database_go.png" onclick="commit(this,'{@name}')" class="pointer"/>
+									</xsl:when>
+									<xsl:when test="count(/page/git-workflows/entry[@name=current()/@name]) > 0 and
+									count(/page/git-workflows/entry[@lastcommit=current()/@lastcommit]) = 0">
+										<img src="images/database_go2.png" onclick="confirm('You are about to overwrite changes to the repository');commit(this,'{@name}', 'yes')" class="pointer"/>
+										<img src="images/database_refresh.png" onclick="evqueueAPI(this, 'git', 'load_workflow', {{ 'name':'{@name}' }});location.reload();" class="pointer"/>
+									</xsl:when>
+								</xsl:choose>
+							</xsl:if>
+							
 							<xsl:choose>
 								<xsl:when test="@has-bound-task = 0">
 									<a href="manage-workflow.php?workflow_id={@id}" title="Text edit">
@@ -95,10 +112,29 @@
 								</xsl:otherwise>
 							</xsl:choose>
 							<xsl:text>&#160;</xsl:text>
-							<img src="images/delete.gif" onclick="deleteWorkflow({@id})" class="pointer" />
+							<img data-confirm="Delete workflow {@id}" src="images/delete.gif" onclick="evqueueAPI(this, 'workflow', 'delete', {{ 'id':'{@id}' }});location.reload();" class="pointer" />
 						</td>
 					</tr>
 				</xsl:for-each>
+			</xsl:for-each>
+			
+			
+			<tr class="groupspace"><td></td></tr>
+			<tr class="group">
+				<td colspan="5">Git</td>
+			</tr>
+			<xsl:for-each select="/page/git-workflows/entry">
+				<xsl:if test="count(/page/workflows/workflow[@name = current()/@name]) = 0">
+					<tr class="evenOdd">
+						<td colspan="3">
+							<xsl:value-of select="@name" />
+						</td>
+						<td class="tdActions" style="min-width: 80px;">
+							<img src="images/database_refresh.png" onclick="evqueueAPI(this, 'git', 'load_workflow', {{ 'name':'{@name}' }});location.reload();" class="pointer"/>
+							<img data-confirm="Delete workflow {@name}" src="images/delete.gif" onclick="evqueueAPI(this, 'git', 'remove_workflow', {{ 'name':'{@name}', 'commit_log':'{@name} removed' }});location.reload();" class="pointer" />
+						</td>
+					</tr>
+				</xsl:if>
 			</xsl:for-each>
 		</table>
 	</xsl:template>

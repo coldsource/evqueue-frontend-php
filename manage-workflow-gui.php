@@ -67,7 +67,7 @@ $xsl->AddFragment(Schedule::getAllXml());
 $xsl->AddFragment(Queue::getAllXml());
 $xsl->AddFragment(Task::getAllXml($filter='no-tied-task'));
 $xsl->AddFragment(Task::getAllGroupXml());
-$xsl->AddFragment(Workflow::getAllGroupXml());
+$xsl->AddFragment(getAllGroupXml());
 $xsl->AddFragment(Notification::getAllXml());
 $xsl->AddFragment(NotificationType::getAllXml());
 

@@ -52,7 +52,7 @@ class WebserviceWrapper
 			return $this->xmldoc;
 		
 		$this->ws_parameters['user_login'] = $_SESSION['user_login'];
-		$this->ws_parameters['user_pwd'] = "";
+		$this->ws_parameters['user_pwd'] = $_SESSION['user_pwd'];
 		
 		$url = SITE_BASE.'ajax/send_datas.php';
 		

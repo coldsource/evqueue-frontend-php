@@ -25,13 +25,13 @@
 				<xsl:for-each select="/page/users/user">
 					<tr class="evenOdd">
 						<td>
-							<xsl:value-of select="@login" />
+							<xsl:value-of select="@name" />
 						</td>
 						<td>
 							<xsl:value-of select="@profile" />
 						</td>
 						<td class="tdActions">
-							<a href="manage-user.php?user_login={@login}">
+							<a href="manage-user.php?user_login={@name}">
 								<img src="images/edit.gif"  />
 							</a>
 						</td>

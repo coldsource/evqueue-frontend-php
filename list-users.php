@@ -21,12 +21,11 @@
 require_once 'inc/auth_check.php';
 require_once 'inc/logger.php';
 require_once 'lib/XSLEngine.php';
-require_once 'bo/BO_user.php';
 
 
 $xsl = new XSLEngine();
-
-$xsl->AddFragment( User::getAllXML() );
+$xml = $evqueue->Api("users", "list");
+$xsl->AddFragment(["users" => $xml]);
 
 $xsl->DisplayXHTML('xsl/list_users.xsl');
 

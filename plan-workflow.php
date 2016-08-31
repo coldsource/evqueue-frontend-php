@@ -138,7 +138,7 @@ foreach ($dates as $label => $unit) {
 $xml .= '</units>';
 $xsl->AddFragment($xml);
 
-$xsl->AddFragment(Workflow::getAllGroupXml());
+$xsl->AddFragment(getAllGroupXml());
 $xsl->AddFragment(Workflow::getAllXml());
 
 $xsl->DisplayXHTML('xsl/plan-workflow.xsl');

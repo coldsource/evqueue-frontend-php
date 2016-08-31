@@ -1,16 +1,13 @@
 <?php
 
-function getevQueue($node = false){
+function getevQueue($node){
 	global $QUEUEING;
-	if($node === false)
-		$node = array_values($QUEUEING)[0];
-	else
-		$node = $QUEUEING[$node];
+	$scheme = $QUEUEING[$node];
 		
 	if(isset($_SESSION['user_login']) && isset($_SESSION['user_pwd']))
-		$evqueue = new evQueue($node, $_SESSION['user_login'], $_SESSION['user_pwd']);
+		$evqueue = new evQueue($scheme, $_SESSION['user_login'], $_SESSION['user_pwd']);
 	else
-		$evqueue = new evQueue($node);
+		$evqueue = new evQueue($scheme);
 		
 	return $evqueue;
 }
@@ -37,7 +34,6 @@ function getAllGroupXml(){
 		if($value != '')
 			$xml .= "<group>$key</group>";
 	}
-	$xml .= "<group></group>";
 	$xml .= '</groups>';
 	
 	return $xml;

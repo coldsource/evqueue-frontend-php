@@ -48,8 +48,8 @@ $xsl = new XSLEngine();
 if (isset($_POST['login']) && isset($_POST['password'])) {
 
 	$pwd = sha1($_POST['password'], true);
-	$evqueue->setUserLogin($_POST['login']);
-	$evqueue->setUserPwd($pwd);
+	$evqueue->SetUserLogin($_POST['login']);
+	$evqueue->SetUserPwd($pwd);
 	
 	try
 	{
@@ -71,6 +71,7 @@ if (isset($_POST['login']) && isset($_POST['password'])) {
 	@session_start();
 	$_SESSION['user_login'] = $_POST['login'];
 	$_SESSION['user_pwd'] = $pwd;
+	$_SESSION['user_profile'] = $evqueue->GetProfile();
 	session_write_close();
 	header('Location: index.php');
 	die();

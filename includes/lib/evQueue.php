@@ -17,7 +17,8 @@
   * 
   * Author: Thibault Kummer
   */
-
+require_once 'inc/logger.php';
+  
 use \Exception as Exception;
 use \DOMDocument as DOMDocument;
 use \DOMXPath as DOMXPath;
@@ -36,6 +37,7 @@ class evQueue {
 	protected $user_login;
 	protected $user_pwd;
 	protected $authentified = false;
+	protected $profile;
 	
 	const ERROR_AUTH_REQUIRED = 1;
 	const ERROR_AUTH_FAILED = 2;
@@ -64,7 +66,12 @@ class evQueue {
 	
 	public function __destruct() {
 		if($this->authentified)
-			$xml = $this->Api('quit');
+		{
+			try {
+				$xml = $this->Api('quit');
+			}
+			catch(Exception $e) {}
+		}
 		$this->disconnect(); 
 	}
 	
@@ -74,11 +81,11 @@ class evQueue {
 		return array('evqueue_ip', 'evqueue_port', 'socket');
 	}
 	
-	public function setUserLogin($login){
+	public function SetUserLogin($login){
 		$this->user_login = $login;
 	}
 	
-	public function setUserPwd($pwd){
+	public function SetUserPwd($pwd){
 		$this->user_pwd = $pwd;
 	}
 	
@@ -101,8 +108,10 @@ class evQueue {
 		$this->connected = true;
 		
 		$xml = $this->recv();
-		if($this->parser_root_tag == "READY")
+		if($this->parser_root_tag == "READY"){
 			$this->authentified = true;
+			$this->profile = $this->parser_root_attributes['PROFILE'];
+		}
 	}
 	
 	protected function authentication(){
@@ -112,11 +121,11 @@ class evQueue {
 		
 		if($this->parser_root_tag == "READY"){
 			$this->authentified = true;
+			$this->profile = $this->parser_root_attributes['PROFILE'];
 			return true;
 		}
 		else{
-			var_dump($this->parser_root_attributes);
-			//die("ss".$this->parser_root_tag);
+			//var_dump($this->parser_root_attributes);
 		}
 		return false;
 	}
@@ -160,7 +169,10 @@ class evQueue {
 	protected function exec($cmd, $return_dom=false)
 	{
 		$this->send("$cmd\n");
-		$out = $this->recv();
+		do{
+			$out = $this->recv();
+		}
+		while($this->parser_root_tag == "PING");
 		
 		return $out;
 	}
@@ -188,7 +200,6 @@ class evQueue {
 	public function Launch($name, $attributes=[], $parameters=[]) {
 		$attributes['name'] = $name;
 		$xml = $this->Api('instance', 'launch', $attributes, $parameters);
-		
 		return (int)$this->parser_root_attributes['WORKFLOW-INSTANCE-ID'];
 	}
 	
@@ -235,10 +246,9 @@ class evQueue {
 			if(!$this->authentication())
 				throw new Exception("evQueue : authentication failed", evQueue::ERROR_AUTH_FAILED);
 		}
-		
 		$dom = $this->build_query($name,$action,$attributes,$parameters);
-		
 		$xml = $this->exec($dom->saveXML());
+		
 		
 		if(!isset($this->parser_root_attributes['STATUS']) || $this->parser_root_attributes['STATUS']!='OK')
 			throw new Exception("evQueue : error returned from engine : {$this->parser_root_attributes['ERROR']}", evQueue::ERROR_RESPONSE_KO);
@@ -246,6 +256,9 @@ class evQueue {
 		return trim($xml);		
 	}
 	
+	public function GetProfile(){
+		return $this->profile;
+	}
 	
 	protected function ParserInit()	{
 		$this->parser_level = 0;

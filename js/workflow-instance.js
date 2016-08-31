@@ -34,26 +34,20 @@ $(document).ready( function() {
 	
 	$(document).delegate('form[id*=launchForm_]', 'submit', function(event) {
 		event.preventDefault();
-		$(this).parents('[id^=relaunch_]').dialog('close');  // close the dialog box so that the user does not click twice on submit
+		$(this).parents('[id*=launch_]').dialog('close');  // close the dialog box so that the user does not click twice on submit
 		
 		var wfparams = {};
 		$(this).find('.paramsTab :input').not('').each( function (i,input) {
 			wfparams[$(input).attr('name')] = $(input).val();
 		});
 		
-		var params = {
-			form_id: 'launchWorkflow',
-			id: $(this).find('input[name=id]').val(),
-			node: $(this).find('.nodeTab select').val(),
+		var attr = {
+			name: $(this).find('input[name=id]').val(),
 			user: $(this).find('.hostTab input[name=user]').val(),
-			host: $(this).find('.hostTab input[name=host]').val(),
-			wfparams: wfparams
+			host: $(this).find('.hostTab input[name=host]').val()
 		};
 		
-		wsfwd({
-			params: params,
-			success: function () { window.location.reload(); }
-		});
+		evqueueAPI(this, "instance", "launch", attr, wfparams, $(this).find('.nodeTab select').val());
 	});
 	
 	$(document).delegate( 'img.deleteWFI', 'click', function() {
@@ -61,16 +55,7 @@ $(document).ready( function() {
 		if (confirm("Delete the workflow instance n°"+id+"?")){
 			deleteWfi(id);
 		}
-	});
-	
-	$(document).delegate( 'img.stopWFI', 'click', function() {
-		var id = $(this).data("wfiid");
-		var node_name = $(this).data("node-name");
-		if (confirm("Stop the workflow instance n°"+id+"?")){
-			stopWfi(id,node_name);
-		}
-	});
-	
+	});	
 });
 
 $(document).ready( function () {
@@ -106,9 +91,10 @@ function refreshWorkflowHTML (id,node_name,container,callback) {
 	
 	$.ajax({
 		url: 'ajax/workflow.php',
+		type: 'post',
 		data: {
 			id: id,
-			node_name: node_name
+			node: node_name
 		},
 		success: function (content) {
 			container.html(content);
@@ -120,8 +106,4 @@ function refreshWorkflowHTML (id,node_name,container,callback) {
 
 function deleteWfi(id){
 	ajaxDelete('deleteWFI', id, '');
-}
-
-function stopWfi(id,node_name){
-	ajaxDelete('stopWFI', id, '', {node_name: node_name});
 }

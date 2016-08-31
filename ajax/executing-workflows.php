@@ -24,16 +24,18 @@ require_once 'lib/XSLEngine.php';
 
 
 $xsl = new XSLEngine();
-
 // EXECUTING workflows
-require 'conf/queueing.php';
 foreach ($QUEUEING as $node_name => $conf) {
 	try{
-		$evqueue_node = new evQueue($conf);
+		$evqueue_node = getevQueue($node_name);
 		$xml = $evqueue_node->Api('status', 'query', ['type' => "workflows"]);
-		$xsl->AddFragment(["instances" => $xml]);
+		$dom = new DOMDocument();
+		$dom->loadXML($xml);
+		$dom->documentElement->setAttribute("node", $node_name);
+		$xsl->AddFragment(["instances" => $dom]);
 	}
 	catch(Exception $e) {
+		die($e);
 		$xsl->AddFragment('<error>evqueue-not-running</error>');  // TODO: add which node is not running
 		$xsl->AddFragment('<workflows status="EXECUTING" />"');
 	}

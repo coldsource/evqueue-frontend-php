@@ -14,7 +14,7 @@
 						<xsl:value-of select="/page/post/@workflow_xml" />
 					</xsl:when>
 					<xsl:otherwise>
-						<xsl:copy-of select="/page/workflow/workflow" />
+						<xsl:copy-of select="/page/response-workflow/workflow/workflow" />
 					</xsl:otherwise>
 				</xsl:choose>
 			</textarea>
@@ -26,7 +26,7 @@
 	<xsl:template name="form_workflow_header">
 		<input type="hidden" name="workflow_id" value="{/page/workflow/@id}" />
 		<label class="formLabel" for="workflow_name">Name:</label>
-		<input type="text" name="workflow_name" id="workflow_name" placeholder="The name of your workflow" value="{/page/post/@workflow_name | /page/workflow/@name}"  />
+		<input type="text" name="workflow_name" id="workflow_name" placeholder="The name of your workflow" value="{/page/post/@workflow_name | /page/response-workflow/workflow/@name}"  />
 		<br />
 		
 		<script type="text/javascript">
@@ -40,23 +40,23 @@
 		</script>
 		
 		<label class="formLabel" for="workflow_group">Group:</label>
-		<input type="text" name="workflow_group" id="workflow_group" value="{/page/post/@workflow_group | /page/workflow/@group }" placeholder="Group name" />
+		<input type="text" name="workflow_group" id="workflow_group" value="{/page/post/@workflow_group | /page/response-workflow/workflow/@group }" placeholder="Group name" />
 		
 		<br />
 		<label class="formLabel" for="workflow_comment">Comment:</label>
-		<input type="text" name="workflow_comment" id="workflow_comment" value="{/page/post/@workflow_comment | /page/workflow/@comment }" placeholder="Comment" />
+		<input type="text" name="workflow_comment" id="workflow_comment" value="{/page/post/@workflow_comment | /page/response-workflow/workflow/@comment }" placeholder="Comment" />
 		<br />
 		
 		<br />
 		<table style="width:560px;">
-			<xsl:for-each select="/page/notification-types/notification-type">
+			<xsl:for-each select="/page/notification_types/notification_type">
 				<xsl:variable name="notification_type_id" select="@id" />
 				<tr>
 					<td colspan="2">
 						Notifications <xsl:value-of select="name" />
 					</td>
 				</tr>
-				<xsl:for-each select="/page/notifications/notification[type-id=$notification_type_id]">
+				<xsl:for-each select="/page/notifications/notification[@type_id=$notification_type_id]">
 					<tr>
 						<td style="width:20px;">
 							<input type="checkbox" name="notification[]" value="{@id}">
@@ -66,7 +66,7 @@
 							</input>
 						</td>
 						<td>
-							<xsl:value-of select="name" />
+							<xsl:value-of select="@name" />
 						</td>
 					</tr>
 				</xsl:for-each>

@@ -47,7 +47,7 @@
 			</td>
 
 			<td>
-				<span class="action" data-id="{@id}" data-node-name="{@node_name | ../@node_name}">
+				<span class="action" data-id="{@id}" data-node-name="{@node_name | ../@node}">
 					<img src="images/plus.png" />
 					<xsl:text> </xsl:text>
 					<xsl:value-of select="@id" />
@@ -66,7 +66,7 @@
 				<xsl:text>)</xsl:text>
 			</td>
 			<td class="tdHost">
-				<xsl:value-of select="@node_name | ../@node_name" />
+				<xsl:value-of select="@node_name | ../@node" />
 			</td>
 			<td class="tdHost">
 				<xsl:choose>
@@ -90,8 +90,8 @@
 			</xsl:if>
 			
 			<td class="tdActions">
-				<xsl:if test="@status='EXECUTING' and (/page/private/logged-in-user/@profile = 'ADMIN' or /page/private/logged-in-user/workflow[@wfname = current()/@name]/right[@action='kill'] = 1)">
-					<img src="images/stop.png" data-wfiid="{@id}" data-node-name="{../@node_name}" class="stopWFI" alt="Stop execution of this workflow" title="Stop execution of this workflow" />
+				<xsl:if test="@status='EXECUTING'">
+					<img src="images/stop.png" data-confirm="Stop execution of this workflow ?" alt="Stop execution of this workflow" title="Stop execution of this workflow" onclick="evqueueAPI(this, 'instance', 'cancel', {{ 'id':{@id} }}, {{}}, {../@node});"/>
 				</xsl:if>
 				
 				<xsl:if test="@status='TERMINATED'">
@@ -170,7 +170,7 @@
 						<li><a href="#hostTab_{$identifier}">Host</a></li>
 					</ul>
 					
-					<input type="hidden" name="id" value="{$identifier}" />
+					<input type="hidden" name="id" value="{@name}" />
 					
 					<div id="paramsTab_{$identifier}" class="paramsTab">
 						<xsl:if test="count(parameters/parameter) = 0">
@@ -451,8 +451,8 @@
 								</xsl:when>
 								<xsl:when test="@status='EXECUTING'">
 									EXECUTING
-									<xsl:if test="@status='EXECUTING' and (/page/private/logged-in-user/@profile = 'ADMIN' or /page/private/logged-in-user/workflow[@wfname = current()/ancestor::workflow[1]/@name]/right[@action='kill'] = 1)">
-										<img class="killTask" src="images/bomb.png" title="Kill Task" onclick="killTask('{/page/get/@node_name}', {ancestor::workflow[1]/@id}, {@pid});" />
+									<xsl:if test="@status='EXECUTING'">
+										<img class="killTask" src="images/bomb.png" title="Kill Task" onclick="evqueueAPI(this, 'instance', 'killtask', {{ 'id':{ancestor::workflow[1]/@id}, 'pid':{@pid} }}, {{}}, '{/page/instance/@node}');" />
 									</xsl:if>
 								</xsl:when>
 								<xsl:when test="@status='QUEUED'">
@@ -864,10 +864,7 @@
 	
 	<xsl:template name="deleteWFI">
 		<xsl:param name="wfiid" />
-		
-		<xsl:if test="/page/private/logged-in-user/workflow[@wfname = current()/@name]/right[@action='del'] = 1 or /page/private/logged-in-user/@profile = 'ADMIN'">
-			<img src="images/delete.gif" class="deleteWFI pointer" data-wfiid="{$wfiid}" alt="Delete workflow instance" title="Delete workflow instance"></img>
-		</xsl:if>
+		<img src="images/delete.gif" class="deleteWFI pointer" data-wfiid="{$wfiid}" alt="Delete workflow instance" title="Delete workflow instance"></img>
 	</xsl:template>
 	
 	
@@ -1011,109 +1008,6 @@
 	<!-- END LIGHT-TREE MODE -->
 	
 	
-	
-	
-	<xsl:template match="instance">
-		<xsl:variable name="trClass">
-			<xsl:choose>
-				<xsl:when test="position() mod(2) = 1">evenTr</xsl:when>
-				<xsl:otherwise>oddTr</xsl:otherwise>
-			</xsl:choose>
-		</xsl:variable>
-		<xsl:variable name="nbErrorsMsg">
-			<xsl:choose>
-				<xsl:when test="count(@errors)=1">1 error</xsl:when>
-				<xsl:otherwise>
-					<xsl:value-of select="count(@errors)" /> errors</xsl:otherwise>
-			</xsl:choose>
-		</xsl:variable>
-		<tr class="{$trClass}">
-			<td class="workflowStatus">
-				<xsl:variable name="current-node">
-					<xsl:copy-of select="." />
-				</xsl:variable>
-				<xsl:choose>
-					<xsl:when test="@running_tasks - @queued_tasks > 0">
-						<img src="images/ajax-loader.gif" alt="Running" title="Task(s) running" />
-					</xsl:when>
-					<xsl:when test="@queued_tasks > 0">
-						<img src="images/waitpoint.gif" alt="Queued" title="Task(s) queued" />
-					</xsl:when>
-					<xsl:when test="@retrying_tasks > 0">
-						<img src="images/alarm_clock.png" alt="Retrying" title="A task ended badly and will retry" />
-					</xsl:when>
-					<xsl:when test="@errors > 0">
-						<img src="images/exclamation.png" alt="Errors" title="Errors" />
-					</xsl:when>
-					<xsl:when test="count(@end_time) > 0">
-						<img src="images/ok.png" alt="Terminated" title="Workflow terminated" />
-					</xsl:when>
-					<xsl:otherwise>
-						<b>?</b>
-					</xsl:otherwise>
-				</xsl:choose>
-			</td>
 
-			<td>
-				<span class="action" data-id="{@id}" data-node-name="{@node_name | ../@node_name}">
-					<img src="images/plus.png" />
-					<xsl:text> </xsl:text>
-					<xsl:value-of select="@id" />
-					&#8211; 
-					<xsl:value-of select="@name" />
-				</span>
-				<xsl:text>&#160;</xsl:text>
-				<xsl:variable name="seconds">
-					<xsl:apply-templates select="." mode="total-time" />
-				</xsl:variable>
-				
-				<xsl:text>(</xsl:text>
-				<xsl:call-template name="display-split-time">
-					<xsl:with-param name="seconds" select="$seconds" />
-				</xsl:call-template>
-				<xsl:text>)</xsl:text>
-			</td>
-			<td class="tdHost">
-				<xsl:value-of select="@node_name | ../@node_name" />
-			</td>
-			<td class="tdHost">
-				<xsl:choose>
-					<xsl:when test="@host != ''"><xsl:value-of select="@host" /></xsl:when>
-					<xsl:otherwise>localhost</xsl:otherwise>
-				</xsl:choose>
-			</td>
-			<td class="tdStarted">
-				<xsl:call-template name="displayDateAndTime">
-					<xsl:with-param name="datetime_start" select="@start_time" />
-				</xsl:call-template>
-			</td>
-			<xsl:if test="count(@end_time) > 0">
-				<td class="tdFinished">
-					<xsl:if test="@end_time != '0000-00-00 00:00:00'">
-						<xsl:call-template name="displayDateAndTime">
-							<xsl:with-param name="datetime_end" select="@end_time" />
-						</xsl:call-template>
-					</xsl:if>		
-				</td>
-			</xsl:if>
-			
-			<td class="tdActions">
-				<xsl:if test="@status='EXECUTING' and (/page/private/logged-in-user/@profile = 'ADMIN' or /page/private/logged-in-user/workflow[@wfname = current()/@name]/right[@action='kill'] = 1)">
-					<img src="images/stop.png" data-wfiid="{@id}" data-node-name="{../@node_name}" class="stopWFI" alt="Stop execution of this workflow" title="Stop execution of this workflow" />
-				</xsl:if>
-				
-				<xsl:if test="@status='TERMINATED'">
-					<xsl:call-template name="deleteWFI">
-						<xsl:with-param name="wfiid" select="@id" />
-					</xsl:call-template>
-				</xsl:if>
-			</td>		
-		</tr>
-		<tr id="tr{@id}" class="hidden">
-			<td colspan="7" class="details">
-				<img src="images/ajax-loader.gif" />
-			</td>
-		</tr>
-	</xsl:template>
 	
 </xsl:stylesheet>

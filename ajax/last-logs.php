@@ -20,14 +20,10 @@
 
 require_once 'inc/auth_check.php';
 require_once 'inc/logger.php';
-require_once 'bo/BO_logs.php';
 require_once 'lib/XSLEngine.php';
 
 
 $xsl = new XSLEngine();
-$PAGESIZE = 100;
-
-$xsl->AddFragment(Logs::getLastLogs($PAGESIZE));
-
+$xsl->AddFragment(['logs' => $evqueue->Api('logs', 'list')]);
 $xsl->DisplayXHTML('../xsl/ajax/view-logs.xsl');
 ?>

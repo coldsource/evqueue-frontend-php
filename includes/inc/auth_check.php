@@ -22,11 +22,12 @@ session_start();
 require_once 'conf/sites_base.php';
 require_once 'inc/evqueue.php';
 
-
 if (!isset($_SESSION['user_login'])) {
 	try{
 		$evqueue->Api('ping');
 		$_SESSION['user_login'] = "anonymous";
+		$_SESSION['user_pwd'] = "";
+		$_SESSION['user_profile'] = "ADMIN";
 	}
 	catch(Exception $e){
 		if($e->getCode() == evQueue::ERROR_AUTH_REQUIRED){

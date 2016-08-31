@@ -21,9 +21,6 @@
 require_once 'inc/auth_check.php';
 require_once 'inc/logger.php';
 require_once 'lib/XSLEngine.php';
-require_once 'lib/DatabaseMySQL.php';
-require_once 'bo/BO_user.php';
-require_once 'bo/BO_workflow.php';
 
 
 $xsl = new XSLEngine();
@@ -57,13 +54,13 @@ if (isset($_POST['action'])) {
 	}
 }
 
+$xml = $evqueue->Api('user', 'get', ['name' => $_GET['user_login']]);
+$xsl->AddFragment(['response-user' => $xml]);
 
-$user = new User(isset($_GET['user_login']) ? $_GET['user_login'] : false);
-$xsl->AddFragment($user->getXML());
+$xml = $evqueue->Api("workflows", "list");
+$xsl->AddFragment(["workflows" => $xml]);
 
-$xsl->AddFragment(Workflow::getAllXml());
-
-$xsl->AddPrivateFragment('<rights><right action="edit" /><right action="read" /><right action="exec" /><right action="kill" /><right action="del" /></rights>');
+$xsl->AddFragment('<rights><right action="edit" /><right action="read" /><right action="exec" /><right action="kill" /></rights>');
 
 
 $xsl->DisplayXHTML('xsl/manage_user.xsl');

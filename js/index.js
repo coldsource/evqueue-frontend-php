@@ -24,6 +24,7 @@ function get_parameters() {
 
 $(document).ready(function() {
 	refreshWorkflows("terminated");
+	refreshWorkflows("executing");
 	
 	$("#dt_inf, #dt_sup").datepicker({dateFormat : "yy-mm-dd", maxDate: new Date(), showAnim: 'slideDown'});
 	$("#hr_inf, #hr_sup").timepicker();
@@ -203,21 +204,6 @@ $(document).ready(function() {
 	});
 });
 
-
-function killTask (node_name, workflow_instance_id, task_pid) {
-	if (confirm('Do you really want to immediately stop the execution of this task?'))
-		wsfwd({
-			params: {
-				form_id: 'killTask',
-				id: workflow_instance_id,
-				task_pid: task_pid,
-				node_name: node_name
-			},
-			success: function () {
-				$('img.refreshWorkflows').click();
-			}
-		});
-}
 
 
 function retryAllTasks () {

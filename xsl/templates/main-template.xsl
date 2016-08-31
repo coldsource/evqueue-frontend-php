@@ -80,7 +80,7 @@
 						<li><a href="{$SITE_BASE}system_state.php">Queues</a></li>
 						<li><a href="{$SITE_BASE}system_statistics.php">Statistics</a></li>
 					</ul>
-					<xsl:if test="/page/private/logged-in-user/@profile = 'ADMIN'">
+					<xsl:if test="$PROFILE = 'ADMIN'">
 						<ul class="submenu" id="submenu-settings">
 							<xsl:if test="$topmenu!='settings'"><xsl:attribute name="style">display:none;</xsl:attribute></xsl:if>
 							<li><a href="{$SITE_BASE}list-tasks.php">Tasks</a></li>
@@ -98,7 +98,8 @@
 						</ul>
 						<ul class="submenu" id="submenu-logging">
 							<xsl:if test="$topmenu!='logging'"><xsl:attribute name="style">display:none;</xsl:attribute></xsl:if>
-							<li><a href="{$SITE_BASE}view-logs.php">Last logs</a></li>
+							<li><a href="{$SITE_BASE}view-logs.php">Engine logs</a></li>
+							<li><a href="{$SITE_BASE}logs/log.html">Interface logs</a></li>
 						</ul>
 					</xsl:if>
 					

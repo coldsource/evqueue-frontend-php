@@ -23,40 +23,55 @@ require_once 'inc/logger.php';
 require_once 'lib/XSLEngine.php';
 require_once 'lib/workflow_instance.php';
 require_once 'lib/save_workflow.php';
-require_once 'bo/BO_workflow.php';
-require_once 'bo/BO_notification.php';
-require_once 'bo/BO_notificationType.php';
 require_once 'utils/xml_utils.php';
 
 $xml_error = "";
 if (isset($_POST) && (count($_POST)>1)){
-	
-	$errors = saveWorkflow($_POST);
-	
-	if ($errors !== false) {
-		$xml_error = $errors;
-	} else {
-		header("location:list-workflows.php");
+	try{
+		if (isset($_GET["workflow_id"]) && ($_GET["workflow_id"] != '')){
+			$xml =  $evqueue->Api('workflow', 'edit', [
+				'id' => $_GET["workflow_id"],
+				'name' => $_POST['workflow_name'],
+				'content' => base64_encode($_POST['workflow_xml']),
+				'group' => $_POST['workflow_group'],
+				'comment' => $_POST['workflow_comment'],
+			]);
+		}
+		else{
+			$xml = $evqueue->Api('workflow', 'create', [
+				'name' => $_POST['workflow_name'],
+				'content' => base64_encode($_POST['workflow_xml']),
+				'group' => $_POST['workflow_group'],
+				'comment' => $_POST['workflow_comment'],
+			]);
+		}
+	}
+	catch(Exception $e){
+		echo $e->getMessage();
 		die();
 	}
+
+	header("location:list-workflows.php");
+	die();
 }
 
 
 $xsl = new XSLEngine();
 
 if (isset($_GET["workflow_id"]) && ($_GET["workflow_id"] != '')){
-	$wk = new Workflow($_GET["workflow_id"]);
-	$xsl->AddFragment($wk->getGeneratedXml());
+	$xsl->AddFragment(['response-workflow' => $evqueue->Api('workflow', 'get', ['id' => $_GET["workflow_id"]])]);
 }
 
 if ($xml_error)
 	$xsl->AddFragment($xml_error);
 
-
-$xsl->AddFragment(Workflow::getAllGroupXml());
+$xsl->AddFragment(getAllGroupXml());
+$xsl->AddFragment(['notifications' => $evqueue->Api('notifications', 'list')]);
+$xsl->AddFragment(['notification_types' => $evqueue->Api('notification_types', 'list')]);
+/*
 $xsl->AddFragment(Notification::getAllXml());
 $xsl->AddFragment(NotificationType::getAllXml());
-
+*/
 $xsl->DisplayXHTML('xsl/manage_workflow.xsl');
 
 ?>
