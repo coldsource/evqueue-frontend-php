@@ -258,5 +258,12 @@ class XSLEngine
 		
 		return "<response />";
 	}
+	
+	public function HasError(){
+		$xpath = new DOMXpath($this->xmldoc);		
+		if($xpath->evaluate("count(/page/errors/error)"))
+		   return true;
+		return false;
+	}
 }
 ?>
