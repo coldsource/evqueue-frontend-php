@@ -289,6 +289,10 @@ class evQueue {
 		if($this->parser_level == 0)
 			$this->parser_ready = true;
 	}
+	
+	public function GetParserRootAttributes(){
+		return $this->parser_root_attributes;
+	}
 }
 
 

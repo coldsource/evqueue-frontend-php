@@ -21,14 +21,16 @@
 require_once 'inc/auth_check.php';
 require_once 'inc/logger.php';
 require_once 'lib/XSLEngine.php';
-require_once 'lib/workflow_instance.php';
-require_once 'lib/save_workflow.php';
-require_once 'utils/xml_utils.php';
 
-$xml_error = "";
+$xsl = new XSLEngine();
+
 if (isset($_POST) && (count($_POST)>1)){
 	try{
 		if (isset($_GET["workflow_id"]) && ($_GET["workflow_id"] != '')){
+			$evqueue->Api('workflow', 'clear_notifications', [
+				'id' => $_GET["workflow_id"]
+			]);
+			
 			$xml =  $evqueue->Api('workflow', 'edit', [
 				'id' => $_GET["workflow_id"],
 				'name' => $_POST['workflow_name'],
@@ -44,34 +46,37 @@ if (isset($_POST) && (count($_POST)>1)){
 				'group' => $_POST['workflow_group'],
 				'comment' => $_POST['workflow_comment'],
 			]);
+			$id = $evqueue->GetParserRootAttributes()['WORKFLOW-ID'];
 		}
-	}
-	catch(Exception $e){
-		echo $e->getMessage();
+		
+		if(count($_POST['notification']) > 0){
+			foreach($_POST['notification'] as $notification){
+				$xml = $evqueue->Api('workflow', 'subscribe_notification', [
+					'id' => $_GET["workflow_id"],
+					'notification_id' => $notification,
+				]);
+			}
+		}
+		
+		header("location:list-workflows.php");
 		die();
 	}
-
-	header("location:list-workflows.php");
-	die();
+	catch(Exception $e){
+		$xsl->AddFragment('<errors><error>'.$e->getMessage().'</error></errors>');
+	}
 }
 
-
-$xsl = new XSLEngine();
 
 if (isset($_GET["workflow_id"]) && ($_GET["workflow_id"] != '')){
 	$xsl->AddFragment(['response-workflow' => $evqueue->Api('workflow', 'get', ['id' => $_GET["workflow_id"]])]);
+	$xsl->AddFragment(['workflow-notifications' => $evqueue->Api('workflow', 'list_notifications', ['id' => $_GET["workflow_id"]])]);
 }
 
-if ($xml_error)
-	$xsl->AddFragment($xml_error);
-
 $xsl->AddFragment(getAllGroupXml());
+
 $xsl->AddFragment(['notifications' => $evqueue->Api('notifications', 'list')]);
 $xsl->AddFragment(['notification_types' => $evqueue->Api('notification_types', 'list')]);
-/*
-$xsl->AddFragment(Notification::getAllXml());
-$xsl->AddFragment(NotificationType::getAllXml());
-*/
+
 $xsl->DisplayXHTML('xsl/manage_workflow.xsl');
 
 ?>

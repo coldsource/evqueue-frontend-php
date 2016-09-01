@@ -58,7 +58,22 @@
 							<xsl:value-of select="@id" />
 						</td>
 						<td>
-							<xsl:value-of select="@name" />
+							
+							<span>
+								<xsl:if test="$USE_GIT = 1">
+									<xsl:attribute name="class">
+										<xsl:choose>
+											<xsl:when test="count(/page/git-workflows/entry[@name=current()/@name]) > 0 and
+											count(/page/git-workflows/entry[@lastcommit=current()/@lastcommit]) = 0">gitNeedUpdate</xsl:when>
+											<xsl:when test="@modified = 1">gitModified</xsl:when>
+											<xsl:when test="count(/page/git-workflows/entry[@name=current()/@name]) = 0">gitNew</xsl:when>
+										</xsl:choose>
+									</xsl:attribute>
+								</xsl:if>
+								<xsl:value-of select="@name" />
+							</span>
+							
+							
 							<xsl:if test="@has-bound-task = 1">
 								<span style="font-size: 80%; color: darkgray;"> (simple)</span>
 							</xsl:if>
@@ -76,41 +91,32 @@
 							<xsl:value-of select="@comment" />
 						</td>
 						<td class="tdActions" style="min-width: 80px;">
-							<xsl:if test="@modified = 1 or @lastcommit = ''">
+							<xsl:if test="$USE_GIT = 1 and (@modified = 1 or @lastcommit = '')">
 								<xsl:choose>
 									<xsl:when test="count(/page/git-workflows/entry[@name=current()/@name]) > 0 and
 									(count(/page/git-workflows/entry[@lastcommit=current()/@lastcommit]) > 0 or @lastcommit = '')">
-										<img src="images/database_go.png" onclick="commit(this,'{@name}')" class="pointer"/>
+										<img src="images/database_go.png" onclick="commit(this,'{@name}')" class="pointer" title="Save this workflow to Git"/>
 									</xsl:when>
 									<xsl:when test="count(/page/git-workflows/entry[@name=current()/@name]) = 0">
-										<img src="images/database_go.png" onclick="commit(this,'{@name}')" class="pointer"/>
+										<img src="images/database_go.png" onclick="commit(this,'{@name}')" class="pointer" title="Save this workflow to Git"/>
 									</xsl:when>
 									<xsl:when test="count(/page/git-workflows/entry[@name=current()/@name]) > 0 and
 									count(/page/git-workflows/entry[@lastcommit=current()/@lastcommit]) = 0">
-										<img src="images/database_go2.png" onclick="confirm('You are about to overwrite changes to the repository');commit(this,'{@name}', 'yes')" class="pointer"/>
-										<img src="images/database_refresh.png" onclick="evqueueAPI(this, 'git', 'load_workflow', {{ 'name':'{@name}' }});location.reload();" class="pointer"/>
+										<img src="images/database_go2.png" onclick="confirm('You are about to overwrite changes to the repository');commit(this,'{@name}', 'yes')" class="pointer" title="Save this workflow to Git"/>
+										<img src="images/database_refresh.png" onclick="evqueueAPI(this, 'git', 'load_workflow', {{ 'name':'{@name}' }});location.reload();" class="pointer" title="Load this workflow from Git"/>
 									</xsl:when>
 								</xsl:choose>
 							</xsl:if>
 							
-							<xsl:choose>
-								<xsl:when test="@has-bound-task = 0">
-									<a href="manage-workflow.php?workflow_id={@id}" title="Text edit">
-										<img src="images/edition/edit-txt.png" />
-									</a>
-									<a href="manage-workflow-gui.php?workflow_id={@id}" title="Graphical edit">
-										<img src="images/edition/edit-gui.png" />
-									</a>
-									<a href="export.php?workflow_id={@id}" title="Export (zip file)">
-										<img src="images/zip.png" />
-									</a>
-								</xsl:when>
-								<xsl:otherwise>
-									<a href="manage-simple-workflow.php?workflow_id={@id}" title="Text edit">
-										<img src="images/edition/edit-txt.png" />
-									</a>
-								</xsl:otherwise>
-							</xsl:choose>
+							<a href="manage-workflow.php?workflow_id={@id}" title="Text edit">
+								<img src="images/edition/edit-txt.png" />
+							</a>
+							<a href="manage-workflow-gui.php?workflow_id={@id}" title="Graphical edit">
+								<img src="images/edition/edit-gui.png" />
+							</a>
+							<a href="export.php?workflow_id={@id}" title="Export (zip file)">
+								<img src="images/zip.png" />
+							</a>
 							<xsl:text>&#160;</xsl:text>
 							<img data-confirm="Delete workflow {@id}" src="images/delete.gif" onclick="evqueueAPI(this, 'workflow', 'delete', {{ 'id':'{@id}' }});location.reload();" class="pointer" />
 						</td>

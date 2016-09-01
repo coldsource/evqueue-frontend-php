@@ -60,7 +60,7 @@
 					<tr>
 						<td style="width:20px;">
 							<input type="checkbox" name="notification[]" value="{@id}">
-								<xsl:if test="/page/workflow/notifications/notification = @id">
+								<xsl:if test="/page/workflow-notifications/notification/@id = @id">
 									<xsl:attribute name="checked">checked</xsl:attribute>
 								</xsl:if>
 							</input>

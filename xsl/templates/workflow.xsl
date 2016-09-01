@@ -1008,6 +1008,48 @@
 	<!-- END LIGHT-TREE MODE -->
 	
 	
+	
+	<!-- EDIT-TREE MODE -->
+	<xsl:template match="workflow" mode="edit-tree">
+		<div class="lightTreeTasks">
+			<div class="lightTreeTask" style="font-weight: bold;">
+				Workflow Start
+			</div>
+		</div>
+		<xsl:apply-templates select="subjobs" mode="edit-tree" />
+	</xsl:template>
+	
+	<xsl:template match="subjobs" mode="edit-tree">
+		<xsl:apply-templates select="job" mode="edit-tree" />
+	</xsl:template>
+	
+	<xsl:template match="job" mode="edit-tree">
+		<xsl:variable name="nbSiblings" select="count(preceding-sibling::job) + 1 + count(following-sibling::job)" />
+		
+		<div class="lightTreeJob" style="width: {(98 - $nbSiblings*2) * count(.//task) div count(..//task) }%;">
+			<div class="lightTreeTasks">
+				<xsl:if test="@condition != ''">
+					<span class="lightTreeJobCondition" title="{@condition}">?</span>
+				</xsl:if>
+				<xsl:if test="@loop != ''">
+					<span class="jobLoop lightTreeJobLoop" title="Loop on: {@loop}">⟲</span>
+				</xsl:if>
+				<xsl:apply-templates select="tasks/task" mode="edit-tree" />
+				<img src="images/edition/addTask.png"/>
+			</div>
+			<xsl:apply-templates select="subjobs" mode="edit-tree" />
+		</div>
+	</xsl:template>
+	
+	<xsl:template match="task" mode="edit-tree">
+		<div class="lightTreeTask" title="{@name}">
+			<xsl:if test="@loop != ''">
+				<span class="taskLoop" title="Loop on: {@loop}">⟲ </span>
+			</xsl:if>
+			<xsl:value-of select="@name" />
+		</div>
+	</xsl:template>
+	<!-- END EDIT-TREE MODE -->
 
 	
 </xsl:stylesheet>

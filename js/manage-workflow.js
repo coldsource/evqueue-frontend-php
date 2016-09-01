@@ -287,3 +287,25 @@ function stopXPathHelp (input) {
 	
 	isInXPathHelp = false;
 }
+
+
+
+
+
+
+
+
+
+$(document).ready( function () {
+	updateTree();
+});
+
+function updateTree() {
+	$.ajax({
+		data:{'xml':$('#workflow_xml').val()},
+		type: 'post',
+		url: 'ajax/edit-workflow-tree.php',
+	}).done(function(result){
+		$('#editTree').html(result);
+	});
+}
