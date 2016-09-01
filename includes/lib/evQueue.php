@@ -141,7 +141,7 @@ class evQueue {
 	
 	protected function send($data)
 	{
-		$written = socket_write($this->socket,$data);
+		$written = @socket_write($this->socket,$data);
 		if($written===false)
 			throw new Exception("evQueue : could not write data to socket");
 		
@@ -152,8 +152,10 @@ class evQueue {
 	protected function recv()
 	{
 		$xml = "";
+		$data = false;
+		
 		$this->ParserInit();
-		while(socket_recv($this->socket, $data, 1600, 0)){
+		while(@socket_recv($this->socket, $data, 1600, 0)){
 			$xml .= $data;
 			$this->ParserParse($data);
 			if($this->parser_ready === true )
