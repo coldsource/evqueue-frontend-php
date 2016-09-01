@@ -43,7 +43,7 @@ class XSLEngine
 {
 	protected $xmldoc;
 	protected $root_node;
-	protected $metas_node;
+	protected $errors_node;
 	protected $parameters = [];
 	protected $display_xml;
 	protected $instruction = "<!doctype html>"; //doctype, xml...
@@ -58,6 +58,10 @@ class XSLEngine
 			if (!is_array($value) && preg_match('/^[a-zA-Z0-9-_]+$/',$param))
 				$this->root_node->setAttribute($param, $value);
 		}
+		
+		// Errors
+		$this->errors_node = $this->xmldoc->createElement('errors');
+		$this->root_node->appendChild($this->errors_node);
 
 		// GET et POST
 		$get_node = $this->xmldoc->createElement('get');
@@ -117,6 +121,12 @@ class XSLEngine
 	public function GetParameter($name)
 	{
 		return isset($this->parameters[$name])?$this->parameters[$name]:false;
+	}
+	
+	public function AddError($error)
+	{
+		$error_node = $this->xmldoc->createElement('error',$error);
+		$this->errors_node->appendChild($error_node);
 	}
 
 	/*
@@ -217,8 +227,6 @@ class XSLEngine
 		echo $this->GetXHTML($xsl_filename);
 	}
 
-	
-
 	public static function RenameElement(\DOMElement $node, $name) {
 		$renamed = $node->ownerDocument->createElement($name);
 		foreach ($node->attributes as $attribute) {
@@ -233,6 +241,22 @@ class XSLEngine
 
 	public function SetInstruction($instruction){
 		$this->instruction = $instruction;
+	}
+	
+	public function Api($name, $action = false, $attributes = [], $parameters = [])
+	{
+		global $evqueue;
+		
+		try
+		{
+			return $evqueue->API($name, $action, $attributes, $parameters);
+		}
+		catch(Exception $e)
+		{
+			$this->AddError($e->getMessage());
+		}
+		
+		return "<response />";
 	}
 }
 ?>
