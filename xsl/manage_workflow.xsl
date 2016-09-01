@@ -14,7 +14,7 @@
 			<div class="boxTitle">
 			<span class="title">
 				<xsl:choose>
-				<xsl:when test="/page/workflow/@id">
+				<xsl:when test="/page/get/@workflow_id">
 					Update Workflow
 				</xsl:when>
 				<xsl:otherwise>
@@ -28,6 +28,8 @@
 				<xsl:call-template name="form_workflow"/>
 			</div>
 		</div>
+		
+		<div id="editTree" data-id="{/page/get/@workflow_id}"></div>
 	</xsl:template>
 	
 </xsl:stylesheet>

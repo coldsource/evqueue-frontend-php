@@ -21,41 +21,13 @@
 require_once 'inc/auth_check.php';
 require_once 'inc/logger.php';
 require_once 'lib/XSLEngine.php';
-require_once 'lib/workflow_instance.php';
-require_once 'lib/save_workflow.php';
-require_once 'bo/BO_workflow.php';
-require_once 'bo/BO_task.php';
-require_once 'bo/BO_notification.php';
-require_once 'bo/BO_notificationType.php';
 
 $xsl = new XSLEngine();
-$xsl->AddFragment(Task::getAllXml($filter='only-tied-task'));
 
+$dom = new DOMDocument();
+$dom->loadXML($_POST['xml']);
 
-if (isset($_GET["workflow_id"]) && ($_GET["workflow_id"] != '')){
-	$wk = new Workflow($_GET["workflow_id"]);
-	$xsl->AddFragment($wk->getGeneratedXml());
-}
+$xsl->AddFragment($_POST['xml']);
 
-
-$xml_error = "";
-if (isset($_POST) && (count($_POST)>1)){
-	
-	$xml_error = edit_simple_workflow($_POST);
-	
-	if ($xml_error === false) {
-		header('Location: list-workflows.php');
-		die();
-	}
-}
-
-if ($xml_error)
-	$xsl->AddFragment($xml_error);
-
-$xsl->AddFragment(getAllGroupXml());
-$xsl->AddFragment(Notification::getAllXml());
-$xsl->AddFragment(NotificationType::getAllXml());
-
-$xsl->DisplayXHTML('xsl/manage_simple_workflow.xsl');
-
+$xsl->DisplayXHTML('../xsl/ajax/edit-workflow-tree.xsl');
 ?>

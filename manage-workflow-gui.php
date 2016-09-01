@@ -21,12 +21,6 @@
 require_once 'inc/auth_check.php';
 require_once 'lib/XSLEngine.php';
 require_once 'inc/logger.php';
-require_once 'bo/BO_workflow.php';
-require_once 'bo/BO_schedule.php';
-require_once 'bo/BO_queue.php';
-require_once 'bo/BO_task.php';
-require_once 'bo/BO_notification.php';
-require_once 'bo/BO_notificationType.php';
 
 
 $xml = null;

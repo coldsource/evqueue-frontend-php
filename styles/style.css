@@ -610,7 +610,7 @@ img.viewmore {
   width: 10%; }
 
 .thActions {
-  width: 6%; }
+  width: 12%; }
 
 .tdHost,
 .tdStarted,
@@ -1085,5 +1085,16 @@ div.lightTreeJob .taskLoop {
   font-size: 110%; }
 
 /* END LIGHT-TREE DISPLAY */
+
+/* GIT */
+.gitNew{
+  color:blue;
+}
+.gitModified{
+  color:green;
+}
+.gitNeedUpdate{
+  color:red;
+}
 
 /*# sourceMappingURL=style.css.map */

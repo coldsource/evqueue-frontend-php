@@ -106,6 +106,7 @@ class XSLEngine
 		$this->SetParameter('EDITION', '0');
 		$this->SetParameter('PROFILE', isset($_SESSION['user_profile']) ? $_SESSION['user_profile']:'');
 		$this->SetParameter('LOGIN', isset($_SESSION['user_login']) ? $_SESSION['user_login']:'');
+		$this->SetParameter('USE_GIT', 1); //TODO
 
 		$this->display_xml = isset($_GET['display_xml']);
 	}
@@ -256,6 +257,13 @@ class XSLEngine
 		}
 		
 		return "<response />";
+	}
+	
+	public function HasError(){
+		$xpath = new DOMXpath($this->xmldoc);		
+		if($xpath->evaluate("count(/page/errors/error)"))
+		   return true;
+		return false;
 	}
 }
 ?>

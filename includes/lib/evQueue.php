@@ -155,14 +155,13 @@ class evQueue {
 		$data = false;
 		
 		$this->ParserInit();
-		while(@socket_recv($this->socket, $data, 1600, 0)){
+		while($recv = socket_recv($this->socket, $data, 1600, 0)){
 			$xml .= $data;
 			$this->ParserParse($data);
 			if($this->parser_ready === true )
 				break;
 		}
-
-		if($data===false)
+		if($data===false || $data === NULL)
 			throw new Exception("evQueue : error reading data");
 
 		return $xml	;
@@ -251,7 +250,6 @@ class evQueue {
 		$dom = $this->build_query($name,$action,$attributes,$parameters);
 		$xml = $this->exec($dom->saveXML());
 		
-		
 		if(!isset($this->parser_root_attributes['STATUS']) || $this->parser_root_attributes['STATUS']!='OK')
 			throw new Exception("evQueue : error returned from engine : {$this->parser_root_attributes['ERROR']}", evQueue::ERROR_RESPONSE_KO);
 		
@@ -266,6 +264,10 @@ class evQueue {
 		$this->parser_level = 0;
 		$this->parser_ready = false;
 		$this->parser = xml_parser_create();
+		
+		$this->parser_root_tag = "";
+		$this->parser_root_attributes = [];
+	
 	
 		xml_set_object($this->parser, $this);
 		xml_set_element_handler($this->parser, "ParserOpen", "ParserClose");
@@ -290,6 +292,10 @@ class evQueue {
 		$this->parser_level--;
 		if($this->parser_level == 0)
 			$this->parser_ready = true;
+	}
+	
+	public function GetParserRootAttributes(){
+		return $this->parser_root_attributes;
 	}
 }
 
