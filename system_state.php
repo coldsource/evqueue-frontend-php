@@ -21,17 +21,29 @@
 require_once 'inc/auth_check.php';
 require_once 'inc/logger.php';
 require_once 'lib/XSLEngine.php';
-require_once 'lib/workflow_instance.php';
-
 
 $xsl = new XSLEngine();
 
-require 'conf/queueing.php';
+foreach ($QUEUEING as $node_name => $conf) {
+	//try{
+		$evqueue_node = getevQueue($node_name);
+		$xml = $evqueue_node->Api('statistics', 'query', ['type' => 'queue']);
+		$dom = new DOMDocument();
+		$dom->loadXML($xml);
+		$dom->documentElement->setAttribute("node_name", $node_name);
+		$xsl->AddFragment(["stats" => $dom]);
+	/*}
+	catch(Exception $e) {
+		$xsl->AddFragment('<error>evqueue-not-running</error>');  // TODO: add which node is not running
+	}*/
+}
+
+/*
 foreach ($QUEUEING as $node_name => $conf) {
 	$wfi = new WorkflowInstance($node_name);
 	$xsl->AddFragment('<stats node_name="'.htmlspecialchars($node_name).'">'.$wfi->GetStatistics("queue").'</stats>');
 }
-
+*/
 $xsl->DisplayXHTML('xsl/system_state.xsl');
 
 ?>

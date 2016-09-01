@@ -21,30 +21,38 @@
 require_once 'inc/auth_check.php';
 require_once 'inc/logger.php';
 require_once 'lib/XSLEngine.php';
-require_once 'lib/workflow_instance.php';
-require_once 'bo/BO_workflow.php';
-require_once 'bo/BO_workflowSchedule.php';
 
 $xsl = new XSLEngine();
 if(isset($_GET['display']) && $_GET['display'] == 'state') {
-	$xsl->AddFragment(WorkflowSchedule::getAllXml(array('active'=>1)));
+	$xml = $xsl->Api('workflow_schedules', 'list'); //TODO : filtre active only
 	$xsl->SetParameter('DISPLAY', 'state');
 }
 else{
-	$xsl->AddFragment(WorkflowSchedule::getAllXml());
+	$xml = $xsl->Api('workflow_schedules', 'list');
 	$xsl->SetParameter('DISPLAY', 'settings');
 }
-$xsl->AddFragment(WorkflowSchedule::GetAllLastExecution());
+$xsl->AddFragment(['schedules' => $xml]);
 
-$xsl->AddFragment(Workflow::getAllXml());
 
-require 'conf/queueing.php';
+$dom = new DOMDocument();
+$dom->loadXML($xml);
+$xpath = new DOMXpath($dom);
+$schedules = $xpath->evaluate('/response/workflow_schedule/@id');
+foreach($schedules as $schedule){
+	$xsl->AddFragment(["workflow-schedules-instance" => $evqueue->Api("instances", "list", ['filter_schedule_id' => $schedule->nodeValue, 'limit' => 1])]);
+}
+
+$xsl->AddFragment(["workflows" => $xsl->Api("workflows", "list")]);
+
+$xsl->AddFragment(["status" => $xsl->Api("status", "query", ['type' => 'scheduler'])]);
+
+/*
 foreach ($QUEUEING as $node_name => $conf) {
 	$wfi = new WorkflowInstance($node_name);
 	$next_exec_time = $wfi->GetNextExecutionTime();
 	if ($next_exec_time)
 		$xsl->AddFragment($next_exec_time);
-}
+}*/
 
 $xsl->DisplayXHTML('xsl/list_workflow_schedules.xsl');
 

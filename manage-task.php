@@ -21,10 +21,7 @@
 require_once 'inc/auth_check.php';
 require_once 'inc/logger.php';
 require_once 'lib/XSLEngine.php';
-require_once 'lib/WebserviceWrapper.php';
-require_once 'lib/workflow_instance.php';
-require_once 'bo/BO_task.php';
-require_once 'utils/xml_utils.php';
+//require_once 'utils/xml_utils.php';
 
 
 $xml_error = "";
@@ -58,7 +55,7 @@ if (isset($_GET["task_id"]) && ($_GET["task_id"] != '')){
 if ($xml_error)
 	$xsl->AddFragment($xml_error);
 
-$xsl->AddFragment(Task::getAllGroupXml());
+$xsl->AddFragment(getAllTaskGroupXml());
 
 $xsl->DisplayXHTML('xsl/manage_task.xsl');
 

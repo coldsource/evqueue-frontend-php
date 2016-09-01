@@ -27,8 +27,8 @@ function evqueueAPI(element, group, action, attributes = [], parameters = [], no
 	});
 }
 
-function commit(element, name, force = 'no'){
+function commit(element, name, group = 'workflow', force = 'no'){
 	var log = window.prompt('Commit log :');
-	evqueueAPI(element, 'git', 'save_workflow', { 'name':name, 'commit_log':log, 'force':force });
+	evqueueAPI(element, 'git', 'save_'+group, { 'name':name, 'commit_log':log, 'force':force });
 	location.reload();
 }
