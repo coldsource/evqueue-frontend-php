@@ -25,45 +25,69 @@ require_once 'lib/XSLEngine.php';
 
 $xsl = new XSLEngine();
 
+if(isset($_GET['action']))
+	$_POST = $_GET;
 
-if (isset($_POST['action'])) {
-	
-	if (isset($_POST['rights'])) {
-		$rights = array();
-		foreach ($_POST['rights'] as $right) {
-			preg_match('/^(edit|read|exec|kill|del)(\d+)$/', $right, $m);
-			list($m, $action, $wfid) = $m;
-
-			$rights[$wfid][$action] = 1;
+if(isset($_POST['action'])) {
+	try
+	{
+		if($_POST['action']=='deleteUser')
+		{
+			$xsl->Api('user','delete',['name'=>$_POST['login']]);
 		}
-		$_POST['rights'] = $rights;
+		
+		if($_POST['action']=='createUser')
+		{
+			if($_POST['password']!=$_POST['password2'])
+				$xsl->AddError("Passwords do not match");
+			
+			if(!$xsl->HasError())
+				$xsl->Api('user','create',['name'=>$_POST['login'], 'password'=>$_POST['password'], 'profile'=>$_POST['profile']]);
+		}
+		
+		if(!$xsl->HasError() && ($_POST['action']=='createUser' || $_POST['action']=='editRights'))
+		{
+			$rights = array();
+			if (isset($_POST['rights'])) {
+				foreach ($_POST['rights'] as $right) {
+					preg_match('/^(edit|read|exec|kill)(\d+)$/', $right, $m);
+					list($m, $action, $wfid) = $m;
+
+					$rights[$wfid][$action] = 1;
+				}
+			}
+			
+			
+			foreach($rights as $wfid=>$wf_rights)
+			{
+				$xsl->Api('user', 'grant', [
+					'name' => $_POST['login'],
+					'workflow_id'=> $wfid,
+					'edit' => (isset($wf_rights['edit']) && $wf_rights['edit'])?'yes':'no',
+					'read' => (isset($wf_rights['read']) && $wf_rights['read'])?'yes':'no',
+					'exec' => (isset($wf_rights['exec']) && $wf_rights['exec'])?'yes':'no',
+					'kill' => (isset($wf_rights['kill']) && $wf_rights['kill'])?'yes':'no',
+				]);
+			}
+		}
+		
+		if(!$xsl->HasError())
+		{
+			header('Location: list-users.php');
+			die();
+		}
 	}
-	
-	// Force posted login to session login while editing one's password
-	if ($_POST['action'] == 'chpwd')
-		$_POST['login'] = $_SESSION['user_login'];
-	
-	$user = new User($_POST['action']=='createUser' ? false : $_POST['login']);
-	$errors = $user->check_values($_POST,true);
-	
-	if ($errors === true) {
-		header('Location: list-users.php');
-		die();
-	} else {
-		$xsl->AddErrors($errors);
-	}
+	catch(Exception $e) {}
 }
 
-$xml = $evqueue->Api('user', 'get', ['name' => $_GET['user_login']]);
-$xsl->AddFragment(['response-user' => $xml]);
+if(isset($_GET['user_login']))
+{
+	$xml = $xsl->Api('user', 'get', ['name' => $_GET['user_login']]);
+	$xsl->AddFragment(['response-user' => $xml]);
+}
 
-$xml = $evqueue->Api("workflows", "list");
+$xml = $xsl->Api("workflows", "list");
 $xsl->AddFragment(["workflows" => $xml]);
 
-$xsl->AddFragment('<rights><right action="edit" /><right action="read" /><right action="exec" /><right action="kill" /></rights>');
-
-
 $xsl->DisplayXHTML('xsl/manage_user.xsl');
-
-
 ?>

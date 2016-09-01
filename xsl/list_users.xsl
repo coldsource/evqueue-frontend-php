@@ -18,8 +18,8 @@
 			<table>
 				<tr>
 					<th>Login</th>
-					<th>Profile</th>
-					<th class="thActions">Actions</th>
+					<th style='width:6em'>Profile</th>
+					<th class="thActions" style="width:60px;">Actions</th>
 				</tr>
 				
 				<xsl:for-each select="/page/users/user">
@@ -27,13 +27,13 @@
 						<td>
 							<xsl:value-of select="@name" />
 						</td>
-						<td>
+						<td class="center">
 							<xsl:value-of select="@profile" />
 						</td>
 						<td class="tdActions">
-							<a href="manage-user.php?user_login={@name}">
-								<img src="images/edit.gif"  />
-							</a>
+							<a href="manage-user.php?user_login={@name}"><img src="images/edit.gif"  /></a>
+							&#160;
+							<a href="manage-user.php?action=deleteUser&amp;login={@name}"><img src="images/delete.gif"  /></a>
 						</td>
 					</tr>
 				</xsl:for-each>
