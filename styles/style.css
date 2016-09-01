@@ -218,6 +218,42 @@ table.unstyled tr, table.unstyled td {
 .vat {
   vertical-align: top; }
 
+/* Global styles for forms */
+div.formdiv form {
+  display:block;
+  align:center;
+}
+
+div.formdiv label {
+  min-width: 15em;
+  display: inline-block;
+  text-align: right;
+  margin-right:1em;
+}
+
+div.formdiv input {
+  min-width:20em;
+}
+
+div.formdiv input[type='submit'] {
+  min-width:10em;
+  display:block;
+  margin-left:19em;
+  margin-top:1em;
+}
+
+div.formdiv input[type='checkbox'] {
+  min-width:3em;
+}
+
+div.formdiv select {
+  min-width:20em;
+}
+
+div#specificRights {
+ padding-left:16em;
+}
+
 /* Login page */
 form.loginFields {
   margin-top: 100px;
@@ -386,10 +422,6 @@ div.infoBloc {
   padding: 5px 10px;
   border-radius: 5px;
   margin: 15px -5px; }
-
-label.formLabel {
-  min-width: 11em;
-  display: inline-block; }
 
 label.forTextarea {
   vertical-align: top;
