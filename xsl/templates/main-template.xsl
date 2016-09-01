@@ -6,6 +6,9 @@
 	<xsl:param name="javascript" select="''" />
 	<xsl:param name="SITE_BASE" select="''" />
 	
+	<xsl:param name="ISFORM" select="''" />
+	<xsl:param name="FORMTITLE" select="''" />
+	
 	<xsl:template match="/">
 		<xsl:param name="title" select="'Workflow'" />
 		<html>
@@ -46,83 +49,25 @@
 			</head>
 			<body>
 				<xsl:if test="$topmenu != ''">
-					<ul class="topmenu">
-						<li class="logo"><a href="{$SITE_BASE}index.php">evQueue</a></li>
-						<li id="system-state">
-							<xsl:if test="$topmenu='system-state'"><xsl:attribute name="class">selected</xsl:attribute></xsl:if>
-							System state
-						</li>
-						<li id="settings">
-							<xsl:if test="$topmenu='settings'"><xsl:attribute name="class">selected</xsl:attribute></xsl:if>
-							Settings
-						</li>
-						<li id="notifications">
-							<xsl:if test="$topmenu='notifications'"><xsl:attribute name="class">selected</xsl:attribute></xsl:if>
-							Notifications
-						</li>
-						<li id="logging">
-							<xsl:if test="$topmenu='logging'"><xsl:attribute name="class">selected</xsl:attribute></xsl:if>
-							Logging
-						</li>
-						<xsl:choose>
-							<xsl:when test="/page/session/workflow/@original-id = 'new'">
-								<li><a style="color: #51d551;" href="{$SITE_BASE}manage-workflow-gui.php">Creating workflow</a></li>
-							</xsl:when>
-							<xsl:when test="count(/page/session/workflow/@original-id) > 0">
-								<li><a style="color: #51d551;" href="{$SITE_BASE}manage-workflow-gui.php?workflow_id={/page/session/workflow/@original-id}">Editing workflow <xsl:value-of select="/page/session/workflow/@original-id" /></a></li>
-							</xsl:when>
-						</xsl:choose>
-					</ul>
-					<ul class="submenu" id="submenu-system-state">
-						<xsl:if test="$topmenu!='system-state'"><xsl:attribute name="style">display:none;</xsl:attribute></xsl:if>
-						<li><a href="{$SITE_BASE}index.php">Workflows instances</a></li>
-						<li><a href="{$SITE_BASE}list-workflow-schedules.php?display=state">Scheduled workflows</a></li>
-						<li><a href="{$SITE_BASE}system_state.php">Queues</a></li>
-						<li><a href="{$SITE_BASE}system_statistics.php">Statistics</a></li>
-					</ul>
-					<xsl:if test="$PROFILE = 'ADMIN'">
-						<ul class="submenu" id="submenu-settings">
-							<xsl:if test="$topmenu!='settings'"><xsl:attribute name="style">display:none;</xsl:attribute></xsl:if>
-							<li><a href="{$SITE_BASE}list-tasks.php">Tasks</a></li>
-							<li><a href="{$SITE_BASE}list-workflows.php">Workflows</a></li>
-							<li><a href="{$SITE_BASE}list-workflow-schedules.php?display=settings">Scheduled workflows</a></li>
-							<li><a href="{$SITE_BASE}list-schedules.php">Retry Schedules</a></li>
-							<li><a href="{$SITE_BASE}list-queues.php">Queues</a></li>
-							<li><a href="{$SITE_BASE}list-users.php">Users</a></li>
-							<li><a href="{$SITE_BASE}system_configuration.php">Running configuration</a></li>
-						</ul>
-						<ul class="submenu" id="submenu-notifications">
-							<xsl:if test="$topmenu!='notifications'"><xsl:attribute name="style">display:none;</xsl:attribute></xsl:if>
-							<li><a href="{$SITE_BASE}plugins/notifications/">Configure</a></li>
-							<li><a href="{$SITE_BASE}plugins/notifications/plugins.php">Manage plugins</a></li>
-						</ul>
-						<ul class="submenu" id="submenu-logging">
-							<xsl:if test="$topmenu!='logging'"><xsl:attribute name="style">display:none;</xsl:attribute></xsl:if>
-							<li><a href="{$SITE_BASE}view-logs.php">Engine logs</a></li>
-							<li><a href="{$SITE_BASE}logs/log.html">Interface logs</a></li>
-						</ul>
-					</xsl:if>
-					
-					<xsl:choose>
-						<xsl:when test="count(/page/private/logged-in-user) > 0">
-							<div id="userInfo">
-								<span><xsl:value-of select="/page/private/logged-in-user/@login" /></span>
-								<xsl:text>&#160;</xsl:text>
-								<a href="{$SITE_BASE}manage-user.php?user_login={/page/private/logged-in-user/@login}" title="Edit">
-									<img src="{$SITE_BASE}images/edit.png" />
-								</a>
-								<xsl:text>&#160;</xsl:text>
-								<a href="{$SITE_BASE}auth.php?action=logout" title="Log out">
-									<img src="{$SITE_BASE}images/logout.png" />
-								</a>
-							</div>
-						</xsl:when>
-					</xsl:choose>
+					<xsl:call-template name="topmenu" />
 				</xsl:if>
 				
-				<div class="content">
-					<xsl:call-template name="content" />
-				</div>
+				<!-- Form page -->
+				<xsl:if test="$ISFORM = '1'">
+					<div class="contentManage">
+						<div class="boxTitle"><xsl:value-of select="$FORMTITLE" /></div>
+						<div class="formdiv">
+							<xsl:call-template name="content" />
+						</div>
+					</div>
+				</xsl:if>
+				
+				<!-- Display page -->
+				<xsl:if test="$ISFORM != '1'">
+					<div class="content">
+						<xsl:call-template name="content" />
+					</div>
+				</xsl:if>
 				
 				<div id="footer">
 					Licensed under GPLv3 (<a href="http://evqueue.net">evqueue.net</a>)
@@ -164,6 +109,81 @@
 				</xsl:for-each>
 			</div>
 		</xsl:if>
+	</xsl:template>
+	
+	<xsl:template name="topmenu">
+		<ul class="topmenu">
+			<li class="logo"><a href="{$SITE_BASE}index.php">evQueue</a></li>
+			<li id="system-state">
+				<xsl:if test="$topmenu='system-state'"><xsl:attribute name="class">selected</xsl:attribute></xsl:if>
+				System state
+			</li>
+			<li id="settings">
+				<xsl:if test="$topmenu='settings'"><xsl:attribute name="class">selected</xsl:attribute></xsl:if>
+				Settings
+			</li>
+			<li id="notifications">
+				<xsl:if test="$topmenu='notifications'"><xsl:attribute name="class">selected</xsl:attribute></xsl:if>
+				Notifications
+			</li>
+			<li id="logging">
+				<xsl:if test="$topmenu='logging'"><xsl:attribute name="class">selected</xsl:attribute></xsl:if>
+				Logging
+			</li>
+			<xsl:choose>
+				<xsl:when test="/page/session/workflow/@original-id = 'new'">
+					<li><a style="color: #51d551;" href="{$SITE_BASE}manage-workflow-gui.php">Creating workflow</a></li>
+				</xsl:when>
+				<xsl:when test="count(/page/session/workflow/@original-id) > 0">
+					<li><a style="color: #51d551;" href="{$SITE_BASE}manage-workflow-gui.php?workflow_id={/page/session/workflow/@original-id}">Editing workflow <xsl:value-of select="/page/session/workflow/@original-id" /></a></li>
+				</xsl:when>
+			</xsl:choose>
+		</ul>
+		<ul class="submenu" id="submenu-system-state">
+			<xsl:if test="$topmenu!='system-state'"><xsl:attribute name="style">display:none;</xsl:attribute></xsl:if>
+			<li><a href="{$SITE_BASE}index.php">Workflows instances</a></li>
+			<li><a href="{$SITE_BASE}list-workflow-schedules.php?display=state">Scheduled workflows</a></li>
+			<li><a href="{$SITE_BASE}system_state.php">Queues</a></li>
+			<li><a href="{$SITE_BASE}system_statistics.php">Statistics</a></li>
+		</ul>
+		<xsl:if test="$PROFILE = 'ADMIN'">
+			<ul class="submenu" id="submenu-settings">
+				<xsl:if test="$topmenu!='settings'"><xsl:attribute name="style">display:none;</xsl:attribute></xsl:if>
+				<li><a href="{$SITE_BASE}list-tasks.php">Tasks</a></li>
+				<li><a href="{$SITE_BASE}list-workflows.php">Workflows</a></li>
+				<li><a href="{$SITE_BASE}list-workflow-schedules.php?display=settings">Scheduled workflows</a></li>
+				<li><a href="{$SITE_BASE}list-schedules.php">Retry Schedules</a></li>
+				<li><a href="{$SITE_BASE}list-queues.php">Queues</a></li>
+				<li><a href="{$SITE_BASE}list-users.php">Users</a></li>
+				<li><a href="{$SITE_BASE}system_configuration.php">Running configuration</a></li>
+			</ul>
+			<ul class="submenu" id="submenu-notifications">
+				<xsl:if test="$topmenu!='notifications'"><xsl:attribute name="style">display:none;</xsl:attribute></xsl:if>
+				<li><a href="{$SITE_BASE}plugins/notifications/">Configure</a></li>
+				<li><a href="{$SITE_BASE}plugins/notifications/plugins.php">Manage plugins</a></li>
+			</ul>
+			<ul class="submenu" id="submenu-logging">
+				<xsl:if test="$topmenu!='logging'"><xsl:attribute name="style">display:none;</xsl:attribute></xsl:if>
+				<li><a href="{$SITE_BASE}view-logs.php">Engine logs</a></li>
+				<li><a href="{$SITE_BASE}logs/log.html">Interface logs</a></li>
+			</ul>
+		</xsl:if>
+		
+		<xsl:choose>
+			<xsl:when test="count(/page/private/logged-in-user) > 0">
+				<div id="userInfo">
+					<span><xsl:value-of select="/page/private/logged-in-user/@login" /></span>
+					<xsl:text>&#160;</xsl:text>
+					<a href="{$SITE_BASE}manage-user.php?user_login={/page/private/logged-in-user/@login}" title="Edit">
+						<img src="{$SITE_BASE}images/edit.png" />
+					</a>
+					<xsl:text>&#160;</xsl:text>
+					<a href="{$SITE_BASE}auth.php?action=logout" title="Log out">
+						<img src="{$SITE_BASE}images/logout.png" />
+					</a>
+				</div>
+			</xsl:when>
+		</xsl:choose>
 	</xsl:template>
 
 </xsl:stylesheet>

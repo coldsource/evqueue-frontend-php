@@ -24,10 +24,8 @@ require_once 'lib/XSLEngine.php';
 
 
 $xsl = new XSLEngine();
-$xml = $evqueue->Api("users", "list");
+$xml = $xsl->Api("users", "list");
 $xsl->AddFragment(["users" => $xml]);
 
 $xsl->DisplayXHTML('xsl/list_users.xsl');
-
-
 ?>

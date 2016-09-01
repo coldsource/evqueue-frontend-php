@@ -3,9 +3,13 @@
 	<xsl:import href="templates/main-template.xsl" />
 	
 	<xsl:variable name="topmenu" select="'settings'" />
-	<xsl:variable name="creation">
-		<xsl:if test="/page/user/@login = ''">1</xsl:if>
-	</xsl:variable>
+	<xsl:variable name="creation"><xsl:if test="count(/page/response-user) = 0">1</xsl:if></xsl:variable>
+	
+	<xsl:param name="ISFORM">1</xsl:param>
+	<xsl:param name="FORMTITLE">
+		<xsl:if test="$creation = 1">Create a new user</xsl:if>
+		<xsl:if test="$creation != 1">Edit user</xsl:if>
+	</xsl:param>
 	
 	<xsl:template name="content">
 		
@@ -19,40 +23,33 @@
 					<input type="hidden" name="action" value="createUser" />
 					
 					<p>
-						<label class="formLabel">Login: </label>
+						<label>Login:</label>
 						<input name="login" placeholder="Enter new login" value="{/page/post/@login}" autocomplete="off" />
 					</p>
 					<p>
-						<label class="formLabel">Profile: </label>
+						<label>Profile:</label>
 						<select name="profile" onchange="profileChanged();">
 							<option value="ADMIN">ADMIN</option>
-							<option value="REGULAR_EVERYDAY_NORMAL_GUY">
-								<xsl:if test="/page/post/@profile = 'REGULAR_EVERYDAY_NORMAL_GUY'">
+							<option value="USER">
+								<xsl:if test="/page/post/@profile = 'USER'">
 									<xsl:attribute name="selected">selected</xsl:attribute>
 								</xsl:if>
-								REGULAR_EVERYDAY_NORMAL_GUY
+								USER
 							</option>
 						</select>
 						
-						<script type="text/javascript">
-							$(document).ready(profileChanged);
-							
-							function profileChanged () {
-								var profile = $('select[name=profile] option:checked').val();
-								if (profile == 'ADMIN') {
-									$('#specificRights').hide();
-									$('#adminRights').show();
-								} else {
-									$('#specificRights').show();
-									$('#adminRights').hide();
-								}
-							}
-						</script>
 					</p>
 					
 					<p>
-						<xsl:call-template name="new-password-fields" />
+						<label>Password:</label>
+						<input type="password" name="password" placeholder="Password" />
 					</p>
+					
+					<p>
+						<label>Confirm password:</label>
+						<input type="password" name="password2" placeholder="Confirm password" />
+					</p>
+					
 					<xsl:call-template name="rights" />
 					
 					<input type="submit" value="Create User" />
@@ -61,57 +58,53 @@
 			
 			<!-- USER EDITION -->
 			<xsl:otherwise>
-				<p>
-					<label class="formLabel">Login: </label>
-					<xsl:value-of select="/page/response-user/user/@name" />
-				</p>
-				<p>
-					<label class="formLabel">Profile: </label>
-					<xsl:value-of select="/page/response-user/user/@profile" />
-				</p>
-				
-				<!-- Change Password Form -->
-				<xsl:if test="/page/response-user/user/@name = $LOGIN">
+				<form method="post">
 					<p>
-						<b>Change password</b>
+						<label>Login: </label>
+						<xsl:value-of select="/page/response-user/user/@name" />
 					</p>
 					<p>
-						<xsl:if test="/page/post/@action = 'chpwd' and count(/page/errors/error) = 0">
-							<p class="success">
-								Your password was changed successfully
-							</p>
-						</xsl:if>
-						
-						<form method="post">
-							<input type="hidden" name="action" value="chpwd" />
-							<input type="hidden" name="login" value="{$LOGIN}" />
-							<label class="formLabel">Current Password: </label>
-							<input type="password" name="current_password" placeholder="Current Password" />
-							<br/>
-							<xsl:call-template name="new-password-fields" />
-							<input type="submit" value="Change Password" />
-						</form>
+						<label>Profile: </label>
+						<xsl:value-of select="/page/response-user/user/@profile" />
 					</p>
-				</xsl:if>
-				
-				<xsl:call-template name="rights" />
+					
+					<xsl:call-template name="rights" />
+					
+					<input type="submit" value="Save user" />
+				</form>
 			</xsl:otherwise>
 		</xsl:choose>
 	</xsl:template>
 	
 	
 	<xsl:template name="rights">
+		<script type="text/javascript">
+			$(document).ready(profileChanged);
+			
+			function profileChanged () {
+				var profile = $('select[name=profile] option:checked').val();
+				if (profile == 'ADMIN') {
+					$('#specificRights').hide();
+					$('#adminRights').show();
+				} else {
+					$('#specificRights').show();
+					$('#adminRights').hide();
+				}
+			}
+		</script>
+	
 		<!-- ADMIN -->
 		<p>
 			<label class="formLabel">
-				<b>Rights</b>
+				<b>User rights</b>
 			</label>
-		</p>
+		
 		<div id="adminRights">
 			<xsl:if test="$creation = 1 or /page/user/@profile = 'ADMIN'">
 				All rights on everything (admin)
 			</xsl:if>
 		</div>
+		</p>
 		
 		<!-- PROFILE USER -->
 		<div id="specificRights">
@@ -120,23 +113,12 @@
 					<xsl:call-template name="rightsTable" />
 				</xsl:when>
 				<xsl:when test="/page/response-user/user/@profile != 'ADMIN' and $PROFILE = 'ADMIN'">
-					<form method="post">
-						<input type="hidden" name="action" value="editRights" />
-						<input type="hidden" name="login" value="{/page/response-user/user/@name}" />
-						<xsl:call-template name="rightsTable" />
-						<input type="submit" value="Save Rights" />
-					</form>
+					<input type="hidden" name="action" value="editRights" />
+					<input type="hidden" name="login" value="{/page/response-user/user/@name}" />
+					<xsl:call-template name="rightsTable" />
 				</xsl:when>
 			</xsl:choose>
 		</div>
-	</xsl:template>
-	
-	
-	<xsl:template name="new-password-fields">
-		<label class="formLabel">New Password: </label>
-		<input type="password" name="password" placeholder="New Password" />
-		<input type="password" name="password2" placeholder="Confirm New Password" />
-		<br/>
 	</xsl:template>
 	
 	
@@ -145,26 +127,44 @@
 			<tbody>
 				<tr>
 					<th>Workflow</th>
-					<xsl:for-each select="/page/ rights/right">
-						<th>
-							<xsl:value-of select="@action" />
-						</th>
-					</xsl:for-each>
+					<th>read</th>
+					<th>exec</th>
+					<th>edit</th>
+					<th>kill</th>
 				</tr>
 				<xsl:for-each select="/page/workflows/workflow">
 					<xsl:variable name="wfid" select="@id" />
 					
 					<tr>
 						<td><xsl:value-of select="@name" /></td>
-						<xsl:for-each select="/page/rights/right">
-							<td>
-								<input type="checkbox" name="rights[]" value="{@action}{$wfid}">
-									<xsl:if test="/page/user/workflow[@wfid = $wfid]/right[@action = current()/@action] = 1">
-										<xsl:attribute name="checked">checked</xsl:attribute>
-									</xsl:if>
-								</input>
-							</td>
-						</xsl:for-each>
+						<td>
+							<input type="checkbox" name="rights[]" value="read{$wfid}">
+								<xsl:if test="/page/response-user/user/right[@workflow-id = $wfid]/@read = 'yes'">
+									<xsl:attribute name="checked">checked</xsl:attribute>
+								</xsl:if>
+							</input>
+						</td>
+						<td>
+							<input type="checkbox" name="rights[]" value="exec{$wfid}">
+								<xsl:if test="/page/response-user/user/right[@workflow-id = $wfid]/@exec = 'yes'">
+									<xsl:attribute name="checked">checked</xsl:attribute>
+								</xsl:if>
+							</input>
+						</td>
+						<td>
+							<input type="checkbox" name="rights[]" value="edit{$wfid}">
+								<xsl:if test="/page/response-user/user/right[@workflow-id = $wfid]/@edit = 'yes'">
+									<xsl:attribute name="checked">checked</xsl:attribute>
+								</xsl:if>
+							</input>
+						</td>
+						<td>
+							<input type="checkbox" name="rights[]" value="kill{$wfid}">
+								<xsl:if test="/page/response-user/user/right[@workflow-id = $wfid]/@kill = 'yes'">
+									<xsl:attribute name="checked">checked</xsl:attribute>
+								</xsl:if>
+							</input>
+						</td>
 					</tr>
 				</xsl:for-each>
 			</tbody>
