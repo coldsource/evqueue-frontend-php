@@ -149,7 +149,7 @@ $(function() {
 		minLength:0
     }).bind('focus', function(){ $(this).autocomplete("search"); } );
 	
-    $( "input#task_group" ).autocomplete({
+    $( "input#group" ).autocomplete({
         source: availableTags,
 		minLength:0
     }).bind('focus', function(){ $(this).autocomplete("search"); } );

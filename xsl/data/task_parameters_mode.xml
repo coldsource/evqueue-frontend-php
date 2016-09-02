@@ -2,5 +2,4 @@
 <task_parameters_modes>
 	<task_parameters_mode value="ENV">ENV</task_parameters_mode>
 	<task_parameters_mode value="CMDLINE">CMDLINE</task_parameters_mode>
-	<task_parameters_mode value="PIPE">PIPE</task_parameters_mode>
 </task_parameters_modes>

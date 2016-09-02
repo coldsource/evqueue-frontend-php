@@ -47,7 +47,7 @@ function getAllTaskGroup(){
 	$dom = new DOMDocument();
 	$dom->loadXML($xml);
 	$xpath = new DOMXPath($dom);
-	$groupsDOM = $xpath->evaluate('/response/tasks/@group');
+	$groupsDOM = $xpath->evaluate('/response/task/@group');
 	foreach($groupsDOM as $groupDOM){
 		isset($groups[$groupDOM->nodeValue]) ? $groups[$groupDOM->nodeValue]++:$groups[$groupDOM->nodeValue]=1;
 	}
@@ -56,7 +56,7 @@ function getAllTaskGroup(){
 }
 
 function getAllTaskGroupXml(){
-	$res = getAllGroup();
+	$res = getAllTaskGroup();
 	$xml = '<tasks-groups>';
 	foreach ($res as $key => $value) {
 		if($value != '')
