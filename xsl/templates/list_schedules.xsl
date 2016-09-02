@@ -13,33 +13,24 @@
 			<tr>
 				<th style="width:40px;">Id</th>
 				<th>Name</th>
-				<th class="thActions">Actions</th>
+				<th class="thActions" style="width:60px;">Actions</th>
 			</tr>
 			
-			<xsl:for-each select="/page/schedules/schedule">
+			<xsl:for-each select="/page/response-schedules/schedule">
 				<tr>
 					<td class="center">
 						<xsl:value-of select="@id" />
 					</td>
 					<td>
-						<xsl:value-of select="schedule_name" />
-						<xsl:text>&#160;</xsl:text>
-						<img src="images/bigger.png" title="View retry schedule XML" class="pointer" onclick="$('#xmlcontent{@id}').dialog({{width:800}});" />
-						<div id="xmlcontent{@id}" style="display:none;">
-							<xsl:apply-templates select="schedule_xml/schedule" mode="xml_display" />
-						</div>
+						<xsl:value-of select="@name" />
 					</td>
 					<td class="center">
 						<a href="manage-schedule.php?schedule_id={@id}">
-							<img src="images/edit.gif" title="Edit retry schedule (GUI mode)" />
+							<img src="images/edit.gif" title="Edit retry schedule" />
 						</a>
 						<xsl:text>&#160;</xsl:text>
-						<a href="manage-schedule-text.php?schedule_id={@id}">
-							<img src="images/edition/edit-txt.png" title="Edit retry schedule text mode)" />
-						</a>
-						<xsl:text>&#160;</xsl:text>
-						<img src="images/delete.gif" onclick="deleteSchedule({@id})" class="pointer" />
-					</td>
+						<img data-confirm="You are about to delete schedule '{@name}'" onclick="evqueueAPI(this, 'retry_schedule', 'delete', {{ 'id':'{@id}' }});location.reload();" src="images/delete.gif"  />
+						</td>
 				</tr>
 			</xsl:for-each>
 		</table>

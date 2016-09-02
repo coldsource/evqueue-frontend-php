@@ -21,11 +21,8 @@
 require_once 'inc/auth_check.php';
 require_once 'inc/logger.php';
 require_once 'lib/XSLEngine.php';
-require_once 'bo/BO_schedule.php';
-
 
 $xsl = new XSLEngine();
-$xsl->AddFragment(Schedule::getAllXml());
+$xsl->AddFragment(['response-schedules' => $xsl->Api('retry_schedules', 'list')]);
 $xsl->DisplayXHTML('xsl/list_schedules.xsl');
-
 ?>

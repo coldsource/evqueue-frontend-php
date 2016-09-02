@@ -24,11 +24,10 @@
 			</div>		
 			<div id="Schedule" class="formdiv">
 				<xsl:call-template name="displayErrors" />
-				
 				<form name="formSchedule" id="formSchedule" action="manage-schedule.php" method="post">
-					<input type="hidden" name="schedule_id" value="{/page/schedule/@id}" />
+					<input type="hidden" name="schedule_id" value="{/page/post/@schedule_id | /page/response-schedule/schedule/@id}" />
 					<label class="formLabel" for="schedule_name">Schedule name:</label>
-					<input type="text" name="schedule_name" id="schedule_name" value="{/page/schedule/schedule/@name}" />
+					<input type="text" name="schedule_name" id="schedule_name" value="{/page/post/@schedule_name|/page/response-schedule/schedule/@name}" />
 					<br />
 					<table style="width: auto; margin-top: 15px;">
 						<tbody>
@@ -36,7 +35,8 @@
 								<td>Retry every X seconds</td>
 								<td>for Y times</td>
 							</tr>
-							<xsl:for-each select="/page/schedule/schedule/level">
+							<xsl:value-of select="/page/current-schedule/schedule" disable-output-escaping="yes" />
+							<xsl:for-each select="/page/current-schedule/schedule/level|/page/response-schedule/schedule/level">
 								<tr>
 									<td>
 										<input type="text" name="retry_delay[]" value="{@retry_delay}" />

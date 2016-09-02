@@ -21,9 +21,9 @@
 require_once 'inc/auth_check.php';
 require_once 'inc/logger.php';
 require_once 'lib/XSLEngine.php';
-require_once 'bo/BO_schedule.php';
 require_once 'lib/WebserviceWrapper.php';
 
+$xsl = new XSLEngine();
 
 $xml_error = $post_schedule_xml = "";
 if (!empty($_POST)){
@@ -31,7 +31,7 @@ if (!empty($_POST)){
 	$id = htmlspecialchars($_POST['schedule_id']);
 	$name = htmlspecialchars($_POST['schedule_name']);
 	
-	$xml = "<schedule name='$name'>";
+	$xml = "<schedule>";
 	for ($i=0; $i<count($_POST['retry_delay']); $i++) {
 		$delay = htmlspecialchars($_POST['retry_delay'][$i]);
 		$times = htmlspecialchars($_POST['retry_times'][$i]);
@@ -39,36 +39,24 @@ if (!empty($_POST)){
 	}
 	$xml .= '</schedule>';
 	
-	$ws = new WebserviceWrapper('save-schedule', 'formSchedule', array(
-			'schedule_id' => $id,
-			'schedule_name' => $name,
-			'schedule_xml' => $xml,
-	), true);
-	$ws->FetchResult();
+	if($_POST['schedule_id'])
+		$xsl->Api('retry_schedule','edit',['id'=>$_POST['schedule_id'], 'name'=>$_POST['schedule_name'], 'content'=>base64_encode($xml)]);
+	else
+		$xsl->Api('retry_schedule','create',['name'=>$_POST['schedule_name'], 'content'=>base64_encode($xml)]);
 	
-	$errors = $ws->HasErrors();
-	if ($errors !== false) {
-		$xml_error = $errors;
-		$post_schedule_xml = "<schedule id='$id'>$xml</schedule>";
-	} else {
+	if($xsl->HasError())
+	{
+		$xsl->AddFragment("<current-schedule>toto$xml</current-schedule>");
+	}
+	else {
 		header("location:list-schedules.php");
 		die();
 	}
 }
 
 
-$xsl = new XSLEngine();
-
-if (isset($_GET["schedule_id"]) && ($_GET["schedule_id"] != '')){
-	$wk = new Schedule($_GET["schedule_id"]);
-	$xsl->AddFragment($wk->getGeneratedXml());
-}
-
-if ($xml_error)
-	$xsl->AddFragment($xml_error);
-
-if ($post_schedule_xml)
-	$xsl->AddFragment($post_schedule_xml);
+if (isset($_GET["schedule_id"]) && ($_GET["schedule_id"] != ''))
+	$xsl->AddFragment(['response-schedule' => $xsl->Api('retry_schedule','get',['id'=>$_GET['schedule_id']])]);
 
 $xsl->DisplayXHTML('xsl/manage_schedule.xsl');
 
