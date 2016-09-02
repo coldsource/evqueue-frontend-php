@@ -11,7 +11,8 @@ $(document).ready( function() {
 
 function evqueueAPI(element, group, action, attributes = [], parameters = [], node = ""){
 	if ($(element).attr('data-confirm')) {
-		confirm($(element).data('confirm'));
+		if(!confirm($(element).data('confirm')))
+			return;
 	}
 	$.ajax({
 		data:{'group':group, 'action':action, 'parameters':parameters, 'attributes':attributes, 'node':node},
