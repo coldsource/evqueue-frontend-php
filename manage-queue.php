@@ -22,7 +22,6 @@ require_once 'inc/auth_check.php';
 require_once 'inc/logger.php';
 require_once 'lib/XSLEngine.php';
 require_once 'lib/WebserviceWrapper.php';
-require_once 'bo/BO_queue.php';
 require_once 'utils/xml_utils.php';
 
 
@@ -31,19 +30,19 @@ $xsl = new XSLEngine();
 
 $xml_error = "";
 if (isset($_POST) && (count($_POST)>1)){
-	$ws = new WebserviceWrapper('create-queue', 'formQueue', $_POST, true);
-	$ws->FetchResult();
+	if(!$_POST['queue_id'])
+		$xsl->Api('queue','create',['name' => $_POST['queue_name'], 'concurrency' => $_POST['queue_concurrency'], 'scheduler' => $_POST['queue_scheduler']]);
+	else
+		$xsl->Api('queue','edit',['id' => $_POST['queue_id'], 'name' => $_POST['queue_name'], 'concurrency' => $_POST['queue_concurrency'], 'scheduler' => $_POST['queue_scheduler']]);
 	
-	$xml_error = $ws->HasErrors();
-	if ($xml_error === false){
+	if (!$xsl->HasError()){
 		header("location:list-queues.php");
 		die();
 	}
 }
 
 if (isset($_GET["queue_id"]) && ($_GET["queue_id"] != '')){
-	$wk = new Queue($_GET["queue_id"]);
-	$xsl->AddFragment($wk->getGeneratedXml());
+	$xsl->AddFragment(['response-queue' => $xsl->Api('queue', 'get', ['id' => $_GET['queue_id']])]);
 }
 
 if ($xml_error)

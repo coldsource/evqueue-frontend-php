@@ -21,11 +21,10 @@
 require_once 'inc/auth_check.php';
 require_once 'inc/logger.php';
 require_once 'lib/XSLEngine.php';
-require_once 'bo/BO_queue.php';
 
 
 $xsl = new XSLEngine();
-$xsl->AddFragment(Queue::getAllXml());
+$xsl->AddFragment(['response-queues' => $xsl->Api('queuepool', 'list')]);
 $xsl->DisplayXHTML('xsl/list_queues.xsl');
 
 ?>

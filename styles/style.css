@@ -202,10 +202,6 @@ button.blue:disabled, input[type=button]:disabled, input[type=submit]:disabled {
 .spaced-h {
   margin: 0 5px; }
 
-input.large, div.formdiv input[type=text],
-div.infoBloc input[type=text] {
-  min-width: 400px; }
-
 .w100 {
   width: 100%; }
 
@@ -686,9 +682,6 @@ form p {
 
 #notices {
   color: green;
-  text-align: center; }
-
-#formQueue {
   text-align: center; }
 
 p.formtitle {

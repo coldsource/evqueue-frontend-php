@@ -5,7 +5,7 @@
 	<xsl:template name="list_queues">
 		
 		<div class="boxTitle">
-			<span class="title">Queues list (<xsl:value-of select="count(/page/queues/queue)" /> active queues, total concurrency is <xsl:value-of select="sum(/page/queues/queue/queue_concurrency)" />)</span>
+			<span class="title">Queues list (<xsl:value-of select="count(/page/response-queues/queue)" /> active queues, total concurrency is <xsl:value-of select="sum(/page/response-queues/queue/@concurrency)" />)</span>
 			<a href="manage-queue.php"><img class="action" src="images/plus3.png" title="Add new queue" /></a>
 		</div>
 		<table>
@@ -17,19 +17,19 @@
 				<th class="thActions">Actions</th>
 			</tr>
 			
-			<xsl:for-each select="/page/queues/queue">
+			<xsl:for-each select="/page/response-queues/queue">
 				<tr class="evenOdd">
 					<td class="center">
 						<xsl:value-of select="@id" />
 					</td>
 					<td>
-						<xsl:value-of select="queue_name" />
+						<xsl:value-of select="@name" />
 					</td>
 					<td class="txtcenter">
-						<xsl:value-of select="queue_scheduler" />
+						<xsl:value-of select="@scheduler" />
 					</td>
 					<td class="center">
-						<xsl:value-of select="queue_concurrency" />
+						<xsl:value-of select="@concurrency" />
 					</td>
 					<td class="tdActions">
 						<a href="manage-queue.php?queue_id={@id}">
