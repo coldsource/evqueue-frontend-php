@@ -265,6 +265,7 @@ class XSLEngine
 		catch(Exception $e)
 		{
 			$this->AddError($e->getMessage());
+			return "<response status='KO' error='".htmlspecialchars($e->getMessage())."' />";
 		}
 		
 		return "<response />";

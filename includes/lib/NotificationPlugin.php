@@ -18,11 +18,9 @@
   * Authors: Nicolas Jean, Christophe Marti 
   */
 
-require_once 'lib/workflow_instance.php';
-
-
 class NotificationPlugin {
 	private $id;
+	private $name;
 	private $relpath;
 	private $destination_folder;
 	private $filename;
@@ -31,16 +29,16 @@ class NotificationPlugin {
 	private $files;
 	private $binary;
 	
-	private $name;
 	private $description;
 	private $binary_name;
 	
-	public function __construct ($id=false,$relpath='./') {
+	public function __construct ($id=false,$name,$relpath='./') {
 		$this->id = $id;
+		$this->name = $name;
 		$this->relpath = $relpath;
 	}
 	
-	public function Install ($filename) {
+	public function Install ($xsl, $filename) {
 		if ($this->id !== false)
 			Logger::GetInstance()->Log(LOG_WARNING,'plugin.php',"Plugin already has an ID, can't install");
 		
@@ -76,27 +74,11 @@ class NotificationPlugin {
 		$this->description = $xpath->evaluate('string(/plugin/description)');
 		$this->binary_name = $xpath->evaluate('string(/plugin/binary)');
 		
-		// beware the duplicate plugin name!
-		$db = new DatabaseMySQL('queueing');
-		$db->QueryPrintf('SELECT * FROM t_notification_type WHERE notification_type_name = %s', $this->name);
-		if ($db->NumRows() > 0)
-			return array('A plugin with the same name is already installed');
-		
-		if ($this->name == '')
-			return array('This plugin has no name (must be defined in the manifest file)');
-		
-		if ($this->binary_name == '')
-			return array('This plugin has no binary (must be defined in the manifest file)');
-		
 		// binary file
 		$this->binary = $this->zip->getFromName($this->binary_name);
 		
 		if ($this->binary === false)
 			return array("Could not find the binary file '$this->binary_name'");
-		
-		// TODO: check that notification-parameters.php contains the appropriate functions?
-		// TODO: check that notification-parameters.xsl contains the appropriate templates?
-		
 		
 		/**** WRITE information, everything should have been checked before ****/
 		
@@ -108,65 +90,34 @@ class NotificationPlugin {
 			if (file_put_contents("$this->destination_folder/$file", $data) === false)
 				return array("Could not write file '$file' locally");
 		
-		$type = new NotificationType();
-		$ret = $type->check_values(array(
-				'notification_type_name' => $this->name,
-				'notification_type_description' => $this->description,
-				'notification_type_binary' => $this->binary_name,
-				'notification_type_binary_content' => $this->binary,
-		), true);
+		$xsl->Api('notification_type', 'register', [
+			'name' => $this->name,
+			'description' => $this->description,
+			'binary_content' => base64_encode($this->binary),
+			]);
 		
-		if ($ret !== true) {
-			$this->rollback($this->binary_name);
-			return array('Could not save notification type, cancelled installation (rolled back writing files locally and binary storage)');
-		}
-		
-		// ask evqueue to store the binary file (it may be running on a different host)
-		if (!WorkflowInstance::SyncNotifications()) {
-			$this->rollback();
-			return array("Could not store the binary file at evqueue's, cancelled installation (rolled back writing files locally)");
-		}
-		
-		if (!WorkflowInstance::ReloadEvqueue()) {
-			$this->rollback($this->binary_name, $type);
-			return array('Could not reload evqueue, cancelled installation (rolled back writing files locally, binary storage and notification type)');
-		}
-		
-		return true;
+		if(!$xsl->HasError())
+			$xsl->AddNotice('Installed plugin successfully!');
 	}
 	
 	private function rollback ($binary_name=null, $notification_type=null) {
 		foreach ($this->files as $file => $data)
 			system("rm $this->destination_folder/$file");
 		system("rmdir $this->destination_folder");
-		
-		if ($binary_name)
-			WorkflowInstance::DeleteFile($binary_name);
-		
-		if ($notification_type)
-			$notification_type->delete();
 	}
 	
-	public function Delete () {
-		$type = new NotificationType($this->id);
-		$name = $type->getName();
+	public function Delete ($xsl) {
+		// 1. Unregister plugin in evQueue engine
+		$xsl->Api('notification_type', 'unregister', ['id'=>$this->id]);
 		
-		// 1. Delete remote binary at evqueue's
-		if (!WorkflowInstance::DeleteFile($type->getBinary()))
-			return array("Can't remove remote file at evqueue's");
-		
-		// 2. Delete entry from t_notification_type
-		$type->delete();
-		
-		// 3. Delete local files
-		$plugin_folder = "$this->relpath/plugins/notifications/$name/";
+		// 2. Delete local files
+		$plugin_folder = "$this->relpath/plugins/notifications/$this->name/";
 		foreach (array('manifest.xml','notification-parameters.php','notification-parameters.xsl') as $file)
 			system("rm $plugin_folder/$file");
 		system("rmdir $plugin_folder");
 		
-		// 4. Reload EvQueue
-		WorkflowInstance::ReloadEvqueue();
-		return true;
+		if(!$xsl->HasError())
+			$xsl->AddNotice('Uninstalled plugin successfully!');
 	}
 }
 

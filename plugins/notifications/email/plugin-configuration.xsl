@@ -7,6 +7,7 @@
 		<table>
 			<tr>
 				<td colspan="4">
+					<input type="hidden" name="id" value="{/page/get/@id}"/>
 					<input type="hidden" name="type_notif" value="email"/>
 					<label class="formLabel"><i>From:</i> field</label>
 					<input type="text" name="from" value="{/page/notification-type/email}" placeholder="E-mail From" /> <br/>

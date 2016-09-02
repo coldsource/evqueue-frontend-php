@@ -19,10 +19,8 @@
   */
 
 require_once 'inc/auth_check.php';
-
 require_once 'inc/logger.php';
 require_once 'lib/XSLEngine.php';
-require_once 'lib/workflow_instance.php';
 
 $action = $_GET['action'];
 $type = $_GET['type'];
@@ -30,17 +28,21 @@ $type = $_GET['type'];
 require_once '../'.$type.'/plugin-configuration.php';
 
 $conf = new PluginConfiguration();
+
 $xsl = new XSLEngine();
+$xsl->SetParameter('SITE_BASE','../../');
 
 
 if( $action == 'edit'){
-	$fichier = WorkflowInstance::GetConfFile($type.'.conf.php');
-	$contenu = $conf->read($fichier);
-	$xsl->AddFragment( $contenu );
+	$xml = $xsl->Api('notification_type','get_conf',['id' => $_GET['id']]);
+	$content = (string)simplexml_load_string($xml)->{'conf'}['content'];
+	$content_xml = $conf->read(base64_decode($content));
+	$xsl->AddFragment( $content_xml );
 	
 }else if( $action == 'save' ){
-	$texte = $conf->write($_POST); // récupération des données
-	WorkflowInstance::StoreConfFile($type.'.conf.php', $texte); // Ecriture des données dans le serveur
+	$content = $conf->write($_POST); // récupération des données
+	echo "saving $content";
+	$xsl->Api('notification_type','set_conf',['id' => $_POST['id'], 'content'=>base64_encode($content)]);
 }
 
 $xsl->DisplayXHTML('../'.$type.'/plugin-configuration.xsl');

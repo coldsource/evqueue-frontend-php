@@ -17,7 +17,7 @@ class PluginConfiguration{
 		@eval('?>'.$str);
 		
 		$xml = '<notification-type>';
-		$xml .= '<email>'.htmlspecialchars($EMAIL_CONFIG['from']).'</email>';
+		$xml .= '<email>'.htmlspecialchars(isset($EMAIL_CONFIG['from'])?$EMAIL_CONFIG['from']:'').'</email>';
 		$xml .= '</notification-type>';
 		
 		return $xml;

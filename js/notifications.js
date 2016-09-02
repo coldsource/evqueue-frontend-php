@@ -30,7 +30,7 @@ function editNotif (button) {
 
 function deleteNotif (id) {
 	if (confirm('Delete notif '+id+'?'))
-		wsfwd({
+		wsfwd('plugins/notifications/ajax/notification.php',{
 			params: {
 				form_id: 'deleteNotif',
 				id: id
@@ -46,7 +46,7 @@ function saveNotif (button) {
 	var params = tr.find(':input').serializeArray();
 	params.push({name: 'form_id', value: 'saveNotif'});
 	
-	wsfwd({
+	wsfwd('plugins/notifications/ajax/notification.php',{
 		params: params,
 		success: function () {
 			window.location.reload();

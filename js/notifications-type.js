@@ -6,9 +6,10 @@ $(document).ready( function () {
 function editNotifType (button) {
 	var tr = button.parents('tr:first');
 	var name = tr.find('td[data-param=name]').data('value');
+	var id = tr.find('td[data-param=id]').data('value');
 	
 	removeActionButtons();
-	$('tr.parameters').show().load('ajax/notification-type.php?type='+name+'&action=edit');
+	$('tr.parameters').show().load('ajax/notification-type.php?type='+name+'&action=edit'+'&id='+id);
 }
 
 function saveNotifType (button) {
