@@ -104,18 +104,19 @@ function ajaxDelete(objAction,id,newurl,params){
  *		success: an option function to execute in case of WS execution without error
  * }
  */
-function wsfwd (options) {
+function wsfwd (url,options) {
 	$.ajax({
 		type: 'POST',
-		url: site_base+'ajax/wsfwd.php',
+		url: site_base+url,
 		data: options.params,
 		dataType: 'xml',
 		success: function(content){
-			
 			// success
 			if ( $(content).find('error').length == 0 ) {
 				if (options.success)
+				{
 					options.success(content);
+				}
 			}
 			
 			// errors?
@@ -125,7 +126,7 @@ function wsfwd (options) {
 					case 'confirm':
 						if (confirm($(this).text())) {
 							options.params.confirm = 'yes';
-							wsfwd(options);
+							wsfwd(url,options);
 						}
 						break;
 						

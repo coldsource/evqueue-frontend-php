@@ -44,6 +44,7 @@ class XSLEngine
 	protected $xmldoc;
 	protected $root_node;
 	protected $errors_node;
+	protected $notices_node;
 	protected $parameters = [];
 	protected $display_xml;
 	protected $instruction = "<!doctype html>"; //doctype, xml...
@@ -62,6 +63,10 @@ class XSLEngine
 		// Errors
 		$this->errors_node = $this->xmldoc->createElement('errors');
 		$this->root_node->appendChild($this->errors_node);
+		
+		// Notices
+		$this->notices_node = $this->xmldoc->createElement('notices');
+		$this->root_node->appendChild($this->notices_node);
 
 		// GET et POST
 		$get_node = $this->xmldoc->createElement('get');
@@ -127,6 +132,12 @@ class XSLEngine
 	{
 		$error_node = $this->xmldoc->createElement('error',$error);
 		$this->errors_node->appendChild($error_node);
+	}
+	
+	public function AddNotice($error)
+	{
+		$notice_node = $this->xmldoc->createElement('notice',$error);
+		$this->notices_node->appendChild($notice_node);
 	}
 
 	/*
@@ -254,13 +265,14 @@ class XSLEngine
 		catch(Exception $e)
 		{
 			$this->AddError($e->getMessage());
+			return "<response status='KO' error='".htmlspecialchars($e->getMessage())."' />";
 		}
 		
 		return "<response />";
 	}
 	
 	public function HasError(){
-		$xpath = new DOMXpath($this->xmldoc);		
+		$xpath = new DOMXpath($this->xmldoc);
 		if($xpath->evaluate("count(/page/errors/error)"))
 		   return true;
 		return false;

@@ -41,8 +41,8 @@
 								
 								<td>
 										<select name="type_id">
-											<xsl:for-each select="/page/notification-types/notification-type">
-												<option value="{@id}"><xsl:value-of select="name" /></option>
+											<xsl:for-each select="/page/response-notification-types/notification_type">
+												<option value="{@id}"><xsl:value-of select="@name" /></option>
 											</xsl:for-each>
 										</select>
 								</td>
@@ -82,16 +82,16 @@
 				</tr>
 				
 				<!-- Actual Lines -->
-				<xsl:for-each select="/page/notifications/notification">
+				<xsl:for-each select="/page/response-notifications/notification">
 					<tr class="evenOdd">
 						<td data-param="id" data-value="{@id}">
 							<xsl:value-of select="@id" />
 						</td>
 						<td data-param="type_id" data-value="{type-id}">
-							<xsl:value-of select="/page/notification-types/notification-type[@id = current()/type-id]/name" />
+							<xsl:value-of select="/page/response-notification-types/notification_type[@id = current()/@type_id]/@name" />
 						</td>
-						<td data-param="name" data-value="{name}">
-							<xsl:value-of select="name" />
+						<td data-param="name" data-value="{@name}">
+							<xsl:value-of select="@name" />
 						</td>
 						<td data-param="parameters">
 							...

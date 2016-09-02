@@ -19,16 +19,14 @@
   */
 
 require_once 'inc/auth_check.php';
-
 require_once 'inc/logger.php';
 require_once 'lib/XSLEngine.php';
-require_once 'bo/BO_notification.php';
-require_once 'bo/BO_notificationType.php';
 
 $xsl = new XSLEngine();
+$xsl->SetParameter('SITE_BASE','../../');
 
-$xsl->AddFragment(Notification::getAllXml());
-$xsl->AddFragment(NotificationType::getAllXml());
+$xsl->AddFragment(['response-notifications' => $xsl->Api('notifications','list')]);
+$xsl->AddFragment(['response-notification-types' => $xsl->Api('notification_types','list')]);
 
 $xsl->DisplayXHTML('index.xsl');
 

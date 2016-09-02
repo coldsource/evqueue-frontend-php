@@ -34,24 +34,25 @@
 					<th class="thActions">Actions</th>
 				</tr>
 				
-				<xsl:for-each select="/page/notification-types/notification-type">
+				<xsl:for-each select="/page/response-notifications-types/notification_type">
 					<tr class="evenOdd">
 						<td data-param="id" data-value="{@id}">
 							<xsl:value-of select="@id" />
 						</td>
-						<td data-param="name" data-value="{name}">
-							<xsl:value-of select="name" />
+						<td data-param="name" data-value="{@name}">
+							<xsl:value-of select="@name" />
 						</td>
 						<td>
-							<xsl:value-of select="description" />
+							<xsl:value-of select="@description" />
 						</td>
 						<td>
-							<xsl:value-of select="binary" />
+							<xsl:value-of select="@binary" />
 						</td>
 						<td class="tdActions">
 							<form method="post">
 								<input type="hidden" name="action" value="delete" />
 								<input type="hidden" name="plugin_id" value="{@id}" />
+								<input type="hidden" name="plugin_name" value="{@name}" />
 								<img class="action" src="{$SITE_BASE}images/edit.gif" onclick="editNotifType($(this));" title="Edit Notification type" />
 								<xsl:text>&#160;</xsl:text> 
 								<input type="image" src="{$SITE_BASE}images/delete.gif" class="action" title="Uninstall this notification plugin" />

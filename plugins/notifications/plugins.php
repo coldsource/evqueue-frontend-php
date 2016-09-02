@@ -19,39 +19,27 @@
   */
 
 require_once 'inc/auth_check.php';
-
 require_once 'inc/logger.php';
 require_once 'lib/XSLEngine.php';
-require_once 'bo/BO_notification.php';
-require_once 'bo/BO_notificationType.php';
 require_once 'lib/NotificationPlugin.php';
 
 
 $xsl = new XSLEngine();
+$xsl->SetParameter('SITE_BASE','../../');
 
 // INSTALL
 if (isset($_FILES['plugin_file'])) {
-	$plugin = new NotificationPlugin(false,'../../');
-	$errors = $plugin->Install($_FILES['plugin_file']['tmp_name']);
-	if ($errors === true)
-		$xsl->AddNotice('Installed plugin successfully!');
-	else
-		$xsl->AddError('error',$errors[0]);
+	$plugin = new NotificationPlugin(false,false,'../../');
+	$errors = $plugin->Install($xsl,$_FILES['plugin_file']['tmp_name']);
 }
 
 // UNINSTALL
 if (isset($_POST['action']) && $_POST['action'] == 'delete') {
-	$plugin = new NotificationPlugin($_POST['plugin_id'],'../../');
-	$errors = $plugin->Delete();
-	if ($errors === true)
-		$xsl->AddNotice('Uninstalled plugin successfully!');
-	else
-		$xsl->AddError('error',$errors[0]);
+	$plugin = new NotificationPlugin($_POST['plugin_id'],$_POST['plugin_name'], '../../');
+	$errors = $plugin->Delete($xsl);
 }
 
-$xsl->AddFragment(Notification::getAllXml());
-$xsl->AddFragment(NotificationType::getAllXml());
+$xsl->AddFragment(['response-notifications-types' => $xsl->Api('notification_types','list')]);
 
 $xsl->DisplayXHTML('plugins.xsl');
-
 ?>
