@@ -248,6 +248,7 @@ class evQueue {
 				throw new Exception("evQueue : authentication failed", evQueue::ERROR_AUTH_FAILED);
 		}
 		$dom = $this->build_query($name,$action,$attributes,$parameters);
+		
 		$xml = $this->exec($dom->saveXML());
 		
 		if(!isset($this->parser_root_attributes['STATUS']) || $this->parser_root_attributes['STATUS']!='OK')

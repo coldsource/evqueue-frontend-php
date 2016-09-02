@@ -24,7 +24,7 @@ function workflow_edit_method()
 {
 	$( "#workflow_edit_select" ).dialog({
 		buttons: [
-			{ text: "Simple", click: function() { window.location='manage-simple-workflow.php'; } },
+			{ text: "Simple", click: function() { window.location='manage-task.php?create_workflow=yes&parameters_mode=CMDLINE'; } },
 			{ text: "Text", click: function() { window.location='manage-workflow.php'; } },
 			{ text: "GUI", click: function() { window.location='manage-workflow-gui.php'; } }
 		]

@@ -58,6 +58,7 @@ if ($xml_error)
 	$xsl->AddFragment($xml_error);
 
 $xsl->AddFragment(getAllTaskGroupXml());
+$xsl->AddFragment(getAllGroupXml());
 
 $xsl->DisplayXHTML('xsl/manage_task.xsl');
 

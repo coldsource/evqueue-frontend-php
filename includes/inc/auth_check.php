@@ -35,6 +35,7 @@ if (!isset($_SESSION['user_login'])) {
 			session_write_close();
 		}
 		else{
+			$xsl->AddFragment('<error>evqueue-not-running</error>');
 			echo $e->getMessage();
 		}
 		die();

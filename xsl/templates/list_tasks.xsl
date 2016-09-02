@@ -49,14 +49,21 @@
 						<td>
 							<span>
 								<xsl:if test="$USE_GIT = 1">
-									<xsl:attribute name="class">
-										<xsl:choose>
-											<xsl:when test="count(/page/git-tasks/entry[@name=current()/@name]) > 0 and
-											count(/page/git-tasks/entry[@lastcommit=current()/@lastcommit]) = 0">gitNeedUpdate</xsl:when>
-											<xsl:when test="@modified = 1">gitModified</xsl:when>
-											<xsl:when test="count(/page/git-tasks/entry[@name=current()/@name]) = 0">gitNew</xsl:when>
-										</xsl:choose>
-									</xsl:attribute>
+									<xsl:choose>
+										<xsl:when test="count(/page/git-tasks/entry[@name=current()/@name]) > 0 and
+										count(/page/git-tasks/entry[@lastcommit=current()/@lastcommit]) = 0">
+											<xsl:attribute name="class">gitNeedUpdate</xsl:attribute>
+											<xsl:attribute name="title">A newer version of this task exists</xsl:attribute>
+										</xsl:when>
+										<xsl:when test="@modified = 1">
+											<xsl:attribute name="class">gitModified</xsl:attribute>
+											<xsl:attribute name="title">This task as been modified</xsl:attribute>
+										</xsl:when>
+										<xsl:when test="count(/page/git-tasks/entry[@name=current()/@name]) = 0">
+											<xsl:attribute name="class">gitNew</xsl:attribute>
+											<xsl:attribute name="title">This task is not yet versionned</xsl:attribute>
+										</xsl:when>
+									</xsl:choose>
 								</xsl:if>
 								<xsl:value-of select="@name" />
 							</span>
