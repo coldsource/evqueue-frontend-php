@@ -21,11 +21,14 @@
 require_once 'inc/auth_check.php';
 require_once 'inc/logger.php';
 require_once 'lib/XSLEngine.php';
-require_once 'bo/BO_task.php';
 
 
 $xsl = new XSLEngine();
-$xsl->AddFragment(Task::getAllXml($filter='no-tied-task'));
+
+$evqueue->Api("git", "pull");
+$xsl->AddFragment(["tasks" => $xsl->Api("tasks", "list")]);
+$xsl->AddFragment(["git-tasks" => $xsl->Api("git", "list_tasks")]);
+
 $xsl->DisplayXHTML('xsl/list_tasks.xsl');
 
 ?>

@@ -204,7 +204,7 @@ class XSLEngine
 	public function GetXHTML($xsl_filename)
 	{
 		$xsltproc = new \XSLTProcessor();
-		$xsltproc->registerPHPFunctions(['urlencode','strtotime','ucfirst', 'sumExecTimes', 'sumRetryTimes']);
+		$xsltproc->registerPHPFunctions(['urlencode','strtotime','ucfirst', 'sumExecTimes', 'sumRetryTimes', 'addslashes']);
 		// Set static parameters
 		foreach($this->parameters as $name=>$value)
 			$xsltproc->setParameter('',$name,$value);

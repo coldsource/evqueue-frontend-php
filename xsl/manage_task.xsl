@@ -8,6 +8,13 @@
 	<xsl:variable name="javascript">
 	</xsl:variable>
 	
+	<xsl:param name="ISFORM">1</xsl:param>
+	<xsl:param name="FORMTITLE">
+		<xsl:if test="$creation = 1">Create a new task</xsl:if>
+		<xsl:if test="$creation != 1">Edit task</xsl:if>
+	</xsl:param>
+	
+	
 	<xsl:template name="content">
 		
 		
@@ -23,72 +30,59 @@
 			];
 		</script>
 		
-		<div class="contentManage">
-			<div class="boxTitle">
-				<span class="title">
-					<xsl:choose>
-						<xsl:when test="/page/task/@id">
-							Update Task
-						</xsl:when>
-						<xsl:otherwise>
-							Create Task
-						</xsl:otherwise>
-					</xsl:choose>
-				</span>
-			</div>
-			<div id="task" class="formdiv">
+	
 				<xsl:call-template name="displayErrors" />
 
 				<form name="formTask" id="formTask" action="manage-task.php" method="post">
-					<input type="hidden" name="task_id" value="{/page/task/@id}" />
+					<input type="hidden" name="id" value="{/page/get/@task_id}" />
 					<label class="formLabel" for="task_name" >Task name</label>
-					<input type="text" name="task_name" id="task_name" value="{/page/task/task_name}" />
+					<input type="text" name="name" id="task_name" value="{/page/task/task/@name}" />
 					<br />
 					<label class="formLabel" for="task_binary_path">Task binary</label>
-					<input type="text" name="task_binary_path" id="task_binary_path" value="{/page/task/task_binary}" placeholder="Absolute path to your script on the host machine" class="filenameInput" />
+					<input type="text" name="binary_path" id="task_binary_path" value="{/page/task/task/@binary}" placeholder="Absolute path to your script on the host machine" class="filenameInput" />
 					<br />
 					<label class="formLabel" for="task_group">Task group</label>
-					<input type="text" name="task_group" id="task_group" value="{/page/task/task_group}" />
+					<input type="text" name="group" id="task_group" value="{/page/task/task/@group}" />
 					<br />
 					<label class="formLabel" for="task_wd">Task working directory</label>
-					<input type="text" name="task_wd" id="task_wd" value="{/page/task/task_wd}" />
+					<input type="text" name="wd" id="task_wd" value="{/page/task/task/@wd}" />
 					<br />
 					<label class="formLabel" for="task_parameters_mode">Parameters mode</label>
-					<select name="task_parameters_mode" id="task_parameters_mode">
+					<select name="parameters_mode" id="task_parameters_mode">
 						<xsl:call-template name="getSelectedItem">
-						<xsl:with-param name="default" select="/page/task/task_parameters_mode" />
+						<xsl:with-param name="default" select="/page/task/task/@parameters_mode" />
 						<xsl:with-param name="condition" select="document('data/task_parameters_mode.xml')/task_parameters_modes/task_parameters_mode" />
 						</xsl:call-template>
 					</select>				
 					<br />
 					<label class="formLabel" for="task_output_method">Output type</label>
-					<select name="task_output_method" id="task_output_method">
+					<select name="output_method" id="task_output_method">
 						<xsl:call-template name="getSelectedItem">
-						<xsl:with-param name="default" select="/page/task/task_output_method" />
+						<xsl:with-param name="default" select="/page/task/task/@output_method" />
 						<xsl:with-param name="condition" select="document('data/task_output_method.xml')/task_output_methods/task_output_method" />
 						</xsl:call-template>
 					</select>				
 					<br />
 					
 					<label class="formLabel" for="task_user">Task user</label>
-					<input type="text" name="task_user" id="task_user" value="{/page/task/task_user}" />
+					<input type="text" name="user" id="task_user" value="{/page/task/task/@user}" />
 					<br />
 
 					<label class="formLabel" for="task_host">Task host</label>
-					<input type="text" name="task_host" id="task_host" value="{/page/task/task_host}" />
+					<input type="text" name="host" id="task_host" value="{/page/task/task/@host}" />
 					<br />
 					
 					<label class="formLabel" for="task_use_agent">Use evqueue agent</label>
-					<input type="checkbox" name="task_use_agent" id="task_use_agent">
-						<xsl:if test="/page/task/task_use_agent = 1">
+					<input type="checkbox" name="use_agent" id="task_use_agent">
+						<xsl:if test="/page/task/task/@use_agent = 1">
 							<xsl:attribute name="checked">checked</xsl:attribute>
 						</xsl:if>
 					</input>
 					<br />
 					
 					<label class="formLabel" for="task_merge_stderr">Merge stderr with stdout</label>
-					<input type="checkbox" name="task_merge_stderr" id="task_merge_stderr">
-						<xsl:if test="/page/task/task_merge_stderr = 1">
+					<input type="checkbox" name="merge_stderr" id="task_merge_stderr">
+						<xsl:if test="/page/task/task/@merge_stderr = 1">
 							<xsl:attribute name="checked">checked</xsl:attribute>
 						</xsl:if>
 					</input>
@@ -119,7 +113,6 @@
 						</ul>
 					</div>
 				</xsl:if>
-			</div>
-		</div>
+
     </xsl:template>
 </xsl:stylesheet>

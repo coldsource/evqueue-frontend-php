@@ -14,7 +14,7 @@
 					<div class="boxTitle statistics">
 						<span class="title">Statistics (node <xsl:value-of select="@node_name" />)</span>
 						<div class="titleAction">
-							<xsl:if test="/page/private/logged-in-user/@profile = 'ADMIN'">
+							<xsl:if test="$PROFILE = 'ADMIN'">
 								<a href="system_statistics.php?action=reset&amp;node_name={@node_name}"><img class="action" src="images/delete.gif" /></a>
 							</xsl:if>
 						</div>

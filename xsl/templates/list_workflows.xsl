@@ -102,7 +102,7 @@
 									</xsl:when>
 									<xsl:when test="count(/page/git-workflows/entry[@name=current()/@name]) > 0 and
 									count(/page/git-workflows/entry[@lastcommit=current()/@lastcommit]) = 0">
-										<img src="images/database_go2.png" onclick="confirm('You are about to overwrite changes to the repository');commit(this,'{@name}', 'yes')" class="pointer" title="Save this workflow to Git"/>
+										<img src="images/database_go2.png" onclick="confirm('You are about to overwrite changes to the repository');commit(this,'{@name}', 'workflow', 'yes')" class="pointer" title="Save this workflow to Git"/>
 										<img src="images/database_refresh.png" onclick="evqueueAPI(this, 'git', 'load_workflow', {{ 'name':'{@name}' }});location.reload();" class="pointer" title="Load this workflow from Git"/>
 									</xsl:when>
 								</xsl:choose>

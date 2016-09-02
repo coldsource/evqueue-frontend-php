@@ -47,8 +47,8 @@
 						<xsl:sort select="." />
 						
 						<xsl:variable name="groupName" select="." />
-						<xsl:variable name="nbwfs" select="count(/page/schedules/schedule[ workflow_id = /page/workflows/workflow[ @group = $groupName ]/@id ])" />
-						
+						<xsl:variable name="nbwfs" select="count(/page/schedules/workflow_schedule[ @workflow_id = /page/workflows/workflow[ @group = $groupName ]/@id ])" />
+
 						<xsl:if test="$nbwfs > 0">
 							<xsl:if test="position() != 1">
 								<tr class="groupspace"><td></td></tr>
@@ -57,7 +57,7 @@
 								<td colspan="8" >
 									<xsl:choose>
 										<xsl:when test="$groupName != ''">
-											<xsl:value-of select="$groupName" />  <!-- /page/workflows/workflow[@id = current()/workflow_id]/@group -->
+											<xsl:value-of select="$groupName" />
 										</xsl:when>
 										<xsl:otherwise>
 											No group
@@ -69,14 +69,14 @@
 							</tr>
 						</xsl:if>
 						
-						<xsl:for-each select="/page/schedules/schedule">
-							<xsl:if test="/page/workflows/workflow[@id = current()/workflow_id]/@group = $groupName">
+						<xsl:for-each select="/page/schedules/workflow_schedule">
+							<xsl:if test="/page/workflows/workflow[@id = current()/@workflow_id]/@group = $groupName">
 								<tr class="evenOdd">
 									<td class="center">
 										<xsl:value-of select="@id" />
 									</td>
 									<td>
-										<xsl:value-of select="/page/workflows/workflow[@id = current()/workflow_id]/@name" />
+										<xsl:value-of select="/page/workflows/workflow[@id = current()/@workflow_id]/@name" />
 										<xsl:if test="comment != ''">
 											(<xsl:value-of select="comment" />)
 										</xsl:if>
@@ -92,7 +92,7 @@
 										</td>
 									</xsl:if>
 									<td class="center">
-										<xsl:value-of select="node_name" />
+										<xsl:value-of select="/page/workflow-schedules-instance/workflow[@schedule_id = current()/@id]/@node_name" />
 									</td>
 									<xsl:if test="$DISPLAY = 'settings'">
 										<td class="center">
@@ -104,15 +104,15 @@
 									</xsl:if>
 									<xsl:if test="$DISPLAY = 'state'">
 										<td class="center">
-											<a href="index.php?workflow_instance_id={/page/last-execution/workflow[@workflow_schedule_id = current()/@id]/@workflow_instance_id}">
+											<a href="index.php?workflow_instance_id={/page/workflow-schedules-instance/workflow[@schedule_id = current()/@id]/@id}">
 												<xsl:choose>
-													<xsl:when test="/page/last-execution/workflow[@workflow_schedule_id = current()/@id]/@workflow_instance_errors>0">
+													<xsl:when test="/page/workflow-schedules-instance/workflow[@schedule_id = current()/@id]/@errors>0">
 														<img src="images/exclamation.png" alt="Errors" title="Errors" />
 													</xsl:when>
-													<xsl:when test="count(/page/last-execution/workflow[@workflow_schedule_id = current()/@id]/@workflow_instance_end) > 0">
+													<xsl:when test="count(/page/workflow-schedules-instance/workflow[@schedule_id = current()/@id]/@end_time) > 0">
 														<img src="images/ok.png" />
 													</xsl:when>
-													<xsl:when test="count(/page/last-execution/workflow[@workflow_schedule_id = current()/@id]) = 0">
+													<xsl:when test="count(/page/workflow-schedules-instance/workflow[@schedule_id = current()/@id]) = 0">
 
 													</xsl:when>
 													<xsl:otherwise>
@@ -122,13 +122,13 @@
 											</a>
 											<xsl:text>&#160;</xsl:text>
 											<xsl:call-template name="displayDateAndTime">
-												<xsl:with-param name="datetime_start" select="/page/last-execution/workflow[@workflow_schedule_id = current()/@id]/@workflow_instance_start" />
+												<xsl:with-param name="datetime_start" select="/page/workflow-schedules-instance/workflow[@schedule_id = current()/@id]/@start_time" />
 											</xsl:call-template>
 										</td>
 									</xsl:if>
 									<td class="center">
 										<xsl:call-template name="displayDateAndTime">
-											<xsl:with-param name="datetime_start" select="/page/status/workflow[@workflow_schedule_id = current()/@id]/@scheduled_at" />
+											<xsl:with-param name="datetime_start" select="/page/status/status/workflow[@workflow_schedule_id = current()/@id]/@scheduled_at" />
 										</xsl:call-template>
 									</td>
 									<xsl:if test="$DISPLAY = 'settings'">

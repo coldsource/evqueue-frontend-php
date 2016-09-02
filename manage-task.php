@@ -21,44 +21,43 @@
 require_once 'inc/auth_check.php';
 require_once 'inc/logger.php';
 require_once 'lib/XSLEngine.php';
-require_once 'lib/WebserviceWrapper.php';
-require_once 'lib/workflow_instance.php';
-require_once 'bo/BO_task.php';
-require_once 'utils/xml_utils.php';
 
+$xsl = new XSLEngine();
 
 $xml_error = "";
 if (isset($_POST) && (count($_POST)>1)){
+	if (isset($_POST["id"]) && ($_POST["id"] != ''))
+		$xsl->Api('task', 'edit', $_POST);
+	else{
+		unset($_POST["id"]);
+		$xsl->Api('task', 'create', $_POST);
+	}
 	
-	$ws = new WebserviceWrapper('create-task', 'formTask', $_POST, true);
-	$ws->FetchResult();
-	
-	$xml_error = $ws->HasErrors();
-	if ($xml_error === false){
+	if (!$xsl->HasError()){
 		header("location:list-tasks.php");
 		die();
 	}
 }
 
-$xsl = new XSLEngine();
 
 if (isset($_GET["task_id"]) && ($_GET["task_id"] != '')){
-	$task = new Task($_GET["task_id"]);
-	$xsl->AddFragment($task->getGeneratedXml());
-	
-	$wfs = $task->GetLinkedWorkflows();
+	$xsl->AddFragment(['task' => $xsl->Api('task', 'get', ['id' => $_GET["task_id"]])]);
+	/*$wfs = $task->GetLinkedWorkflows();
 	$linkedWF = '<linked-workflows>';
 	foreach ($wfs as $wf) {
 		$linkedWF .= "<workflow>{$wf->get_name()}</workflow>";
 	}
 	$linkedWF .= '</linked-workflows>';
-	$xsl->AddFragment($linkedWF);
+	$xsl->AddFragment($linkedWF);*/
+	$xsl->SetParameter('creation', 0);
 }
+else
+	$xsl->SetParameter('creation', 1);
 
 if ($xml_error)
 	$xsl->AddFragment($xml_error);
 
-$xsl->AddFragment(Task::getAllGroupXml());
+$xsl->AddFragment(getAllTaskGroupXml());
 
 $xsl->DisplayXHTML('xsl/manage_task.xsl');
 

@@ -21,25 +21,29 @@
 require_once 'inc/auth_check.php';
 require_once 'inc/logger.php';
 require_once 'lib/XSLEngine.php';
-require_once 'lib/workflow_instance.php';
-require_once 'lib/WebserviceWrapper.php';
 
 
 $xsl = new XSLEngine();
 
-require 'conf/queueing.php';
 foreach ($QUEUEING as $node_name => $conf) {
-	$wfi = new WorkflowInstance($node_name);
-	
-	if (isset($_GET['action']) && $_GET['action'] == 'reset') {
-		$ws = new WebserviceWrapper('reset-stats', 'resetStats', ['node_name'=>$_GET['node_name']], true);
-		$ws->FetchResult();
-		header('Location: system_statistics.php');
-		die();
+	try{
+		$evqueue_node = getevQueue($node_name);
+		if (isset($_GET['action']) && $_GET['action'] == 'reset') {
+			$evqueue_node->Api('statistics', 'reset', ['type' => 'global']);
+		}
+		
+		$xml = $evqueue_node->Api('statistics', 'query', ['type' => 'global']);
+		$dom = new DOMDocument();
+		$dom->loadXML($xml);
+		$dom->documentElement->setAttribute("node_name", $node_name);
+		$xsl->AddFragment(["global" => $dom]);
 	}
-	
-	$xsl->AddFragment('<global node_name="'.htmlspecialchars($node_name).'">'.$wfi->GetStatistics("global").'</global>');
+	catch(Exception $e) {
+		
+	}
 }
+
+
 
 $xsl->DisplayXHTML('xsl/system_statistics.xsl');
 
