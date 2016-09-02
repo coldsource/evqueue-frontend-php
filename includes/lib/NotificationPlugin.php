@@ -112,7 +112,7 @@ class NotificationPlugin {
 		
 		// 2. Delete local files
 		$plugin_folder = "$this->relpath/plugins/notifications/$this->name/";
-		foreach (array('manifest.xml','notification-parameters.php','notification-parameters.xsl') as $file)
+		foreach (array('manifest.xml','notification-parameters.php','notification-parameters.xsl','plugin-configuration.xsl','plugin-configuration.php') as $file)
 			system("rm $plugin_folder/$file");
 		system("rmdir $plugin_folder");
 		
