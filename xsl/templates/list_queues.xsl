@@ -36,7 +36,7 @@
 							<img src="images/edit.gif"  />
 						</a>
 						<xsl:text>&#160;</xsl:text>
-						<img src="images/delete.gif" onclick="deleteQueue({@id})" class="pointer" />
+						<img data-confirm="You are about to delete queue '{@name}'" onclick="evqueueAPI(this, 'queue', 'delete', {{ 'id':'{@id}' }});location.reload();" src="images/delete.gif"  />
 					</td>
 				</tr>
 			</xsl:for-each>

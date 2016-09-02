@@ -31,11 +31,6 @@ if(isset($_GET['action']))
 if(isset($_POST['action'])) {
 	try
 	{
-		if($_POST['action']=='deleteUser')
-		{
-			$xsl->Api('user','delete',['name'=>$_POST['login']]);
-		}
-		
 		if($_POST['action']=='createUser')
 		{
 			if($_POST['password']!=$_POST['password2'])

@@ -33,7 +33,7 @@
 						<td class="tdActions">
 							<a href="manage-user.php?user_login={@name}"><img src="images/edit.gif"  /></a>
 							&#160;
-							<a href="manage-user.php?action=deleteUser&amp;login={@name}"><img src="images/delete.gif"  /></a>
+							<img data-confirm="You are about to delete user '{@name}'" onclick="evqueueAPI(this, 'user', 'delete', {{ 'name':'{@name}' }});location.reload();" src="images/delete.gif"  />
 						</td>
 					</tr>
 				</xsl:for-each>
