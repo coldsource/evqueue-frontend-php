@@ -50,6 +50,7 @@ if (isset($_POST['login']) && isset($_POST['password'])) {
 	$pwd = sha1($_POST['password'], true);
 	$evqueue->SetUserLogin($_POST['login']);
 	$evqueue->SetUserPwd($pwd);
+	$nodes = [];
 	
 	try
 	{
@@ -58,9 +59,9 @@ if (isset($_POST['login']) && isset($_POST['password'])) {
 			$evqueue_node = new evQueue($scheme,$_POST['login'],$pwd);
 			$evqueue_node->Api('ping');
 			$node_name = $evqueue_node->GetParserRootAttributes()['NODE'];
-			if(isset($_SESSION['nodes'][$node_name]) || $node_name == '')
+			if(isset($nodes[$node_name]) || $node_name == '')
 				throw new Exception('Node name can\'t be null and should be unique');
-			$_SESSION['nodes'][$node_name] = $scheme;
+			$nodes[$node_name] = $scheme;
 		}
 		
 	}
@@ -81,6 +82,7 @@ if (isset($_POST['login']) && isset($_POST['password'])) {
 	$_SESSION['user_login'] = $_POST['login'];
 	$_SESSION['user_pwd'] = $pwd;
 	$_SESSION['user_profile'] = $evqueue->GetProfile();
+	$_SESSION['nodes'] = $nodes;
 	session_write_close();
 	header('Location: index.php');
 	die();

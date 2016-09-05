@@ -155,7 +155,7 @@ class evQueue {
 		$data = false;
 		
 		$this->ParserInit();
-		while($recv = socket_recv($this->socket, $data, 1600, 0)){
+		while($recv = @socket_recv($this->socket, $data, 1600, 0)){
 			$xml .= $data;
 			$this->ParserParse($data);
 			if($this->parser_ready === true )
