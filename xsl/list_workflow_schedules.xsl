@@ -134,8 +134,8 @@
 									<xsl:if test="$DISPLAY = 'settings'">
 										<td class="center">
 											<xsl:choose>
-												<xsl:when test="active = 1"><img src="images/ok.png" /></xsl:when>
-												<xsl:otherwise test="active = 1"><img src="images/locked.png" /></xsl:otherwise>
+												<xsl:when test="@active = 1"><img src="images/ok.png" /></xsl:when>
+												<xsl:otherwise test="@active = 1"><img src="images/locked.png" /></xsl:otherwise>
 												<xsl:otherwise>-</xsl:otherwise>
 											</xsl:choose>
 										</td>
@@ -148,7 +148,7 @@
 											<xsl:text>&#160;</xsl:text>
 											<a href="plan-workflow.php?id={@id}" style="text-decoration: none;"><img src="images/edit.gif" /></a>
 											<xsl:text>&#160;</xsl:text>
-											<img onclick="if (confirm('Really delete (and deactivate) workflow schedule '+{@id}+'?')) ajaxDelete('deleteWorkflowSchedule',{@id},'list-workflow-schedules.php');" src="images/delete.gif" class="pointer"/>
+											<img data-confirm="Really delete (and deactivate) workflow schedule '+{@id}+'?" onclick="evqueueAPI(this, 'workflow_schedule', 'delete', {{ 'id':'{@id}' }});location.reload();" src="images/delete.gif" class="pointer" />
 										</xsl:if>
 									</td>
 								</tr>

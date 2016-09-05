@@ -28,6 +28,16 @@ if (!isset($_SESSION['user_login'])) {
 		$_SESSION['user_login'] = "anonymous";
 		$_SESSION['user_pwd'] = "";
 		$_SESSION['user_profile'] = "ADMIN";
+		
+		foreach($QUEUEING as $scheme){
+			$evqueue_node = new evQueue($scheme);
+			$evqueue_node->Api('ping');
+			$node_name = $evqueue_node->GetParserRootAttributes()['NODE'];
+			if(isset($_SESSION['nodes'][$node_name]) || $node_name == '')
+				throw new Exception('Node name can\'t be null and should be unique');
+			$_SESSION['nodes'][$node_name] = $scheme;
+		}
+		
 	}
 	catch(Exception $e){
 		if($e->getCode() == evQueue::ERROR_AUTH_REQUIRED){
@@ -35,7 +45,7 @@ if (!isset($_SESSION['user_login'])) {
 			session_write_close();
 		}
 		else{
-			$xsl->AddFragment('<error>evqueue-not-running</error>');
+			//$xsl->AddFragment('<error>evqueue-not-running</error>');
 			echo $e->getMessage();
 		}
 		die();

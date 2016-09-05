@@ -1,9 +1,6 @@
 <?php
 
-function getevQueue($node){
-	global $QUEUEING;
-	$scheme = $QUEUEING[$node];
-		
+function getevQueue($scheme){	
 	if(isset($_SESSION['user_login']) && isset($_SESSION['user_pwd']))
 		$evqueue = new evQueue($scheme, $_SESSION['user_login'], $_SESSION['user_pwd']);
 	else

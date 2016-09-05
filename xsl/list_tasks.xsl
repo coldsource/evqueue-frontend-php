@@ -6,7 +6,6 @@
 	<xsl:variable name="topmenu" select="'settings'" />
 	
 	<xsl:variable name="javascript">
-		<src>js/list-tasks.js</src>
 	</xsl:variable>
 
    <xsl:template name="content">

@@ -19,6 +19,6 @@
   */
 
 $QUEUEING = [
-	'localhost' => 'tcp://localhost:5000'
+	'tcp://localhost:5000'
 ];
 ?>

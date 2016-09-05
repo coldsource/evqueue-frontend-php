@@ -23,9 +23,6 @@ a, a:visited {
 select.ui-timepicker-select {
   width: auto; }
 
-.planChoice select {
-  width: 100%; }
-
 input, select {
   border: 1px solid darkgray; }
 
@@ -575,9 +572,6 @@ li.fakeTask {
   clear: both; }
 
 img.relaunch {
-  cursor: pointer; }
-
-img.deleteWFI {
   cursor: pointer; }
 
 div.statusFilter {

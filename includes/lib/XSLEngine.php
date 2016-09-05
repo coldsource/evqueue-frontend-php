@@ -101,7 +101,7 @@ class XSLEngine
 		require 'conf/queueing.php';
 		$nodes = $this->xmldoc->createElement('evqueue-nodes');
 		$this->root_node->appendChild($nodes);
-		foreach ($QUEUEING as $node_name => $conf) {
+		foreach ($_SESSION['nodes'] as $node_name => $conf) {
 			$node = $this->xmldoc->createElement('node');
 			$node->setAttribute('name', $node_name);
 			$node->appendChild($this->xmldoc->createTextNode($conf));
@@ -254,13 +254,15 @@ class XSLEngine
 		$this->instruction = $instruction;
 	}
 	
-	public function Api($name, $action = false, $attributes = [], $parameters = [])
+	public function Api($name, $action = false, $attributes = [], $parameters = [], $evqueue_node = false)
 	{
 		global $evqueue;
+		if($evqueue_node === false)
+			$evqueue_node = $evqueue;
 		
 		try
 		{
-			return $evqueue->API($name, $action, $attributes, $parameters);
+			return $evqueue_node->API($name, $action, $attributes, $parameters);
 		}
 		catch(Exception $e)
 		{

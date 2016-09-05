@@ -49,13 +49,6 @@ $(document).ready( function() {
 		
 		evqueueAPI(this, "instance", "launch", attr, wfparams, $(this).find('.nodeTab select').val());
 	});
-	
-	$(document).delegate( 'img.deleteWFI', 'click', function() {
-		var id = $(this).data("wfiid");
-		if (confirm("Delete the workflow instance n°"+id+"?")){
-			deleteWfi(id);
-		}
-	});	
 });
 
 $(document).ready( function () {
@@ -101,9 +94,4 @@ function refreshWorkflowHTML (id,node_name,container,callback) {
 			if (callback) callback();
 		}
 	});
-}
-
-
-function deleteWfi(id){
-	ajaxDelete('deleteWFI', id, '');
 }

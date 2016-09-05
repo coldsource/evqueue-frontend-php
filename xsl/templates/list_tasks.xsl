@@ -126,18 +126,6 @@
 				</xsl:if>
 			</xsl:for-each>
 		</table>
-		
-		<div id="deleteTaskDlg" title="Delete task" style="display: none;">
-			<i>Really delete task '<span class="taskName" />'? (#<span class="taskId" />)</i>
-			<br/><br/>
-			<label>
-				<input type="checkbox" name="deleteBinary" />
-				Also delete binary stored by evQueue
-			</label>
-			<br/><br/>
-			<input type="submit" value="Delete Task" onclick="ajaxDelete('deleteTask',$('span.taskId').text(),'list-tasks.php',{{deleteBinary: $('input[name=deleteBinary]').is(':checked')?1:0 }});" />
-		</div>
-		
 	</xsl:template>
 	
 	

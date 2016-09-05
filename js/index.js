@@ -203,13 +203,3 @@ $(document).ready(function() {
 		divToToggle.toggle('fast')
 	});
 });
-
-
-
-function retryAllTasks () {
-	if (confirm('Do you really want to retry all tasks? This can lead to tasks stopping in error sooner than expected, since their retry "counter" gets decremented.'))
-		$.ajax({
-			type: 'post',
-			url: 'ajax/retry.php',
-		});
-}

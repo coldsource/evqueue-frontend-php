@@ -1,46 +1,5 @@
 
 
-function ajaxPost(form_id,newurl,submit_form,confirmed){
-	
-	var params = getAjaxData(form_id);
-	if (typeof(confirmed) != 'undefined' && confirmed == 'yes') {
-		params += 'confirm=yes';
-		$('#'+form_id).append('<input type="hidden" name="confirm" value="yes" />');
-	}
-	
-	$.ajax({
-		type: 'POST',
-		url: site_base+'ajax/wsfwd.php',
-		data: params,
-		dataType: 'xml',
-		success: function(content){
-
-			if ( $(content).find('error').length == 0 ) {
-				if (submit_form == true){
-					$('#'+form_id).submit();
-				}else{
-					if (newurl != ""){
-						window.location.href = newurl;
-					}					
-				}
-			}else {
-				$(content).find('error').each( function () {
-					if ($(this).attr('name') == 'confirm') {
-						if (confirm($(this).text()))
-							ajaxPost(form_id,newurl,submit_form,'yes');
-						
-					} else if ($(this).attr('name') == 'no-right') {
-						alert("You don't have the right to perform this action");
-						
-					} else {
-						alert($(this).text());
-					}
-				});
-			}
-		}
-	});
-}
-
 function getAjaxData(form_id){
 	return data = 'form_id='+form_id+"&" + $('#'+form_id).find('input,select,textarea').serialize();
 }
@@ -58,44 +17,6 @@ function ajaxField(field,value,void_value) {
 		a[$(field).attr('name')] = value;
 		return $.param(a) + '&';
 	}
-}
-
-function ajaxDelete(objAction,id,newurl,params){
-	
-	if (typeof(params) == 'undefined')
-		params = {};
-	params.form_id = objAction;
-	params.id = id;
-	
-	$.ajax({
-		type: 'POST',
-		url: site_base+'ajax/wsfwd.php',
-		data: params,
-		dataType: 'xml',
-		success: function(content){
-			if ( $(content).find('error').length == 0 ) {
-				if (newurl != ""){
-					window.location.href = newurl;
-				}
-			}else {
-				$(content).find('error').each( function () {
-					if ($(this).attr('id') == 'confirm') {
-						if (confirm($(this).text())) {
-							params.confirm = 'yes';
-							ajaxDelete(objAction,id,newurl,params);
-						}
-						
-					} else if ($(this).attr('id') == 'no-right') {
-						alert("You don't have the right to perform this action");
-						
-					} else {
-						alert($(this).text());
-					}
-				});
-			}
-		}
-	});
-	
 }
 
 /*

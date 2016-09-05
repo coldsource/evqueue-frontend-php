@@ -25,9 +25,9 @@ require_once 'lib/XSLEngine.php';
 
 $xsl = new XSLEngine();
 
-foreach ($QUEUEING as $node_name => $conf) {
+foreach ($_SESSION['nodes'] as $node_name => $conf) {
 	try{
-		$evqueue_node = getevQueue($node_name);
+		$evqueue_node = getevQueue($conf);
 		if (isset($_GET['action']) && $_GET['action'] == 'reset') {
 			$evqueue_node->Api('statistics', 'reset', ['type' => 'global']);
 		}

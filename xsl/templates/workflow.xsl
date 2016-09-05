@@ -95,9 +95,7 @@
 				</xsl:if>
 				
 				<xsl:if test="@status='TERMINATED'">
-					<xsl:call-template name="deleteWFI">
-						<xsl:with-param name="wfiid" select="@id" />
-					</xsl:call-template>
+					<img data-confirm="Delete workflow instance {@id} ?" src="images/delete.gif" onclick="evqueueAPI(this, 'instance', 'delete', {{ 'id':'{@id}' }});location.reload();" class="pointer" />
 				</xsl:if>
 			</td>		
 		</tr>
@@ -645,7 +643,7 @@
 						</span>
 						<img src="images/refresh.png" class="refreshWorkflows action" title="Refresh workflow list" data-status="{$status}" style="margin-left: 5px;" />
 						<xsl:if test="$status = 'EXECUTING'">
-							<img src="images/alarm_clock.png" class="retryAllTasks action" title="Retry all tasks" style="margin-left: 5px;" onclick="retryAllTasks();" />
+							<img src="images/alarm_clock.png" onclick="evqueueAPI(this, 'control', 'retry');" class="pointer" data-confirm='Do you really want to retry all tasks? This can lead to tasks stopping in error sooner than expected, since their retry "counter" gets decremented.' title="Retry all tasks" style="margin-left: 5px;"/>
 						</xsl:if>
 						<div style="float:right;"><input type="checkbox" class="autorefresh" checked="checked" />&#160;Auto-refresh</div>
 					</div>
@@ -864,7 +862,7 @@
 	
 	<xsl:template name="deleteWFI">
 		<xsl:param name="wfiid" />
-		<img src="images/delete.gif" class="deleteWFI pointer" data-wfiid="{$wfiid}" alt="Delete workflow instance" title="Delete workflow instance"></img>
+		<img data-confirm="Delete workflow instance {$wfiid}" src="images/delete.gif" onclick="evqueueAPI(this, 'instance', 'delete', {{ 'id':'{$wfiid}' }});location.reload();" class="pointer" />
 	</xsl:template>
 	
 	

@@ -25,9 +25,9 @@ require_once 'lib/XSLEngine.php';
 
 $xsl = new XSLEngine();
 // EXECUTING workflows
-foreach ($QUEUEING as $node_name => $conf) {
+foreach ($_SESSION['nodes'] as $node_name => $conf) {
 	try{
-		$evqueue_node = getevQueue($node_name);
+		$evqueue_node = getevQueue($conf);
 		$xml = $evqueue_node->Api('status', 'query', ['type' => "workflows"]);
 		$dom = new DOMDocument();
 		$dom->loadXML($xml);

@@ -54,6 +54,15 @@ if (isset($_POST['login']) && isset($_POST['password'])) {
 	try
 	{
 		$xml = $evqueue->Api('ping');
+		foreach($QUEUEING as $scheme){
+			$evqueue_node = new evQueue($scheme,$_POST['login'],$pwd);
+			$evqueue_node->Api('ping');
+			$node_name = $evqueue_node->GetParserRootAttributes()['NODE'];
+			if(isset($_SESSION['nodes'][$node_name]) || $node_name == '')
+				throw new Exception('Node name can\'t be null and should be unique');
+			$_SESSION['nodes'][$node_name] = $scheme;
+		}
+		
 	}
 	catch(Exception $e)
 	{

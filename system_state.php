@@ -24,9 +24,9 @@ require_once 'lib/XSLEngine.php';
 
 $xsl = new XSLEngine();
 
-foreach ($QUEUEING as $node_name => $conf) {
+foreach ($_SESSION['nodes'] as $node_name => $conf) {
 	//try{
-		$evqueue_node = getevQueue($node_name);
+		$evqueue_node = getevQueue($conf);
 		$xml = $evqueue_node->Api('statistics', 'query', ['type' => 'queue']);
 		$dom = new DOMDocument();
 		$dom->loadXML($xml);
@@ -39,7 +39,7 @@ foreach ($QUEUEING as $node_name => $conf) {
 }
 
 /*
-foreach ($QUEUEING as $node_name => $conf) {
+foreach ($_SESSION['nodes'] as $node_name => $conf) {
 	$wfi = new WorkflowInstance($node_name);
 	$xsl->AddFragment('<stats node_name="'.htmlspecialchars($node_name).'">'.$wfi->GetStatistics("queue").'</stats>');
 }

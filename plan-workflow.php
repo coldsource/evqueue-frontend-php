@@ -19,92 +19,71 @@
   */
 
 require_once 'inc/auth_check.php';
-require_once 'bo/BO_workflow.php';
-require_once 'bo/BO_task.php';
 require_once 'inc/logger.php';
 require_once 'lib/WebserviceWrapper.php';
 require_once 'lib/XSLEngine.php';
-require_once 'lib/save_workflow.php';
-require_once 'bo/BO_workflowSchedule.php';
 
 $xsl = new XSLEngine();
 
-
 $units_checks = null;
 if (isset($_GET['id'])) {
-	$ws = new WorkflowSchedule($_GET['id']);
-	$xsl->AddFragment($ws->getGeneratedXml());
+	$xml = $xsl->Api('workflow_schedule', 'get', ['id' => $_GET['id']]);
+	$xsl->AddFragment(['schedule' => $xml]);
 	
-	$wfid = $ws->get_workflow_id();
-	$wf = new Workflow($wfid);
-	$xsl->AddFragment($wf->getGeneratedXml());
-	
-	$xsl->AddFragment(Task::getAllXml($filter='only-tied-task'));
+	$dom = new DOMDocument();
+	$dom->loadXML($xml);
+	$xpath = new DOMXPath($dom);
+	$workflow_id = $xpath->evaluate('string(/response/workflow_schedule/@workflow_id)');
+	$schedule = $xpath->evaluate('string(/response/workflow_schedule/@schedule)');
+	$xsl->AddFragment(['workflow' => $xsl->Api('workflow', 'get', ['id' => $workflow_id])]);
 	
 	list(
 		$units_checks['Seconds'],$units_checks['Minutes'],$units_checks['Hours'],
 		$units_checks['Days'],$units_checks['Months'],$units_checks['Weekdays']
-	) = split(';',$ws->get_schedule());
+	) = split(';',$schedule);
 	foreach ($units_checks as $key => $arr)
 		$units_checks[$key] = $arr !== '' ? split(',',$arr) : array();
 }
 
-
-$xml_error = "";
 if (!empty($_POST)) {
-	
-	$errors = false;
-	switch ($_POST['whatSelectMode']) {
-		case 'Workflow':
-			$_POST['workflow_id'] = $_POST['workflow_id_select'];
-			break;
-		
-		case 'Script':
-			$params = $_POST;
-			$params['bound'] = true;
-			$errors = edit_simple_workflow($params);
-			
-			if ($errors !== false)
-				$xml_error = $errors;
-			else
-				// TODO: bug: how to get the new/updated workflow id?
-				$_POST['workflow_id'] = $ws->FetchResult()->documentElement->attributes->getNamedItem('id')->nodeValue;
-			break;
-		
-		default:
-			Logger::GetInstance()->Log(LOG_ERR,'plan-workflow.php',"Unknown tab for workflow selection: '{$_POST['whatSelectMode']}'");
+
+	if($_POST['whatSelectMode'] == 'Script'){
+		$_POST['create_workflow'] = 'yes';
+		$xsl->Api('task', 'create', $_POST);
+		$id = $evqueue->GetParserRootAttributes();
+		print_r($id);die();
 	}
-	unset($_POST['workflow_id_select']);
 	
-	if (is_numeric($_POST['workflow_id'])) {
-		$ws = new WebserviceWrapper('workflow-schedule-save', 'formWorkflowSchedule', array(
-				'workflow_schedule_id' => $_POST['workflow_schedule_id'],
-				'workflow_id' => $_POST['workflow_id'],
-				'schedule' => $_POST['schedule'],
-				'onfailure' => $_POST['onfailure'],
-				'schedule_user' => $_POST['schedule_user'],
+	parse_str($_POST['schedule_parameters'], $params);
+	
+	$attr = [
+		'workflow_id'  => $_POST['workflow_id_select'],
+		'schedule'     => $_POST['schedule'],
+		'onfailure'    => $_POST['onfailure'],
+		'user'         => $_POST['schedule_user'],
+		'host'         => $_POST['schedule_host'],
+		'active'       => (isset($_POST['active']) && $_POST['active'] == 'on') ? 'yes' : 'no',
+		'schedule_comment' => $_POST['schedule_comment'],
+	];
+	
+	$evqueue_node = getevQueue($_SESSION['nodes'][$_POST['node_name']]);
+	
+	if($_POST['workflow_schedule_id'] != ''){
+		$attr['id'] = $_POST['workflow_schedule_id'];
+		$xml = $xsl->Api('workflow_schedule', 'edit', $attr, $params, $evqueue_node);
+	}
+	else
+		$xsl->Api('workflow_schedule', 'create', $attr, $params, $evqueue_node);
+	
+	if (!$xsl->HasError()) {
+		header("location:list-workflow-schedules.php");
+		die();
+	}
+		
+		/*$ws = new WebserviceWrapper('workflow-schedule-save', 'formWorkflowSchedule', array(
 				'node_name' => $_POST['node_name'],
-				'schedule_host' => $_POST['schedule_host'],
-				'active' => (isset($_POST['active']) && $_POST['active'] == 'on') ? 1 : 0,
-				'schedule_comment' => $_POST['schedule_comment'],
-				'schedule_parameters' => $_POST['schedule_parameters'],
-				'bind' => 'yes',
-		), true);
-		$ws->FetchResult();
-
-		$errors = $ws->HasErrors();
-		if ($errors !== false) {
-			$xml_error = $errors;
-		} else {
-			header("location:list-workflow-schedules.php");
-			die();
-		}
-	}
+				'bind' => 'yes',*/
 }
-
-if ($xml_error)
-	$xsl->AddFragment($xml_error);
-
 
 
 $days = $months = array();
@@ -139,7 +118,7 @@ $xml .= '</units>';
 $xsl->AddFragment($xml);
 
 $xsl->AddFragment(getAllGroupXml());
-$xsl->AddFragment(Workflow::getAllXml());
+$xsl->AddFragment(["workflows" => $xsl->Api("workflows", "list")]);
 
 $xsl->DisplayXHTML('xsl/plan-workflow.xsl');
 

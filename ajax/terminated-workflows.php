@@ -33,8 +33,11 @@ if(isset($_GET['wf_name'])){
 		//"offset" => "",
 	];
 }
+elseif(isset($_GET['workflow_schedule_id']))
+	$filters['filter_schedule_id'] = $_GET['workflow_schedule_id'];
 else
 	$filters = [];
+	
 if(isset($_GET['searchParams'])){
 	$getParams = json_decode($_GET['searchParams'], 1);
 	$parameters = [];

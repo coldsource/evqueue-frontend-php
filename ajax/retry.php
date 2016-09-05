@@ -23,7 +23,7 @@ require_once 'inc/logger.php';
 require_once 'lib/workflow_instance.php';
 
 require 'conf/queueing.php';
-foreach ($QUEUEING as $node_name => $conf) {
+foreach ($_SESSION['nodes'] as $node_name => $conf) {
 	$wfi = new WorkflowInstance($node_name);
 	$wfi->RetryAll();
 }

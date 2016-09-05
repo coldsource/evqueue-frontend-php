@@ -85,50 +85,5 @@
 				</xsl:call-template>
 			</xsl:if>
 		</xsl:if>
-	</xsl:template>
-	
-	
-	<xsl:template name="edit-simple-workflow">
-		<xsl:param name="standalone" select="'yes'" />
-		
-		<form method="post">
-			<xsl:call-template name="form_workflow_header"/>
-			<br />
-			<label class="formLabel" for="task_wd">Script working directory:</label>
-			<input type="text" name="task_wd" id="task_wd" value="{/page/tasks/task[task_name = /page/workflow//task/@name]/task_wd | /page/post/@task_wd}" />
-			<br/>
-			<br/>
-			
-			<xsl:if test="$standalone = 'yes'">
-				<b>A "simple" workflow</b> is a workflow that contains only <emph>one</emph> task, i.e. one script that will be executed.<br/>
-				Give here the absolute path (or relative to the <i>processmanager.tasks.directory</i> conf parameter) to your script on the host machine:
-				<br/>
-				<br/>
-			</xsl:if>
-			
-			<label class="formLabel" for="task_wd">Path to your script:</label>
-			<input name="script_path" placeholder="The path to your script" class="filenameInput">
-				<xsl:attribute name="value">
-					<xsl:choose>
-						<xsl:when test="/page/post/@script_path">
-							<xsl:value-of select="/page/post/@script_path" />
-						</xsl:when>
-						<xsl:otherwise>
-							<xsl:value-of select="/page/tasks/task[task_name = /page/workflow//task/@name]/task_binary" />
-							<xsl:for-each select="/page/workflow//task/input">
-								<xsl:text> </xsl:text><xsl:value-of select="php:function('addslashes', string(.))" /><xsl:text></xsl:text>
-							</xsl:for-each>
-						</xsl:otherwise>
-					</xsl:choose>
-				</xsl:attribute>
-			</input>
-			
-			<xsl:if test="$standalone = 'yes'">
-				<br/>
-				<br/>
-				<input class="button" type="submit" value="Save workflow" />
-			</xsl:if>
-		</form>
-	</xsl:template>
-	
+	</xsl:template>	
 </xsl:stylesheet>
