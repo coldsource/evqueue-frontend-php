@@ -33,3 +33,11 @@ function commit(element, name, group = 'workflow', force = 'no'){
 	evqueueAPI(element, 'git', 'save_'+group, { 'name':name, 'commit_log':log, 'force':force });
 	location.reload();
 }
+
+function retryAllTasks(){
+	$.ajax({
+		url: 'ajax/retry.php'
+	}).done(function(xml){
+		
+	});
+}

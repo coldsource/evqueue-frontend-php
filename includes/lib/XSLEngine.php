@@ -101,11 +101,13 @@ class XSLEngine
 		require 'conf/queueing.php';
 		$nodes = $this->xmldoc->createElement('evqueue-nodes');
 		$this->root_node->appendChild($nodes);
-		foreach ($_SESSION['nodes'] as $node_name => $conf) {
-			$node = $this->xmldoc->createElement('node');
-			$node->setAttribute('name', $node_name);
-			$node->appendChild($this->xmldoc->createTextNode($conf));
-			$nodes->appendChild($node);
+		if(isset($_SESSION['nodes']) && is_array($_SESSION['nodes'])){
+			foreach ($_SESSION['nodes'] as $node_name => $conf) {
+				$node = $this->xmldoc->createElement('node');
+				$node->setAttribute('name', $node_name);
+				$node->appendChild($this->xmldoc->createTextNode($conf));
+				$nodes->appendChild($node);
+			}
 		}
 		$this->SetParameter('NOW', date('Y-m-d H:i:s'));
 		$this->SetParameter('EDITION', '0');

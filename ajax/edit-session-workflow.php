@@ -23,25 +23,6 @@ require_once 'inc/logger.php';
 require_once 'lib/save_workflow.php';
 
 
-function pie ($type, $msg='') {
-	if ($type == 'confirm' && isset($_POST['confirmed']))
-		return;  // don't die, go on with action, it has been confirmed by the user
-	
-	die(json_encode(array(
-			'type' => $type,
-			'msg' => $msg,
-	)));
-}
-
-function hasChildren($p,$nodename=null) {
-	if ($p->hasChildNodes())
-		foreach ($p->childNodes as $c)
-		 if ($c->nodeType == XML_ELEMENT_NODE && ($nodename === null || $nodename == $c->nodeName))
-			return true;
-	return false;
-}
-
-
 
 if (!isset($_POST['action']) || !isset($_POST['location']))
 	pie('ko','action or location not set');

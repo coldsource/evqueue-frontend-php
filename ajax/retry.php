@@ -20,12 +20,11 @@
 
 require_once 'inc/auth_check.php';
 require_once 'inc/logger.php';
-require_once 'lib/workflow_instance.php';
-
 require 'conf/queueing.php';
+
 foreach ($_SESSION['nodes'] as $node_name => $conf) {
-	$wfi = new WorkflowInstance($node_name);
-	$wfi->RetryAll();
+	$evqueue_node = getevQueue($conf);
+	$xml = $evqueue_node->Api('control', 'retry');
 }
 
 

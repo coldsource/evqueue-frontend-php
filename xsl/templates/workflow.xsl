@@ -643,7 +643,7 @@
 						</span>
 						<img src="images/refresh.png" class="refreshWorkflows action" title="Refresh workflow list" data-status="{$status}" style="margin-left: 5px;" />
 						<xsl:if test="$status = 'EXECUTING'">
-							<img src="images/alarm_clock.png" onclick="evqueueAPI(this, 'control', 'retry');" class="pointer" data-confirm='Do you really want to retry all tasks? This can lead to tasks stopping in error sooner than expected, since their retry "counter" gets decremented.' title="Retry all tasks" style="margin-left: 5px;"/>
+							<img src="images/alarm_clock.png" onclick="retryAllTasks();" class="pointer" data-confirm='Do you really want to retry all tasks? This can lead to tasks stopping in error sooner than expected, since their retry "counter" gets decremented.' title="Retry all tasks" style="margin-left: 5px;"/>
 						</xsl:if>
 						<div style="float:right;"><input type="checkbox" class="autorefresh" checked="checked" />&#160;Auto-refresh</div>
 					</div>

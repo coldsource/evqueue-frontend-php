@@ -24,6 +24,7 @@ require_once 'lib/XSLEngine.php';
 
 $xsl = new XSLEngine();
 
+
 if (isset($_POST) && (count($_POST)>1)){
 	if (isset($_GET["workflow_id"]) && ($_GET["workflow_id"] != '')){
 		$xsl->Api('workflow', 'clear_notifications', [

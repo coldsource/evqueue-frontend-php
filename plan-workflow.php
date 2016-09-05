@@ -79,10 +79,6 @@ if (!empty($_POST)) {
 		header("location:list-workflow-schedules.php");
 		die();
 	}
-		
-		/*$ws = new WebserviceWrapper('workflow-schedule-save', 'formWorkflowSchedule', array(
-				'node_name' => $_POST['node_name'],
-				'bind' => 'yes',*/
 }
 
 
