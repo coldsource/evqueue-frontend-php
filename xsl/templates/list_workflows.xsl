@@ -134,7 +134,7 @@
 			
 			<tr class="groupspace"><td></td></tr>
 			<tr class="group">
-				<td colspan="5">Git</td>
+				<td colspan="5">Git only</td>
 			</tr>
 			<xsl:for-each select="/page/git-workflows/entry">
 				<xsl:if test="count(/page/workflows/workflow[@name = current()/@name]) = 0">
