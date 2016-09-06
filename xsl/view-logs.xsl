@@ -11,6 +11,10 @@
 
 	<xsl:template name="content">
 		<div id="queue" class="contentList">
+			<br />
+			<xsl:for-each select="/page/config/response">
+				<div>Current log filter on node <b><xsl:value-of select="@node" /></b> is : <b><xsl:value-of select="configuration/entry[@name = 'logger.db.filter']/@value" /></b></div>
+			</xsl:for-each>
 			<div id="lastlogs">
 				<xsl:call-template name="last-logs" />
 			</div>
