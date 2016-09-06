@@ -20,7 +20,6 @@
 
 require_once 'inc/auth_check.php';
 require_once 'inc/logger.php';
-require_once 'lib/WebserviceWrapper.php';
 require_once 'lib/XSLEngine.php';
 
 $xsl = new XSLEngine();

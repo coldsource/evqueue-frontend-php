@@ -143,7 +143,7 @@ class XSLEngine
 	}
 
 	/*
-	 * @param $fragment is either an XML string, a DOMDocument, or a WebserviceWrapperGeneric.
+	 * @param $fragment is either an XML string or a DOMDocument.
 	 */
 	public function AddFragment($xml, $parent_node = false)
 	{
@@ -175,14 +175,8 @@ class XSLEngine
 			$node = $this->xmldoc->importNode($xml->firstChild,true);
 			$added_node = $parent_node->appendChild($node);
 
-		} else if ($xml instanceof WebserviceWrapperGeneric) {
-
-			$dom = $xml->FetchResult();
-			$node = $this->xmldoc->importNode($dom->firstChild,true);
-			$added_node = $parent_node->appendChild($node);
-
 		} else {
-			Logger::Log(LOG_ERR, 'XSLEngine.php', '$xml is neither an XML string, a DOMDocument nor a WebserviceWrapper');
+			Logger::Log(LOG_ERR, 'XSLEngine.php', '$xml is neither an XML string or a DOMDocument');
 		}
 
 		if($added_node !== false && $rootName !== false && $added_node->nodeName != $rootName){

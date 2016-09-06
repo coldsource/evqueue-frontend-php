@@ -21,7 +21,6 @@
 require_once 'inc/auth_check.php';
 require_once 'inc/logger.php';
 require_once 'lib/XSLEngine.php';
-require_once 'lib/WebserviceWrapper.php';
 require_once 'utils/xml_utils.php';
 
 
