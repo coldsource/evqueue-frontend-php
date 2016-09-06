@@ -24,7 +24,6 @@ require_once 'lib/XSLEngine.php';
 
 
 $xsl = new XSLEngine();
-// EXECUTING workflows
 foreach ($QUEUEING as $scheme) {
 	try{
 		$evqueue_node = getevQueue($scheme);

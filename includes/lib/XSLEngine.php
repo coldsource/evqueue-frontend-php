@@ -274,7 +274,7 @@ class XSLEngine
 		return "<response />";
 	}
 	
-	public function ClusterApi($name, $action = false, $attributes = [], $parameters = [], $evqueue_node = false)
+	public function ClusterApi($name, $action = false, $attributes = [], $parameters = [])
 	{
 		$full_xml = '<cluster>';
 		foreach ($_SESSION['nodes'] as $node_name => $conf) {

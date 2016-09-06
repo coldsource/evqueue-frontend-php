@@ -92,7 +92,7 @@
 										</td>
 									</xsl:if>
 									<td class="center">
-										<xsl:value-of select="/page/workflow-schedules-instance/workflow[@schedule_id = current()/@id]/@node_name" />
+										<xsl:value-of select="@node" />
 									</td>
 									<xsl:if test="$DISPLAY = 'settings'">
 										<td class="center">
@@ -128,7 +128,7 @@
 									</xsl:if>
 									<td class="center">
 										<xsl:call-template name="displayDateAndTime">
-											<xsl:with-param name="datetime_start" select="/page/status/status/workflow[@workflow_schedule_id = current()/@id]/@scheduled_at" />
+											<xsl:with-param name="datetime_start" select="/page/status/response/status/workflow[@workflow_schedule_id = current()/@id]/@scheduled_at" />
 										</xsl:call-template>
 									</td>
 									<xsl:if test="$DISPLAY = 'settings'">

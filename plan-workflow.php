@@ -50,34 +50,37 @@ if (!empty($_POST)) {
 	if($_POST['whatSelectMode'] == 'Script'){
 		$_POST['create_workflow'] = 'yes';
 		$xsl->Api('task', 'create', $_POST);
-		$id = $evqueue->GetParserRootAttributes();
-		print_r($id);die();
+		if(isset($evqueue->GetParserRootAttributes()['WORKFLOW-ID']))
+			$_POST['workflow_id_select'] = $evqueue->GetParserRootAttributes()['WORKFLOW-ID'];
+		
 	}
 	
-	parse_str($_POST['schedule_parameters'], $params);
-	
-	$attr = [
-		'workflow_id'  => $_POST['workflow_id_select'],
-		'schedule'     => $_POST['schedule'],
-		'onfailure'    => $_POST['onfailure'],
-		'user'         => $_POST['schedule_user'],
-		'host'         => $_POST['schedule_host'],
-		'active'       => (isset($_POST['active']) && $_POST['active'] == 'on') ? 'yes' : 'no',
-		'schedule_comment' => $_POST['schedule_comment'],
-	];
-	
-	$evqueue_node = getevQueue($_SESSION['nodes'][$_POST['node_name']]);
-	
-	if($_POST['workflow_schedule_id'] != ''){
-		$attr['id'] = $_POST['workflow_schedule_id'];
-		$xml = $xsl->Api('workflow_schedule', 'edit', $attr, $params, $evqueue_node);
-	}
-	else
-		$xsl->Api('workflow_schedule', 'create', $attr, $params, $evqueue_node);
-	
-	if (!$xsl->HasError()) {
-		header("location:list-workflow-schedules.php");
-		die();
+	if(!$xsl->HasError()){
+		parse_str($_POST['schedule_parameters'], $params);
+		$attr = [
+			'workflow_id'      => $_POST['workflow_id_select'],
+			'schedule'         => $_POST['schedule'],
+			'onfailure'        => $_POST['onfailure'],
+			'user'             => $_POST['schedule_user'],
+			'host'             => $_POST['schedule_host'],
+			'active'           => (isset($_POST['active']) && $_POST['active'] == 'on') ? 'yes' : 'no',
+			'schedule_comment' => $_POST['schedule_comment'],
+			'node'             => $_POST['node_name'],
+		];
+		
+		$evqueue_node = getevQueue($_SESSION['nodes'][$_POST['node_name']]);
+		
+		if($_POST['workflow_schedule_id'] != ''){
+			$attr['id'] = $_POST['workflow_schedule_id'];
+			$xml = $xsl->Api('workflow_schedule', 'edit', $attr, $params, $evqueue_node);
+		}
+		else
+			$xsl->Api('workflow_schedule', 'create', $attr, $params, $evqueue_node);
+		
+		if (!$xsl->HasError()) {
+			header("location:list-workflow-schedules.php");
+			die();
+		}
 	}
 }
 

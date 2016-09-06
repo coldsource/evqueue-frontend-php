@@ -23,36 +23,31 @@ require_once 'inc/logger.php';
 require_once 'lib/XSLEngine.php';
 
 $xsl = new XSLEngine();
-if(isset($_GET['display']) && $_GET['display'] == 'state') {
-	$xml = $xsl->Api('workflow_schedules', 'list'); //TODO : filtre active only
-	$xsl->SetParameter('DISPLAY', 'state');
-}
-else{
-	$xml = $xsl->Api('workflow_schedules', 'list');
-	$xsl->SetParameter('DISPLAY', 'settings');
-}
-$xsl->AddFragment(['schedules' => $xml]);
-
+	
+$xml = $xsl->Api('workflow_schedules', 'list');
 
 $dom = new DOMDocument();
 $dom->loadXML($xml);
 $xpath = new DOMXpath($dom);
+
+
+if(isset($_GET['display']) && $_GET['display'] == 'state'){
+	$xsl->SetParameter('DISPLAY', 'state');
+	$schedules = $xpath->evaluate('/response/workflow_schedule[@active = 0]');
+	foreach($schedules as $schedule){
+		$schedule->parentNode->removeChild($schedule);
+	}
+}
+else
+	$xsl->SetParameter('DISPLAY', 'settings');
+
+$xsl->AddFragment(['schedules' => $dom]);
 $schedules = $xpath->evaluate('/response/workflow_schedule/@id');
 foreach($schedules as $schedule){
 	$xsl->AddFragment(["workflow-schedules-instance" => $xsl->Api("instances", "list", ['filter_schedule_id' => $schedule->nodeValue, 'limit' => 1])]);
 }
-
 $xsl->AddFragment(["workflows" => $xsl->Api("workflows", "list")]);
-
-$xsl->AddFragment(["status" => $xsl->Api("status", "query", ['type' => 'scheduler'])]);
-
-/*
-foreach ($QUEUEING as $node_name => $conf) {
-	$wfi = new WorkflowInstance($node_name);
-	$next_exec_time = $wfi->GetNextExecutionTime();
-	if ($next_exec_time)
-		$xsl->AddFragment($next_exec_time);
-}*/
+$xsl->AddFragment(["status" => $xsl->ClusterApi("status", "query", ['type' => 'scheduler'])]);
 
 $xsl->DisplayXHTML('xsl/list_workflow_schedules.xsl');
 
