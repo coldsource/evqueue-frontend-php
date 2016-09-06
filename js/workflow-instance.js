@@ -17,7 +17,7 @@ $(document).ready( function() {
 	});
 	
 	// LAUNCH WORKFLOW
-	$('select#launchWF').change( function () {
+	$('select#launchWF option').click( function () {
 		var name = $(this).val();
 		$("#launch_"+name).dialog({ 
 			minHeight: 300, 

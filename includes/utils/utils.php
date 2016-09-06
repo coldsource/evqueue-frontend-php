@@ -10,9 +10,9 @@ function getevQueue($scheme){
 }
 
 function getAllGroup(){
-	global $evqueue;
+	global $xsl;
 	$groups = [];
-	$xml = $evqueue->Api("workflows", "list");
+	$xml = $xsl->Api("workflows", "list");
 	$dom = new DOMDocument();
 	$dom->loadXML($xml);
 	$xpath = new DOMXPath($dom);

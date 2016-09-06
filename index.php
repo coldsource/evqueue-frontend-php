@@ -23,7 +23,7 @@ require_once 'inc/logger.php';
 require_once 'lib/XSLEngine.php';
 $xsl = new XSLEngine();
 
-$xml = $evqueue->Api("workflows", "list");
+$xml = $xsl->Api("workflows", "list");
 $xsl->AddFragment(["available-workflows" => $xml]);
 $xsl->AddFragment(getAllGroupXml());
 

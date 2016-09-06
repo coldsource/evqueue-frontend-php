@@ -24,7 +24,8 @@ require_once 'inc/evqueue.php';
 
 if (!isset($_SESSION['user_login'])) {
 	try{
-		$evqueue->Api('ping');
+		if($evqueue)
+			$evqueue->Api('ping');
 		$_SESSION['user_login'] = "anonymous";
 		$_SESSION['user_pwd'] = "";
 		$_SESSION['user_profile'] = "ADMIN";
@@ -57,7 +58,8 @@ if (!isset($_SESSION['user_login'])) {
 }
 else{
 	try{
-		$evqueue->Api('ping');
+		if($evqueue)
+			$evqueue->Api('ping');
 	}
 	catch(Exception $e){
 		echo $e->getMessage();die();

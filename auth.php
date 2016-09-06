@@ -54,7 +54,7 @@ if (isset($_POST['login']) && isset($_POST['password'])) {
 	
 	try
 	{
-		$xml = $evqueue->Api('ping');
+		$xml = $xsl->Api('ping');
 		foreach($QUEUEING as $scheme){
 			try{
 					$evqueue_node = new evQueue($scheme,$_POST['login'],$pwd);

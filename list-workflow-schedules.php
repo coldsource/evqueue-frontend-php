@@ -39,7 +39,7 @@ $dom->loadXML($xml);
 $xpath = new DOMXpath($dom);
 $schedules = $xpath->evaluate('/response/workflow_schedule/@id');
 foreach($schedules as $schedule){
-	$xsl->AddFragment(["workflow-schedules-instance" => $evqueue->Api("instances", "list", ['filter_schedule_id' => $schedule->nodeValue, 'limit' => 1])]);
+	$xsl->AddFragment(["workflow-schedules-instance" => $xsl->Api("instances", "list", ['filter_schedule_id' => $schedule->nodeValue, 'limit' => 1])]);
 }
 
 $xsl->AddFragment(["workflows" => $xsl->Api("workflows", "list")]);

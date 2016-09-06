@@ -18,8 +18,6 @@ if(!isset($_POST['node']) || $_POST['node'] == ""){
 		}
 	}
 	while($i < $count  && $evqueue == false);
-	if($evqueue == false)
-		die("There is not running engine");
 }
 elseif(!isset($_SESSION['nodes'][$_POST['node']]))
 	die("Node ".$_POST['node']." doesn't exist");

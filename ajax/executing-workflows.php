@@ -25,18 +25,20 @@ require_once 'lib/XSLEngine.php';
 
 $xsl = new XSLEngine();
 // EXECUTING workflows
-foreach ($_SESSION['nodes'] as $node_name => $conf) {
+foreach ($QUEUEING as $scheme) {
 	try{
-		$evqueue_node = getevQueue($conf);
+		$evqueue_node = getevQueue($scheme);
+		$evqueue_node->Api('ping');
+		$node_name = $evqueue_node->GetParserRootAttributes()['NODE'];
 		$xml = $evqueue_node->Api('status', 'query', ['type' => "workflows"]);
 		$dom = new DOMDocument();
 		$dom->loadXML($xml);
 		$dom->documentElement->setAttribute("node", $node_name);
 		$xsl->AddFragment(["instances" => $dom]);
+		$_SESSION['node'][$node_name] = $scheme;
 	}
 	catch(Exception $e) {
-		$xsl->AddFragment('<error id="evqueue-not-running" node="'.$node_name.'"></error>');  // TODO: add which node is not running
-		//$xsl->AddFragment('<workflows status="EXECUTING" />"');
+		$xsl->AddFragment('<error id="evqueue-not-running" node="'.$scheme.'">'.$e->getMessage().'</error>');
 	}
 }
 $xsl->DisplayXHTML('../xsl/ajax/executing-workflows.xsl');

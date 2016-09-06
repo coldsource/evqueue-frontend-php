@@ -255,6 +255,11 @@ class XSLEngine
 		global $evqueue;
 		if($evqueue_node === false)
 			$evqueue_node = $evqueue;
+			
+		if($evqueue_node === false){
+			$this->AddError("This engine is not running");
+			return "<response status='KO' error='This engine is not running' />";
+		}
 		
 		try
 		{

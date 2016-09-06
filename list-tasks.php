@@ -25,7 +25,7 @@ require_once 'lib/XSLEngine.php';
 
 $xsl = new XSLEngine();
 
-$evqueue->Api("git", "pull");
+$xsl->Api("git", "pull");
 $xsl->AddFragment(["tasks" => $xsl->Api("tasks", "list")]);
 $xsl->AddFragment(["git-tasks" => $xsl->Api("git", "list_tasks")]);
 

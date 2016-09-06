@@ -49,7 +49,7 @@ else
 	$parameters = [];
 	
 $xsl = new XSLEngine();
-$xml = $evqueue->Api('instances', 'list', $filters, $parameters);
+$xml = $xsl->Api('instances', 'list', $filters, $parameters);
 $xsl->AddFragment(["instances" => $xml]);
 
 $xsl->DisplayXHTML('../xsl/ajax/terminated-workflows.xsl');

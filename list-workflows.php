@@ -38,12 +38,11 @@ if (isset($_FILES['workflow_zip_file'])) {
 		$xsl->AddErrors($errors);
 }
 
-$evqueue->Api("git", "pull");
+$xsl->Api("git", "pull");
 
 $xsl->AddFragment(["workflows" => $xsl->Api("workflows", "list")]);
 $xsl->AddFragment(["git-workflows" => $xsl->Api("git", "list_workflows")]);
 
-//$xsl->AddFragment(Task::getAllXml($filter='only-tied-task'));
 $xsl->DisplayXHTML('xsl/list_workflows.xsl');
 
 ?>
