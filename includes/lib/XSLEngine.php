@@ -275,6 +275,29 @@ class XSLEngine
 		return "<response />";
 	}
 	
+	public function ClusterApi($name, $action = false, $attributes = [], $parameters = [], $evqueue_node = false)
+	{
+		$full_xml = '<cluster>';
+		foreach ($_SESSION['nodes'] as $node_name => $conf) {
+			try {
+				$evqueue_node = getevQueue($conf);
+				$xml = $evqueue_node->Api($name, $action, $attributes, $parameters);
+				$dom = new DOMDocument();
+				$dom->loadXML($xml);
+				$dom->documentElement->setAttribute("node", $node_name);
+				$xml = $dom->saveXML($dom->documentElement);
+				
+				$full_xml .= $xml;
+			}
+			catch(Exception $e) {
+				$this->AddError($e->getMessage());
+			}
+		}
+		$full_xml .= '</cluster>';
+		
+		return $full_xml;
+	}
+	
 	public function HasError(){
 		$xpath = new DOMXpath($this->xmldoc);
 		if($xpath->evaluate("count(/page/errors/error)"))
