@@ -90,7 +90,7 @@
 										<tr>
 											<xsl:for-each select="/page/units/unit">
 												<td>
-													<select name="{@input_name}" multiple="multiple" size="12">
+													<select name="{@input_name}" multiple="multiple" size="12" class="custom-schedule-select">
 														<option value="">
 															<xsl:if test="count(value[@checked='true']) = 0">
 																<xsl:attribute name="selected">selected</xsl:attribute>

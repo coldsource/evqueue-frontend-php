@@ -243,6 +243,10 @@ div.formdiv select {
   min-width:20em;
 }
 
+div.formdiv select.custom-schedule-select{
+  min-width: unset;
+}
+
 div#specificRights {
  padding-left:16em;
 }
