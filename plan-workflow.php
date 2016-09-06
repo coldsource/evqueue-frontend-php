@@ -33,6 +33,7 @@ if (isset($_GET['id'])) {
 	$dom = new DOMDocument();
 	$dom->loadXML($xml);
 	$xpath = new DOMXPath($dom);
+	//echo $xml;die();
 	$workflow_id = $xpath->evaluate('string(/response/workflow_schedule/@workflow_id)');
 	$schedule = $xpath->evaluate('string(/response/workflow_schedule/@schedule)');
 	$xsl->AddFragment(['workflow' => $xsl->Api('workflow', 'get', ['id' => $workflow_id])]);

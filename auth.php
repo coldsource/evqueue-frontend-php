@@ -56,19 +56,29 @@ if (isset($_POST['login']) && isset($_POST['password'])) {
 	{
 		$xml = $evqueue->Api('ping');
 		foreach($QUEUEING as $scheme){
-			$evqueue_node = new evQueue($scheme,$_POST['login'],$pwd);
-			$evqueue_node->Api('ping');
-			$node_name = $evqueue_node->GetParserRootAttributes()['NODE'];
-			if(isset($nodes[$node_name]) || $node_name == '')
-				throw new Exception('Node name can\'t be null and should be unique');
-			$nodes[$node_name] = $scheme;
+			try{
+					$evqueue_node = new evQueue($scheme,$_POST['login'],$pwd);
+					$evqueue_node->Api('ping');
+					$node_name = $evqueue_node->GetParserRootAttributes()['NODE'];
+					if(isset($nodes[$node_name]) || $node_name == '')
+						throw new Exception('Node name can\'t be null and should be unique. Check your configuration.', evQueue::ERROR_ENGINE_NAME);
+					$nodes[$node_name] = $scheme;
+			}
+			catch(Exception $e){
+				if($e->getCode() == evQueue::ERROR_ENGINE_NAME)
+					throw $e;
+			}
 		}
 		
 	}
 	catch(Exception $e)
 	{
+		echo $e->getMessage();die();
 		if($e->getCode() != evQueue::ERROR_AUTH_FAILED){
 			$xsl->AddFragment('<error>evqueue-ko</error>');
+		}
+		elseif($e->getCode() != evQueue::ERROR_ENGINE_NAME){
+			die($e->getMessage());
 		}
 		else{
 			$xsl->AddFragment('<error>wrong-creds</error>');

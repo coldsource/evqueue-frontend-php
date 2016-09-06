@@ -42,6 +42,7 @@ class evQueue {
 	const ERROR_AUTH_REQUIRED = 1;
 	const ERROR_AUTH_FAILED = 2;
 	const ERROR_RESPONSE_KO = 3;
+	const ERROR_ENGINE_NAME = 4;
 	
 	
 	public function __construct($cnx_string, $user_login = null, $user_pwd = null) {

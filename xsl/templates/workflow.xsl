@@ -600,6 +600,14 @@
 		<xsl:param name="status" />
 		
 		<div id="{$status}-workflows" class="workflow-list">
+			
+			<xsl:for-each select="error[@id='evqueue-not-running']">
+				<div id="evqueue-not-running">
+					Evqueue is not running on node '<xsl:value-of select="@node" />'!!!<br/>
+					<!--If you expect workflows to be launched, you should start the evqueue process urgently!-->
+				</div>
+			</xsl:for-each>
+			
 			<xsl:choose>
 				<xsl:when test="count(exsl:node-set($instances))=0">
 					<div style="text-align: center">

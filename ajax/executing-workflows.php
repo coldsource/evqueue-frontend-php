@@ -35,12 +35,10 @@ foreach ($_SESSION['nodes'] as $node_name => $conf) {
 		$xsl->AddFragment(["instances" => $dom]);
 	}
 	catch(Exception $e) {
-		die($e);
-		$xsl->AddFragment('<error>evqueue-not-running</error>');  // TODO: add which node is not running
-		$xsl->AddFragment('<workflows status="EXECUTING" />"');
+		$xsl->AddFragment('<error id="evqueue-not-running" node="'.$node_name.'"></error>');  // TODO: add which node is not running
+		//$xsl->AddFragment('<workflows status="EXECUTING" />"');
 	}
 }
-
 $xsl->DisplayXHTML('../xsl/ajax/executing-workflows.xsl');
 
 ?>
