@@ -43,16 +43,17 @@
 	
 		<xsl:call-template name="displayErrors" />
 
-		<form name="formTask" id="formTask" action="manage-task.php" method="post">
+		<form name="formTask" id="formTask" method="post">
 			<xsl:call-template name="taskFormInputs" />
-			
-			<label class="formLabel" for="create_workflow">Create workflow</label>
-			<input type="checkbox" name="create_workflow" id="create_workflow" value="yes">
-				<xsl:if test="/page/post/@create_workflow = 'yes' or /page/get/@create_workflow = 'yes' or (/page/task/task/@create_workflow = 1 and count(/page/post/@create_workflow) = 0)">
-					<xsl:attribute name="checked">checked</xsl:attribute>
-				</xsl:if>
-			</input>
-			<br />
+			<xsl:if test="count(/page/get/@task_id) = 0">
+				<label class="formLabel" for="create_workflow">Create workflow</label>
+				<input type="checkbox" name="create_workflow" id="create_workflow" value="yes">
+					<xsl:if test="/page/post/@create_workflow = 'yes' or /page/get/@create_workflow = 'yes' or (/page/task/task/@create_workflow = 1 and count(/page/post/@create_workflow) = 0)">
+						<xsl:attribute name="checked">checked</xsl:attribute>
+					</xsl:if>
+				</input>
+				<br />
+			</xsl:if>
 			
 			<input type="submit" name="submitFormTask" id="submitFormTask" class="submitFormButton submitFormButtonSmall">
 				<xsl:attribute name="value">

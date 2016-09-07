@@ -76,3 +76,34 @@ $(function() {
 		minLength:0
     }).bind('focus', function(){ $(this).autocomplete("search"); } );
 });
+
+
+$(document).on('keyup click', '#binary', function(){
+	val = $(this).val();
+	if (val.substr(val.length - 1) == "/" || val == "") {
+		$.ajax({
+			data:{'group':'filesystem', 'action':'list', 'attributes':{'path':$(this).val()}},
+			type: 'post',
+			url: 'ajax/evqueue_api.php',
+			content:'xml',
+		}).done(function(xml){
+			availableFiles = [];
+			
+			$(xml).find('response entry').each(function(){
+				availableFiles.push(val+$(this).attr('name'));
+			});
+			
+			availableFiles.sort(function(a,b){
+				return a.toLowerCase() > b.toLowerCase() ? 1 : -1;
+			})
+			
+			$( "input#binary" ).autocomplete({
+				source: availableFiles,
+				minLength:0
+			});
+			
+			
+			$( "input#binary" ).autocomplete("search");
+		});
+	}
+})

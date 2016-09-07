@@ -1051,7 +1051,7 @@ div.lightTreeJob {
 
 div.lightTreeJob:before {
   content: url(../images/down-arrow.png);
-  margin-left: 49%; }
+  margin-left: 49.5%; }
 
 .lightTreeJobCondition {
   font-size: 110%;

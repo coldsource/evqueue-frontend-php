@@ -115,12 +115,16 @@
 								</xsl:choose>
 							</xsl:if>
 							
-							<a href="manage-workflow.php?workflow_id={@id}" title="Text edit">
-								<img src="images/edition/edit-txt.png" />
-							</a>
-							<a href="manage-workflow-gui.php?workflow_id={@id}" title="Graphical edit">
-								<img src="images/edition/edit-gui.png" />
-							</a>
+							<xsl:if test="@has-bound-task = '1'">
+								<a href="manage-task.php?task_id={@bound-task-id}" title="Text edit">
+									<img src="images/edition/edit-txt.png" />
+								</a>
+							</xsl:if>
+							<xsl:if test="@has-bound-task = '0'">
+								<a href="manage-workflow.php?workflow_id={@id}" title="Text edit">
+									<img src="images/edition/edit-txt.png" />
+								</a>
+							</xsl:if>
 							<a href="export.php?workflow_id={@id}" title="Export (zip file)">
 								<img src="images/zip.png" />
 							</a>

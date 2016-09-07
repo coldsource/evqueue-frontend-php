@@ -24,7 +24,7 @@
 	</xsl:template>
 	
 	<xsl:template name="form_workflow_header">
-		<input type="hidden" name="workflow_id" value="{/page/workflow/@id}" />
+		<input type="hidden" name="workflow_id" value="{/page/get/@workflow_id}" />
 		<label class="formLabel" for="workflow_name">Name:</label>
 		<input type="text" name="workflow_name" id="workflow_name" placeholder="The name of your workflow" value="{/page/post/@workflow_name | /page/response-workflow/workflow/@name}"  />
 		<br />

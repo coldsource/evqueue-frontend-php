@@ -24,10 +24,7 @@ require_once 'lib/XSLEngine.php';
 
 $xsl = new XSLEngine();
 
-$dom = new DOMDocument();
-$dom->loadXML($_POST['xml']);
+$xsl->AddFragment($_SESSION['edition'][$_POST['id']]['workflow']);
 
-$xsl->AddFragment($_POST['xml']);
-
-$xsl->DisplayXHTML('../xsl/ajax/edit-workflow-tree.xsl');
+$xsl->DisplayXHTML('../xsl/ajax/get-workflow-tree.xsl');
 ?>

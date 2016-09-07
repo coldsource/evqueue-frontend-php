@@ -21,7 +21,7 @@
 				<th class="thActions">Actions</th>
 			</tr>
 			
-			<xsl:for-each select="page/tasks/task/@group[generate-id(.) = generate-id(key('groups', .))]">
+			<xsl:for-each select="page/tasks/task[not(starts-with(@name,'@'))]/@group[generate-id(.) = generate-id(key('groups', .))]">
 				<xsl:sort select="." />
 				
 				<xsl:variable name="groupName" select="." />

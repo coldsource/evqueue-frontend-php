@@ -148,7 +148,7 @@
 											<xsl:text>&#160;</xsl:text>
 											<a href="plan-workflow.php?id={@id}" style="text-decoration: none;"><img src="images/edit.gif" /></a>
 											<xsl:text>&#160;</xsl:text>
-											<img data-confirm="Really delete (and deactivate) workflow schedule '+{@id}+'?" onclick="evqueueAPI(this, 'workflow_schedule', 'delete', {{ 'id':'{@id}' }});location.reload();" src="images/delete.gif" class="pointer" />
+											<img data-confirm="Really delete (and deactivate) workflow schedule '{@id}'?" onclick="evqueueAPI(this, 'workflow_schedule', 'delete', {{ 'id':'{@id}' }});location.reload();" src="images/delete.gif" class="pointer" />
 										</xsl:if>
 									</td>
 								</tr>

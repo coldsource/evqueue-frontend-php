@@ -24,6 +24,7 @@ require_once 'lib/XSLEngine.php';
 
 
 $xsl = new XSLEngine();
+$_SESSION['nodes'] = [];
 foreach ($QUEUEING as $scheme) {
 	try{
 		$evqueue_node = getevQueue($scheme);
@@ -34,7 +35,7 @@ foreach ($QUEUEING as $scheme) {
 		$dom->loadXML($xml);
 		$dom->documentElement->setAttribute("node", $node_name);
 		$xsl->AddFragment(["instances" => $dom]);
-		$_SESSION['node'][$node_name] = $scheme;
+		$_SESSION['nodes'][$node_name] = $scheme;
 	}
 	catch(Exception $e) {
 		$xsl->AddFragment('<error id="evqueue-not-running" node="'.$scheme.'">'.$e->getMessage().'</error>');
