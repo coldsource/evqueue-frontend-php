@@ -20,10 +20,9 @@
 
 require_once 'inc/auth_check.php';
 require_once 'inc/logger.php';
-require_once 'lib/save_workflow.php';
 
 
-
+/*
 if (!isset($_POST['action']) || !isset($_POST['location']))
 	pie('ko','action or location not set');
 
@@ -54,7 +53,7 @@ if ($_POST['location'] != '') {
 		pie('ko',"no node at xpath {$_POST['location']}");
 	
 	$location = $nodes->item(0);
-}
+}*/
 
 
 switch ($_POST['action']) {
@@ -304,19 +303,15 @@ switch ($_POST['action']) {
 		pie('ok-redirect','list-workflows.php');  // redirect to workflow list
 		break;
 	
+	case 'updateXml':
+		$_SESSION['edition'][$_POST['id']]['workflow'] = $_POST['xml'];
+		break;
+	
 	default:
 		pie('ko',"undefined action {$_POST['action']}");
 }
 
-
-// TODO: xsd check
-
-/* TODO: big parse'n'check
- * - tasks' task_name, queue_name and retry_schedule
- * - valid xpath in <value> tags
- * - ..?
- */
-
+/*
 $_SESSION['edition']['workflow'] = $dom->saveXML($dom->documentElement);
 
 if(isset($_POST['workflow_name']) && isset($_POST['workflow_group'])){
@@ -326,4 +321,5 @@ if(isset($_POST['workflow_name']) && isset($_POST['workflow_group'])){
 }
 session_write_close();
 pie('ok');
+*/
 ?>

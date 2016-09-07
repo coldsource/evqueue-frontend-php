@@ -15,6 +15,9 @@
 		<label class="formLabel" for="wd">Task working directory</label>
 		<input type="text" name="wd" id="wd" value="{/page/post/@wd | /page/task/task/@wd}" />
 		<br />
+		<label class="formLabel" for="comment">Task comment</label>
+		<input type="text" name="comment" id="comment" value="{/page/post/@comment | /page/task/task/@comment}" />
+		<br />
 		<label class="formLabel" for="parameters_mode">Parameters mode</label>
 		<select name="parameters_mode" id="parameters_mode">
 			<xsl:call-template name="getSelectedItem">

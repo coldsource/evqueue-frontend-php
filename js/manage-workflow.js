@@ -300,12 +300,30 @@ $(document).ready( function () {
 	updateTree();
 });
 
+$(document).on('focusout', '#workflow_xml', function(){
+	$.ajax({
+		data:{'xml':$('#workflow_xml').val(), 'action':'updateXml', id:getId()},
+		type: 'post',
+		url: 'ajax/edit-session-workflow.php',
+	}).done(function(result){
+		updateTree();
+	});
+});
+
 function updateTree() {
 	$.ajax({
-		data:{'xml':$('#workflow_xml').val()},
+		data:{'id':getId()},
 		type: 'post',
-		url: 'ajax/edit-workflow-tree.php',
+		url: 'ajax/get-workflow-tree.php',
 	}).done(function(result){
 		$('#editTree').html(result);
 	});
+}
+
+function getId() {
+	id = $("input[name='workflow_id']").val();
+	if (id == '') {
+		id = 'new';
+	}
+	return id;
 }
