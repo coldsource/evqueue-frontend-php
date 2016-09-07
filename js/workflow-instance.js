@@ -47,7 +47,8 @@ $(document).ready( function() {
 			host: $(this).find('.hostTab input[name=host]').val()
 		};
 		
-		evqueueAPI(this, "instance", "launch", attr, wfparams, $(this).find('.nodeTab select').val());
+		evqueueAPI(this, "instance", "launch", attr, wfparams, $(this).find('.nodeTab select').val());	
+		refreshWorkflows("executing");
 	});
 });
 
