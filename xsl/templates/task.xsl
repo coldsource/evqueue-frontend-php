@@ -1,10 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:exsl="http://exslt.org/common" version="1.0">
+<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:exsl="http://exslt.org/common" version="1.0" xmlns:php="http://php.net/xsl" >
 	<xsl:import href="../templates/dropdown_utils.xsl" />
 	<xsl:template name="taskFormInputs">
 		<input type="hidden" name="id" value="{/page/get/@task_id}" />
 		<label class="formLabel" for="name" >Task name</label>
-		<input type="text" name="name" id="name" value="{/page/post/@name | /page/task/task/@name}" />
+		<xsl:if test="count(/page/workflows/workflow[@bound-task-id=/page/get/@task_id]) > 0 and count(/page/post/@name) = 0">
+			<input type="text" name="name" id="name" value="{php:function('substr', string(/page/task/task/@name), 1)}" />
+		</xsl:if>
+		<xsl:if test="count(/page/workflows/workflow[@bound-task-id=/page/get/@task_id]) = 0 or count(/page/post/@name) > 0">
+			<input type="text" name="name" id="name" value="{/page/post/@name | /page/task/task/@name}" />
+		</xsl:if>
 		<br />
 		<label class="formLabel" for="binary">Task binary</label>
 		<input type="text" name="binary" id="binary" value="{/page/post/@binary | /page/task/task/@binary}" placeholder="Absolute path to your script on the host machine" class="filenameInput" />

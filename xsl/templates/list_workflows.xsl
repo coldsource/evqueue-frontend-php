@@ -116,7 +116,7 @@
 							</xsl:if>
 							
 							<xsl:if test="@has-bound-task = '1'">
-								<a href="manage-task.php?task_id={@id}" title="Text edit">
+								<a href="manage-task.php?task_id={@bound-task-id}" title="Text edit">
 									<img src="images/edition/edit-txt.png" />
 								</a>
 							</xsl:if>

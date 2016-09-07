@@ -49,7 +49,8 @@ if (isset($_GET["task_id"]) && ($_GET["task_id"] != '')){
 	}
 	$linkedWF .= '</linked-workflows>';
 	$xsl->AddFragment($linkedWF);*/
-	$xsl->SetParameter('creation', 0);
+	$xsl->SetParameter('creation', 0);	
+	$xsl->AddFragment(["workflows" => $xsl->Api("workflows", "list")]);
 }
 else
 	$xsl->SetParameter('creation', 1);
