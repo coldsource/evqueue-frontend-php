@@ -9,6 +9,8 @@
 	<xsl:param name="ISFORM" select="''" />
 	<xsl:param name="FORMTITLE" select="''" />
 	
+	<xsl:param name="LOGIN" select="''" />
+	
 	<xsl:template match="/">
 		<xsl:param name="title" select="'Workflow'" />
 		<html>
@@ -170,11 +172,11 @@
 		</xsl:if>
 		
 		<xsl:choose>
-			<xsl:when test="count(/page/private/logged-in-user) > 0">
+			<xsl:when test="$LOGIN != ''">
 				<div id="userInfo">
-					<span><xsl:value-of select="/page/private/logged-in-user/@login" /></span>
+					<span><xsl:value-of select="$LOGIN" /></span>
 					<xsl:text>&#160;</xsl:text>
-					<a href="{$SITE_BASE}manage-user.php?user_login={/page/private/logged-in-user/@login}" title="Edit">
+					<a href="{$SITE_BASE}user-preferences.php" title="My preferences">
 						<img src="{$SITE_BASE}images/edit.png" />
 					</a>
 					<xsl:text>&#160;</xsl:text>
