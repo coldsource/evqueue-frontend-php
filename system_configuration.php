@@ -34,9 +34,7 @@ foreach ($_SESSION['nodes'] as $node_name => $conf) {
 		$xsl->AddFragment(["global" => $dom]);
 	}
 	catch(Exception $e) {
-		die($e);
-		$xsl->AddFragment('<error>evqueue-not-running</error>');  // TODO: add which node is not running
-		$xsl->AddFragment('<workflows status="EXECUTING" />"');
+		$xsl->Adderror($e->getMessage());
 	}
 }
 $xsl->DisplayXHTML('xsl/system_configuration.xsl');

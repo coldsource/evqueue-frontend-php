@@ -9,6 +9,8 @@
 	</xsl:variable>
 	
 	<xsl:template name="content">
+		<xsl:call-template name="displayErrors" />
+		
 		<div class="contentManage">
 			<div class="boxTitle statistics">
 				<span class="title">Configuration</span>
