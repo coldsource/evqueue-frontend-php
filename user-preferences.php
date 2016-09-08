@@ -32,7 +32,11 @@ if(isset($_POST['action'])) {
 			$xsl->AddError("Passwords do not match");
 		
 		if($_POST['password']!='' && !$xsl->HasError())
+		{
 			$xsl->Api('user','change_password',['name'=>$_SESSION['user_login'], 'password'=>$_POST['password']]);
+			if(!$xsl->HasError())
+				$_SESSION['user_pwd'] = sha1($_POST['password'],true);
+		}
 		
 		$preferences = json_encode(['prefered_node' => $_POST['prefered_node']]);
 		$xsl->Api('user', 'update_preferences', ['name'=> $_SESSION['user_login'],'preferences' =>$preferences]);
