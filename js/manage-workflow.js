@@ -41,15 +41,14 @@ $(document).ready( function () {
 
 
 
-function executeAction (action, clicked, confirmed) {
+function executeAction (action, clicked, confirmed, postAction = false) {
 	if (isInXPathHelp) return;
-	
 	var item = $();
 	var loc = '';
 	confirmed = typeof(confirmed)!='undefined' ? confirmed : false;
 	
 	if (typeof(clicked) != 'undefined') {
-		item = clicked.parents('.actionItem:eq(0)');
+		item = clicked;
 		if (typeof(item.data('xpath')) != 'undefined')
 			loc = item.data('xpath');
 	}
@@ -64,9 +63,9 @@ function executeAction (action, clicked, confirmed) {
 	$.ajax({
 		url: 'ajax/edit-session-workflow.php',
 		type: 'POST',
-		data: 'action='+action+'&location='+loc+'&'+item.find('form').serialize()+(confirmed ? '&confirmed=true' : '')+'&workflow_name='+workflow_name+'&workflow_group='+workflow_group+'&workflow_comment='+workflow_comment,
+		data: 'action='+action+'&location='+loc+'&'+item.serialize()+(confirmed ? '&confirmed=true' : '')+'&workflow_name='+workflow_name+'&workflow_group='+workflow_group+'&workflow_comment='+workflow_comment+'&xml='+$('#workflow_xml').val()+"&id="+getId(),
 		success: function (res) {
-			res = $.parseJSON(res);
+			/*res = $.parseJSON(res);
 			
 			switch (res.type) {
 				case 'ok':
@@ -86,13 +85,15 @@ function executeAction (action, clicked, confirmed) {
 				
 				default:
 					$('p#statusBar').css({color: 'red'}).html('Action failed: '+action+' ('+res.msg+')');
-			}
+			}*/
+			updateTree(postAction);
+			updateXML();
 		}
 	});
-	
+	return false;
 }
 
-
+/*
 function editTask (clicked) {
 	if (isInXPathHelp) return;
 	
@@ -106,7 +107,7 @@ function editTask (clicked) {
 	
 	removeEditButtons();
 	task.addClass('editing').html($('form#editTask'));
-}
+}*/
 
 
 function editTaskInputs (clicked) {
@@ -149,14 +150,14 @@ function editTaskInput (clicked) {
 	});
 	
 	removeEditButtons();
-	input.addClass('editing').html($('form#editTaskInput'));
+	input.addClass('editing').html($('form#editTaskInput').data('xpath', input.data('xpath')));
 }
 
 
 function addTaskInputValue (clicked) {
 	if (isInXPathHelp) return;
 	
-	$('.taskInput.editing .taskInputValues').append($('#taskInputValueSample').html());
+	$(clicked).parent().prev().append($('#taskInputValueSample').html());
 }
 
 function deleteTaskInputValue (clicked) {
@@ -211,11 +212,11 @@ $(document).delegate( 'img.startXPathHelp', 'click', function (event) {
 	isInXPathHelp = true;
 	
 	// highlight selectable items
-	var currentJob = $(this);
+	/*var currentJob = $(this);
 	if (!currentJob.is('.job'))
 		currentJob = currentJob.parents('.job:eq(0)');
 	
-	currentJob.parents('.job').children('.tasks').children('.task').find('.taskName').add('.parameter').addClass('xpathSelectable');
+	currentJob.parents('.job').children('.tasks').children('.task').find('.taskName').add('.parameter').addClass('xpathSelectable');*/
 	
 	var input = $(this).prev('input');
 	input.data('previousValue', input.val());
@@ -224,16 +225,16 @@ $(document).delegate( 'img.startXPathHelp', 'click', function (event) {
 	$(this).prevAll('select[name^=value_type]').find('option[value=xpath]').attr('selected',true);
 	
 	var currentTaskOrJob = input.parents('div.task,div.job').eq(0);
-	var baseXPath;  // xpath expression we're willing to write will be relative to this baseXPath (parent job)
+	var baseXPath = $(this).data('xpath').xpathParent(4);  // xpath expression we're willing to write will be relative to this baseXPath (parent job)
 	
-	switch (currentTaskOrJob.data('type')) {
+	/*switch (currentTaskOrJob.data('type')) {
 		case 'task':
 			baseXPath = currentTaskOrJob.data('xpath').xpathParent(4);  // get up to containing job (2), and then to parent job (2 more)
 			break;
 		case 'job':
 			baseXPath = currentTaskOrJob.data('xpath').xpathParent(2);  // get up to parent job
 			break;
-	}
+	}*/
 	
 	$('div#popinMsg').text("Hover a workflow parameter or a parent task to select its value/output as input for "+currentTaskOrJob.data('type')+" '"+currentTaskOrJob.data('name')+"'").show();
 	
@@ -241,7 +242,7 @@ $(document).delegate( 'img.startXPathHelp', 'click', function (event) {
 	if (isInLoop)
 		$('div#popinMsg').append('<p class="popinWarning">You cannot access any task output because you are in a loop, use children and attributes of the tags you are looping on.</p>');
 	
-	$('div.task').mouseenter( function () {
+	$('.lightTreeTask').mouseenter( function () {
 		if (isInLoop) {
 			input.removeClass('success').addClass('error').val("Job/task loop combinations not implemented");
 			return;
@@ -267,13 +268,13 @@ $(document).delegate( 'img.startXPathHelp', 'click', function (event) {
 		input.removeClass('error').addClass('success').val( "/workflow/parameters/parameter[@name='"+$(this).data('name')+"']" );
 	});
 	
-	$('div.task,li.parameter').click( function (event) {
+	$('.lightTreeTask,li.parameter').click( function (event) {
 		stopXPathHelp(input);
 	});
 });
 
 function stopXPathHelp (input) {
-	$('div.task,li.parameter').off('mouseenter click');
+	$('.lightTreeTask,li.parameter').off('mouseenter click');
 	$('.xpathSelectable').removeClass('xpathSelectable');
 	$('div#popinMsg').text('').hide();
 	
@@ -298,6 +299,7 @@ function stopXPathHelp (input) {
 
 $(document).ready( function () {
 	updateTree();
+	updateXML();
 });
 
 $(document).on('focusout', '#workflow_xml', function(){
@@ -310,13 +312,26 @@ $(document).on('focusout', '#workflow_xml', function(){
 	});
 });
 
-function updateTree() {
+function updateTree(action = false) {
 	$.ajax({
-		data:{'id':getId()},
+		data:{'id':getId(), 'mode':'tree'},
 		type: 'post',
-		url: 'ajax/get-workflow-tree.php',
+		url: 'ajax/get-workflow.php',
 	}).done(function(result){
 		$('#editTree').html(result);
+		if (action != false) {
+			$(action.selector).trigger(action.event);
+		}
+		
+	});
+}
+function updateXML() {
+	$.ajax({
+		data:{'id':getId(), 'mode':'xml'},
+		type: 'post',
+		url: 'ajax/get-workflow.php',
+	}).done(function(result){
+		$("#workflow_xml").val(result);
 	});
 }
 
@@ -327,3 +342,36 @@ function getId() {
 	}
 	return id;
 }
+
+function showEditTask(element) {
+	$('#editTask').html('');
+	$(element).parent().find('.editTask').clone().appendTo('#editTask').show();
+}
+
+
+$(document).on('mouseenter', '.lightTreeTasks', function(event){
+	$('.edit-tree-action').hide();
+	$(this).parent().children('.edit-tree-action').show();
+	$(this).find('.edit-tree-action').show();
+	//$(this).childrent('.edit-tree-action').show();
+	event.stopPropagation();
+	
+	$(this).parent().mouseleave(function(){
+		$('.edit-tree-action').hide();
+		$(this).off();
+	})
+	
+});
+
+
+$(document).on('mouseenter', '.lightTreeNewJob', function(event){
+	$('.edit-tree-action').hide();
+	$(this).find('.edit-tree-action').show();
+	event.stopPropagation();
+	
+	$(this).mouseleave(function(){
+		$('.edit-tree-action').hide();
+		$(this).off();
+	})
+	
+});

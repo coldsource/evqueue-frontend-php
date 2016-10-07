@@ -38,12 +38,17 @@
 	
 	
 	<xsl:template name="schedules-select">
+		<xsl:param name="selected" select="''" />
+		
 		<select name="retry_schedule">
 			<optgroup label="Retry schedule">Retry schedule</optgroup>
 			<option value="">-None-</option>
 			<xsl:for-each select="/page/schedules/schedule">
-				<option value="{schedule_name}" title="{schedule_xml}">
-					<xsl:value-of select="schedule_name" />
+				<option value="{@name}" title="{@xml}">
+					<xsl:if test="$selected = @name" >
+						<xsl:attribute name="selected" >selected</xsl:attribute>
+					</xsl:if>
+					<xsl:value-of select="@name" />
 				</option>
 			</xsl:for-each>
 		</select>

@@ -22,6 +22,17 @@ require_once 'inc/auth_check.php';
 require_once 'inc/logger.php';
 
 
+function pie ($type, $msg='') {
+	if ($type == 'confirm' && isset($_POST['confirmed']))
+		return;  // don't die, go on with action, it has been confirmed by the user
+	
+	die(json_encode(array(
+			'type' => $type,
+			'msg' => $msg,
+	)));
+}
+
+
 /*
 if (!isset($_POST['action']) || !isset($_POST['location']))
 	pie('ko','action or location not set');
@@ -33,15 +44,13 @@ if (!preg_match('_^(/\w+\[\d+\])*$_',$_POST['location']))
 if (!isset($_SESSION['edition']['workflow']))
 	pie('ko','no workflow in set in session');
 
+*/
+
 
 $dom = new DOMDocument();
-if (!@$dom->loadXML($_SESSION['edition']['workflow'])) {
-	unset($_SESSION['edition']['workflow']);
-	unset($_SESSION['edition']['vars']);
-	session_write_close();
-	pie('ko','invalid workflow set in session (it has just been completely deleted)');
+if (!@$dom->loadXML($_POST['xml'])) {
+	pie('ko','invalid workflow ');
 }
-
 
 // get the location where the action is supposed to take place
 $location = null;
@@ -53,8 +62,7 @@ if ($_POST['location'] != '') {
 		pie('ko',"no node at xpath {$_POST['location']}");
 	
 	$location = $nodes->item(0);
-}*/
-
+}
 
 switch ($_POST['action']) {
 	
@@ -303,13 +311,81 @@ switch ($_POST['action']) {
 		pie('ok-redirect','list-workflows.php');  // redirect to workflow list
 		break;
 	
+
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	case 'updateXml':
 		$_SESSION['edition'][$_POST['id']]['workflow'] = $_POST['xml'];
+		break;
+	
+
+	case 'addChildJob':		
+		$nodes = $xpath->evaluate('subjobs', $location);
+		if ($nodes->length > 0) {
+			$location = $nodes->item(0);
+		} else {
+			$node = $dom->createElement('subjobs');
+			$location->appendChild($node);
+			$location = $node;
+		}
+		
+		$newjob = $dom->createElement('job');
+		$newtasks = $dom->createElement('tasks');
+		$newtask = $dom->createElement('task');
+		$newtask->setAttribute('name', 'new task');
+		
+		$newtasks->appendChild($newtask);
+		$newjob->appendChild($newtasks);
+		$location->appendChild($newjob);
+		
+		break;
+
+	case 'addParentJob':
+		$job = $location;
+		$location = $job->parentNode;
+		
+		$newjob = $dom->createElement('job');
+		$newsubjobs = $dom->createElement('subjobs');
+		$newtasks = $dom->createElement('tasks');
+		$newtask = $dom->createElement('task');
+		$newtask->setAttribute('name', 'new task');
+		
+		$newtasks->appendChild($newtask);
+		$newjob->appendChild($newtasks);
+		$newjob->appendChild($newsubjobs);
+		$newsubjobs->appendChild($job);  // previous job becomes a subjob of the new job
+		$location->appendChild($newjob);
+		break;
+	
+	case 'removeJob':
+		
+		if(true){ // todo check si on veut tout supprimer
+			$subJobs = $xpath->evaluate('subjobs/job', $location);
+			foreach($subJobs as $subJob){
+				$subJob = $dom->importNode($subJob, true);
+				$location->parentNode->appendChild($subJob);
+			}
+		}	
+		
+		$location->parentNode->removeChild($location);
 		break;
 	
 	default:
 		pie('ko',"undefined action {$_POST['action']}");
 }
+$_SESSION['edition'][$_POST['id']]['workflow'] = $dom->saveXML($dom->documentElement);
 
 /*
 $_SESSION['edition']['workflow'] = $dom->saveXML($dom->documentElement);

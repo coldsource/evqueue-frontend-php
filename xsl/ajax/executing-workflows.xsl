@@ -5,7 +5,7 @@
 	
 	<xsl:template match="/page">
 		<xsl:call-template name="instances">
-			<xsl:with-param name="instances" select="/page/instances/workflow" />
+			<xsl:with-param name="instances" select="/page/instances/workflow[position() &lt; 51]" />
 			<xsl:with-param name="status" select="'EXECUTING'" />
 		</xsl:call-template>
 	</xsl:template>

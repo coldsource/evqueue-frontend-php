@@ -50,11 +50,11 @@
 		<select name="queue_name">
 			<optgroup label="Queue name">Queue name</optgroup>
 			<xsl:for-each select="/page/queues/queue">
-				<option value="{queue_name}">
-					<xsl:if test="queue_name = 'default'">
+				<option value="{@name}">
+					<xsl:if test="@name = $selected">
 						<xsl:attribute name="selected">selected</xsl:attribute>
 					</xsl:if>
-					<xsl:value-of select="queue_name" /> (<xsl:value-of select="queue_concurrency" />)
+					<xsl:value-of select="@name" /> (<xsl:value-of select="@concurrency" />)
 				</option>
 			</xsl:for-each>
 		</select>

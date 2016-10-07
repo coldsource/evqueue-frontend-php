@@ -2,6 +2,9 @@
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:exsl="http://exslt.org/common" xmlns:php="http://php.net/xsl" version="1.0">
 	<xsl:import href="datetime.xsl" />
 	<xsl:import href="xmlhighlight.xsl" />
+	<xsl:import href="list_queues.xsl" />
+	<xsl:import href="list_schedules.xsl" />
+	<xsl:import href="list_tasks.xsl" />
 	
 	<xsl:param name="EDITION">0</xsl:param>
 	
@@ -209,7 +212,7 @@
 	</xsl:template>
 	
 	
-	<xsl:template match="workflow" mode="tree">
+	<!--<xsl:template match="workflow" mode="tree">
 		<div>
 			<xsl:apply-templates select="." mode="relaunch" />
 			
@@ -286,10 +289,10 @@
 				</xsl:if>
 			</div>
 		</div>
-	</xsl:template>
+	</xsl:template>-->
 	
 	
-	<xsl:template match="job">
+	<!--<xsl:template match="job">
 		<xsl:param name="first" select="0" />
 		<xsl:param name="skipped" select="0" />
 		
@@ -359,10 +362,10 @@
 				</xsl:with-param>
 			</xsl:apply-templates>
 		</div>
-	</xsl:template>
+	</xsl:template>-->
 	
 	
-	<xsl:template match="task">
+	<!--<xsl:template match="task">
 		<xsl:param name="skipped" select="0" />
 		
 		<xsl:variable name="skippedJobOrTask">
@@ -480,7 +483,6 @@
 					</xsl:choose>
 				</span>
 				
-				<!--<xsl:variable name="pct">20</xsl:variable>-->
 				
 				<xsl:if test="@progression != 0 and @progression != 100">
 					<div class="progressbar-wrapper">
@@ -573,7 +575,6 @@
 				<ul class="taskInputs">
 					<xsl:apply-templates select="input|stdin" />
 					
-					<!-- display STDIN in edition mode even if there's none -->
 					<xsl:if test="count(stdin) = 0">
 						<li class="taskInput" data-name="stdin" data-type="stdin">
 							<span class="taskInputName taskInputNameSTDIN">STDIN</span>
@@ -592,7 +593,7 @@
 				</ul>
 			</xsl:if>
 		</div>
-	</xsl:template>
+	</xsl:template>-->
 	
 	
 	<xsl:template name="instances">
@@ -633,16 +634,16 @@
 								<span class="prevPage action" data-status="{$status}">&lt;</span>
 							</xsl:if>
 							<xsl:if test="$status = 'EXECUTING'">
-								<xsl:value-of select="sum(/page/workflows/@total-running)" />
+								<xsl:value-of select="count(/page/instances/workflow)" />
 							</xsl:if>
 							<xsl:text> </xsl:text>
 							<xsl:value-of select="$status" />
 							Workflows
-							<xsl:if test="$status = 'EXECUTING' and count(exsl:node-set($instances)) != sum(/page/workflows/@total-running)">
+							<xsl:if test="$status = 'EXECUTING' and count(exsl:node-set($instances)) != count(/page/instances/workflow)">
 								(<xsl:value-of select="count(exsl:node-set($instances))" /> displayed)
 							</xsl:if>
 							<xsl:if test="$status = 'TERMINATED'">
-								<xsl:value-of select="/page/workflows/@first" />-<xsl:value-of select="/page/workflows/@last" />&#160;<span style="font-size: 80%">(<xsl:value-of select="/page/workflows/@total" /> total)</span>
+								<xsl:value-of select="($PAGE*$LIMIT)+1-$LIMIT" />-<xsl:value-of select="($PAGE*$LIMIT)" />&#160;<span style="font-size: 80%">(<xsl:value-of select="/page/instances/@rows" /> total)</span>
 							</xsl:if>
 							<xsl:text> </xsl:text>
 							<xsl:if test="$status = 'TERMINATED'">
@@ -684,31 +685,22 @@
 		Parameters list:
 		<ul class="inputs">
 			<xsl:for-each select="parameter">
-				<li class="parameter actionItem" data-name="{@name}">
+				<li class="parameter" data-name="{@name}">
 					<xsl:attribute name="data-xpath">
 						<xsl:apply-templates select="." mode="xpath" />
 					</xsl:attribute>
-					
-					<xsl:value-of select="@name"/>
-					<xsl:if test="$EDITION = 0">
-						<xsl:text>: </xsl:text>
-						<xsl:value-of select="."/>
-					</xsl:if>
-					<xsl:if test="$EDITION = 1">
-						<div class="actions">
-							<img src="images/edition/delete.png" class="deleteWorkflowParameter" title="Delete this parameter" onclick="executeAction('deleteParameter',$(this));" />
-						</div>
-					</xsl:if>
+					<xsl:value-of select="@name" />
+					<div class="actions">
+						<img src="images/edition/delete.png" class="deleteWorkflowParameter" title="Delete this parameter" onclick="executeAction('deleteParameter',$(this).parent().parent());" />
+					</div>
 				</li>
 			</xsl:for-each>
-			<xsl:if test="$EDITION=1">
-				<li id="addParameter" class="actionItem">
-					<form onsubmit="executeAction('addParameter',$(this)); return false;">
-						<input name="parameter_name" placeholder="new parameter" autocomplete="off" />
-						<input type="submit" class="spaced-h" value="Add parameter" />
-					</form>
-				</li>
-			</xsl:if>
+			<li id="addParameter" class="actionItem">
+				<form onsubmit="executeAction('addParameter',$(this)); return false;">
+					<input name="parameter_name" placeholder="new parameter" autocomplete="off" />
+					<input type="submit" class="spaced-h" value="Add parameter" />
+				</form>
+			</li>
 		</ul>
 	</xsl:template>
 	
@@ -775,7 +767,7 @@
 			
 			<xsl:call-template name="inputActions">
 				<xsl:with-param name="type" select="local-name(.)" />
-			</xsl:call-template>
+			</xsl:call-template>			
 		</li>
 	</xsl:template>
 	
@@ -786,7 +778,11 @@
 		<div class="actions">
 			<img class="editTaskInput" src="images/edition/edit.gif" title="Edit this input" onclick="editTaskInput($(this));" />
 			<xsl:if test="$type = 'input' or $type = 'stdin'">
-				<img src="images/edition/delete.png" class="deleteTaskInput" title="Delete this input" onclick="executeAction('deleteTaskInput',$(this));" />
+				<img src="images/edition/delete.png" class="deleteTaskInput" title="Delete this input" >
+					<xsl:attribute name="onclick">
+						executeAction('deleteTaskInput',$(this).parent().parent(), 'undefined', {selector:'.lightTreeTask[data-xpath="<xsl:apply-templates select="./../." mode="xpath" />"] > div', event:'click'});
+					</xsl:attribute>
+				</img>
 			</xsl:if>
 		</div>
 	</xsl:template>
@@ -865,12 +861,6 @@
 			$('#output-<xsl:value-of select="$output-id" /> ul li:first-child a').click();
 			</script>
 		</li>
-	</xsl:template>
-	
-	
-	<xsl:template name="deleteWFI">
-		<xsl:param name="wfiid" />
-		<img data-confirm="Delete workflow instance {$wfiid}" src="images/delete.gif" onclick="evqueueAPI(this, 'instance', 'delete', {{ 'id':'{$wfiid}' }});location.reload();" class="pointer" />
 	</xsl:template>
 	
 	
@@ -972,54 +962,78 @@
 	</xsl:template>
 	
 	
-	<!-- LIGHT-TREE MODE -->
-	<xsl:template match="workflow" mode="light-tree">
-		<div class="lightTreeTasks">
-			<div class="lightTreeTask" style="font-weight: bold;">
-				Workflow Start
-			</div>
-		</div>
-		<xsl:apply-templates select="subjobs" mode="light-tree" />
-	</xsl:template>
-	
-	<xsl:template match="subjobs" mode="light-tree">
-		<xsl:apply-templates select="job" mode="light-tree" />
-	</xsl:template>
-	
-	<xsl:template match="job" mode="light-tree">
-		<xsl:variable name="nbSiblings" select="count(preceding-sibling::job) + 1 + count(following-sibling::job)" />
-		
-		<div class="lightTreeJob" style="width: {(98 - $nbSiblings*2) * count(.//task) div count(..//task) }%;">
-			<div class="lightTreeTasks">
-				<xsl:if test="@condition != ''">
-					<span class="lightTreeJobCondition" title="{@condition}">?</span>
-				</xsl:if>
-				<xsl:if test="@loop != ''">
-					<span class="jobLoop lightTreeJobLoop" title="Loop on: {@loop}">⟲</span>
-				</xsl:if>
-				<xsl:apply-templates select="tasks/task" mode="light-tree" />
-			</div>
-			<xsl:apply-templates select="subjobs" mode="light-tree" />
-		</div>
-	</xsl:template>
-	
-	<xsl:template match="task" mode="light-tree">
-		<div class="lightTreeTask" title="{@name}">
-			<xsl:if test="@loop != ''">
-				<span class="taskLoop" title="Loop on: {@loop}">⟲ </span>
-			</xsl:if>
-			<xsl:value-of select="@name" />
-		</div>
-	</xsl:template>
-	<!-- END LIGHT-TREE MODE -->
-	
-	
 	
 	<!-- EDIT-TREE MODE -->
 	<xsl:template match="workflow" mode="edit-tree">
-		<div class="lightTreeTasks">
-			<div class="lightTreeTask" style="font-weight: bold;">
+		<div style="display: none;">
+			<div id="taskInputValueSample" style="display: none;">
+				<div class="taskInputValue">
+					<select name="value_type[]">
+						<option value="text">text</option>
+						<option value="xpath">xpath value</option>
+						<option value="copy">xpath copy</option>
+					</select>
+					<input name="value[]" class="large spaced-h" />
+					<img class="action startXPathHelp" src="images/edition/help.png" />
+					<img onclick="deleteTaskInputValue($(this));" title="Delete this value" src="images/edition/delete.png" />
+					<br/>
+				</div>
+			</div>
+			
+			<form id="editTaskInput" onsubmit="return executeAction('editTaskInput',$(this));">
+				<input type="hidden" name="type" />
+				
+				<table class="unstyled">
+					<tbody>
+						<tr>
+							<td>
+								Input name
+							</td>
+							<td>
+								<input name="name" placeholder="input name" />
+								<span class="hint spaced-h">(only useful when passing ENV parameters, but does not hurt the command line)</span>
+							</td>
+						</tr>
+						<tr class="stdinMode">
+							<td>
+								Stdin mode
+							</td>
+							<td>
+								<select name="mode" onchange="$(this).next('span').text( $(this).children('option:selected').attr('title') );">
+									<option value="xml" title="Texts, values and copies here after will be concatenated and serialised as XML, including the stdin node.">xml</option>
+									<option value="text" title="Texts, values and copies here after will be concatenated as a simple text value. XML nodes will be stripped.">text</option>
+								</select>
+								<span class="hint spaced-h"></span>
+							</td>
+						</tr>
+						<tr class="vat">
+							<td>
+								Input value
+							</td>
+							<td>
+								<div class="taskInputValues">
+									<!-- value/copy/text lines will be appended here by the javascript -->
+								</div>
+								<div class="spaced-v">
+									<img class="addTaskInputValue" src="images/edition/addTask.png" onclick="addTaskInputValue($(this));" />
+								</div>
+							</td>
+						</tr>
+						<tr>
+							<td colspan="2">
+								<input class="spaced-v" type="submit" value="Save" />
+								<a class="action spaced" onclick="window.location.reload(); return false;">Cancel</a>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</form>
+		</div>
+		
+		<div class="lightTreeStart">
+			<div class="" style="font-weight: bold;">
 				Workflow Start
+				<xsl:apply-templates select="parameters" />
 			</div>
 		</div>
 		<xsl:apply-templates select="subjobs" mode="edit-tree" />
@@ -1030,10 +1044,27 @@
 	</xsl:template>
 	
 	<xsl:template match="job" mode="edit-tree">
-		<xsl:variable name="nbSiblings" select="count(preceding-sibling::job) + 1 + count(following-sibling::job)" />
-		
-		<div class="lightTreeJob" style="width: {(98 - $nbSiblings*2) * count(.//task) div count(..//task) }%;">
-			<div class="lightTreeTasks">
+		<xsl:variable name="minus">
+			<xsl:if test="position() = count(../job)">
+				<xsl:text> - 30px</xsl:text>
+			</xsl:if>
+		</xsl:variable>
+		<div class="lightTreeJob" style="width: calc({(100 div sum(../job/@data-size)) * @data-size}%);">
+			
+			<img src="images/edition/addTask.png" onclick="executeAction('addParentJob',$(this))" class="pointer edit-tree-action" style="position:absolute;top:3px;left:50%;">
+				<xsl:attribute name="data-xpath">
+					<xsl:apply-templates select="." mode="xpath" />
+				</xsl:attribute>
+			</img>
+			<img src="images/edition/down-arrow.png" class="pointer down-arrow"/>
+			
+			<div class="lightTreeTasks" style="width:calc(100% - 4px {$minus});">	
+				<img src="images/edition/delete.png" onclick="executeAction('removeJob',$(this))" class="pointer edit-tree-action" style="float:right;margin:2px 2px 0 0;">
+					<xsl:attribute name="data-xpath">
+						<xsl:apply-templates select="." mode="xpath" />
+					</xsl:attribute>
+				</img>
+				
 				<xsl:if test="@condition != ''">
 					<span class="lightTreeJobCondition" title="{@condition}">?</span>
 				</xsl:if>
@@ -1041,18 +1072,132 @@
 					<span class="jobLoop lightTreeJobLoop" title="Loop on: {@loop}">⟲</span>
 				</xsl:if>
 				<xsl:apply-templates select="tasks/task" mode="edit-tree" />
-				<img src="images/edition/addTask.png"/>
+				<img src="images/edition/addTask.png" class="edit-tree-action"/>
 			</div>
+			
+			
+			<xsl:if test="position() = count(../job)">
+				<div class="lightTreeNewJob pointer" onclick="executeAction('addChildJob',$(this))">
+					<xsl:attribute name="data-xpath">
+						<xsl:apply-templates select="../.." mode="xpath" />
+					</xsl:attribute>
+					<div style="border: 1px dotted darkgray;border-radius: 8px;text-align:center;width:23px;height:20px;padding-top:2px;margin-left:2px;">
+						<img src="images/edition/addTask.png" class="edit-tree-action"/>
+					</div>
+				</div>
+			</xsl:if>
+			
+			
 			<xsl:apply-templates select="subjobs" mode="edit-tree" />
+			<xsl:if test="count(subjobs/job) = 0">				
+				<img src="images/edition/addTask.png" onclick="executeAction('addChildJob',$(this))" class="pointer edit-tree-action" style="position:absolute;bottom:10px;left:50%;">
+					<xsl:attribute name="data-xpath">
+						<xsl:apply-templates select="." mode="xpath" />
+					</xsl:attribute>
+				</img>
+				<img src="images/edition/down-arrow.png" class="pointer down-arrow"/>
+			</xsl:if>
 		</div>
 	</xsl:template>
 	
 	<xsl:template match="task" mode="edit-tree">
-		<div class="lightTreeTask" title="{@name}">
+		<div class="lightTreeTask" title="{@name}" data-name="{@name}">
+			<xsl:attribute name="data-xpath">
+				<xsl:apply-templates select="." mode="xpath" />
+			</xsl:attribute>
 			<xsl:if test="@loop != ''">
 				<span class="taskLoop" title="Loop on: {@loop}">⟲ </span>
 			</xsl:if>
-			<xsl:value-of select="@name" />
+			<div onclick="showEditTask(this)" class="pointer"><xsl:value-of select="@name" /></div>
+			
+			
+			<form class="editTask" style="display:none;">
+				<xsl:attribute name="data-xpath">
+					<xsl:apply-templates select="." mode="xpath" />
+				</xsl:attribute>
+				<table class="unstyled">
+					<tbody>
+						<tr>
+							<td>Task name</td>
+							<td>
+								<xsl:apply-templates select="/page/tasks-groups" mode="tasks-select">
+									<xsl:with-param name="name" select="'task_name'" />
+									<xsl:with-param name="selected_value" select="@name" />
+								</xsl:apply-templates>
+							</td>
+						</tr>
+						<tr>
+							<td>Queue</td>
+							<td>
+								<xsl:call-template name="queues-select" >
+									<xsl:with-param name="selected" select="@queue" />
+								</xsl:call-template>
+							</td>
+						</tr>
+						<tr>
+							<td>Retry schedule</td>
+							<td>
+								<xsl:call-template name="schedules-select" >
+									<xsl:with-param name="selected" select="@retry_schedule" />
+								</xsl:call-template>
+							</td>
+						</tr>
+						<tr>
+							<td>Task loop expression</td>
+							<td class="xPathAble">
+								<input name="loop" class="taskLoop w100" title="loop expression" placeholder="loop expression" value="{@loop}" />
+								<img class="action startXPathHelp embedded" src="images/edition/help.png" >
+									<xsl:attribute name="data-xpath">
+										<xsl:apply-templates select="." mode="xpath" />
+									</xsl:attribute>
+								</img>
+							</td>
+						</tr>
+						<tr>
+							<td>Task condition</td>
+							<td class="xPathAble">
+								<input name="condition" class="taskCondition w100" title="condition" placeholder="condition" value="{@condition}"/>
+								<img class="action startXPathHelp embedded" src="images/edition/help.png" >
+									<xsl:attribute name="data-xpath">
+										<xsl:apply-templates select="." mode="xpath" />
+									</xsl:attribute>
+								</img>
+							</td>
+						</tr>
+						<tr colspan="2">
+							<td>
+								<input type="button" class="spaced-v" value="Save" onclick="executeAction('editTask',$(this));" >
+									<xsl:attribute name="onclick">
+										executeAction('editTask',$(this).closest('form'), 'undefined', {selector:'.lightTreeTask[data-xpath="<xsl:apply-templates select="." mode="xpath" />"] > div', event:'click'});
+									</xsl:attribute>
+								</input>
+								<a class="action spaced" onclick="window.location.reload(); return false;">Cancel</a>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+				
+				<ul class="taskInputs">
+					<xsl:apply-templates select="input|stdin" />
+					
+					<!-- display STDIN in edition mode even if there's none -->
+					<xsl:if test="count(stdin) = 0">
+						<li class="taskInput" data-name="stdin" data-type="stdin">
+							<span class="taskInputName taskInputNameSTDIN">STDIN</span>
+							<div class="taskInputValues">
+								<span class="spaced-h" data-type="text" data-value="" title="text">not used yet</span>
+							</div>
+							<xsl:call-template name="inputActions" />
+						</li>
+					</xsl:if>
+						
+					<li class="addTaskInput">
+						<form>
+							<input class="spaced-v" type="button" onclick="executeAction('addTaskInput',$(this));" value="Add input" />
+						</form>
+					</li>
+				</ul>
+			</form>
 		</div>
 	</xsl:template>
 	<!-- END EDIT-TREE MODE -->

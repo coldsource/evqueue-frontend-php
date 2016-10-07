@@ -47,38 +47,40 @@ if (isset($_GET['action']))
 $xsl = new XSLEngine();
 if (isset($_POST['login']) && isset($_POST['password'])) {
 
-	$pwd = sha1($_POST['password'], true);
-	$evqueue->SetUserLogin($_POST['login']);
-	$evqueue->SetUserPwd($pwd);
-	$nodes = [];
+	
 	
 	try
 	{
+		if($evqueue === false)
+			throw new Exception('There is no running node.');
+		$pwd = sha1($_POST['password'], true);
+		$evqueue->SetUserLogin($_POST['login']);
+		$evqueue->SetUserPwd($pwd);
+		$nodes = [];
+		
 		$xml = $xsl->Api('ping');
 		foreach($QUEUEING as $scheme){
 			try{
-					$evqueue_node = new evQueue($scheme,$_POST['login'],$pwd);
-					$evqueue_node->Api('ping');
-					$node_name = $evqueue_node->GetParserRootAttributes()['NODE'];
-					if(isset($nodes[$node_name]) || $node_name == '')
-						throw new Exception('Node name can\'t be null and should be unique. Check your configuration.', evQueue::ERROR_ENGINE_NAME);
-					$nodes[$node_name] = $scheme;
+				$evqueue_node = new evQueue($scheme,$_POST['login'],$pwd);
+				$evqueue_node->Api('ping');
+				$node_name = $evqueue_node->GetParserRootAttributes()['NODE'];
+				if(isset($nodes[$node_name]) || $node_name == '')
+					throw new Exception('Node name can\'t be null and should be unique. Check your configuration.', evQueue::ERROR_ENGINE_NAME);
+				$nodes[$node_name] = $scheme;
 			}
-			catch(Exception $e){
+			catch(Exception $e){				
 				if($e->getCode() == evQueue::ERROR_ENGINE_NAME)
 					throw $e;
 			}
 		}
+		if(count($nodes) == 0)
+			throw new Exception('There is no running node');
 		
 	}
 	catch(Exception $e)
 	{
-		echo $e->getMessage();die();
 		if($e->getCode() != evQueue::ERROR_AUTH_FAILED){
-			$xsl->AddFragment('<error>evqueue-ko</error>');
-		}
-		elseif($e->getCode() != evQueue::ERROR_ENGINE_NAME){
-			die($e->getMessage());
+			$xsl->AddFragment('<error msg="'.$e->getMessage().'">evqueue-ko</error>');
 		}
 		else{
 			$xsl->AddFragment('<error>wrong-creds</error>');
@@ -89,6 +91,7 @@ if (isset($_POST['login']) && isset($_POST['password'])) {
 	
 
 	@session_start();
+	$_SESSION = [];
 	$_SESSION['user_login'] = $_POST['login'];
 	$_SESSION['user_pwd'] = $pwd;
 	$_SESSION['user_profile'] = $evqueue->GetProfile();

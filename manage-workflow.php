@@ -66,17 +66,21 @@ if (isset($_POST) && (count($_POST)>1)){
 
 
 if (isset($_GET["workflow_id"]) && ($_GET["workflow_id"] != '')){
+	$_SESSION['edition'] = [];
 	$xml = $xsl->Api('workflow', 'get', ['id' => $_GET["workflow_id"]]);
+	if(!isset($_SESSION['edition'][$_GET["workflow_id"]]['workflow'])){
+		$dom = new DOMDocument();
+		$dom->LoadXML($xml);
+		$xpath = new DOMXPath($dom);
+		$w = $xpath->evaluate('/response/workflow/workflow')[0];
+		$xml = $dom->saveXML($w);
+		$_SESSION['edition'][$_GET["workflow_id"]]['workflow'] = $xml;
+	}
+	else{
+		
+	}
 	$xsl->AddFragment(['response-workflow' => $xml]);
 	$xsl->AddFragment(['workflow-notifications' => $xsl->Api('workflow', 'list_notifications', ['id' => $_GET["workflow_id"]])]);
-	
-	//TODO : test si $_SESSION['edition'][$_GET["workflow_id"]]['workflow']  existe
-	$dom = new DOMDocument();
-	$dom->LoadXML($xml);
-	$xpath = new DOMXPath($dom);
-	$w = $xpath->evaluate('/response/workflow/workflow')[0];
-	$a = $dom->saveXML($w);
-	$_SESSION['edition'][$_GET["workflow_id"]]['workflow'] = $a;
 }
 else{
 	$_SESSION['edition']['new']['workflow'] = '';

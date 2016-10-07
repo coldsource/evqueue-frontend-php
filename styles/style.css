@@ -494,7 +494,8 @@ ul.inputs ul {
   padding-left: 15px; }
 
 ul.inputs li {
-  padding-bottom: 5px; }
+  padding-bottom: 5px;
+  font-weight: 100;}
 
 sup.attribute {
   color: red; }
@@ -773,14 +774,14 @@ div.editionWorkflow div.actions {
   margin: 0 5px; }
 
 div.editionWorkflow ul.inputs li:hover div.actions,
+div.editionWorkflow ul.taskInputs li:hover div.actions,
 div.editionWorkflow div.task:hover div.actions {
-  opacity: 1; }
+  opacity: 1 !important; }
 
 div.editionWorkflow select[name=task_name] {
   font-weight: bold; }
 
 div.editionWorkflow .taskInputs {
-  display: none;
   font-size: 90%;
   list-style-image: url("../images/input.png"); }
 
@@ -823,14 +824,6 @@ div.taskInputValue {
 td.xPathAble {
   position: relative; }
 
-div.editionWorkflow img.startXPathHelp {
-  margin-left: -8px;
-  z-index: 1; }
-  div.editionWorkflow img.startXPathHelp.embedded {
-    position: absolute;
-    top: 4px;
-    right: 1px; }
-
 div.editionWorkflow .xpathSelectable {
   text-shadow: 1px 1px 4px lightgreen; }
 
@@ -863,11 +856,17 @@ div.editionWorkflow img.addTaskArrowLeft {
 div.retrySchedule {
   display: inline-block; }
 
-div.editionWorkflow .editing {
-  width: 90%;
-  padding: 2px 5px;
+.editTask {
+  padding: 5px 5px;
   background-color: #F0F0F0;
-  border: 1px solid lightgray; }
+  border: 1px solid lightgray;
+  margin-bottom:10px;
+  margin-top:20px;}
+  
+  .editTask img.startXPathHelp.embedded {
+    position: absolute;
+    top: 4px;
+    right: 1px; }
 
 div.editionWorkflow div.jobInfos {
   float: right;
@@ -1044,14 +1043,29 @@ table.edit_notif input {
   width: 393px; }
 
 /* BEGIN LIGHT-TREE DISPLAY */
+div.lightTreeStart{
+  border: 1px solid darkgray;
+  border-radius: 8px;
+  padding:5px;
+  text-align: center;
+}
+
 div.lightTreeJob {
   display: inline-block;
   vertical-align: top;
-  margin: 0 1%; }
+  text-align: center;
+  position:relative;}
+  
+div.lightTreeNewJob {
+  display: inline-block;
+  vertical-align: top; }
 
-div.lightTreeJob:before {
-  content: url(../images/down-arrow.png);
-  margin-left: 49.5%; }
+img.down-arrow {
+  margin:auto;
+  display: block;}
+
+img.edit-tree-action{
+  display:none;}
 
 .lightTreeJobCondition {
   font-size: 110%;
@@ -1066,7 +1080,8 @@ div.lightTreeTasks {
   border: 1px solid darkgray;
   border-radius: 8px;
   overflow: hidden;
-  text-align: center; }
+  text-align: center;
+  display: inline-block;}
 
 div.lightTreeTask {
   margin: 5px 0; }

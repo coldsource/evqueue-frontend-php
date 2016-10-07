@@ -43,6 +43,7 @@ class evQueue {
 	const ERROR_AUTH_FAILED = 2;
 	const ERROR_RESPONSE_KO = 3;
 	const ERROR_ENGINE_NAME = 4;
+	const ERROR_ENGINE = 5;
 	
 	
 	public function __construct($cnx_string, $user_login = null, $user_pwd = null) {
@@ -163,7 +164,7 @@ class evQueue {
 				break;
 		}
 		if($data===false || $data === NULL)
-			throw new Exception("evQueue : error reading data");
+			throw new Exception("evQueue : error reading data", evQueue::ERROR_ENGINE);
 
 		return $xml	;
 	}

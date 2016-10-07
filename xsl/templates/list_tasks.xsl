@@ -160,6 +160,9 @@
 					</xsl:attribute>
 					<xsl:for-each select="/page/tasks/task[@group=current()]">
 						<option value="{@name}">
+							<xsl:if test="$selected_value = @name" >
+								<xsl:attribute name="selected" >selected</xsl:attribute>
+							</xsl:if>
 							<xsl:value-of select="@name" />
 						</option>
 					</xsl:for-each>

@@ -12,7 +12,7 @@ if(!isset($_POST['node']) || $_POST['node'] == ""){
 			$evqueue->Api('ping');
 		}
 		catch(Exception $e){
-			if($e->getCode() != 1) //it's ok if engine require auth
+			if($e->getCode() != evQueue::ERROR_AUTH_REQUIRED) //it's ok if engine require auth
 				$evqueue = false;
 			$i++;
 		}

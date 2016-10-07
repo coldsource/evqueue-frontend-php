@@ -29,7 +29,9 @@
 			</div>
 		</div>
 		
-		<div id="editTree" data-id="{/page/get/@workflow_id}"></div>
+		<div class="editionWorkflow">
+			<div id="editTree" data-id="{/page/get/@workflow_id}"></div>
+		</div>
 	</xsl:template>
 	
 </xsl:stylesheet>

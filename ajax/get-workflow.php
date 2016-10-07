@@ -22,9 +22,41 @@ require_once 'inc/auth_check.php';
 require_once 'inc/logger.php';
 require_once 'lib/XSLEngine.php';
 
-$xsl = new XSLEngine();
 
-$xsl->AddFragment($_SESSION['edition'][$_POST['id']]['workflow']);
+if($_POST['mode'] == "xml"){
+	echo $_SESSION['edition'][$_POST['id']]['workflow'];
+	die();
+}
+
+
+$xsl = new XSLEngine();
+$dom = new DOMDocument();
+$dom->loadXML($_SESSION['edition'][$_POST['id']]['workflow']);
+
+$xpath = new DOMXPath($dom);
+$rootJob = $xpath->evaluate('/workflow')->item(0);
+countdJobs($rootJob, $xpath);
+$xsl->AddFragment($dom);
+
+$xsl->AddFragment(getAllTaskGroupXml());
+$xsl->AddFragment(["tasks" => $xsl->Api("tasks", "list")]);
+$xsl->AddFragment(['queues' => $xsl->Api('queuepool', 'list')]);
+$xsl->AddFragment(['schedules' => $xsl->Api('retry_schedules', 'list')]);
 
 $xsl->DisplayXHTML('../xsl/ajax/get-workflow-tree.xsl');
+
+function countdJobs($currentJob, $xpath){
+	$jobs = $xpath->evaluate('subjobs/job', $currentJob);
+	
+	$nb = 0;
+	foreach($jobs as $job){
+		$nb += countdJobs($job, $xpath);
+	}
+	if($nb==0)
+		$nb = 1;
+	
+	$currentJob->setAttribute('data-size', $nb);
+	return $nb;
+}
+
 ?>
