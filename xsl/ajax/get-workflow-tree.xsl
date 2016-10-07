@@ -6,6 +6,7 @@
 	<xsl:template match="/">
 		<div>
 			<div id="editTask"></div>
+			<div id="jobInfos"></div>
 			<h2 style="text-align: center; text-decoration: underline;">Tree Visualisation</h2>
 			<xsl:apply-templates select="/page/workflow" mode="edit-tree" />
 		</div>

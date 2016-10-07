@@ -974,7 +974,11 @@
 						<option value="copy">xpath copy</option>
 					</select>
 					<input name="value[]" class="large spaced-h" />
-					<img class="action startXPathHelp" src="images/edition/help.png" />
+					<img class="action startXPathHelp" src="images/edition/help.png" >
+						<xsl:attribute name="data-xpath">
+							<xsl:apply-templates select="." mode="xpath" />
+						</xsl:attribute>
+					</img>
 					<img onclick="deleteTaskInputValue($(this));" title="Delete this value" src="images/edition/delete.png" />
 					<br/>
 				</div>
@@ -1028,6 +1032,40 @@
 					</tbody>
 				</table>
 			</form>
+			
+			<form id="editJob" onsubmit="executeAction('editJob',$(this)); return false;">
+				<table class="unstyled">
+					<tbody>
+						<tr>
+							<td>Job name</td>
+							<td>
+								<input name="name" placeholder="job name" />
+							</td>
+						</tr>
+						<tr>
+							<td>Job condition</td>
+							<td class="xPathAble">
+								<input name="condition" class="w100" title="execution condition" placeholder="execution condition" />
+								<img class="action startXPathHelp embedded" src="images/edition/help.png" />
+							</td>
+						</tr>
+						<tr>
+							<td>Job loop</td>
+							<td class="xPathAble">
+								<input name="loop" class="w100" title="loop expression" placeholder="loop expression" />
+								<img class="action startXPathHelp embedded" src="images/edition/help.png" />
+							</td>
+						</tr>
+						<tr>
+							<td colspan="2">
+								<input type="submit" class="spaced-v" value="Save" />
+								<a class="action spaced" onclick="window.location.reload(); return false;">Cancel</a>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</form>
+			
 		</div>
 		
 		<div class="lightTreeStart">
@@ -1050,6 +1088,9 @@
 			</xsl:if>
 		</xsl:variable>
 		<div class="lightTreeJob" style="width: calc({(100 div sum(../job/@data-size)) * @data-size}%);">
+			<xsl:attribute name="data-loop"><xsl:value-of select="@loop" /></xsl:attribute>
+			<xsl:attribute name="data-condition"><xsl:value-of select="@condition" /></xsl:attribute>
+			<xsl:attribute name="data-name"><xsl:value-of select="@name" /></xsl:attribute>
 			
 			<img src="images/edition/addTask.png" onclick="executeAction('addParentJob',$(this))" class="pointer edit-tree-action" style="position:absolute;top:3px;left:50%;">
 				<xsl:attribute name="data-xpath">
@@ -1058,8 +1099,13 @@
 			</img>
 			<img src="images/edition/down-arrow.png" class="pointer down-arrow"/>
 			
-			<div class="lightTreeTasks" style="width:calc(100% - 4px {$minus});">	
+			<div class="lightTreeTasks" style="width:calc(100% - 4px {$minus});">
 				<img src="images/edition/delete.png" onclick="executeAction('removeJob',$(this))" class="pointer edit-tree-action" style="float:right;margin:2px 2px 0 0;">
+					<xsl:attribute name="data-xpath">
+						<xsl:apply-templates select="." mode="xpath" />
+					</xsl:attribute>
+				</img>
+				<img src="images/edition/edit.gif" onclick="editJob($(this));" class="pointer edit-tree-action" style="float:right;margin:2px 2px 0 0;">
 					<xsl:attribute name="data-xpath">
 						<xsl:apply-templates select="." mode="xpath" />
 					</xsl:attribute>
@@ -1183,6 +1229,9 @@
 					<!-- display STDIN in edition mode even if there's none -->
 					<xsl:if test="count(stdin) = 0">
 						<li class="taskInput" data-name="stdin" data-type="stdin">
+							<xsl:attribute name="data-xpath">
+								<xsl:apply-templates select="." mode="xpath" />
+							</xsl:attribute>
 							<span class="taskInputName taskInputNameSTDIN">STDIN</span>
 							<div class="taskInputValues">
 								<span class="spaced-h" data-type="text" data-value="" title="text">not used yet</span>

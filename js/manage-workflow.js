@@ -170,14 +170,16 @@ function deleteTaskInputValue (clicked) {
 function editJob (clicked) {
 	if (isInXPathHelp) return;
 	
-	var job = clicked.parents('div.job:eq(0)');
+	var job = clicked.parents('div.lightTreeJob:eq(0)');
+	
+	console.log(job);
 	
 	$('form#editJob').find('input[name=name]').val(job.data('name'));
 	$('form#editJob').find('input[name=loop]').val(job.data('loop'));
 	$('form#editJob').find('input[name=condition]').val(job.data('condition'));
 	
 	removeEditButtons();
-	job.find('div.jobInfos:eq(0)').addClass('editing').html($('form#editJob'));
+	$('div#jobInfos:eq(0)').addClass('editing').html($('form#editJob'));
 }
 
 
