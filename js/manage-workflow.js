@@ -43,6 +43,7 @@ $(document).ready( function () {
 
 function executeAction (action, clicked, confirmed, postAction = false) {
 	if (isInXPathHelp) return;
+	
 	var item = $();
 	var loc = '';
 	confirmed = typeof(confirmed)!='undefined' ? confirmed : false;
@@ -105,7 +106,6 @@ function editTask (clicked) {
 	$('form#editTask').find('input[name=loop]').val(task.data('loop'));
 	$('form#editTask').find('input[name=condition]').val(task.data('condition'));
 	
-	removeEditButtons();
 	task.addClass('editing').html($('form#editTask'));
 }*/
 
@@ -149,7 +149,6 @@ function editTaskInput (clicked) {
 		thisValue.find('input[name^=value]').val($(this).data('value'));
 	});
 	
-	removeEditButtons();
 	input.addClass('editing').html($('form#editTaskInput').data('xpath', input.data('xpath')));
 }
 
@@ -168,38 +167,11 @@ function deleteTaskInputValue (clicked) {
 
 
 function editJob (clicked) {
-	if (isInXPathHelp) return;
-	
-	var job = clicked.parents('div.lightTreeJob:eq(0)');
-	
-	console.log(job);
-	
-	$('form#editJob').find('input[name=name]').val(job.data('name'));
-	$('form#editJob').find('input[name=loop]').val(job.data('loop'));
-	$('form#editJob').find('input[name=condition]').val(job.data('condition'));
-	
-	removeEditButtons();
-	$('div#jobInfos:eq(0)').addClass('editing').html($('form#editJob'));
-}
-
-
-function removeEditButtons() {
-	$('\
-		img.editJob,\n\
-		img.editTask,\n\
-		img.editTaskInput,\n\
-		img.editTaskInput,\n\
-		img.editTaskInputs,\n\
-		img.deleteTask,\n\
-		img.deleteTaskInput,\n\
-		img.addTaskArrowDown,\n\
-		img.deleteWorkflowParameter,\n\
-		div.addTaskContainer,\n\
-		.addTaskInput,\n\
-		#addParameter,\n\
-		#addRootTask').remove();
-	
-	$('input#saveWorkflow').attr('disabled',true);
+	if (isInXPathHelp === false) {
+		$('#formContainer').html('');
+		$(clicked).parent().parent().find(' > .editJob').clone().appendTo('#formContainer').show();
+		location.hash = "#formContainer";
+	}
 }
 
 
@@ -295,10 +267,6 @@ function stopXPathHelp (input) {
 
 
 
-
-
-
-
 $(document).ready( function () {
 	updateTree();
 	updateXML();
@@ -346,8 +314,11 @@ function getId() {
 }
 
 function showEditTask(element) {
-	$('#editTask').html('');
-	$(element).parent().find('.editTask').clone().appendTo('#editTask').show();
+	if (isInXPathHelp === false) {
+		$('#formContainer').html('');
+		$(element).parent().find('.editTask').clone().appendTo('#formContainer').show();
+		location.hash = "#formContainer";
+	}
 }
 
 

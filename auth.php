@@ -18,8 +18,6 @@
   * Authors: Nicolas Jean, Christophe Marti 
   */
 
-
-require_once 'conf/sites_base.php';
 require_once 'inc/logger.php';
 require_once 'lib/XSLEngine.php';
 require_once 'inc/evqueue.php';
@@ -69,13 +67,10 @@ if (isset($_POST['login']) && isset($_POST['password'])) {
 				$nodes[$node_name] = $scheme;
 			}
 			catch(Exception $e){				
-				if($e->getCode() == evQueue::ERROR_ENGINE_NAME)
+				if($e->getCode() == evQueue::ERROR_ENGINE_NAME || $e->getCode() == evQueue::ERROR_AUTH_FAILED)
 					throw $e;
 			}
 		}
-		if(count($nodes) == 0)
-			throw new Exception('There is no running node');
-		
 	}
 	catch(Exception $e)
 	{

@@ -24,8 +24,6 @@ class Logger
 
 	private $filter_priority;
 	private $filter_context;
-
-	private $file;
 	private $run_env;
 
 	public function __construct($app_name)
@@ -41,12 +39,6 @@ class Logger
 		$this->run_env = 'web';
 		if (preg_match('/^cli/',php_sapi_name()))
 			$this->run_env = 'cli';
-
-		// Initiate log file
-		$basepath = dirname(dirname(dirname(__FILE__)))."/logs";
-		if(!is_dir($basepath))
-			mkdir($basepath,0700,true);
-		$this->file = fopen("$basepath/log.html",'a+');
 
 		// Initiate syslog
 		openlog($app_name,LOG_ODELAY,LOG_LOCAL0);
@@ -86,14 +78,14 @@ class Logger
 		if($priority <= self::$instance->filter_priority && (self::$instance->filter_context == '*' || self::$instance->filter_context == $context)) {
 			switch($priority)
 			{
-				case LOG_EMERG: $priority_text = 'Emergency'; $color = '#FF0000'; break;
-				case LOG_ALERT: $priority_text = 'Alert'; $color = '#FF0000'; break;
-				case LOG_CRIT: $priority_text = 'Critical'; $color = '#FF0000'; break;
-				case LOG_ERR: $priority_text = 'Error'; $color = '#FF0000'; break;
-				case LOG_WARNING: $priority_text = 'Warning'; $color = '#FF9F30'; break;
-				case LOG_NOTICE: $priority_text = 'Notice'; $color = '#FFFF55'; break;
-				case LOG_INFO: $priority_text = 'Info'; $color = '#BCFF78'; break;
-				case LOG_DEBUG: $priority_text = 'Debug'; $color = '#FFFFFF'; break;
+				case LOG_EMERG: $priority_text = 'Emergency'; $color = '#FF0000'; $type = E_USER_NOTICE; break;
+				case LOG_ALERT: $priority_text = 'Alert'; $color = '#FF0000'; $type = E_USER_NOTICE; break;
+				case LOG_CRIT: $priority_text = 'Critical'; $color = '#FF0000'; $type = E_USER_NOTICE; break;
+				case LOG_ERR: $priority_text = 'Error'; $color = '#FF0000'; $type = E_USER_ERROR; break;
+				case LOG_WARNING: $priority_text = 'Warning'; $color = '#FF9F30'; $type = E_USER_WARNING; break;
+				case LOG_NOTICE: $priority_text = 'Notice'; $color = '#FFFF55'; $type = E_USER_NOTICE; break;
+				case LOG_INFO: $priority_text = 'Info'; $color = '#BCFF78'; $type = E_USER_NOTICE; break;
+				case LOG_DEBUG: $priority_text = 'Debug'; $color = '#FFFFFF'; $type = E_USER_NOTICE; break;
 				default: die(-1);
 			}
 
@@ -141,8 +133,9 @@ class Logger
 			}
 
 			$log .= "</table>\n";
-			fwrite(self::$instance->file,$log);
-
+			
+			trigger_error($log, $type);
+			
 			// Log in syslog
 			if(isset($_SERVER['HTTP_X_UNIQUE_ID']))
 				syslog($priority,"[ {$_SERVER['HTTP_X_UNIQUE_ID']} $context ] $message");

@@ -691,7 +691,8 @@
 					</xsl:attribute>
 					<xsl:value-of select="@name" />
 					<div class="actions">
-						<img src="images/edition/delete.png" class="deleteWorkflowParameter" title="Delete this parameter" onclick="executeAction('deleteParameter',$(this).parent().parent());" />
+						<img src="images/edition/delete.png" class="deleteWorkflowParameter" title="Delete this parameter" onclick="
+						('deleteParameter',$(this).parent().parent());" />
 					</div>
 				</li>
 			</xsl:for-each>
@@ -1032,40 +1033,6 @@
 					</tbody>
 				</table>
 			</form>
-			
-			<form id="editJob" onsubmit="executeAction('editJob',$(this)); return false;">
-				<table class="unstyled">
-					<tbody>
-						<tr>
-							<td>Job name</td>
-							<td>
-								<input name="name" placeholder="job name" />
-							</td>
-						</tr>
-						<tr>
-							<td>Job condition</td>
-							<td class="xPathAble">
-								<input name="condition" class="w100" title="execution condition" placeholder="execution condition" />
-								<img class="action startXPathHelp embedded" src="images/edition/help.png" />
-							</td>
-						</tr>
-						<tr>
-							<td>Job loop</td>
-							<td class="xPathAble">
-								<input name="loop" class="w100" title="loop expression" placeholder="loop expression" />
-								<img class="action startXPathHelp embedded" src="images/edition/help.png" />
-							</td>
-						</tr>
-						<tr>
-							<td colspan="2">
-								<input type="submit" class="spaced-v" value="Save" />
-								<a class="action spaced" onclick="window.location.reload(); return false;">Cancel</a>
-							</td>
-						</tr>
-					</tbody>
-				</table>
-			</form>
-			
 		</div>
 		
 		<div class="lightTreeStart">
@@ -1087,11 +1054,7 @@
 				<xsl:text> - 30px</xsl:text>
 			</xsl:if>
 		</xsl:variable>
-		<div class="lightTreeJob" style="width: calc({(100 div sum(../job/@data-size)) * @data-size}%);">
-			<xsl:attribute name="data-loop"><xsl:value-of select="@loop" /></xsl:attribute>
-			<xsl:attribute name="data-condition"><xsl:value-of select="@condition" /></xsl:attribute>
-			<xsl:attribute name="data-name"><xsl:value-of select="@name" /></xsl:attribute>
-			
+		<div class="lightTreeJob" style="width: calc({(100 div sum(../job/@data-size)) * @data-size}%);">			
 			<img src="images/edition/addTask.png" onclick="executeAction('addParentJob',$(this))" class="pointer edit-tree-action" style="position:absolute;top:3px;left:50%;">
 				<xsl:attribute name="data-xpath">
 					<xsl:apply-templates select="." mode="xpath" />
@@ -1118,7 +1081,11 @@
 					<span class="jobLoop lightTreeJobLoop" title="Loop on: {@loop}">⟲</span>
 				</xsl:if>
 				<xsl:apply-templates select="tasks/task" mode="edit-tree" />
-				<img src="images/edition/addTask.png" class="edit-tree-action"/>
+				<img src="images/edition/addTask.png" class="edit-tree-action pointer" onclick="executeAction('addParallelTask',$(this))" >
+					<xsl:attribute name="data-xpath">
+						<xsl:apply-templates select="." mode="xpath" />
+					</xsl:attribute>
+				</img>
 			</div>
 			
 			
@@ -1143,6 +1110,42 @@
 				</img>
 				<img src="images/edition/down-arrow.png" class="pointer down-arrow"/>
 			</xsl:if>
+			
+			<form class="editJob" onsubmit="executeAction('editJob',$(this)); return false;" style="display:none;">
+				<xsl:attribute name="data-xpath">
+					<xsl:apply-templates select="." mode="xpath" />
+				</xsl:attribute>
+				<table class="unstyled">
+					<tbody>
+						<tr>
+							<td>Job name</td>
+							<td>
+								<input name="name" placeholder="job name" value="{@name}" />
+							</td>
+						</tr>
+						<tr>
+							<td>Job condition</td>
+							<td class="xPathAble">
+								<input name="condition" class="w100" title="execution condition" placeholder="execution condition" value="{@condition}"/>
+								<img class="action startXPathHelp embedded" src="images/edition/help.png" />
+							</td>
+						</tr>
+						<tr>
+							<td>Job loop</td>
+							<td class="xPathAble">
+								<input name="loop" class="w100" title="loop expression" placeholder="loop expression" value="{@loop}" />
+								<img class="action startXPathHelp embedded" src="images/edition/help.png" />
+							</td>
+						</tr>
+						<tr>
+							<td colspan="2">
+								<input type="submit" class="spaced-v" value="Save" />
+								<a class="action spaced" onclick="window.location.reload(); return false;">Cancel</a>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</form>
 		</div>
 	</xsl:template>
 	
@@ -1212,10 +1215,8 @@
 						</tr>
 						<tr colspan="2">
 							<td>
-								<input type="button" class="spaced-v" value="Save" onclick="executeAction('editTask',$(this));" >
-									<xsl:attribute name="onclick">
-										executeAction('editTask',$(this).closest('form'), 'undefined', {selector:'.lightTreeTask[data-xpath="<xsl:apply-templates select="." mode="xpath" />"] > div', event:'click'});
-									</xsl:attribute>
+								<input type="button" class="spaced-v" value="Save" >
+									<xsl:attribute name="onclick">executeAction('editTask',$(this).closest('form'), 'undefined', {selector:'.lightTreeTask[data-xpath="<xsl:apply-templates select="." mode="xpath" />"] > div', event:'click'});</xsl:attribute>
 								</input>
 								<a class="action spaced" onclick="window.location.reload(); return false;">Cancel</a>
 							</td>
@@ -1242,7 +1243,9 @@
 						
 					<li class="addTaskInput">
 						<form>
-							<input class="spaced-v" type="button" onclick="executeAction('addTaskInput',$(this));" value="Add input" />
+							<input class="spaced-v" type="button" value="Add input" >
+								<xsl:attribute name="onclick">executeAction('addTaskInput',$(this).closest('form'), 'undefined', {selector:'.lightTreeTask[data-xpath="<xsl:apply-templates select="." mode="xpath" />"] > div', event:'click'});</xsl:attribute>
+							</input>
 						</form>
 					</li>
 				</ul>

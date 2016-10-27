@@ -856,14 +856,15 @@ div.editionWorkflow img.addTaskArrowLeft {
 div.retrySchedule {
   display: inline-block; }
 
-.editTask {
+#formContainer > form {
   padding: 5px 5px;
   background-color: #F0F0F0;
   border: 1px solid lightgray;
   margin-bottom:10px;
   margin-top:20px;}
   
-  .editTask img.startXPathHelp.embedded {
+  .editTask img.startXPathHelp.embedded ,
+  .editJob img.startXPathHelp.embedded {
     position: absolute;
     top: 4px;
     right: 1px; }
@@ -1021,7 +1022,7 @@ ul.scheduleParameters li {
   padding: 0; }
 
 div.install_content {
-  width: 340px;
+  width: 540px;
   margin: auto; }
 
 div.install_content div.error {

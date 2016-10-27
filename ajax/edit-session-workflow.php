@@ -91,10 +91,21 @@ switch ($_POST['action']) {
 		$tasks->appendChild($task);
 		break;
 	
-	case 'addParallelTask':
+	/*case 'addParallelTask':
 		$newtask = $dom->createElement('task');
 		$newtask->setAttribute('name', 'new task');
 		$location->parentNode->appendChild($newtask);
+		break;*/
+		
+	case 'addParallelTask':
+		//todo check tasks
+		$location = $xpath->evaluate('tasks',$location)->item(0);  // 'taks' node
+		
+		$newtask = $dom->createElement('task');
+		$newtask->setAttribute('name', 'new task');
+		$location->appendChild($newtask);
+		
+		echo $dom->saveXML($dom->documentElement);
 		break;
 	
 	case 'addChildTask':

@@ -46,15 +46,19 @@ if (isset($_POST) && (count($_POST)>1)){
 			'group' => $_POST['workflow_group'],
 			'comment' => $_POST['workflow_comment'],
 		]);
-		$id = $evqueue->GetParserRootAttributes()['WORKFLOW-ID'];
+		
+		if(!$xsl->HasError())
+			$id = $evqueue->GetParserRootAttributes()['WORKFLOW-ID'];
 	}
 	
-	if(count($_POST['notification']) > 0){
-		foreach($_POST['notification'] as $notification){
-			$xml = $xsl->Api('workflow', 'subscribe_notification', [
-				'id' => $_GET["workflow_id"],
-				'notification_id' => $notification,
-			]);
+	if(!$xsl->HasError()){
+		if(count($_POST['notification']) > 0){
+			foreach($_POST['notification'] as $notification){
+				$xml = $xsl->Api('workflow', 'subscribe_notification', [
+					'id' => $_GET["workflow_id"],
+					'notification_id' => $notification,
+				]);
+			}
 		}
 	}
 	
@@ -66,24 +70,26 @@ if (isset($_POST) && (count($_POST)>1)){
 
 
 if (isset($_GET["workflow_id"]) && ($_GET["workflow_id"] != '')){
-	$_SESSION['edition'] = [];
 	$xml = $xsl->Api('workflow', 'get', ['id' => $_GET["workflow_id"]]);
+
+	$_SESSION['edition'] = [];
 	if(!isset($_SESSION['edition'][$_GET["workflow_id"]]['workflow'])){
 		$dom = new DOMDocument();
 		$dom->LoadXML($xml);
 		$xpath = new DOMXPath($dom);
 		$w = $xpath->evaluate('/response/workflow/workflow')[0];
-		$xml = $dom->saveXML($w);
-		$_SESSION['edition'][$_GET["workflow_id"]]['workflow'] = $xml;
+		$xml2 = $dom->saveXML($w);
+		$_SESSION['edition'][$_GET["workflow_id"]]['workflow'] = $xml2;
 	}
 	else{
 		
 	}
+	
 	$xsl->AddFragment(['response-workflow' => $xml]);
 	$xsl->AddFragment(['workflow-notifications' => $xsl->Api('workflow', 'list_notifications', ['id' => $_GET["workflow_id"]])]);
 }
 else{
-	$_SESSION['edition']['new']['workflow'] = '';
+	$_SESSION['edition']['new']['workflow'] = '<workflow><parameters></parameters><subjobs><job><tasks><task name="new task"/></tasks></job></subjobs></workflow>';
 }
 
 $xsl->AddFragment(getAllGroupXml());
