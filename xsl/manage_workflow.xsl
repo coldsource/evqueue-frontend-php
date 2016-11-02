@@ -2,13 +2,13 @@
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
 	<xsl:import href="templates/main-template.xsl" />
 	<xsl:import href="templates/edit_workflow.xsl" />
-	
+
 	<xsl:variable name="topmenu" select="'settings'" />
-	
+
 	<xsl:variable name="javascript">
 		<src>js/manage-workflow.js</src>
 	</xsl:variable>
-	
+
 	<xsl:template name="content">
 		<div class="contentManage">
 			<div class="boxTitle">
@@ -28,10 +28,10 @@
 				<xsl:call-template name="form_workflow"/>
 			</div>
 		</div>
-		
+
 		<div class="editionWorkflow">
 			<div id="editTree" data-id="{/page/get/@workflow_id}"></div>
 		</div>
 	</xsl:template>
-	
+
 </xsl:stylesheet>

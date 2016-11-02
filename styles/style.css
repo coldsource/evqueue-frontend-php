@@ -782,6 +782,7 @@ div.editionWorkflow select[name=task_name] {
   font-weight: bold; }
 
 div.editionWorkflow .taskInputs {
+  padding-left:24px;
   font-size: 90%;
   list-style-image: url("../images/input.png"); }
 
@@ -804,7 +805,7 @@ div.editionWorkflow .taskInputNameSTDIN {
 
 div.editionWorkflow .taskInputValues {
   color: #878787;
-  display: inline-block;
+  display: inline;
   vertical-align: top;
   position: relative; }
 
@@ -862,7 +863,7 @@ div.retrySchedule {
   border: 1px solid lightgray;
   margin-bottom:10px;
   margin-top:20px;}
-  
+
   .editTask img.startXPathHelp.embedded ,
   .editJob img.startXPathHelp.embedded {
     position: absolute;
@@ -1056,7 +1057,7 @@ div.lightTreeJob {
   vertical-align: top;
   text-align: center;
   position:relative;}
-  
+
 div.lightTreeNewJob {
   display: inline-block;
   vertical-align: top; }

@@ -1,12 +1,12 @@
 <?php
  /*
   * This file is part of evQueue
-  * 
+  *
   * evQueue is free software: you can redistribute it and/or modify
   * it under the terms of the GNU General Public License as published by
   * the Free Software Foundation, either version 3 of the License, or
   * (at your option) any later version.
-  * 
+  *
   * evQueue is distributed in the hope that it will be useful,
   * but WITHOUT ANY WARRANTY; without even the implied warranty of
   * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
@@ -14,8 +14,8 @@
   *
   * You should have received a copy of the GNU General Public License
   * along with evQueue. If not, see <http://www.gnu.org/licenses/>.
-  * 
-  * Authors: Nicolas Jean, Christophe Marti 
+  *
+  * Authors: Nicolas Jean, Christophe Marti
   */
 
 require_once 'inc/auth_check.php';
@@ -30,7 +30,7 @@ if (isset($_POST) && (count($_POST)>1)){
 		$xsl->Api('workflow', 'clear_notifications', [
 			'id' => $_GET["workflow_id"]
 		]);
-		
+
 		$xml =  $xsl->Api('workflow', 'edit', [
 			'id' => $_GET["workflow_id"],
 			'name' => $_POST['workflow_name'],
@@ -46,11 +46,11 @@ if (isset($_POST) && (count($_POST)>1)){
 			'group' => $_POST['workflow_group'],
 			'comment' => $_POST['workflow_comment'],
 		]);
-		
+
 		if(!$xsl->HasError())
 			$id = $evqueue->GetParserRootAttributes()['WORKFLOW-ID'];
 	}
-	
+
 	if(!$xsl->HasError()){
 		if(count($_POST['notification']) > 0){
 			foreach($_POST['notification'] as $notification){
@@ -61,7 +61,7 @@ if (isset($_POST) && (count($_POST)>1)){
 			}
 		}
 	}
-	
+
 	if(!$xsl->HasError()){
 		header("location:list-workflows.php");
 		die();
@@ -72,7 +72,7 @@ if (isset($_POST) && (count($_POST)>1)){
 if (isset($_GET["workflow_id"]) && ($_GET["workflow_id"] != '')){
 	$xml = $xsl->Api('workflow', 'get', ['id' => $_GET["workflow_id"]]);
 
-	$_SESSION['edition'] = [];
+	//$_SESSION['edition'] = [];
 	if(!isset($_SESSION['edition'][$_GET["workflow_id"]]['workflow'])){
 		$dom = new DOMDocument();
 		$dom->LoadXML($xml);
@@ -81,14 +81,11 @@ if (isset($_GET["workflow_id"]) && ($_GET["workflow_id"] != '')){
 		$xml2 = $dom->saveXML($w);
 		$_SESSION['edition'][$_GET["workflow_id"]]['workflow'] = $xml2;
 	}
-	else{
-		
-	}
-	
+
 	$xsl->AddFragment(['response-workflow' => $xml]);
 	$xsl->AddFragment(['workflow-notifications' => $xsl->Api('workflow', 'list_notifications', ['id' => $_GET["workflow_id"]])]);
 }
-else{
+elseif(!isset($_SESSION['edition']['new']['workflow'])){
 	$_SESSION['edition']['new']['workflow'] = '<workflow><parameters></parameters><subjobs><job><tasks><task name="new task"/></tasks></job></subjobs></workflow>';
 }
 
