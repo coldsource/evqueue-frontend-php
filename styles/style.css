@@ -1072,11 +1072,20 @@ img.edit-tree-action{
 .lightTreeJobCondition {
   font-size: 110%;
   font-weight: bold;
-  float: left; }
+  margin-right: 5px;
+}
 
 .lightTreeJobLoop {
   font-weight: bold;
-  float: left; }
+  margin-right: 5px;
+}
+
+div.jobActions{
+	height: 20px;
+}
+div.jobActions img{
+	margin-left:5px;
+}
 
 div.lightTreeTasks {
   border: 1px solid darkgray;

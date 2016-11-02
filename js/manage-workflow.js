@@ -1,8 +1,8 @@
 
 
 var isInXPathHelp = false;
-var inJobTaskXpath = false; //used for load a specific form reloading the tree
-
+var inTaskXpath = false; //used for load a specific form reloading the tree
+var taskActions = ["editTask", "addTaskInput", "editTaskInput"];
 
 String.prototype.xpathParent = function (repeat) {
 	var parts = this.split('/');
@@ -53,6 +53,10 @@ function executeAction (action, clicked, confirmed) {
 		item = clicked;
 		if (typeof(item.data('xpath')) != 'undefined')
 			loc = item.data('xpath');
+	}
+
+	if(taskActions.indexOf(action) == -1){
+		inTaskXpath = false;
 	}
 
 	sessionStorage.setItem('previousAction',action);
@@ -169,9 +173,9 @@ function deleteTaskInputValue (clicked) {
 
 function editJob (clicked) {
 	if (isInXPathHelp === false) {
-		inJobTaskXpath = "img.edit-job[data-xpath='"+$(clicked).data('xpath')+"']";
+		//inTaskXpath = "img.edit-job[data-xpath='"+$(clicked).data('xpath')+"']";
 		$('#formContainer').html('');
-		$(clicked).parent().parent().find(' > .editJob').clone().appendTo('#formContainer').show();
+		$(clicked).parent().parent().parent().find(' > .editJob').clone().appendTo('#formContainer').show();
 		location.hash = "#formContainer";
 	}
 }
@@ -291,7 +295,7 @@ function updateTree() {
 		url: 'ajax/get-workflow.php',
 	}).done(function(result){
 		$('#editTree').html(result);
-		$(inJobTaskXpath).click();
+		$(inTaskXpath).click();
 	});
 }
 function updateXML() {
@@ -314,7 +318,7 @@ function getId() {
 
 function showEditTask(element) {
 	if (isInXPathHelp === false) {
-		inJobTaskXpath = ".lightTreeTask[data-xpath='"+$(element).parent().data('xpath')+"'] > div";
+		inTaskXpath = ".lightTreeTask[data-xpath='"+$(element).parent().data('xpath')+"'] > div";
 		$('#formContainer').html('');
 		$(element).parent().find('.editTask').clone().appendTo('#formContainer').show();
 		location.hash = "#formContainer";

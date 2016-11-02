@@ -1063,29 +1063,31 @@
 			<img src="images/edition/down-arrow.png" class="pointer down-arrow"/>
 
 			<div class="lightTreeTasks" style="width:calc(100% - 4px {$minus});">
-				<img src="images/edition/delete.png" onclick="executeAction('removeJob',$(this))" class="pointer edit-tree-action" style="float:right;margin:2px 2px 0 0;">
-					<xsl:attribute name="data-xpath">
-						<xsl:apply-templates select="." mode="xpath" />
-					</xsl:attribute>
-				</img>
-				<img src="images/edition/edit.gif" onclick="editJob($(this));" class="pointer edit-tree-action edit-job" style="float:right;margin:2px 2px 0 0;">
-					<xsl:attribute name="data-xpath">
-						<xsl:apply-templates select="." mode="xpath" />
-					</xsl:attribute>
-				</img>
-
-				<xsl:if test="@condition != ''">
-					<span class="lightTreeJobCondition" title="{@condition}">?</span>
-				</xsl:if>
-				<xsl:if test="@loop != ''">
-					<span class="jobLoop lightTreeJobLoop" title="Loop on: {@loop}">⟲</span>
-				</xsl:if>
+				<div class="jobActions">
+					<xsl:if test="@condition != ''">
+						<span class="lightTreeJobCondition" title="{@condition}">?</span>
+					</xsl:if>
+					<xsl:if test="@loop != ''">
+						<span class="jobLoop lightTreeJobLoop" title="Loop on: {@loop}">⟲</span>
+					</xsl:if>
+					<b><xsl:value-of select="@name" /></b>
+					<img src="images/edition/delete.png" onclick="executeAction('removeJob',$(this))" class="pointer edit-tree-action" title="Delete the job">
+						<xsl:attribute name="data-xpath">
+							<xsl:apply-templates select="." mode="xpath" />
+						</xsl:attribute>
+					</img>
+					<img src="images/edition/edit.gif" onclick="editJob($(this));" class="pointer edit-tree-action edit-job" title="Edit the job" >
+						<xsl:attribute name="data-xpath">
+							<xsl:apply-templates select="." mode="xpath" />
+						</xsl:attribute>
+					</img>
+					<img src="images/edition/addTask.png" onclick="executeAction('addParallelTask',$(this))" class="pointer edit-tree-action" title="Add a task">
+						<xsl:attribute name="data-xpath">
+							<xsl:apply-templates select="." mode="xpath" />
+						</xsl:attribute>
+					</img>
+				</div>
 				<xsl:apply-templates select="tasks/task" mode="edit-tree" />
-				<img src="images/edition/addTask.png" class="edit-tree-action pointer" onclick="executeAction('addParallelTask',$(this))" >
-					<xsl:attribute name="data-xpath">
-						<xsl:apply-templates select="." mode="xpath" />
-					</xsl:attribute>
-				</img>
 			</div>
 
 
@@ -1154,10 +1156,16 @@
 			<xsl:attribute name="data-xpath">
 				<xsl:apply-templates select="." mode="xpath" />
 			</xsl:attribute>
-			<xsl:if test="@loop != ''">
-				<span class="taskLoop" title="Loop on: {@loop}">⟲ </span>
-			</xsl:if>
-			<div onclick="showEditTask(this)" class="pointer"><xsl:value-of select="@name" /></div>
+
+			<div onclick="showEditTask(this)" class="pointer">
+				<xsl:if test="@condition != ''">
+					<span class="taskLoop" title="Loop on: {@condition}">? </span>
+				</xsl:if>
+				<xsl:if test="@loop != ''">
+					<span class="taskLoop" title="Loop on: {@loop}">⟲ </span>
+				</xsl:if>
+				<xsl:value-of select="@name" />
+			</div>
 
 
 			<form class="editTask" style="display:none;">
