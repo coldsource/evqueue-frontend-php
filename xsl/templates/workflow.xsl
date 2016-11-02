@@ -1235,6 +1235,7 @@
 									<xsl:attribute name="onclick">executeAction('editTask',$(this).closest('form'));</xsl:attribute>
 								</input>
 								<a class="action spaced" onclick="window.location.reload(); return false;">Cancel</a>
+								<img src="images/edition/delete.png" class="deleteTask" title="Delete this task" onclick="executeAction('deleteTask',$(this).closest('form'));" />
 							</td>
 						</tr>
 					</tbody>
