@@ -1129,14 +1129,22 @@
 							<td>Job condition</td>
 							<td class="xPathAble">
 								<input name="condition" class="w100" title="execution condition" placeholder="execution condition" value="{@condition}"/>
-								<img class="action startXPathHelp embedded" src="images/edition/help.png" />
+								<img class="action startXPathHelp embedded" src="images/edition/help.png" >
+									<xsl:attribute name="data-xpath">
+										<xsl:apply-templates select="." mode="xpath" />
+									</xsl:attribute>
+								</img>
 							</td>
 						</tr>
 						<tr>
 							<td>Job loop</td>
 							<td class="xPathAble">
 								<input name="loop" class="w100" title="loop expression" placeholder="loop expression" value="{@loop}" />
-								<img class="action startXPathHelp embedded" src="images/edition/help.png" />
+								<img class="action startXPathHelp embedded" src="images/edition/help.png" >
+									<xsl:attribute name="data-xpath">
+										<xsl:apply-templates select="." mode="xpath" />
+									</xsl:attribute>
+								</img>
 							</td>
 						</tr>
 						<tr>
