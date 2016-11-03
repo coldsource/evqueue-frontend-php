@@ -231,7 +231,7 @@ div.formdiv input {
 div.formdiv input[type='submit'] {
   min-width:10em;
   display:block;
-  margin-left:19em;
+  margin-left:0;
   margin-top:1em;
 }
 
@@ -436,8 +436,12 @@ label.forTextarea {
 .submitFormButtonMedium {
   margin-left: 42em; }
 
+.buttonFormWorkflow{
+	margin-right: 1em;
+}
+
 textarea.large {
-  width: 68.8%;
+  width: 100%;
   height: 500px; }
 
 textarea.small {
@@ -892,6 +896,14 @@ div.editionWorkflow img.editJob {
 
 div.editionWorkflow input.ui-button {
   padding: 0.1em 1em; }
+
+#Workflow{
+	border: 1px solid #dee0e3;
+	padding: 10px;
+}
+#Workflow > .formdiv{
+border:0;
+padding: 0;}
 
 /********** [END] specific rules for workflow display in edition mode **********/
 /* Workflow Planning pages */

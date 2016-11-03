@@ -10,7 +10,7 @@
 	</xsl:variable>
 
 	<xsl:template name="content">
-		<div class="contentManage">
+		<div class="contentManage" style="width:100%;">
 			<div class="boxTitle">
 			<span class="title">
 				<xsl:choose>
@@ -23,15 +23,21 @@
 				</xsl:choose>
 			</span>
 			</div>
-			<div id="Workflow" class="formdiv">
-				<xsl:call-template name="displayErrors" />
-				<xsl:call-template name="form_workflow"/>
+			<div id="Workflow">
+				<div class="formdiv">
+					<xsl:call-template name="displayErrors" />
+					<xsl:call-template name="form_workflow"/>
+				</div>
+
+				<div class="editionWorkflow">
+					<div id="editTree" data-id="{/page/get/@workflow_id}"></div>
+				</div>
+				<input type="button" name="submitFormWorkflow" class="buttonFormWorkflow" value="Save workflow" onclick="$('#formWorkflow').submit()" />
+				<input type="button" name="cancelFormWorkflow" class="buttonFormWorkflow" value="Cancel" onclick="location.pathname = location.pathname+'?workflow_id={/page/get/@workflow_id}'+'&amp;cancel'" />
 			</div>
 		</div>
 
-		<div class="editionWorkflow">
-			<div id="editTree" data-id="{/page/get/@workflow_id}"></div>
-		</div>
+
 	</xsl:template>
 
 </xsl:stylesheet>

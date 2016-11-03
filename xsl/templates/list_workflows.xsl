@@ -3,11 +3,11 @@
 	<xsl:import href="dropdown_utils.xsl" />
 	<xsl:import href="xmlhighlight.xsl" />
 	<xsl:import href="workflow.xsl" />
-	
+
 	<xsl:key name="groups" match="/page/workflows/workflow/@group" use="." />
-	
+
 	<xsl:template name="list_workflows">
-		
+
 		<div style="text-align: center; margin-top: 2em;">
 			<form method="post" enctype="multipart/form-data">
 				<input type="file" name="workflow_zip_file" onchange="$(this).parents('form:eq(0)').submit();" />
@@ -17,7 +17,7 @@
 			<xsl:call-template name="displayNotices" />
 			<xsl:call-template name="displayErrors" />
 		</div>
-		
+
 		<div id="workflow_edit_select" style="display:none;">Select workflow edition mode</div>
 		<div class="boxTitle">
 			<span class="title">Workflows List</span>
@@ -30,12 +30,12 @@
 				<th>Comment</th>
 				<th class="thActions">Actions</th>
 			</tr>
-			
+
 			<xsl:for-each select="/page/workflows/workflow/@group[generate-id(.) = generate-id(key('groups', .))]">
 				<xsl:sort select="." />
-				
+
 				<xsl:variable name="groupName" select="." />
-				
+
 				<xsl:if test="position() != 1">
 					<tr class="groupspace"><td></td></tr>
 				</xsl:if>
@@ -51,14 +51,14 @@
 						</xsl:choose>
 					</td>
 				</tr>
-				
+
 				<xsl:for-each select="/page/workflows/workflow[@group = $groupName]">
 					<tr class="evenOdd">
 						<td>
 							<xsl:value-of select="@id" />
 						</td>
 						<td>
-							
+
 							<span>
 								<xsl:if test="$USE_GIT = 1">
 									<xsl:choose>
@@ -79,8 +79,8 @@
 								</xsl:if>
 								<xsl:value-of select="@name" />
 							</span>
-							
-							
+
+
 							<xsl:if test="@has-bound-task = 1">
 								<span style="font-size: 80%; color: darkgray;"> (simple)</span>
 							</xsl:if>
@@ -88,10 +88,6 @@
 							<img src="images/bigger.png" title="View workflow XML" class="pointer" onclick = "$('#xmlcontent{@id}').dialog({{width:800}});" />
 							<div id="xmlcontent{@id}" style="display:none;">
 								<xsl:apply-templates select="." mode="xml_display" />
-							</div>
-							<img src="images/workflow.png" title="Tree Visualisation" class="pointer" onclick="$('#lightTree{@id}').dialog({{width: 'auto'}});" />
-							<div id="lightTree{@id}" style="display:none;">
-								<xsl:apply-templates select="." mode="light-tree" />
 							</div>
 						</td>
 						<td>
@@ -114,7 +110,7 @@
 									</xsl:when>
 								</xsl:choose>
 							</xsl:if>
-							
+
 							<xsl:if test="@has-bound-task = '1'">
 								<a href="manage-task.php?task_id={@bound-task-id}" title="Text edit">
 									<img src="images/edition/edit-txt.png" />
@@ -134,8 +130,8 @@
 					</tr>
 				</xsl:for-each>
 			</xsl:for-each>
-			
-			
+
+
 			<tr class="groupspace"><td></td></tr>
 			<tr class="group">
 				<td colspan="5">Git only</td>
@@ -155,29 +151,29 @@
 			</xsl:for-each>
 		</table>
 	</xsl:template>
-	
-	
+
+
 	<xsl:template match="*" mode="minimal" priority="-1">
 		<xsl:apply-templates select="*" mode="minimal" />
 	</xsl:template>
-	
-	
+
+
 	<xsl:template match="job" mode="minimal">
 		<div class="job">
 			<xsl:apply-templates select="*" mode="minimal" />
 		</div>
 	</xsl:template>
-	
-	
+
+
 	<xsl:template match="workflow[@has-bound-task = 1]//task" mode="minimal" priority="1">
 		<xsl:value-of select="/page/tasks/task[task_name = current()/@name]/task_binary" />
 		<br/>
 	</xsl:template>
-	
+
 	<xsl:template match="task" mode="minimal">
 		<xsl:value-of select="@name" />
 		<br/>
 	</xsl:template>
-	
-	
+
+
 </xsl:stylesheet>

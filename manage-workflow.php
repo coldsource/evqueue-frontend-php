@@ -68,11 +68,18 @@ if (isset($_POST) && (count($_POST)>1)){
 	}
 }
 
+if(isset($_GET['cancel'])){
+	if (isset($_GET["workflow_id"]) && ($_GET["workflow_id"] != '')){
+		unset($_SESSION['edition'][$_GET["workflow_id"]]);
+	}
+	else{
+		unset($_SESSION['edition']['new']);
+	}
+}
 
 if (isset($_GET["workflow_id"]) && ($_GET["workflow_id"] != '')){
 	$xml = $xsl->Api('workflow', 'get', ['id' => $_GET["workflow_id"]]);
 
-	//$_SESSION['edition'] = [];
 	if(!isset($_SESSION['edition'][$_GET["workflow_id"]]['workflow'])){
 		$dom = new DOMDocument();
 		$dom->LoadXML($xml);

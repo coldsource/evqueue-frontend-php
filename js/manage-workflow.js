@@ -17,7 +17,7 @@ String.prototype.xpathParent = function (repeat) {
 
 
 // Perform actions according to the values of previousAction and previousXPath
-$(document).ready( function () {
+/*$(document).ready( function () {
 	var previousAction = sessionStorage.getItem('previousAction');
 	var previousXPath = sessionStorage.getItem('previousXPath');
 	sessionStorage.clear();
@@ -38,9 +38,11 @@ $(document).ready( function () {
 			taskDiv.find('img.editTaskInputs').click();
 			break;
 	}
+});*/
+
+$(document).on("click", "#toggleXML", function(){
+	$('#workflow_xml').toggle();
 });
-
-
 
 function executeAction (action, clicked, confirmed) {
 	if (isInXPathHelp) return;

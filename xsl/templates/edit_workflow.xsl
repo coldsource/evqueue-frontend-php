@@ -5,10 +5,10 @@
 	<xsl:template name="form_workflow">
 		<form name="formWorkflow" id="formWorkflow" action="manage-workflow.php?workflow_id={/page/get/@workflow_id}" method="post">
 			<xsl:call-template name="form_workflow_header"/>
+
+			<label><u id="toggleXML" class="pointer">Toggle Workflow XML</u></label>
 			<br />
-			Workflow xml:
-			<br />
-			<textarea id="workflow_xml" name="workflow_xml" class="large">
+			<textarea id="workflow_xml" name="workflow_xml" class="large" style="display:none;margin-bottom:10px;">
 				<xsl:choose>
 					<xsl:when test="/page/post/@workflow_xml != ''">
 						<xsl:value-of select="/page/post/@workflow_xml" />
@@ -19,16 +19,15 @@
 				</xsl:choose>
 			</textarea>
 			<br />
-			<input type="submit" name="submitFormWorkflow" class="submitFormButton submitFormButtonLarge" value="Save workflow" />
 		</form>
 	</xsl:template>
-	
+
 	<xsl:template name="form_workflow_header">
 		<input type="hidden" name="workflow_id" value="{/page/get/@workflow_id}" />
 		<label class="formLabel" for="workflow_name">Name:</label>
 		<input type="text" name="workflow_name" id="workflow_name" placeholder="The name of your workflow" value="{/page/post/@workflow_name | /page/response-workflow/workflow/@name}"  />
 		<br />
-		
+
 		<script type="text/javascript">
 			availableTags = [
 				<xsl:for-each select="/page/groups/group">
@@ -38,15 +37,15 @@
 				</xsl:for-each>
 			];
 		</script>
-		
+
 		<label class="formLabel" for="workflow_group">Group:</label>
 		<input type="text" name="workflow_group" id="workflow_group" value="{/page/post/@workflow_group | /page/response-workflow/workflow/@group }" placeholder="Group name" />
-		
+
 		<br />
 		<label class="formLabel" for="workflow_comment">Comment:</label>
 		<input type="text" name="workflow_comment" id="workflow_comment" value="{/page/post/@workflow_comment | /page/response-workflow/workflow/@comment }" placeholder="Comment" />
 		<br />
-		
+
 		<br />
 		<table style="width:560px;">
 			<xsl:for-each select="/page/notification_types/notification_type">
@@ -73,7 +72,7 @@
 			</xsl:for-each>
 		</table>
 	</xsl:template>
-	
+
 	<xsl:template name="escapeQuote">
 		<xsl:param name="pText" select="."/>
 		<xsl:if test="string-length($pText) >0">
@@ -85,5 +84,5 @@
 				</xsl:call-template>
 			</xsl:if>
 		</xsl:if>
-	</xsl:template>	
+	</xsl:template>
 </xsl:stylesheet>
