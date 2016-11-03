@@ -91,6 +91,7 @@ if (isset($_POST['login']) && isset($_POST['password'])) {
 	$_SESSION['user_pwd'] = $pwd;
 	$_SESSION['user_profile'] = $evqueue->GetProfile();
 	$_SESSION['nodes'] = $nodes;
+	$_SESSION['git_enabled'] = $evqueue->GetConfigurationEntry('git.repository')!=""?true:false;
 	session_write_close();
 	header('Location: index.php');
 	die();

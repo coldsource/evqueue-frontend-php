@@ -241,6 +241,19 @@ class evQueue {
 		return $this->profile;
 	}
 	
+	public function GetConfigurationEntry($name) {
+		$xml = $this->Api('status','query',[ 'type' => 'configuration' ]);
+		
+		$dom = new DOMDocument();
+		$dom->loadXML($xml);
+		
+		$xpath = new DOMXpath($dom);
+		$nodes = $xpath->query('/response/configuration/entry[@name = "'.htmlspecialchars($name).'"]');
+		if($nodes->length==0)
+			return false;
+		return $nodes->item(0)->getAttribute('value');
+	}
+	
 	protected function ParserInit()	{
 		$this->parser_level = 0;
 		$this->parser_ready = false;
