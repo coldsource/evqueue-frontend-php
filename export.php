@@ -22,7 +22,7 @@ foreach($tasks as $task)
 }
 
 // Fetch workflow XML
-$workflow_xml = $evqueue->Api('workflow','get',[ 'id' => 1 ]);
+$workflow_xml = $evqueue->Api('workflow','get',[ 'id' => $_GET['workflow_id'] ]);
 
 $workflow_dom = new DOMDocument();
 $workflow_dom->loadXML($workflow_xml);
