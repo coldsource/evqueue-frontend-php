@@ -212,7 +212,7 @@
 	</xsl:template>
 
 
-	<!--<xsl:template match="workflow" mode="tree">
+	<xsl:template match="workflow" mode="tree">
 		<div>
 			<xsl:apply-templates select="." mode="relaunch" />
 
@@ -289,10 +289,10 @@
 				</xsl:if>
 			</div>
 		</div>
-	</xsl:template>-->
+	</xsl:template>
 
 
-	<!--<xsl:template match="job">
+	<xsl:template match="job">
 		<xsl:param name="first" select="0" />
 		<xsl:param name="skipped" select="0" />
 
@@ -362,10 +362,10 @@
 				</xsl:with-param>
 			</xsl:apply-templates>
 		</div>
-	</xsl:template>-->
+	</xsl:template>
 
 
-	<!--<xsl:template match="task">
+	<xsl:template match="task">
 		<xsl:param name="skipped" select="0" />
 
 		<xsl:variable name="skippedJobOrTask">
@@ -593,7 +593,7 @@
 				</ul>
 			</xsl:if>
 		</div>
-	</xsl:template>-->
+	</xsl:template>
 
 
 	<xsl:template name="instances">
