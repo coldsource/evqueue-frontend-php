@@ -125,9 +125,7 @@ class evQueue {
 			$this->profile = $this->parser_root_attributes['PROFILE'];
 			return true;
 		}
-		else{
-			//var_dump($this->parser_root_attributes);
-		}
+		
 		return false;
 	}
 	
@@ -201,7 +199,7 @@ class evQueue {
 	
 	public function Launch($name, $attributes=[], $parameters=[]) {
 		$attributes['name'] = $name;
-		$xml = $this->Api('instance', 'launch', $attributes, $parameters);
+		$this->Api('instance', 'launch', $attributes, $parameters);
 		return (int)$this->parser_root_attributes['WORKFLOW-INSTANCE-ID'];
 	}
 	
@@ -212,28 +210,10 @@ class evQueue {
 	 * found.
 	 */
 	public function GetWorkflowStatus( $workflow_instance_id ) {
-		$output = $this->exec("<workflow id='$workflow_instance_id' />");
 		
-		$xml = simplexml_load_string($output);
-		$workflow_instance_status = (string)$xml['status'];
-		
-		if (in_array($workflow_instance_status, array('EXECUTING','TERMINATED','ABORTED')))
-			return $workflow_instance_status;
-		
-		return false;
-	}
-
-	
-	public  function GetRunningTasks($workflow_instance_id) {
-		$dom = $this->exec("<workflow id='$workflow_instance_id' />",true);
-		$xpath = new DOMXpath($dom);
-		
-		$nodes = $xpath->query("//task[@status='EXECUTING']/@name");
-		$tasks = array();
-		foreach($nodes as $node)
-			$tasks[] = $node->nodeValue;
-		
-		return $tasks;
+		$xml = $this->Api('instance', 'query', [ 'id' => $workflow_instance_id]);
+		$sxml = simplexml_load_string($xml);
+		return (string)($sxml->workflow['status']);
 	}
 
 		
@@ -254,7 +234,7 @@ class evQueue {
 		if(!isset($this->parser_root_attributes['STATUS']) || $this->parser_root_attributes['STATUS']!='OK')
 			throw new Exception("evQueue : error returned from engine : {$this->parser_root_attributes['ERROR']}", evQueue::ERROR_RESPONSE_KO);
 		
-		return trim($xml);		
+		return trim($xml);
 	}
 	
 	public function GetProfile(){
