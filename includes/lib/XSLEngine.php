@@ -1,12 +1,12 @@
 <?php
  /*
   * This file is part of evQueue
-  * 
+  *
   * evQueue is free software: you can redistribute it and/or modify
   * it under the terms of the GNU General Public License as published by
   * the Free Software Foundation, either version 3 of the License, or
   * (at your option) any later version.
-  * 
+  *
   * evQueue is distributed in the hope that it will be useful,
   * but WITHOUT ANY WARRANTY; without even the implied warranty of
   * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
@@ -14,8 +14,8 @@
   *
   * You should have received a copy of the GNU General Public License
   * along with evQueue. If not, see <http://www.gnu.org/licenses/>.
-  * 
-  * Authors: Nicolas Jean, Christophe Marti 
+  *
+  * Authors: Nicolas Jean, Christophe Marti
   */
 
 function sumExecTimes ($nodes) {
@@ -32,13 +32,13 @@ function sumRetryTimes ($nodes) {
 	foreach ($nodes as $node) {
 		if (!$prev_exit_time)
 			$prev_exit_time = $node->getAttribute('execution_time');  // initialise prev_exec_time at the beginning, *and* when we move on to another task (previous node was output[@retval=0])
-		
+
 		$total_time += strtotime($node->getAttribute('execution_time')) - strtotime($prev_exit_time);
 		$prev_exit_time = ($node->getAttribute('retval') == 0) ? null : $node->getAttribute('exit_time');  // reset prev_exit_time on retval=0 since we're moving to another task after that
 	}
 	return $total_time;
 }
-  
+
 class XSLEngine
 {
 	protected $xmldoc;
@@ -59,11 +59,11 @@ class XSLEngine
 			if (!is_array($value) && preg_match('/^[a-zA-Z0-9-_]+$/',$param))
 				$this->root_node->setAttribute($param, $value);
 		}
-		
+
 		// Errors
 		$this->errors_node = $this->xmldoc->createElement('errors');
 		$this->root_node->appendChild($this->errors_node);
-		
+
 		// Notices
 		$this->notices_node = $this->xmldoc->createElement('notices');
 		$this->root_node->appendChild($this->notices_node);
@@ -116,9 +116,19 @@ class XSLEngine
 		$this->SetParameter('USE_GIT', 1); //TODO
 
 		$this->display_xml = isset($_GET['display_xml']);
+
+		if(isset($_SESSION['edition']) && is_array($_SESSION['edition'])){
+			$session = $this->xmldoc->createElement('session');
+			foreach ($_SESSION['edition'] as $key => $value) {
+				$wf = $this->xmldoc->createElement('workflow');
+				$wf->setAttribute("original-id", $key);
+				$session->appendChild($wf);
+			}
+			$this->root_node->appendChild($session);
+		}
 	}
 
-	
+
 
 	public function SetParameter($name,$value)
 	{
@@ -129,13 +139,13 @@ class XSLEngine
 	{
 		return isset($this->parameters[$name])?$this->parameters[$name]:false;
 	}
-	
+
 	public function AddError($error)
 	{
 		$error_node = $this->xmldoc->createElement('error',$error);
 		$this->errors_node->appendChild($error_node);
 	}
-	
+
 	public function AddNotice($error)
 	{
 		$notice_node = $this->xmldoc->createElement('notice',$error);
@@ -220,7 +230,7 @@ class XSLEngine
 			Logger::Log(LOG_INFO,'WebserviceWrapper',"XSL transformation took ".number_format((microtime(true)-$t1)*1000,1)."ms");
 
 		$dom->formatOutput = false;
-		
+
 		return $this->instruction.$dom->saveXML($dom->documentElement);
 	}
 
@@ -249,18 +259,18 @@ class XSLEngine
 	public function SetInstruction($instruction){
 		$this->instruction = $instruction;
 	}
-	
+
 	public function Api($name, $action = false, $attributes = [], $parameters = [], $evqueue_node = false)
 	{
 		global $evqueue;
 		if($evqueue_node === false)
 			$evqueue_node = $evqueue;
-			
+
 		if($evqueue_node === false){
 			$this->AddError("This engine is not running");
 			return "<response status='KO' error='This engine is not running' />";
 		}
-		
+
 		try
 		{
 			return $evqueue_node->API($name, $action, $attributes, $parameters);
@@ -270,10 +280,10 @@ class XSLEngine
 			$this->AddError($e->getMessage());
 			return "<response status='KO' error='".htmlspecialchars($e->getMessage())."' />";
 		}
-		
+
 		return "<response />";
 	}
-	
+
 	public function ClusterApi($name, $action = false, $attributes = [], $parameters = [])
 	{
 		$full_xml = '<cluster>';
@@ -285,7 +295,7 @@ class XSLEngine
 				$dom->loadXML($xml);
 				$dom->documentElement->setAttribute("node", $node_name);
 				$xml = $dom->saveXML($dom->documentElement);
-				
+
 				$full_xml .= $xml;
 			}
 			catch(Exception $e) {
@@ -293,10 +303,10 @@ class XSLEngine
 			}
 		}
 		$full_xml .= '</cluster>';
-		
+
 		return $full_xml;
 	}
-	
+
 	public function HasError(){
 		$xpath = new DOMXpath($this->xmldoc);
 		if($xpath->evaluate("count(/page/errors/error)"))

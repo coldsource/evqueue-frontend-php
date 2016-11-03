@@ -33,7 +33,7 @@
 					<div id="editTree" data-id="{/page/get/@workflow_id}"></div>
 				</div>
 				<input type="button" name="submitFormWorkflow" class="buttonFormWorkflow" value="Save workflow" onclick="$('#formWorkflow').submit()" />
-				<input type="button" name="cancelFormWorkflow" class="buttonFormWorkflow" value="Cancel" onclick="location.pathname = location.pathname+'?workflow_id={/page/get/@workflow_id}'+'&amp;cancel'" />
+				<input type="button" name="cancelFormWorkflow" class="buttonFormWorkflow" value="Cancel" onclick="location = '{$SITE_BASE}list-workflows.php?cancel={/page/get/@workflow_id}'" />
 			</div>
 		</div>
 

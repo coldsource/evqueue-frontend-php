@@ -1,24 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:exsl="http://exslt.org/common" version="1.0">
 	<xsl:output method="xml" indent="no" omit-xml-declaration="yes" encoding="utf-8" doctype-public="-//W3C//DTD XHTML 1.0 Transitional//EN" doctype-system="http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd" />
-	
+
 	<xsl:param name="CSS" select="''" />
 	<xsl:param name="javascript" select="''" />
 	<xsl:param name="SITE_BASE" select="''" />
-	
+
 	<xsl:param name="ISFORM" select="''" />
 	<xsl:param name="FORMTITLE" select="''" />
-	
+
 	<xsl:param name="LOGIN" select="''" />
-	
+
 	<xsl:template match="/">
 		<xsl:param name="title" select="'Workflow'" />
 		<html>
 			<head>
 				<meta http-equiv="Content-Type" content="application/xhtml+xml; charset=utf-8" />
-				
+
 				<link rel="stylesheet" type="text/css" href="{$SITE_BASE}js/jquery-ui-1.11.4.custom/jquery-ui.min.css"/>
-				
+
 				<xsl:choose>
 					<xsl:when test="$CSS = 'GUI'">
 						<link rel="stylesheet" type="text/css" href="{$SITE_BASE}styles/gui.css"/>
@@ -27,33 +27,33 @@
 						<link rel="stylesheet" type="text/css" href="{$SITE_BASE}styles/style.css"/>
 					</xsl:otherwise>
 				</xsl:choose>
-				
+
 				<link rel="stylesheet" type="text/css" href="{$SITE_BASE}js/jQuery-Timepicker-Addon/dist/jquery-ui-timepicker-addon.min.css"/>
-				
+
 				<script type="text/javascript">
 					var site_base = '<xsl:value-of select="$SITE_BASE" />';
 				</script>
-				
+
 				<script type="text/javascript" src="{$SITE_BASE}js/jquery-1.7.1.min.js" />
 				<script type="text/javascript" src="{$SITE_BASE}js/jquery-ui-1.11.4.custom/jquery-ui.min.js" />
 				<script type="text/javascript" src="{$SITE_BASE}js/forms.js" />
 				<script type="text/javascript" src="{$SITE_BASE}js/jQuery-Timepicker-Addon/dist/jquery-ui-timepicker-addon.min.js" />
 				<script type="text/javascript" src="{$SITE_BASE}js/progressbar.js" />
 				<script type="text/javascript" src="{$SITE_BASE}js/global.js" />
-				
+
 				<xsl:if test="$javascript != '' and exsl:node-set($javascript)/src">
 					<xsl:for-each select="exsl:node-set($javascript)/src">
 						<script type="text/javascript" src="{$SITE_BASE}{.}"><xsl:text><![CDATA[]]></xsl:text></script>
 					</xsl:for-each>
 				</xsl:if>
-				
+
 				<title><xsl:value-of select="$title" /></title>
 			</head>
 			<body>
 				<xsl:if test="$topmenu != ''">
 					<xsl:call-template name="topmenu" />
 				</xsl:if>
-				
+
 				<!-- Form page -->
 				<xsl:if test="$ISFORM = '1'">
 					<div class="contentManage">
@@ -63,22 +63,22 @@
 						</div>
 					</div>
 				</xsl:if>
-				
+
 				<!-- Display page -->
 				<xsl:if test="$ISFORM != '1'">
 					<div class="content">
 						<xsl:call-template name="content" />
 					</div>
 				</xsl:if>
-				
+
 				<div id="footer">
 					Licensed under GPLv3 (<a href="http://evqueue.net">evqueue.net</a>)
 				</div>
 			</body>
 		</html>
 	</xsl:template>
-	
-	
+
+
 	<xsl:template name="displayErrors">
 		<xsl:if test="count(/page/errors/error) > 0">
 			<div id="errors">
@@ -100,7 +100,7 @@
 			</div>
 		</xsl:if>
 	</xsl:template>
-	
+
 	<xsl:template name="displayNotices">
 		<xsl:if test="count(/page/notices/notice) > 0">
 			<div id="notices">
@@ -112,7 +112,7 @@
 			</div>
 		</xsl:if>
 	</xsl:template>
-	
+
 	<xsl:template name="topmenu">
 		<ul class="topmenu">
 			<li class="logo"><a href="{$SITE_BASE}index.php">evQueue</a></li>
@@ -132,14 +132,16 @@
 				<xsl:if test="$topmenu='logging'"><xsl:attribute name="class">selected</xsl:attribute></xsl:if>
 				Logging
 			</li>
-			<xsl:choose>
-				<xsl:when test="/page/session/workflow/@original-id = 'new'">
-					<li><a style="color: #51d551;" href="{$SITE_BASE}manage-workflow-gui.php">Creating workflow</a></li>
-				</xsl:when>
-				<xsl:when test="count(/page/session/workflow/@original-id) > 0">
-					<li><a style="color: #51d551;" href="{$SITE_BASE}manage-workflow-gui.php?workflow_id={/page/session/workflow/@original-id}">Editing workflow <xsl:value-of select="/page/session/workflow/@original-id" /></a></li>
-				</xsl:when>
-			</xsl:choose>
+			<xsl:for-each select="/page/session/workflow">
+				<xsl:choose>
+					<xsl:when test="@original-id = 'new'">
+						<li><a style="color: #51d551;" href="{$SITE_BASE}manage-workflow.php">Creating workflow</a></li>
+					</xsl:when>
+					<xsl:otherwise>
+						<li><a style="color: #51d551;" href="{$SITE_BASE}manage-workflow.php?workflow_id={@original-id}">Editing workflow <xsl:value-of select="@original-id" /></a></li>
+					</xsl:otherwise>
+				</xsl:choose>
+			</xsl:for-each>
 		</ul>
 		<ul class="submenu" id="submenu-system-state">
 			<xsl:if test="$topmenu!='system-state'"><xsl:attribute name="style">display:none;</xsl:attribute></xsl:if>
@@ -169,7 +171,7 @@
 				<li><a href="{$SITE_BASE}view-logs.php">Engine logs</a></li>
 			</ul>
 		</xsl:if>
-		
+
 		<xsl:choose>
 			<xsl:when test="$LOGIN != ''">
 				<div id="userInfo">
