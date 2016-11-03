@@ -24,7 +24,7 @@ require_once 'lib/XSLEngine.php';
 
 $limit = 30;
 $page = ((isset($_GET['p']) && $_GET['p'] > 0) ? $_GET['p']:1);
-$offset = $page * $limit;
+$offset = ($page-1) * $limit;
 
 $filters = [
 	"limit"  => $limit,
