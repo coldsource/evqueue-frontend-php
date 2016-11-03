@@ -34,9 +34,9 @@
 							<th>Host</th>
 						</xsl:if>
 						<xsl:if test="$DISPLAY = 'state'">
-							<th style="width:130px;">Last execution</th>
+							<th style="width:140px;">Last execution</th>
 						</xsl:if>
-						<th style="width:130px;">Next execution time</th>
+						<th style="width:140px;">Next execution time</th>
 						<xsl:if test="$DISPLAY = 'settings'">
 							<th style="width:60px;">Status</th>
 						</xsl:if>
