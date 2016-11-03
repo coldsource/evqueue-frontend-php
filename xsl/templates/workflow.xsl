@@ -94,7 +94,7 @@
 
 			<td class="tdActions">
 				<xsl:if test="@status='EXECUTING'">
-					<img src="images/stop.png" data-confirm="Stop execution of this workflow ?" alt="Stop execution of this workflow" title="Stop execution of this workflow" onclick="evqueueAPI(this, 'instance', 'cancel', {{ 'id':{@id} }}, {{}}, {../@node});"/>
+					<img src="images/stop.png" data-confirm="Are you sure you want to stop the execution of this workflow ?" alt="Stop execution of this workflow" title="Stop execution of this workflow" onclick="evqueueAPI(this, 'instance', 'cancel', {{ 'id':{@id} }}, {{}}, '{../@node}');"/>
 				</xsl:if>
 
 				<xsl:if test="@status='TERMINATED'">
@@ -453,7 +453,7 @@
 								<xsl:when test="@status='EXECUTING'">
 									EXECUTING
 									<xsl:if test="@status='EXECUTING'">
-										<img class="killTask" src="images/bomb.png" title="Kill Task" onclick="evqueueAPI(this, 'instance', 'killtask', {{ 'id':{ancestor::workflow[1]/@id}, 'pid':{@pid} }}, {{}}, '{/page/instance/@node}');" />
+										<img class="killTask" src="images/bomb.png" data-confirm="Are you sure you want to kill this task ?" title="Kill Task" onclick="evqueueAPI(this, 'instance', 'killtask', {{ 'id':{ancestor::workflow[1]/@id}, 'pid':{@pid} }}, {{}}, '{/page/instance/@node}');" />
 									</xsl:if>
 								</xsl:when>
 								<xsl:when test="@status='QUEUED'">
