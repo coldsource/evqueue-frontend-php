@@ -38,6 +38,7 @@ if (isset($_POST) && (count($_POST)>1)){
 			'group' => $_POST['workflow_group'],
 			'comment' => $_POST['workflow_comment'],
 		]);
+		unset($_SESSION['edition'][$_GET["workflow_id"]]);
 	}
 	else{
 		$xml = $xsl->Api('workflow', 'create', [
@@ -46,7 +47,7 @@ if (isset($_POST) && (count($_POST)>1)){
 			'group' => $_POST['workflow_group'],
 			'comment' => $_POST['workflow_comment'],
 		]);
-
+		unset($_SESSION['edition']['new']);
 		if(!$xsl->HasError())
 			$id = $evqueue->GetParserRootAttributes()['WORKFLOW-ID'];
 	}

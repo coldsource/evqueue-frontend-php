@@ -25,19 +25,21 @@ function evqueueAPI(element, group, action, attributes = [], parameters = [], no
 		if ($(error).length > 0) {
 			alert(error.html());
 		}
+		return xml;
 	});
 }
 
-function commit(element, name, group = 'workflow', force = 'no'){
-	var log = window.prompt('Commit log :');
-	evqueueAPI(element, 'git', 'save_'+group, { 'name':name, 'commit_log':log, 'force':force });
-	location.reload();
+function commit(element, name, group = 'workflow', force = 'no', id='-1'){
+	$("input[name='commit-name']").val(name);
+	$("input[name='commit-force']").val(force);
+	$("input[name='commit-id']").val(id);
+	$("#dialog-commit").dialog();
 }
 
 function retryAllTasks(){
 	$.ajax({
 		url: 'ajax/retry.php'
 	}).done(function(xml){
-		
+
 	});
 }
