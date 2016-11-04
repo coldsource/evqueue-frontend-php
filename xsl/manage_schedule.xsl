@@ -28,8 +28,9 @@
 					<input type="hidden" name="schedule_id" value="{/page/post/@schedule_id | /page/response-schedule/schedule/@id}" />
 					<label class="formLabel" for="schedule_name">Schedule name:</label>
 					<input type="text" name="schedule_name" id="schedule_name" value="{/page/post/@schedule_name|/page/response-schedule/schedule/@name}" />
-					<br />
-					<table style="width: auto; margin-top: 15px;">
+					<br /><br />
+					<label class="formLabel">Schedule description:</label>
+					<table style="width: auto; margin-top: 15px; display:inline;">
 						<tbody>
 							<tr>
 								<td>Retry every X seconds</td>
