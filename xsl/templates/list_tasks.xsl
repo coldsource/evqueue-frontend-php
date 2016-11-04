@@ -2,11 +2,14 @@
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:exsl="http://exslt.org/common" version="1.0">
 	<xsl:import href="dropdown_utils.xsl" />
 	<xsl:output method="xml"/>
-	
+
 	<xsl:key name="groups" match="/page/tasks/task/@group" use="." />
-	
+
 	<xsl:template name="list_tasks">
-		
+		<div style="text-align: center;">
+			<xsl:call-template name="displayNotices" />
+			<xsl:call-template name="displayErrors" />
+		</div>
 		<div class="boxTitle">
 			<span class="title">Tasks list</span>
 			<a href="manage-task.php"><img class="action" src="images/plus3.png" title="Add new task" /></a>
@@ -20,10 +23,10 @@
 				<th>Host</th>
 				<th class="thActions">Actions</th>
 			</tr>
-			
+
 			<xsl:for-each select="page/tasks/task[not(starts-with(@name,'@'))]/@group[generate-id(.) = generate-id(key('groups', .))]">
 				<xsl:sort select="." />
-				
+
 				<xsl:variable name="groupName" select="." />
 				<xsl:if test="position() != 1">
 					<tr class="groupspace"><td></td></tr>
@@ -40,7 +43,7 @@
 						</xsl:choose>
 					</td>
 				</tr>
-				
+
 				<xsl:for-each select="/page/tasks/task[@group = $groupName]">
 					<tr class="evenOdd">
 						<td>
@@ -97,7 +100,7 @@
 									</xsl:when>
 								</xsl:choose>
 							</xsl:if>
-							
+
 							<a href="manage-task.php?task_id={@id}">
 								<img src="images/edit.gif"  />
 							</a>
@@ -107,7 +110,7 @@
 					</tr>
 				</xsl:for-each>
 			</xsl:for-each>
-			
+
 			<tr class="groupspace"><td></td></tr>
 			<tr class="group">
 				<td colspan="6">Git only</td>
@@ -127,8 +130,8 @@
 			</xsl:for-each>
 		</table>
 	</xsl:template>
-	
-	
+
+
 	<xsl:template name="tasks-select">
 		<select name="task_name">
 			<optgroup>Retry schedule</optgroup>
@@ -139,12 +142,12 @@
 			</xsl:for-each>
 		</select>
 	</xsl:template>
-	
+
 	<xsl:template match="tasks-groups" mode="tasks-select">
 		<xsl:param name="name" select="'@name'" />
 		<xsl:param name="id" select="''" />
 		<xsl:param name="selected_value" select="''" />
-		
+
 		<select name="{$name}" id="{$id}" >
 			<xsl:for-each select="group">
 				<optgroup>
@@ -170,5 +173,5 @@
 			</xsl:for-each>
 		</select>
 	</xsl:template>
-	
+
 </xsl:stylesheet>

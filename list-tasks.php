@@ -36,7 +36,6 @@ if($_SESSION['git_enabled'])
 	$xsl->Api("git", "pull");
 	$xsl->AddFragment(["git-tasks" => $xsl->Api("git", "list_tasks")]);
 }
-
 $xsl->DisplayXHTML('xsl/list_tasks.xsl');
 
 ?>
