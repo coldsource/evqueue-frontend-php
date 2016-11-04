@@ -3,23 +3,25 @@
 	<xsl:output method="xml"/>
 
 	<xsl:template name="form_workflow">
-		<form name="formWorkflow" id="formWorkflow" action="manage-workflow.php?workflow_id={/page/get/@workflow_id}" method="post">
-			<xsl:call-template name="form_workflow_header"/>
+		<div class="formdiv">
+			<form name="formWorkflow" id="formWorkflow" action="manage-workflow.php?workflow_id={/page/get/@workflow_id}" method="post">
+				<xsl:call-template name="form_workflow_header"/>
 
-			<label><u id="toggleXML" class="pointer">Toggle Workflow XML</u></label>
-			<br />
-			<textarea id="workflow_xml" name="workflow_xml" class="large" style="display:none;margin-bottom:10px;">
-				<xsl:choose>
-					<xsl:when test="/page/post/@workflow_xml != ''">
-						<xsl:value-of select="/page/post/@workflow_xml" />
-					</xsl:when>
-					<xsl:otherwise>
-						<xsl:copy-of select="/page/response-workflow/workflow/workflow" />
-					</xsl:otherwise>
-				</xsl:choose>
-			</textarea>
-			<br />
-		</form>
+				<label><u id="toggleXML" class="pointer">Toggle Workflow XML</u></label>
+				<br />
+				<textarea id="workflow_xml" name="workflow_xml" class="large" style="display:none;margin-bottom:10px;">
+					<xsl:choose>
+						<xsl:when test="/page/post/@workflow_xml != ''">
+							<xsl:value-of select="/page/post/@workflow_xml" />
+						</xsl:when>
+						<xsl:otherwise>
+							<xsl:copy-of select="/page/response-workflow/workflow/workflow" />
+						</xsl:otherwise>
+					</xsl:choose>
+				</textarea>
+				<br />
+			</form>
+		</div>
 	</xsl:template>
 
 	<xsl:template name="form_workflow_header">
