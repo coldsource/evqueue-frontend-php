@@ -45,7 +45,7 @@ class evQueue {
 	const ERROR_ENGINE = 5;
 
 
-	public function __construct($cnx_string, $user_login = null, $user_pwd = null) {
+	public function __construct($cnx_string, $user_login = null, $user_pwd = null, $user_pwd_hashed = false) {
 		if(substr($cnx_string, 0 ,7) == 'unix://'){
 			$this->evqueue_ip =substr($cnx_string, 6);
 			$this->evqueue_port = 0;
@@ -62,7 +62,7 @@ class evQueue {
 		socket_set_option($this->socket, SOL_SOCKET, SO_SNDTIMEO, ['sec' => 10, 'usec' => 0]);
 
 		$this->user_login = $user_login;
-		$this->user_pwd = $user_pwd;
+		$this->SetUserPwd($user_pwd, $user_pwd_hashed);
 	}
 
 	public function __destruct() {
@@ -86,8 +86,11 @@ class evQueue {
 		$this->user_login = $login;
 	}
 
-	public function SetUserPwd($pwd){
-		$this->user_pwd = $pwd;
+	public function SetUserPwd($pwd, $user_pwd_hashed = false){
+		if($user_pwd_hashed)
+			$this->user_pwd = $pwd;
+		else
+			$this->user_pwd = sha1($pwd, true);
 	}
 
 	protected function connect()

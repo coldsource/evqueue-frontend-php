@@ -1,11 +1,11 @@
 <?php
 
-function getevQueue($scheme){	
+function getevQueue($scheme){
 	if(isset($_SESSION['user_login']) && isset($_SESSION['user_pwd']))
-		$evqueue = new evQueue($scheme, $_SESSION['user_login'], $_SESSION['user_pwd']);
+		$evqueue = new evQueue($scheme, $_SESSION['user_login'], $_SESSION['user_pwd'], true);
 	else
 		$evqueue = new evQueue($scheme);
-		
+
 	return $evqueue;
 }
 
@@ -32,7 +32,7 @@ function getAllGroupXml(){
 			$xml .= "<group>$key</group>";
 	}
 	$xml .= '</groups>';
-	
+
 	return $xml;
 }
 
@@ -60,7 +60,7 @@ function getAllTaskGroupXml(){
 			$xml .= "<group>$key</group>";
 	}
 	$xml .= '</tasks-groups>';
-	
+
 	return $xml;
 }
 
