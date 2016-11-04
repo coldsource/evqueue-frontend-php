@@ -11,7 +11,7 @@
 				<input type="hidden" name="commit-id" />
 				<input type="text" placeholder="Commit log" name="commit-log" class="w100"/><br />
 				<xsl:if test="$group = 'workflow'">
-					<label>Commit tasks<input type="checkbox" name="commit-tasks"/></label><br />
+					<label><input type="checkbox" name="commit-tasks"/>&#160;Also commit depending tasks</label><br />
 				</xsl:if>
 				<input type="submit" class="submitFormButton" />
 			</form>
