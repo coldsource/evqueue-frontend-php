@@ -42,6 +42,9 @@
 		
 	
 		<xsl:call-template name="displayErrors" />
+		<xsl:if test="/page/@create_workflow = 'yes'">
+			<p><i>You are in simple workflow mode. A simple workflow only contains one task and is named after its task name.</i></p>
+		</xsl:if>
 
 		<form name="formTask" id="formTask" method="post">
 			<xsl:call-template name="taskFormInputs" />
