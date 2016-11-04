@@ -231,7 +231,7 @@ div.formdiv input {
 div.formdiv input[type='submit'] {
   min-width:10em;
   display:block;
-  margin-left:0;
+  margin-left:20em;
   margin-top:1em;
 }
 
@@ -247,8 +247,9 @@ div.formdiv select.custom-schedule-select{
   min-width: unset;
 }
 
-div#specificRights {
- padding-left:16em;
+div.formdiv form > div {
+	margin-top: 10px;
+	margin-bottom:10px;
 }
 
 /* Login page */
@@ -975,156 +976,3 @@ div.contentList, div.contentManage {
   font-weight: bold;
   text-align: center;
   margin-top: 30px; }
-
-@media (max-width: 1280px) {
-  div.contentList, div.contentManage {
-    width: auto;
-    margin-top: 40px; }
-
-  .submitFormButtonMedium {
-    margin-left: 0; } }
-ul.ui-autocomplete {
-  width: 150px;
-  margin-left: 0px;
-  padding-left: 0px;
-  list-style-type: none; }
-
-ul.ui-autocomplete li {
-  padding-left: 10px;
-  cursor: pointer; }
-
-/* schedule */
-#paramsTabClone {
-  display: none; }
-
-#hostTab input {
-  width: 25em; }
-
-form#formSchedule img {
-  cursor: pointer; }
-
-p#scheduleInEnglish {
-  font-weight: bold;
-  color: #474747;
-  text-align: center;
-  margin-bottom: 50px; }
-
-ul.scheduleParameters {
-  float: right;
-  list-style-type: none;
-  margin: 0;
-  padding: 0; }
-
-ul.scheduleParameters li {
-  display: inline-block;
-  padding: 0 3px;
-  margin: 0 4px;
-  border: 1px solid lightgray;
-  border-radius: 5px;
-  background-color: #f7f7f7; }
-
-/* tasks */
-#task div.linked-workflow {
-  display: inline-block;
-  vertical-align: top;
-  float: right; }
-
-#task div.linked-workflow ul {
-  list-style: none;
-  margin: 0;
-  padding: 0; }
-
-div.install_content {
-  width: 540px;
-  margin: auto; }
-
-div.install_content div.error {
-  text-align: center;
-  font-weight: bold;
-  margin-bottom: 10px; }
-
-div.install_content div.submit {
-  text-align: center; }
-
-table.edit_notif {
-  border-collapse: collapse;
-  border-spacing: 0; }
-
-table.edit_notif .formLabel {
-  width: 130px; }
-
-table.edit_notif input {
-  width: 393px; }
-
-/* BEGIN LIGHT-TREE DISPLAY */
-div.lightTreeStart{
-  border: 1px solid darkgray;
-  border-radius: 8px;
-  padding:5px;
-  text-align: center;
-}
-
-div.lightTreeJob {
-  display: inline-block;
-  vertical-align: top;
-  text-align: center;
-  position:relative;}
-
-div.lightTreeNewJob {
-  display: inline-block;
-  vertical-align: top; }
-
-img.down-arrow {
-  margin:auto;
-  display: block;}
-
-img.edit-tree-action{
-  display:none;}
-
-.lightTreeJobCondition {
-  font-size: 110%;
-  font-weight: bold;
-  margin-right: 5px;
-}
-
-.lightTreeJobLoop {
-  font-weight: bold;
-  margin-right: 5px;
-}
-
-div.jobActions{
-	height: 20px;
-	text-align: left;
-}
-div.jobActions img{
-	margin-left:5px;
-}
-
-div.lightTreeTasks {
-  border: 1px solid darkgray;
-  border-radius: 8px;
-  overflow: hidden;
-  text-align: center;
-  display: inline-block;}
-
-div.lightTreeTask {
-  margin: 5px 0; }
-
-div.lightTreeJob .jobLoop,
-div.lightTreeJob .taskLoop {
-  font-size: 110%; }
-
-/* END LIGHT-TREE DISPLAY */
-
-/* GIT */
-.gitNew{
-  color:blue;
-}
-.gitModified{
-  color:green;
-}
-.gitNeedUpdate{
-  color:red;
-}
-
-/*# sourceMappingURL=style.css.map */

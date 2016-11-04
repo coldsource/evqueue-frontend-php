@@ -24,9 +24,10 @@
 
 	<xsl:template name="form_workflow_header">
 		<input type="hidden" name="workflow_id" value="{/page/get/@workflow_id}" />
-		<label class="formLabel" for="workflow_name">Name:</label>
-		<input type="text" name="workflow_name" id="workflow_name" placeholder="The name of your workflow" value="{/page/post/@workflow_name | /page/response-workflow/workflow/@name}"  />
-		<br />
+		<div>
+			<label class="formLabel" for="workflow_name">Name:</label>
+			<input type="text" name="workflow_name" id="workflow_name" placeholder="The name of your workflow" value="{/page/post/@workflow_name | /page/response-workflow/workflow/@name}"  />
+		</div>
 
 		<script type="text/javascript">
 			availableTags = [
@@ -38,13 +39,15 @@
 			];
 		</script>
 
-		<label class="formLabel" for="workflow_group">Group:</label>
-		<input type="text" name="workflow_group" id="workflow_group" value="{/page/post/@workflow_group | /page/response-workflow/workflow/@group }" placeholder="Group name" />
+		<div>
+			<label class="formLabel" for="workflow_group">Group:</label>
+			<input type="text" name="workflow_group" id="workflow_group" value="{/page/post/@workflow_group | /page/response-workflow/workflow/@group }" placeholder="Group name" />
+		</div>
 
-		<br />
-		<label class="formLabel" for="workflow_comment">Comment:</label>
-		<input type="text" name="workflow_comment" id="workflow_comment" value="{/page/post/@workflow_comment | /page/response-workflow/workflow/@comment }" placeholder="Comment" />
-		<br />
+		<div>
+			<label class="formLabel" for="workflow_comment">Comment:</label>
+			<input type="text" name="workflow_comment" id="workflow_comment" value="{/page/post/@workflow_comment | /page/response-workflow/workflow/@comment }" placeholder="Comment" />
+		</div>
 
 		<br />
 		<table style="width:560px;">

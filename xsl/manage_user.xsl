@@ -22,11 +22,11 @@
 				<form method="post">
 					<input type="hidden" name="action" value="createUser" />
 					
-					<p>
+					<div>
 						<label>Login:</label>
 						<input name="login" placeholder="Enter new login" value="{/page/post/@login}" autocomplete="off" />
-					</p>
-					<p>
+					</div>
+					<div>
 						<label>Profile:</label>
 						<select name="profile" onchange="profileChanged();">
 							<option value="ADMIN">ADMIN</option>
@@ -38,17 +38,17 @@
 							</option>
 						</select>
 						
-					</p>
+					</div>
 					
-					<p>
+					<div>
 						<label>Password:</label>
 						<input type="password" name="password" placeholder="Password" />
-					</p>
+					</div>
 					
-					<p>
+					<div>
 						<label>Confirm password:</label>
 						<input type="password" name="password2" placeholder="Confirm password" />
-					</p>
+					</div>
 					
 					<xsl:call-template name="rights" />
 					
@@ -59,14 +59,14 @@
 			<!-- USER EDITION -->
 			<xsl:otherwise>
 				<form method="post">
-					<p>
+					<div>
 						<label>Login: </label>
 						<xsl:value-of select="/page/response-user/user/@name" />
-					</p>
-					<p>
+					</div>
+					<div>
 						<label>Profile: </label>
 						<xsl:value-of select="/page/response-user/user/@profile" />
-					</p>
+					</div>
 					
 					<xsl:call-template name="rights" />
 					
@@ -94,17 +94,19 @@
 		</script>
 	
 		<!-- ADMIN -->
-		<p>
-			<label class="formLabel">
+		<div>
+			<label>
 				<b>User rights</b>
 			</label>
+			
+			<div style="display:inline-block;width:40em;">
 		
 		<div id="adminRights">
 			<xsl:if test="$creation = 1 or /page/user/@profile = 'ADMIN'">
 				All rights on everything (admin)
 			</xsl:if>
 		</div>
-		</p>
+		
 		
 		<!-- PROFILE USER -->
 		<div id="specificRights">
@@ -119,11 +121,13 @@
 				</xsl:when>
 			</xsl:choose>
 		</div>
+		
+		</div></div>
 	</xsl:template>
 	
 	
 	<xsl:template name="rightsTable">
-		<table class="userRights" style="min-width: 50%; width: auto; margin-top: 10px;">
+		<table class="userRights" style="min-width: 50%; width: auto; margin-top: 10px; display:inline;">
 			<tbody>
 				<tr>
 					<th>Workflow</th>

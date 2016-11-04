@@ -206,6 +206,7 @@
 						<div id="paramsTabForm"></div>
 					</div>
 					<div id="nodeTab">
+						<label>Plan workflow on node:</label>
 						<select name="node_name">
 							<xsl:for-each select="/page/evqueue-nodes/node">
 								<option value="{@name}">
@@ -217,11 +218,11 @@
 					</div>
 					<div id="hostTab">
 						<br />
-						<label class="formLabel" for="schedule_user">Task user : </label>
+						<label for="schedule_user">Task user : </label>
 						<input type="text" name="schedule_user" id="schedule_user" value="{/page/schedule/workflow_schedule/@user}" placeholder="Enter user here, leave blank for local execution" />
 
 						<br />
-						<label class="formLabel" for="schedule_host">Task host : </label>
+						<label for="schedule_host">Task host : </label>
 						<input type="text" name="schedule_host" id="schedule_host" value="{/page/schedule/workflow_schedule/@host}" placeholder="Enter host here, leave blank for local execution" />
 					</div>
 					<input type="button" value="Save this plan" onclick="setParameter(); $('#formWorkflowSchedule').submit();" />
