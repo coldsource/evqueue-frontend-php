@@ -7,20 +7,6 @@ $filename = tempnam('/tmp','evqueue-frontend-');
 $zip = new ZipArchive();
 $zip->open($filename,ZipArchive::CREATE|ZipArchive::OVERWRITE);
 
-// Fetch tasks for name <-> id mapping
-$tasks_xml = $evqueue->Api('tasks','list');
-
-$tasks_dom = new DOMDocument();
-$tasks_dom->loadXML($tasks_xml);
-
-$tasks_xpath = new DOMXPath($tasks_dom);
-$tasks = $tasks_xpath->query('/response/task');
-$tasks_name_id = [];
-foreach($tasks as $task)
-{
-	$tasks_name_id[$task->getAttribute('name')] = $task->getAttribute('id');
-}
-
 // Fetch workflow XML
 $workflow_xml = $evqueue->Api('workflow','get',[ 'id' => $_GET['workflow_id'] ]);
 
@@ -38,7 +24,7 @@ foreach($tasks as $task)
 {
 	// Fetch task description and add to Zip
 	$task_name = $task->getAttribute('name');
-	$task_xml = $evqueue->Api('task','get',[ 'id' => $tasks_name_id[$task_name]]);
+	$task_xml = $evqueue->Api('task','search',[ 'name' => $task_name]);
 	
 	$task_dom = new DOMDocument();
 	$task_dom->loadXML($task_xml);
