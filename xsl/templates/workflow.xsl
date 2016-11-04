@@ -974,12 +974,8 @@
 						<option value="xpath">xpath value</option>
 						<option value="copy">xpath copy</option>
 					</select>
-					<input name="value[]" class="large spaced-h" />
-					<img class="action startXPathHelp" src="images/edition/help.png" >
-						<xsl:attribute name="data-xpath">
-							<xsl:apply-templates select="." mode="xpath" />
-						</xsl:attribute>
-					</img>
+					<input name="value[]" class="spaced-h" style="width:89%;"/>
+					<img class="action startXPathHelp" src="images/edition/help.png" />
 					<img onclick="deleteTaskInputValue($(this));" title="Delete this value" src="images/edition/delete.png" />
 					<br/>
 				</div>
@@ -1129,22 +1125,14 @@
 							<td>Job condition</td>
 							<td class="xPathAble">
 								<input name="condition" class="w100" title="execution condition" placeholder="execution condition" value="{@condition}"/>
-								<img class="action startXPathHelp embedded" src="images/edition/help.png" >
-									<xsl:attribute name="data-xpath">
-										<xsl:apply-templates select="." mode="xpath" />
-									</xsl:attribute>
-								</img>
+								<img class="action startXPathHelp embedded" src="images/edition/help.png" />
 							</td>
 						</tr>
 						<tr>
 							<td>Job loop</td>
 							<td class="xPathAble">
 								<input name="loop" class="w100" title="loop expression" placeholder="loop expression" value="{@loop}" />
-								<img class="action startXPathHelp embedded" src="images/edition/help.png" >
-									<xsl:attribute name="data-xpath">
-										<xsl:apply-templates select="." mode="xpath" />
-									</xsl:attribute>
-								</img>
+								<img class="action startXPathHelp embedded" src="images/edition/help.png" />
 							</td>
 						</tr>
 						<tr>
@@ -1165,7 +1153,7 @@
 				<xsl:apply-templates select="." mode="xpath" />
 			</xsl:attribute>
 
-			<div onclick="showEditTask(this)" class="pointer">
+			<div onclick="editTask(this)" class="pointer">
 				<xsl:if test="@condition != ''">
 					<span class="taskLoop" title="Loop on: {@condition}">? </span>
 				</xsl:if>
@@ -1211,22 +1199,14 @@
 							<td>Task loop expression</td>
 							<td class="xPathAble">
 								<input name="loop" class="taskLoop w100" title="loop expression" placeholder="loop expression" value="{@loop}" />
-								<img class="action startXPathHelp embedded" src="images/edition/help.png" >
-									<xsl:attribute name="data-xpath">
-										<xsl:apply-templates select="." mode="xpath" />
-									</xsl:attribute>
-								</img>
+								<img class="action startXPathHelp embedded" src="images/edition/help.png" />
 							</td>
 						</tr>
 						<tr>
 							<td>Task condition</td>
 							<td class="xPathAble">
 								<input name="condition" class="taskCondition w100" title="condition" placeholder="condition" value="{@condition}"/>
-								<img class="action startXPathHelp embedded" src="images/edition/help.png" >
-									<xsl:attribute name="data-xpath">
-										<xsl:apply-templates select="." mode="xpath" />
-									</xsl:attribute>
-								</img>
+								<img class="action startXPathHelp embedded" src="images/edition/help.png" />
 							</td>
 						</tr>
 						<tr colspan="2">

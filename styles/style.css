@@ -1094,6 +1094,7 @@ img.edit-tree-action{
 
 div.jobActions{
 	height: 20px;
+	text-align: left;
 }
 div.jobActions img{
 	margin-left:5px;

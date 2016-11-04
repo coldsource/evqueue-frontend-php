@@ -2,6 +2,7 @@
 
 var isInXPathHelp = false;
 var inTaskXpath = false; //used for load a specific form reloading the tree
+var xPathHelp = "/";
 var taskActions = ["editTask", "addTaskInput", "editTaskInput"];
 
 String.prototype.xpathParent = function (repeat) {
@@ -101,21 +102,24 @@ function executeAction (action, clicked, confirmed) {
 	return false;
 }
 
-/*
-function editTask (clicked) {
-	if (isInXPathHelp) return;
+function editJob (clicked) {
+	if (isInXPathHelp === false) {
+		xPathHelp = $(clicked).data('xpath').xpathParent(2);
+		$('#formContainer').html('');
+		$(clicked).parent().parent().parent().find(' > .editJob').clone().appendTo('#formContainer').show();
+		location.hash = "#formContainer";
+	}
+}
 
-	var task = clicked.parents('div.task:eq(0)');
-
-	$('form#editTask').find('select[name=task_name]').find('option[value="'+task.data('name')+'"]').attr('selected', 'selected');
-	$('form#editTask').find('select[name=queue_name]').find('option[value="'+task.data('queue')+'"]').attr('selected', 'selected');
-	$('form#editTask').find('select[name=retry_schedule]').find('option[value="'+task.data('retry-schedule')+'"]').attr('selected', 'selected');
-	$('form#editTask').find('input[name=loop]').val(task.data('loop'));
-	$('form#editTask').find('input[name=condition]').val(task.data('condition'));
-
-	task.addClass('editing').html($('form#editTask'));
-}*/
-
+function editTask(element) {
+	if (isInXPathHelp === false) {
+		inTaskXpath = ".lightTreeTask[data-xpath='"+$(element).parent().data('xpath')+"'] > div";
+		xPathHelp = $(element).parent().data('xpath').xpathParent(4);
+		$('#formContainer').html('');
+		$(element).parent().find('.editTask').clone().appendTo('#formContainer').show();
+		location.hash = "#formContainer";
+	}
+}
 
 function editTaskInputs (clicked) {
 	if (isInXPathHelp) return;
@@ -172,17 +176,6 @@ function deleteTaskInputValue (clicked) {
 	clicked.parent('.taskInputValue').remove();
 }
 
-
-function editJob (clicked) {
-	if (isInXPathHelp === false) {
-		//inTaskXpath = "img.edit-job[data-xpath='"+$(clicked).data('xpath')+"']";
-		$('#formContainer').html('');
-		$(clicked).parent().parent().parent().find(' > .editJob').clone().appendTo('#formContainer').show();
-		location.hash = "#formContainer";
-	}
-}
-
-
 function cancelEdition () {
 	if (confirm("Are you sure you want to cancel ALL ongoing changes to this workflow?"))
 		executeAction('cancel');
@@ -207,16 +200,7 @@ $(document).delegate( 'img.startXPathHelp', 'click', function (event) {
 	$(this).prevAll('select[name^=value_type]').find('option[value=xpath]').attr('selected',true);
 
 	var currentTaskOrJob = input.parents('div.task,div.job').eq(0);
-	var baseXPath = $(this).data('xpath').xpathParent(4);  // xpath expression we're willing to write will be relative to this baseXPath (parent job)
-
-	/*switch (currentTaskOrJob.data('type')) {
-		case 'task':
-			baseXPath = currentTaskOrJob.data('xpath').xpathParent(4);  // get up to containing job (2), and then to parent job (2 more)
-			break;
-		case 'job':
-			baseXPath = currentTaskOrJob.data('xpath').xpathParent(2);  // get up to parent job
-			break;
-	}*/
+	var baseXPath = xPathHelp;  // xpath expression we're willing to write will be relative to this baseXPath (parent job)
 
 	$('div#popinMsg').text("Hover a workflow parameter or a parent task to select its value/output as input for "+currentTaskOrJob.data('type')+" '"+currentTaskOrJob.data('name')+"'").show();
 
@@ -316,15 +300,6 @@ function getId() {
 		id = 'new';
 	}
 	return id;
-}
-
-function showEditTask(element) {
-	if (isInXPathHelp === false) {
-		inTaskXpath = ".lightTreeTask[data-xpath='"+$(element).parent().data('xpath')+"'] > div";
-		$('#formContainer').html('');
-		$(element).parent().find('.editTask').clone().appendTo('#formContainer').show();
-		location.hash = "#formContainer";
-	}
 }
 
 

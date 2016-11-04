@@ -1,12 +1,12 @@
 <?php
  /*
   * This file is part of evQueue
-  * 
+  *
   * evQueue is free software: you can redistribute it and/or modify
   * it under the terms of the GNU General Public License as published by
   * the Free Software Foundation, either version 3 of the License, or
   * (at your option) any later version.
-  * 
+  *
   * evQueue is distributed in the hope that it will be useful,
   * but WITHOUT ANY WARRANTY; without even the implied warranty of
   * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
@@ -14,10 +14,10 @@
   *
   * You should have received a copy of the GNU General Public License
   * along with evQueue. If not, see <http://www.gnu.org/licenses/>.
-  * 
+  *
   * Author: Thibault Kummer
   */
-  
+
 use \Exception as Exception;
 use \DOMDocument as DOMDocument;
 use \DOMXPath as DOMXPath;
@@ -27,7 +27,7 @@ class evQueue {
 	protected $evqueue_port;
 	protected $socket = false;
 	protected $connected = false;
-	
+
 	protected $parser;
 	protected $parser_level ;
 	protected $parser_ready;
@@ -37,19 +37,19 @@ class evQueue {
 	protected $user_pwd;
 	protected $authentified = false;
 	protected $profile;
-	
+
 	const ERROR_AUTH_REQUIRED = 1;
 	const ERROR_AUTH_FAILED = 2;
 	const ERROR_RESPONSE_KO = 3;
 	const ERROR_ENGINE_NAME = 4;
 	const ERROR_ENGINE = 5;
-	
-	
+
+
 	public function __construct($cnx_string, $user_login = null, $user_pwd = null) {
 		if(substr($cnx_string, 0 ,7) == 'unix://'){
-			$this->evqueue_ip =$cnx_string;
-			$this->evqueue_port = -1;
-			$this->socket = socket_create(AF_UNIX, SOCK_STREAM, SOL_TCP);
+			$this->evqueue_ip =substr($cnx_string, 6);
+			$this->evqueue_port = 0;
+			$this->socket = socket_create(AF_UNIX, SOCK_STREAM, 0);
 		}
 		elseif(substr($cnx_string, 0 ,6) == 'tcp://'){
 			list($this->evqueue_ip,$this->evqueue_port) = explode(':', substr($cnx_string, 6));
@@ -57,14 +57,14 @@ class evQueue {
 		}
 		else
 			throw new Exception("evQueue : Unknown scheme '$cnx_string'");
-		
+
 		socket_set_option($this->socket, SOL_SOCKET, SO_RCVTIMEO, ['sec' => 10, 'usec' => 0]);
 		socket_set_option($this->socket, SOL_SOCKET, SO_SNDTIMEO, ['sec' => 10, 'usec' => 0]);
-		
+
 		$this->user_login = $user_login;
 		$this->user_pwd = $user_pwd;
 	}
-	
+
 	public function __destruct() {
 		if($this->authentified)
 		{
@@ -73,62 +73,62 @@ class evQueue {
 			}
 			catch(Exception $e) {}
 		}
-		$this->disconnect(); 
+		$this->disconnect();
 	}
-	
+
 	public function __sleep()
 	{
 		$this->socket = false;
 		return array('evqueue_ip', 'evqueue_port', 'socket');
 	}
-	
+
 	public function SetUserLogin($login){
 		$this->user_login = $login;
 	}
-	
+
 	public function SetUserPwd($pwd){
 		$this->user_pwd = $pwd;
 	}
-	
+
 	protected function connect()
 	{
 		if($this->socket!==false && $this->connected !== false)
 			return; // Already connected
-		
+
 		socket_set_nonblock($this->socket);
 		socket_connect($this->socket, $this->evqueue_ip,$this->evqueue_port);
-		
+
 		$read_fd = [];
 		$write_fd = [$this->socket];
 		$excpt_fd = [];
 		if(socket_select($read_fd,$write_fd,$excpt_fd,2)==0)
 			throw new Exception("evQueue : unable to connect to core engine with IP $this->evqueue_ip and port $this->evqueue_port");
-		
+
 		socket_set_block($this->socket);
- 			
+
 		$this->connected = true;
-		
+
 		$xml = $this->recv();
 		if($this->parser_root_tag == "READY"){
 			$this->authentified = true;
 			$this->profile = $this->parser_root_attributes['PROFILE'];
 		}
 	}
-	
+
 	protected function authentication(){
 		$hmac = hash_hmac("sha1",hex2bin($this->parser_root_attributes['CHALLENGE']),$this->user_pwd);
 		$dom = $this->build_query('auth', false, ["response" => $hmac, "user" => $this->user_login]);
 		$xml = $this->exec($dom->saveXML());
-		
+
 		if($this->parser_root_tag == "READY"){
 			$this->authentified = true;
 			$this->profile = $this->parser_root_attributes['PROFILE'];
 			return true;
 		}
-		
+
 		return false;
 	}
-	
+
 	protected function disconnect()
 	{
 		if($this->socket!==false){
@@ -137,22 +137,22 @@ class evQueue {
 			$this->connected=false;
 		}
 	}
-	
+
 	protected function send($data)
 	{
 		$written = @socket_write($this->socket,$data);
 		if($written===false)
 			throw new Exception("evQueue : could not write data to socket");
-		
+
 		if(strlen($data)!=$written)
 			throw new Exception("evQueue : tried to write ".strlen($data)." but only wrote $written");
 	}
-	
+
 	protected function recv()
 	{
 		$xml = "";
 		$data = false;
-		
+
 		$this->ParserInit();
 		while($recv = @socket_recv($this->socket, $data, 1600, 0)){
 			$xml .= $data;
@@ -165,7 +165,7 @@ class evQueue {
 
 		return $xml	;
 	}
-	
+
 	protected function exec($cmd, $return_dom=false)
 	{
 		$this->send("$cmd\n");
@@ -173,16 +173,16 @@ class evQueue {
 			$out = $this->recv();
 		}
 		while($this->parser_root_tag == "PING");
-		
+
 		return $out;
 	}
-	
+
 	protected function build_query($name, $action = false, $attributes = [], $parameters = []){
 		$dom = new \DOMDocument("1.0", "utf-8");
 		$root = $dom->createElement($name);
 		if($action)
 			$root->setAttribute('action', $action);
-		
+
 		foreach ($attributes as $key => $value) {
 			$root->setAttribute($key, $value);
 		}
@@ -193,73 +193,73 @@ class evQueue {
 			$root->appendChild($param);
 		}
 		$dom->appendChild($root);
-		
+
 		return $dom;
 	}
-	
+
 	public function Launch($name, $attributes=[], $parameters=[]) {
 		$attributes['name'] = $name;
 		$this->Api('instance', 'launch', $attributes, $parameters);
 		return (int)$this->parser_root_attributes['WORKFLOW-INSTANCE-ID'];
 	}
-	
-	
+
+
 	/*
 	 * Gives the status of a workflow instance determined by $workflow_instance_id.
 	 * @return the status as a string, or false if the workflow instance was not
 	 * found.
 	 */
 	public function GetWorkflowStatus( $workflow_instance_id ) {
-		
+
 		$xml = $this->Api('instance', 'query', [ 'id' => $workflow_instance_id]);
 		$sxml = simplexml_load_string($xml);
 		return (string)($sxml->workflow['status']);
 	}
 
-		
+
 	public function Api($name, $action = false, $attributes = [], $parameters = []){
 		if(!$this->connected)
 			$this->connect();
-			
+
 		if(!$this->authentified){
 			if($this->user_login === null)
 				throw new Exception("evQueue : login and password required", evQueue::ERROR_AUTH_REQUIRED);
-			
+
 			if(!$this->authentication())
 				throw new Exception("evQueue : authentication failed", evQueue::ERROR_AUTH_FAILED);
 		}
 		$dom = $this->build_query($name,$action,$attributes,$parameters);
 		$xml = $this->exec($dom->saveXML());
-		
+
 		if(!isset($this->parser_root_attributes['STATUS']) || $this->parser_root_attributes['STATUS']!='OK')
 			throw new Exception("evQueue : error returned from engine : {$this->parser_root_attributes['ERROR']}", evQueue::ERROR_RESPONSE_KO);
-		
+
 		return trim($xml);
 	}
-	
+
 	public function GetProfile(){
 		return $this->profile;
 	}
-	
+
 	protected function ParserInit()	{
 		$this->parser_level = 0;
 		$this->parser_ready = false;
 		$this->parser = xml_parser_create();
-		
+
 		$this->parser_root_tag = "";
 		$this->parser_root_attributes = [];
-	
-	
+
+
 		xml_set_object($this->parser, $this);
 		xml_set_element_handler($this->parser, "ParserOpen", "ParserClose");
 	}
-	
-	protected function ParserParse($data) 
+
+	protected function ParserParse($data)
 	{
 		xml_parse($this->parser, $data);
 	}
-	
-	protected function ParserOpen($parser, $tag, $attributes) 
+
+	protected function ParserOpen($parser, $tag, $attributes)
 	{
 		if($this->parser_level == 0){
 			$this->parser_root_tag = $tag;
@@ -267,14 +267,14 @@ class evQueue {
 		}
 		$this->parser_level++;
 	}
-	
-	protected function ParserClose($parser, $tag) 
+
+	protected function ParserClose($parser, $tag)
 	{
 		$this->parser_level--;
 		if($this->parser_level == 0)
 			$this->parser_ready = true;
 	}
-	
+
 	public function GetParserRootAttributes(){
 		return $this->parser_root_attributes;
 	}
