@@ -1,0 +1,15 @@
+Source: evqueue-frontend-php
+Section: net
+Priority: optional
+Maintainer: Thibault Kummer <bob@coldsource.net>
+Build-Depends: debhelper (>= 9.0.0)
+Standards-Version: 3.9.7
+Homepage: http://www.evqueue.net
+Vcs-Git: https://github.com/coldsource/evqueue-frontend-php.git
+Vcs-Browser: https://github.com/coldsource/evqueue-frontend-php
+
+Package: evqueue-frontend-php
+Architecture: all
+Depends: apache2, libapache2-mod-php5, php5-curl, php5-mysql, php5-xsl, ${misc:Depends}
+Description: evQueue web board
+ evQueue web interface, allows to simply create and run workflows.

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -e
 
 case "$1" in
 	failed-upgrade|abort-install|abort-upgrade|disappear|upgrade)
@@ -9,7 +9,7 @@ case "$1" in
 			rm -f /etc/apache2/conf.d/evqueue.conf
 		elif [ -f /etc/apache2/conf-available/evqueue.conf ]; then
 			rm -f /etc/apache2/conf-available/evqueue.conf
-			/usr/sbin/a2disconf evqueue
+			a2disconf evqueue
 		fi
 	;;
 	
@@ -18,7 +18,7 @@ case "$1" in
 			rm -f /etc/apache2/conf.d/evqueue.conf
 		elif [ -f /etc/apache2/conf-available/evqueue.conf ]; then
 			rm -f /etc/apache2/conf-available/evqueue.conf
-			/usr/sbin/a2disconf evqueue
+			a2disconf evqueue
 		fi
 		
 		rm -rf /etc/evqueue
