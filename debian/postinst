@@ -19,3 +19,5 @@ if [ "$1" = "configure" ]; then
 	chown -R www-data:www-data /usr/share/evqueue
 
 fi
+
+#DEBHELPER#

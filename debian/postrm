@@ -34,3 +34,5 @@ if [ -x /usr/sbin/invoke-rc.d ]; then
 else
 	/etc/init.d/apache2 restart
 fi
+
+#DEBHELPER#
