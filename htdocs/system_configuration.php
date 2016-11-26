@@ -24,6 +24,7 @@ require_once 'lib/XSLEngine.php';
 
 
 $xsl = new XSLEngine();
+
 foreach ($_SESSION['nodes'] as $node_name => $conf) {
 	try{
 		$evqueue_node = getevQueue($conf);
@@ -31,6 +32,7 @@ foreach ($_SESSION['nodes'] as $node_name => $conf) {
 		$dom = new DOMDocument();
 		$dom->loadXML($xml);
 		$dom->documentElement->setAttribute("node_name", $node_name);
+		$dom->documentElement->setAttribute("version", $evqueue_node->GetVersion());
 		$xsl->AddFragment(["global" => $dom]);
 	}
 	catch(Exception $e) {

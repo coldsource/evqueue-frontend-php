@@ -27,6 +27,7 @@ class evQueue {
 	protected $evqueue_port;
 	protected $socket = false;
 	protected $connected = false;
+	protected $version = false;
 
 	protected $parser;
 	protected $parser_level ;
@@ -126,9 +127,12 @@ class evQueue {
 		if($this->parser_root_tag == "READY"){
 			$this->authentified = true;
 			$this->profile = $this->parser_root_attributes['PROFILE'];
+			
+			$this->version = $this->parser_root_attributes['VERSION'];
+
 			return true;
 		}
-
+		
 		return false;
 	}
 
@@ -239,6 +243,10 @@ class evQueue {
 
 		return trim($xml);
 	}
+	
+	public function GetVersion() {
+		return $this->version;
+	}
 
 	public function GetProfile(){
 		return $this->profile;
@@ -257,7 +265,7 @@ class evQueue {
 		return $nodes->item(0)->getAttribute('value');
 	}
 
-	protected function ParserInit()	{
+	protected function ParserInit() {
 		$this->parser_level = 0;
 		$this->parser_ready = false;
 		$this->parser = xml_parser_create();
