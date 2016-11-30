@@ -19,7 +19,7 @@
 			<div class="makeMeTabz">
 				<ul>
 					<xsl:for-each select="/page/global">
-						<li><a href="#{@node_name}"><xsl:value-of select="@node_name" /> (<xsl:value-of select="@version" />)</a></li>
+						<li><a href="#{@node_name}"><xsl:value-of select="@node_name" /> (v<xsl:value-of select="@version" />)</a></li>
 					</xsl:for-each>
 				</ul>
 				
