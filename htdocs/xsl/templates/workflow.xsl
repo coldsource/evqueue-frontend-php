@@ -184,7 +184,7 @@
 						<select name="node">
 							<xsl:for-each select="/page/evqueue-nodes/node">
 								<option value="{@name}">
-									<xsl:if test="@name = /page/get/@node_name">
+									<xsl:if test="@name = /page/get/@node_name or @name = /page/post/@node">
 										<xsl:attribute name="selected">selected</xsl:attribute>
 									</xsl:if>
 									<xsl:value-of select="@name" />
@@ -513,7 +513,7 @@
 				</span>
 			</xsl:if>
 
-			<xsl:if test="@status='TERMINATED'">
+			<xsl:if test="@status='TERMINATED' or @status='ABORTED'">
 				<div class="taskOutput hidden">
 					<xsl:variable name="not-tied-task-binary">
 						<xsl:value-of select="/page/tasks/task[workflow_id = '' and task_name = current()/@name]/task_binary" />
@@ -548,7 +548,16 @@
 						</xsl:if>
 					</ul>
 					<ul>
-						<xsl:apply-templates select="output" />
+						<xsl:choose>
+							<xsl:when test="@status='ABORTED' and @retval=0">
+								<div class="taskOutputContent">
+									<xsl:value-of select="stderr" />
+								</div>
+							</xsl:when>
+							<xsl:otherwise>
+								<xsl:apply-templates select="output" />
+							</xsl:otherwise>
+						</xsl:choose>
 					</ul>
 				</div>
 			</xsl:if>
