@@ -1,12 +1,12 @@
 <?php
  /*
   * This file is part of evQueue
-  * 
+  *
   * evQueue is free software: you can redistribute it and/or modify
   * it under the terms of the GNU General Public License as published by
   * the Free Software Foundation, either version 3 of the License, or
   * (at your option) any later version.
-  * 
+  *
   * evQueue is distributed in the hope that it will be useful,
   * but WITHOUT ANY WARRANTY; without even the implied warranty of
   * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
@@ -14,8 +14,8 @@
   *
   * You should have received a copy of the GNU General Public License
   * along with evQueue. If not, see <http://www.gnu.org/licenses/>.
-  * 
-  * Authors: Nicolas Jean, Christophe Marti 
+  *
+  * Authors: Nicolas Jean, Christophe Marti
   */
 
 require_once 'inc/auth_check.php';
@@ -30,6 +30,7 @@ if($_POST['mode'] == "xml"){
 
 
 $xsl = new XSLEngine();
+$xsl->setParameter('ACTION',1);
 $dom = new DOMDocument();
 $dom->loadXML($_SESSION['edition'][$_POST['id']]['workflow']);
 
@@ -47,14 +48,14 @@ $xsl->DisplayXHTML('../xsl/ajax/get-workflow-tree.xsl');
 
 function countdJobs($currentJob, $xpath){
 	$jobs = $xpath->evaluate('subjobs/job', $currentJob);
-	
+
 	$nb = 0;
 	foreach($jobs as $job){
 		$nb += countdJobs($job, $xpath);
 	}
 	if($nb==0)
 		$nb = 1;
-	
+
 	$currentJob->setAttribute('data-size', $nb);
 	return $nb;
 }

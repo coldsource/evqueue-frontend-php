@@ -7,6 +7,7 @@
 	<xsl:import href="list_tasks.xsl" />
 
 	<xsl:param name="EDITION">0</xsl:param>
+	<xsl:param name="ACTION">0</xsl:param>
 
 	<xsl:template match="workflow">
 		<xsl:variable name="trClass">
@@ -699,18 +700,25 @@
 						<xsl:apply-templates select="." mode="xpath" />
 					</xsl:attribute>
 					<xsl:value-of select="@name" />
-					<div class="actions">
-						<img src="images/edition/delete.png" class="deleteWorkflowParameter" title="Delete this parameter" onclick="
-						executeAction('deleteParameter',$(this).parent().parent());" />
-					</div>
+					<xsl:if test="$ACTION != '1'">
+						: <xsl:value-of select="." />
+					</xsl:if>
+					<xsl:if test="$ACTION = '1'">
+						<div class="actions">
+							<img src="images/edition/delete.png" class="deleteWorkflowParameter" title="Delete this parameter" onclick="
+							executeAction('deleteParameter',$(this).parent().parent());" />
+						</div>
+					</xsl:if>
 				</li>
 			</xsl:for-each>
-			<li id="addParameter" class="actionItem">
-				<form onsubmit="executeAction('addParameter',$(this)); return false;">
-					<input name="parameter_name" placeholder="new parameter" autocomplete="off" />
-					<input type="submit" class="spaced-h" value="Add parameter" />
-				</form>
-			</li>
+			<xsl:if test="$ACTION = '1'">
+				<li id="addParameter" class="actionItem">
+					<form onsubmit="executeAction('addParameter',$(this)); return false;">
+						<input name="parameter_name" placeholder="new parameter" autocomplete="off" />
+						<input type="submit" class="spaced-h" value="Add parameter" />
+					</form>
+				</li>
+			</xsl:if>
 		</ul>
 	</xsl:template>
 
