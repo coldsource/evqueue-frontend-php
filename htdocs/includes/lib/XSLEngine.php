@@ -78,8 +78,10 @@ class XSLEngine
 				[$_GET,  $this->root_node],
 				[$_GET,  $get_node],
 				[$_POST, $post_node]
-		] as list($params,$node)) {
-
+		] as $infos) {
+			
+			list($params,$node) = $infos;
+			
 			foreach ($params as $param => $value) {
 				if (!is_array($value)){
 					if(preg_match('/^[a-zA-Z0-9-_]+$/',$param))
