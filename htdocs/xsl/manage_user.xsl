@@ -1,27 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
 	<xsl:import href="templates/main-template.xsl" />
-	
+
 	<xsl:variable name="topmenu" select="'settings'" />
 	<xsl:variable name="creation"><xsl:if test="count(/page/response-user) = 0">1</xsl:if></xsl:variable>
-	
+
 	<xsl:param name="ISFORM">1</xsl:param>
 	<xsl:param name="FORMTITLE">
 		<xsl:if test="$creation = 1">Create a new user</xsl:if>
 		<xsl:if test="$creation != 1">Edit user</xsl:if>
 	</xsl:param>
-	
+
 	<xsl:template name="content">
-		
+
 		<xsl:call-template name="displayErrors" />
-		
+
 		<xsl:choose>
-			
+
 			<!-- USER CREATION -->
 			<xsl:when test="$creation = 1">
 				<form method="post">
 					<input type="hidden" name="action" value="createUser" />
-					
+
 					<div>
 						<label>Login:</label>
 						<input name="login" placeholder="Enter new login" value="{/page/post/@login}" autocomplete="off" />
@@ -37,25 +37,25 @@
 								USER
 							</option>
 						</select>
-						
+
 					</div>
-					
+
 					<div>
 						<label>Password:</label>
 						<input type="password" name="password" placeholder="Password" />
 					</div>
-					
+
 					<div>
 						<label>Confirm password:</label>
 						<input type="password" name="password2" placeholder="Confirm password" />
 					</div>
-					
+
 					<xsl:call-template name="rights" />
-					
+
 					<input type="submit" value="Create User" />
 				</form>
 			</xsl:when>
-			
+
 			<!-- USER EDITION -->
 			<xsl:otherwise>
 				<form method="post">
@@ -67,20 +67,24 @@
 						<label>Profile: </label>
 						<xsl:value-of select="/page/response-user/user/@profile" />
 					</div>
-					
+					<div>
+						<label>Change password: </label>
+						<input type="password" name="password" placeholder="New password"/>
+					</div>
+
 					<xsl:call-template name="rights" />
-					
+
 					<input type="submit" value="Save user" />
 				</form>
 			</xsl:otherwise>
 		</xsl:choose>
 	</xsl:template>
-	
-	
+
+
 	<xsl:template name="rights">
 		<script type="text/javascript">
 			$(document).ready(profileChanged);
-			
+
 			function profileChanged () {
 				var profile = $('select[name=profile] option:checked').val();
 				if (profile == 'ADMIN') {
@@ -92,22 +96,22 @@
 				}
 			}
 		</script>
-	
+
 		<!-- ADMIN -->
 		<div>
 			<label>
 				<b>User rights</b>
 			</label>
-			
+
 			<div style="display:inline-block;width:40em;">
-		
+
 		<div id="adminRights">
 			<xsl:if test="$creation = 1 or /page/user/@profile = 'ADMIN'">
 				All rights on everything (admin)
 			</xsl:if>
 		</div>
-		
-		
+
+
 		<!-- PROFILE USER -->
 		<div id="specificRights">
 			<xsl:choose>
@@ -119,13 +123,17 @@
 					<input type="hidden" name="login" value="{/page/response-user/user/@name}" />
 					<xsl:call-template name="rightsTable" />
 				</xsl:when>
+				<xsl:when test="/page/response-user/user/@profile = 'ADMIN'">
+					<input type="hidden" name="action" value="editPassword" />
+					<input type="hidden" name="login" value="{/page/response-user/user/@name}" />
+				</xsl:when>
 			</xsl:choose>
 		</div>
-		
+
 		</div></div>
 	</xsl:template>
-	
-	
+
+
 	<xsl:template name="rightsTable">
 		<table class="userRights" style="min-width: 50%; width: auto; margin-top: 10px; display:inline;">
 			<tbody>
@@ -138,7 +146,7 @@
 				</tr>
 				<xsl:for-each select="/page/workflows/workflow">
 					<xsl:variable name="wfid" select="@id" />
-					
+
 					<tr>
 						<td><xsl:value-of select="@name" /></td>
 						<td>

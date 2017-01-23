@@ -1,12 +1,12 @@
 <?php
  /*
   * This file is part of evQueue
-  * 
+  *
   * evQueue is free software: you can redistribute it and/or modify
   * it under the terms of the GNU General Public License as published by
   * the Free Software Foundation, either version 3 of the License, or
   * (at your option) any later version.
-  * 
+  *
   * evQueue is distributed in the hope that it will be useful,
   * but WITHOUT ANY WARRANTY; without even the implied warranty of
   * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
@@ -14,8 +14,8 @@
   *
   * You should have received a copy of the GNU General Public License
   * along with evQueue. If not, see <http://www.gnu.org/licenses/>.
-  * 
-  * Authors: Nicolas Jean, Christophe Marti 
+  *
+  * Authors: Nicolas Jean, Christophe Marti
   */
 
 require_once 'inc/auth_check.php';
@@ -35,11 +35,15 @@ if(isset($_POST['action'])) {
 		{
 			if($_POST['password']!=$_POST['password2'])
 				$xsl->AddError("Passwords do not match");
-			
+
 			if(!$xsl->HasError())
 				$xsl->Api('user','create',['name'=>$_POST['login'], 'password'=>$_POST['password'], 'profile'=>$_POST['profile']]);
 		}
-		
+		elseif($_POST['password']!='')
+		{
+			$xsl->Api('user','change_password',['name'=>$_POST['login'], 'password'=>$_POST['password']]);
+		}
+
 		if(!$xsl->HasError() && ($_POST['action']=='createUser' || $_POST['action']=='editRights'))
 		{
 			$rights = array();
@@ -51,8 +55,8 @@ if(isset($_POST['action'])) {
 					$rights[$wfid][$action] = 1;
 				}
 			}
-			
-			
+
+
 			foreach($rights as $wfid=>$wf_rights)
 			{
 				$xsl->Api('user', 'grant', [
@@ -65,7 +69,7 @@ if(isset($_POST['action'])) {
 				]);
 			}
 		}
-		
+
 		if(!$xsl->HasError())
 		{
 			header('Location: list-users.php');
