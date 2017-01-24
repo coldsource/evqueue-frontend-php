@@ -23,15 +23,15 @@ require_once 'inc/logger.php';
 require_once 'lib/XSLEngine.php';
 
 
-if (!isset($_POST['id']))
+if (!isset($_GET['id']))
 	die('<error/>');
 
 $xsl = new XSLEngine();
 
-$xml = $evqueue->Api("instance", "query", ["id" => $_POST['id']]);
+$xml = $evqueue->Api("instance", "query", ["id" => $_GET['id']]);
 $dom = new DOMDocument();
 $dom->loadXML($xml);
-$dom->documentElement->setAttribute("node", $_POST['node']);
+$dom->documentElement->setAttribute("node", $_GET['node']);
 $xsl->AddFragment(["instance" => $dom]);
 echo $xsl->DisplayXHTML('../xsl/ajax/workflow.xsl');
 

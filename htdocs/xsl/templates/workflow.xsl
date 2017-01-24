@@ -226,7 +226,7 @@
 				<xsl:if test="$EDITION = 1">editionWorkflow</xsl:if>
 			</xsl:variable>
 
-			<div class="workflow {$editionClass}" id="workflow{@id}" data-id="{@id}" data-node-name="{../@node_name}">
+			<div class="workflow {$editionClass}" id="workflow{@id}" data-id="{@id}" data-node-name="{@node_name | ../@node}">
 				<img src="images/listli.png" class="formattedXml" />
 				<xsl:text>&#160;</xsl:text>
 				<img src="images/re-launch.png" data-wfiid="{@id}" data-node-name="{../@node_name}" class="relaunch" alt="Re-launch workflow instance" title="Re-launch workflow instance" ></img>

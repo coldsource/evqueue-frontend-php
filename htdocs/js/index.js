@@ -117,7 +117,7 @@ $(document).ready(function() {
 		}
 		
 		var wf = wfs.eq(0);
-		refreshWorkflowHTML(wf.data('id'), wf.data('node-name'), wf.parent('td.details'), function () {
+		refreshWorkflowHTML(wf.data('id'), wf.data('node-name'), wf.parents('td.details:eq(0)'), function () {
 			autoRefreshOpenWFs(wfs.slice(1),callback);
 		});
 	}

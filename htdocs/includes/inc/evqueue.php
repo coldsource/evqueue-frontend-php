@@ -3,7 +3,7 @@ require_once 'lib/evQueue.php';
 require_once 'utils/utils.php';
 require 'conf/queueing.php';
 
-if(!isset($_POST['node']) || $_POST['node'] == ""){
+if(!isset($_REQUEST['node']) || $_REQUEST['node'] == ""){
 	$count = count($QUEUEING);
 	$i = 0;
 	do{
@@ -19,10 +19,10 @@ if(!isset($_POST['node']) || $_POST['node'] == ""){
 	}
 	while($i < $count  && $evqueue == false);
 }
-elseif(!isset($_SESSION['nodes'][$_POST['node']]))
-	die("Node ".$_POST['node']." doesn't exist");
+elseif(!isset($_SESSION['nodes'][$_REQUEST['node']]))
+	die("Node ".$_REQUEST['node']." doesn't exist");
 else
-	$evqueue = getevQueue($_SESSION['nodes'][$_POST['node']]);
+	$evqueue = getevQueue($_SESSION['nodes'][$_REQUEST['node']]);
 	
 
 ?>

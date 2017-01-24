@@ -85,7 +85,6 @@ function refreshWorkflowHTML (id,node_name,container,callback) {
 	
 	$.ajax({
 		url: 'ajax/workflow.php',
-		type: 'post',
 		data: {
 			id: id,
 			node: node_name
