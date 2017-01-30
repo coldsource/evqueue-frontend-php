@@ -185,7 +185,7 @@
 						<select name="node">
 							<xsl:for-each select="/page/evqueue-nodes/node">
 								<option value="{@name}">
-									<xsl:if test="@name = /page/get/@node_name or @name = /page/post/@node">
+									<xsl:if test="@name = /page/get/@node_name or @name = /page/get/@node">
 										<xsl:attribute name="selected">selected</xsl:attribute>
 									</xsl:if>
 									<xsl:value-of select="@name" />
