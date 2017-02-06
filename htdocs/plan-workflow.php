@@ -40,9 +40,9 @@ if (isset($_GET['id'])) {
 	list(
 		$units_checks['Seconds'],$units_checks['Minutes'],$units_checks['Hours'],
 		$units_checks['Days'],$units_checks['Months'],$units_checks['Weekdays']
-	) = split(';',$schedule);
+	) = explode(';',$schedule);
 	foreach ($units_checks as $key => $arr)
-		$units_checks[$key] = $arr !== '' ? split(',',$arr) : array();
+		$units_checks[$key] = $arr !== '' ? explode(',',$arr) : array();
 }
 
 if (!empty($_POST)) {
