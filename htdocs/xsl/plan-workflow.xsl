@@ -230,13 +230,13 @@
 			</form>
 			<div id="paramsTabClone">
 				<xsl:for-each select="/page/workflows/workflow">
-					<div id="schedule_workflow_parameter_{@id}" class="schedule_workflow_parameter">					
+					<div id="schedule_workflow_parameter_{@id}" class="schedule_workflow_parameter">
 						<div id="paramsTab_{@name}">
 							<input type="hidden" name="id" value="{@name}" />
 							<xsl:if test="count(parameters/parameter) = 0">
 								No parameters for this workflow
 							</xsl:if>
-							<xsl:apply-templates select="parameters" mode="edit"></xsl:apply-templates>
+							<xsl:apply-templates select="parameters" mode="edit" />
 						</div>
 					</div>
 				</xsl:for-each>

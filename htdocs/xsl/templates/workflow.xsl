@@ -178,7 +178,7 @@
 						<xsl:if test="count(parameters/parameter) = 0">
 							No parameters for this workflow
 						</xsl:if>
-						<xsl:apply-templates select="parameters" mode="edit"></xsl:apply-templates>
+						<xsl:apply-templates select="parameters" mode="edit" />
 					</div>
 
 					<div id="nodeTab_{$identifier}" class="nodeTab">
@@ -731,7 +731,7 @@
 						<xsl:value-of select="@name" />
 					</td>
 					<td>
-						<input type="text" name="{@name}" value="{. | /page/schedule/parameters/parameter[current()/@name=./@name]}" />
+						<input type="text" name="{@name}" value="{@value | /page/schedule/workflow_schedule/parameter[@name = current()/@name]/@value}" />
 					</td>
 				</tr>
 			</xsl:for-each>

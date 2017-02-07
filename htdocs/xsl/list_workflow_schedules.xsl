@@ -81,8 +81,8 @@
 											(<xsl:value-of select="comment" />)
 										</xsl:if>
 										<ul class="scheduleParameters">
-											<xsl:for-each select="parameters/parameter">
-												<li><xsl:value-of select="@name" />: <xsl:value-of select="." /></li>
+											<xsl:for-each select="parameter">
+												<li><xsl:value-of select="@name" />: <xsl:value-of select="@value" /></li>
 											</xsl:for-each>
 										</ul>
 									</td>

@@ -24,7 +24,7 @@ require_once 'lib/XSLEngine.php';
 
 $xsl = new XSLEngine();
 	
-$xml = $xsl->Api('workflow_schedules', 'list');
+$xml = $xsl->Api('workflow_schedules', 'list', ['display_parameters' => 'yes']);
 
 $dom = new DOMDocument();
 $dom->loadXML($xml);
