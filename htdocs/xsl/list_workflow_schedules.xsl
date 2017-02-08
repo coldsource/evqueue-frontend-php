@@ -77,8 +77,8 @@
 									</td>
 									<td>
 										<xsl:value-of select="/page/workflows/workflow[@id = current()/@workflow_id]/@name" />
-										<xsl:if test="comment != ''">
-											(<xsl:value-of select="comment" />)
+										<xsl:if test="@comment != ''">
+											(<i><xsl:value-of select="@comment" /></i>)
 										</xsl:if>
 										<ul class="scheduleParameters">
 											<xsl:for-each select="parameter">

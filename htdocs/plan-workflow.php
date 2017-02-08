@@ -64,7 +64,7 @@ if (!empty($_POST)) {
 			'user'             => $_POST['schedule_user'],
 			'host'             => $_POST['schedule_host'],
 			'active'           => (isset($_POST['active']) && $_POST['active'] == 'on') ? 'yes' : 'no',
-			'schedule_comment' => $_POST['schedule_comment'],
+			'comment'          => $_POST['schedule_comment'],
 			'node'             => $_POST['node_name'],
 		];
 		
