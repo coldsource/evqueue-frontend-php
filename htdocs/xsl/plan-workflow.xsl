@@ -210,7 +210,7 @@
 						<select name="node_name">
 							<xsl:for-each select="/page/evqueue-nodes/node">
 								<option value="{@name}">
-									<xsl:if test="@name = /page/schedule/node_name"><xsl:attribute name="selected">selected</xsl:attribute></xsl:if>
+									<xsl:if test="@name = /page/schedule/workflow_schedule/@node"><xsl:attribute name="selected">selected</xsl:attribute></xsl:if>
 									<xsl:value-of select="@name" />
 								</option>
 							</xsl:for-each>
