@@ -88,7 +88,7 @@
 									</td>
 									<xsl:if test="$DISPLAY = 'settings'">
 										<td class="center">
-											<xsl:value-of select="onfailure" />
+											<xsl:value-of select="@onfailure" />
 										</td>
 									</xsl:if>
 									<td class="center">
@@ -97,7 +97,7 @@
 									<xsl:if test="$DISPLAY = 'settings'">
 										<td class="center">
 											<xsl:choose>
-												<xsl:when test="host != ''"><xsl:value-of select="host" /></xsl:when>
+												<xsl:when test="@host != ''"><xsl:value-of select="@host" /></xsl:when>
 												<xsl:otherwise>localhost</xsl:otherwise>
 											</xsl:choose>
 										</td>
