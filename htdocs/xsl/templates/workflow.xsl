@@ -731,7 +731,7 @@
 						<xsl:value-of select="@name" />
 					</td>
 					<td>
-						<input type="text" name="{@name}" value="{@value | /page/schedule/workflow_schedule/parameter[@name = current()/@name]/@value}" />
+						<input type="text" name="{@name}" value="{. | /page/schedule/workflow_schedule/parameter[@name = current()/@name]/@value}" />
 					</td>
 				</tr>
 			</xsl:for-each>
