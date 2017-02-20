@@ -32,13 +32,13 @@ $filters = [
 ];
 
 if(isset($_GET['wf_name'])){
-	$filters = [
+	$filters = array_merge($filters, [
 		"filter_node" => $_GET['node'],
 		"filter_workflow" => $_GET['wf_name'],
 		"filter_launched_from" => trim($_GET['dt_inf']." ".$_GET['hr_inf']),
 		"filter_launched_until" => trim($_GET['dt_sup']." ".$_GET['hr_sup']),
 		"filter_status" => "",
-	];
+	]);
 }
 elseif(isset($_GET['workflow_schedule_id']))
 	$filters['filter_schedule_id'] = $_GET['workflow_schedule_id'];
