@@ -1,12 +1,12 @@
 <?php
  /*
   * This file is part of evQueue
-  * 
+  *
   * evQueue is free software: you can redistribute it and/or modify
   * it under the terms of the GNU General Public License as published by
   * the Free Software Foundation, either version 3 of the License, or
   * (at your option) any later version.
-  * 
+  *
   * evQueue is distributed in the hope that it will be useful,
   * but WITHOUT ANY WARRANTY; without even the implied warranty of
   * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
@@ -14,8 +14,8 @@
   *
   * You should have received a copy of the GNU General Public License
   * along with evQueue. If not, see <http://www.gnu.org/licenses/>.
-  * 
-  * Authors: Nicolas Jean, Christophe Marti 
+  *
+  * Authors: Nicolas Jean, Christophe Marti
   */
 
 require_once 'inc/auth_check.php';
@@ -28,10 +28,10 @@ $xsl = new XSLEngine();
 foreach ($_SESSION['nodes'] as $node_name => $conf) {
 	try{
 		$evqueue_node = getevQueue($conf);
-		if (isset($_GET['action']) && $_GET['action'] == 'reset') {
+		if (isset($_GET['action']) && $_GET['action'] == 'reset' && isset($_GET['node_name']) && $_GET['node_name'] == $node_name) {
 			$evqueue_node->Api('statistics', 'reset', ['type' => 'global']);
 		}
-		
+
 		$xml = $evqueue_node->Api('statistics', 'query', ['type' => 'global']);
 		$dom = new DOMDocument();
 		$dom->loadXML($xml);
@@ -39,7 +39,7 @@ foreach ($_SESSION['nodes'] as $node_name => $conf) {
 		$xsl->AddFragment(["global" => $dom]);
 	}
 	catch(Exception $e) {
-		
+
 	}
 }
 
