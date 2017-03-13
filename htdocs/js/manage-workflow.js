@@ -69,10 +69,24 @@ function executeAction (action, clicked, confirmed) {
 	workflow_group = document.getElementById('workflow_group').value;
 	workflow_comment = document.getElementById('workflow_comment').value;
 
+	var data = {
+    'action': action,
+    'location': loc,
+    'workflow_name': workflow_name,
+    'workflow_group': workflow_group,
+    'workflow_comment': workflow_comment,
+    'xml': $('#workflow_xml').val(),
+    'id': getId(),
+  };
+  if (confirmed){
+    $.extend(data, {'confirmed':true});
+  }
+	//'action='+action+'&location='+loc+'&'+item.serialize()+(confirmed ? '&confirmed=true' : '')+'&workflow_name='+workflow_name+'&workflow_group='+workflow_group+'&workflow_comment='+workflow_comment+'&xml='+$('#workflow_xml').val()+"&id="+getId()
+
 	$.ajax({
 		url: 'ajax/edit-session-workflow.php',
 		type: 'POST',
-		data: 'action='+action+'&location='+loc+'&'+item.serialize()+(confirmed ? '&confirmed=true' : '')+'&workflow_name='+workflow_name+'&workflow_group='+workflow_group+'&workflow_comment='+workflow_comment+'&xml='+$('#workflow_xml').val()+"&id="+getId(),
+		data: data,
 		success: function (res) {
 			/*res = $.parseJSON(res);
 
