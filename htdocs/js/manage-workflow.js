@@ -81,6 +81,7 @@ function executeAction (action, clicked, confirmed) {
   if (confirmed){
     $.extend(data, {'confirmed':true});
   }
+	data = $.param(data)+'&'+item.serialize();
 	//'action='+action+'&location='+loc+'&'+item.serialize()+(confirmed ? '&confirmed=true' : '')+'&workflow_name='+workflow_name+'&workflow_group='+workflow_group+'&workflow_comment='+workflow_comment+'&xml='+$('#workflow_xml').val()+"&id="+getId()
 
 	$.ajax({
