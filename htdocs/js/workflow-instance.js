@@ -1,6 +1,4 @@
 
-
-
 $(document).ready( function() {
 	
 	$(document).delegate( 'img.relaunch', 'click', function() {
@@ -17,15 +15,12 @@ $(document).ready( function() {
 	});
 	
 	// LAUNCH WORKFLOW
+	$('select#launchWF').change( function () {
+		launchWF($(this).val());
+	});
 	$('select#launchWF option').click( function () {
-		var name = $(this).val();
-		$("#launch_"+name).dialog({ 
-			minHeight: 300, 
-			minWidth: 650, 
-			modal: true, 
-			title: "Launch workflow "+name
-		});
-		$('div.makeMeTabz:visible').tabs().removeClass('makeMeTabz');
+		if($(this).val() == $(this).closest("select").val())
+			launchWF($(this).val());
 	});
 	
 	$('#searchByWorkflow #searchByWorkflowSelect').change(function(){
@@ -94,4 +89,14 @@ function refreshWorkflowHTML (id,node_name,container,callback) {
 			if (callback) callback();
 		}
 	});
+}
+
+function launchWF(name){
+	$("#launch_"+name).dialog({ 
+		minHeight: 300, 
+		minWidth: 650, 
+		modal: true, 
+		title: "Launch workflow "+name
+	});
+	$('div.makeMeTabz:visible').tabs().removeClass('makeMeTabz');
 }
