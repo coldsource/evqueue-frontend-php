@@ -33,7 +33,7 @@ if (isset($_POST) && (count($_POST)>1)){
 		$xsl->Api('queue','create',[
         'name' => $_POST['queue_name'],
         'concurrency' => $_POST['queue_concurrency'],
-        'dynamic' => ($_POST['dynamic']=='1' ? 'yes' : 'no'),
+        'dynamic' => (isset($_POST['dynamic']) && $_POST['dynamic']=='1' ? 'yes' : 'no'),
         'scheduler' => $_POST['queue_scheduler']
       ]);
 	else
@@ -41,7 +41,7 @@ if (isset($_POST) && (count($_POST)>1)){
         'id' => $_POST['queue_id'],
         'name' => $_POST['queue_name'],
         'concurrency' => $_POST['queue_concurrency'],
-        'dynamic' => ($_POST['dynamic']=='1' ? 'yes' : 'no'),
+        'dynamic' => (isset($_POST['dynamic']) && $_POST['dynamic']=='1' ? 'yes' : 'no'),
         'scheduler' => $_POST['queue_scheduler']
       ]);
 
