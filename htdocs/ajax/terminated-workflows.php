@@ -44,7 +44,10 @@ elseif(isset($_GET['workflow_schedule_id']))
 	$filters['filter_schedule_id'] = $_GET['workflow_schedule_id'];
 elseif(isset($_GET['filter']) && $_GET['filter'] == 'errors')
 	$filters['filter_error'] = 'yes';
-
+	
+if(isset($_GET['filter_id']) && is_numeric($_GET['filter_id'])){
+	$filters['filter_id'] = $_GET['filter_id'];
+}
 
 if(isset($_GET['searchParams'])){
 	$getParams = json_decode($_GET['searchParams'], 1);
