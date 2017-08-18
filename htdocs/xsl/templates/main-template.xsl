@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:exsl="http://exslt.org/common" version="1.0">
-	<xsl:output method="xml" indent="no" omit-xml-declaration="yes" encoding="utf-8" doctype-public="-//W3C//DTD XHTML 1.0 Transitional//EN" doctype-system="http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd" />
+	<xsl:output method="html" indent="no" omit-xml-declaration="yes" encoding="utf-8" doctype-public="-//W3C//DTD XHTML 1.0 Transitional//EN" doctype-system="http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd" />
 
-	<xsl:param name="CSS" select="''" />
+	<xsl:param name="css" select="''" />
 	<xsl:param name="javascript" select="''" />
 	<xsl:param name="SITE_BASE" select="''" />
 
@@ -10,37 +10,40 @@
 	<xsl:param name="FORMTITLE" select="''" />
 
 	<xsl:param name="LOGIN" select="''" />
+	
+	<xsl:param name="FULLSCREEN" select="'no'" />
 
 	<xsl:template match="/">
 		<xsl:param name="title" select="'Workflow'" />
 		<html>
 			<head>
-				<meta http-equiv="Content-Type" content="application/xhtml+xml; charset=utf-8" />
+				<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 
-				<link rel="stylesheet" type="text/css" href="{$SITE_BASE}js/jquery-ui-1.11.4.custom/jquery-ui.min.css"/>
-
-				<xsl:choose>
-					<xsl:when test="$CSS = 'GUI'">
-						<link rel="stylesheet" type="text/css" href="{$SITE_BASE}styles/gui.css"/>
-					</xsl:when>
-					<xsl:otherwise>
-						<link rel="stylesheet" type="text/css" href="{$SITE_BASE}styles/style.css"/>
-					</xsl:otherwise>
-				</xsl:choose>
-
-				<link rel="stylesheet" type="text/css" href="{$SITE_BASE}js/jQuery-Timepicker-Addon/dist/jquery-ui-timepicker-addon.min.css"/>
+				<!-- Load base CSS -->
+				<link rel="stylesheet" type="text/css" href="{$SITE_BASE}styles/jquery/jquery-ui.min.css"/>
+				<link rel="stylesheet" type="text/css" href="{$SITE_BASE}styles/font-awesome.css"/>
+				<link rel="stylesheet" type="text/css" href="{$SITE_BASE}styles/style.css"/>
+				
+				<!-- Load additional CSS -->
+				<xsl:if test="$css != '' and exsl:node-set($css)/src">
+					<xsl:for-each select="exsl:node-set($css)/src">
+						<link rel="stylesheet" type="text/css" href="{$SITE_BASE}{.}"/>
+					</xsl:for-each>
+				</xsl:if>
 
 				<script type="text/javascript">
 					var site_base = '<xsl:value-of select="$SITE_BASE" />';
 				</script>
 
-				<script type="text/javascript" src="{$SITE_BASE}js/jquery-1.7.1.min.js" />
-				<script type="text/javascript" src="{$SITE_BASE}js/jquery-ui-1.11.4.custom/jquery-ui.min.js" />
+				<!-- Load base javascript -->
+				<script type="text/javascript" src="{$SITE_BASE}js/jquery/jquery-1.12.4.min.js" />
+				<script type="text/javascript" src="{$SITE_BASE}js/jquery/jquery-ui.min.js" />
+				
 				<script type="text/javascript" src="{$SITE_BASE}js/forms.js" />
-				<script type="text/javascript" src="{$SITE_BASE}js/jQuery-Timepicker-Addon/dist/jquery-ui-timepicker-addon.min.js" />
 				<script type="text/javascript" src="{$SITE_BASE}js/progressbar.js" />
 				<script type="text/javascript" src="{$SITE_BASE}js/global.js" />
 
+				<!-- Load additional javascript -->
 				<xsl:if test="$javascript != '' and exsl:node-set($javascript)/src">
 					<xsl:for-each select="exsl:node-set($javascript)/src">
 						<script type="text/javascript" src="{$SITE_BASE}{.}"><xsl:text><![CDATA[]]></xsl:text></script>
@@ -50,18 +53,20 @@
 				<title><xsl:value-of select="$title" /></title>
 			</head>
 			<body>
-				<xsl:if test="$topmenu != ''">
-					<xsl:call-template name="topmenu" />
-				</xsl:if>
+				<xsl:if test="$FULLSCREEN = 'no'">
+					<xsl:if test="$topmenu != ''">
+						<xsl:call-template name="topmenu" />
+					</xsl:if>
 
-				<!-- Form page -->
-				<xsl:if test="$ISFORM = '1'">
-					<div class="contentManage">
-						<div class="boxTitle"><xsl:value-of select="$FORMTITLE" /></div>
-						<div class="formdiv">
-							<xsl:call-template name="content" />
+					<!-- Form page -->
+					<xsl:if test="$ISFORM = '1'">
+						<div class="contentManage">
+							<div class="boxTitle"><xsl:value-of select="$FORMTITLE" /></div>
+							<div class="formdiv">
+								<xsl:call-template name="content" />
+							</div>
 						</div>
-					</div>
+					</xsl:if>
 				</xsl:if>
 
 				<!-- Display page -->
@@ -71,9 +76,11 @@
 					</div>
 				</xsl:if>
 
-				<div id="footer">
-					Licensed under GPLv3 (<a href="http://evqueue.net">evqueue.net</a>)
-				</div>
+				<xsl:if test="$FULLSCREEN = 'no'">
+					<div id="footer">
+						Licensed under GPLv3 (<a href="http://evqueue.net">evqueue.net</a>)
+					</div>
+				</xsl:if>
 			</body>
 		</html>
 	</xsl:template>

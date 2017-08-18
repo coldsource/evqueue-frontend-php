@@ -15,29 +15,15 @@
   * You should have received a copy of the GNU General Public License
   * along with evQueue. If not, see <http://www.gnu.org/licenses/>.
   * 
-  * Authors: Nicolas Jean, Christophe Marti 
+  * Author: Thibault KUMMER
   */
 
 require_once 'inc/auth_check.php';
 require_once 'inc/logger.php';
+require_once 'lib/XSLEngine.php';
 
-//sleep(2);
 
-if(isset($_POST['group'])){
-	$action = isset($_POST['action']) ? $_POST['action']:false;
-	$attributes = isset($_POST['attributes']) ? $_POST['attributes']:[];
-	$parameters = isset($_POST['parameters']) ? $_POST['parameters']:[];
-	
-	header('content-type: text/xml');
-	
-	try
-	{
-		$xml = $evqueue->Api($_POST['group'], $action, $attributes, $parameters);
-	}
-	catch(Exception $e)
-	{
-		echo "<error>".htmlspecialchars($e->getMessage())."</error>";
-		die(-1);
-	}
-	echo $xml;
-}
+$xsl = new XSLEngine();
+$xsl->AddFragment(['tasks' => $evqueue->Api('tasks', 'list')]);
+$xsl->DisplayXHTML('../xsl/ajax/tasks-library.xsl');
+?>

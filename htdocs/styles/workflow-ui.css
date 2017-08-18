@@ -1,0 +1,171 @@
+/* General */
+.faicon {
+	font-family:FontAwesome;
+}
+
+.help {
+	font-size:12px;
+	vertical-align:top;
+}
+
+/* Workflow display */
+
+div#sticky_menu {
+	position:fixed;
+	top:0px;
+	left:0px;
+	background:#ffffff;
+	width:100%;
+	border-bottom:1px solid;
+	padding:4px;
+	font-family:FontAwesome;
+	font-size:20px;
+}
+
+div#sticky_menu span {
+	margin-left:5px;
+	margin-right:5px;
+}
+
+div#workflow {
+	margin-top:50px;
+	margin-left:auto;
+	margin-right:auto;
+	border:1px solid;
+	font-size:10px;
+}
+
+div.branch {
+	display:inline-block;
+	text-align:center;
+	vertical-align:top;
+}
+
+div.node {
+	border:1px solid;
+	display:inline-block;
+	width:200px;
+	height:100px;
+	position:relative;
+	margin:auto;
+	background-color:white;
+	vertical-align:top;
+	font-size:12px;
+}
+
+div.nodesep {
+	display:inline-block;
+	width:calc((100% - 200px) / 2 - 10px);
+	min-width:10px;
+	height:100px;
+}
+
+div.presep {
+	height:10px;
+}
+
+div.presep div {
+	display:inline-block;
+	width:0px;
+	height:10px;
+	border:1px solid;
+	border-color:red;
+}
+
+div.sep {
+	border:1px solid;
+	height:0px;
+	border-color:red;
+}
+
+div.nosep {
+	margin-left:calc(50% - 1px);
+	width:0;
+}
+
+div.lsep {
+	margin-left:calc(50% - 1px);
+	width:50%;
+}
+
+div.rsep {
+	width:calc(50% - 1px);
+}
+
+div.postsep {
+	display:block;
+	width:0px;
+	height:10px;
+	border:1px solid;
+	border-color:red;
+	margin:auto;
+}
+
+/* Library task */
+div#tasks-library {
+	display:none;
+}
+
+div.task_icon
+{
+	display:inline-block;
+	width:40px;
+	height:40px;
+	border:1px solid;
+	text-align:center;
+}
+
+div.task
+{
+	display:inline-block;
+	text-align:center;
+	margin:5px;
+	width:160px;
+	border:0px;
+}
+
+div.task p
+{
+	margin:2px;
+	word-wrap:break-word;
+}
+
+/* Task input selector */
+div#value-selector {
+	display:none;
+}
+
+/* Task editor */
+div#task-editor {
+	display:none;
+}
+
+div#task-editor div.input_line {
+	margin-top:5px;
+	margin-bottom:5px;
+}
+
+div#task-editor div.input {
+	display:inline-block;
+	width:150px;
+}
+
+div#task-editor div.value {
+	display:inline-block;
+}
+
+div.input_part {
+	display:inline-block;
+	margin-left:5px;
+	margin-right:5px;
+	border:1px solid;
+	padding:3px;
+}
+
+div.input_type_xpathvalue {
+	background-color:#e6ffe6;
+}
+
+div.input_type_text {
+	background-color:#ffffcc;
+}

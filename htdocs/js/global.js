@@ -9,23 +9,25 @@ $(document).ready( function() {
 
 
 
-function evqueueAPI(element, group, action, attributes = [], parameters = [], node = ""){
+function evqueueAPI(element, group, action, attributes = [], parameters = [], cbk = false){
 	if ($(element).attr('data-confirm')) {
 		if(!confirm($(element).data('confirm')))
 			return;
 	}
+	
 	$.ajax({
-		data:{'group':group, 'action':action, 'parameters':parameters, 'attributes':attributes, 'node':node},
+		data:{'group':group, 'action':action, 'parameters':parameters, 'attributes':attributes},
 		type: 'post',
 		url: 'ajax/evqueue_api.php',
 		content:'xml',
-		async:false,
 	}).done(function(xml){
 		error = $(xml).find('error');
 		if ($(error).length > 0) {
 			alert(error.html());
 		}
-		return xml;
+		
+		if(cbk)
+			cbk(xml);
 	});
 }
 

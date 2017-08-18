@@ -72,4 +72,32 @@
 		</div>
 	</xsl:template>
 	
+	<xsl:key name="groups" match="/page/tasks/task/@group" use="." />
+	<xsl:template name="tasks-library">
+		<xsl:for-each select="/page/tasks/task/@group[generate-id(.) = generate-id(key('groups', .))]">
+			<xsl:sort select="." />
+
+			<xsl:variable name="groupName" select="." />
+			<h1>
+				<xsl:choose>
+					<xsl:when test="$groupName != ''">
+						<xsl:value-of select="$groupName" />
+					</xsl:when>
+					<xsl:otherwise>
+						No group
+					</xsl:otherwise>
+				</xsl:choose>
+			</h1>
+			
+			<xsl:for-each select="/page/tasks/task[@group = $groupName]">
+				<div class="task" data-type="task" data-name="{@name}">
+					<div class="task_icon">
+						TASK
+					</div>
+					<p><xsl:value-of select="@name" /></p>
+				</div>
+			</xsl:for-each>
+		</xsl:for-each>
+	</xsl:template>
+	
 </xsl:stylesheet>
