@@ -3,20 +3,121 @@ function TaskEditor()
 	this.id = false;
 	this.task = false;
 	
+	var me = this;
+	
+	evqueueAPI(false,'queuepool','list',{},[],function(xml) {
+		$(xml).find('queue').each(function(index, value) {
+			$('#task-editor select#queue').append($('<option>', {value: $(value).attr('name'),text:$(value).attr('name')+" ("+$(value).attr('concurrency')+")"}));
+		});
+	});
+	
+	$('#task-editor select#retryschedule').append($('<option>', {value: '',text:'None'}));
+	evqueueAPI(false,'retry_schedules','list',{},[],function(xml) {
+		$(xml).find('schedule').each(function(index, value) {
+			$('#task-editor select#retryschedule').append($('<option>', {value: $(value).attr('name'),text:$(value).attr('name')}));
+		});
+	});
+	
+	$('#task-editor select#retryretval').append($('<option>', {value: '',text:'All error codes'}));
+	for(var i=1;i<256;i++)
+		$('#task-editor select#retryretval').append($('<option>', {value: i,text:'Code '+i}));
+	
 	
 	$('#add-input').click(this.AddInput);
 	
-	$('#add_text_value').click(this.AddTextInputPart);
-	$('#add_xpath_value').click(this.AddValueInputPart);
+	$('#tab-conditionsloops span.fa-magic').click(function() {
+		var input = $(this).parent().find('input');
+		
+		OpenXPathHelper();
+		
+		$('#xpath-selector #add_xpath_node').off('click').on('click', function() {
+			$('#xpath-selector').dialog('close');
+			
+			input.val(XPathHelperPath($('#xpath-selector')));
+		});
+	});
 }
 
 TaskEditor.prototype.Open = function(id)
 {
 	this.id = id;
+	this.task = wf.GetTaskByID(this.id);
+	this.wfbackupdone = false;
 	
 	this.RefreshInputs();
 	
-	$('#task-editor').dialog({width:900,height:400});
+	InitializeXPathHelper(this.task,'task');
+	
+	var condition = this.task.GetAttribute("condition");
+	$('#task-editor input#condition').val(condition);
+	
+	var loop = this.task.GetAttribute("loop");
+	$('#task-editor input#loop').val(loop);
+	
+	var iterationcondition = this.task.GetAttribute("iteration-condition");
+	$('#task-editor input#iteration-condition').val(iterationcondition);
+	
+	var queue = this.task.GetAttribute('queue');
+	$("#task-editor select#queue option[value='"+queue+"']").attr("selected", "selected");
+	
+	var retry_schedule = this.task.GetAttribute('retry_schedule');
+	$("#task-editor select#retryschedule").val(retry_schedule);
+	$("#task-editor select#retryschedule").change(function() {
+		if($(this).val()=='')
+		{
+			$("#task-editor select#retryretval").val('');
+			$("#task-editor select#retryretval").attr('disabled','disabled');
+		}
+		else
+			$("#task-editor select#retryretval").removeAttr('disabled');
+	});
+	
+	var retry_retval = this.task.GetAttribute('retry_retval');
+	if(retry_schedule=='')
+	{
+		$("#task-editor select#retryretval").val('');
+		$("#task-editor select#retryretval").attr('disabled','disabled');
+	}
+	else
+	{
+		$("#task-editor select#retryretval").val(retry_retval);
+		$("#task-editor select#retryretval").removeAttr('disabled');
+	}
+	
+	var stdin_mode = this.task.GetAttribute('stdinmode');
+	$("#task-editor select#stdinmode").val(stdin_mode);
+	
+	var me = this;
+	$('#task-editor').dialog({
+		width:900,
+		height:400,
+		title:"Edit task '"+this.task.GetName()+"'",
+		close:function() {
+			me.SaveAttribute('condition',condition,$('#task-editor input#condition').val());
+			me.SaveAttribute('loop',loop,$('#task-editor input#loop').val());
+			me.SaveAttribute('iteration-condition',iterationcondition,$('#task-editor input#iteration-condition').val());
+			me.SaveAttribute('queue',queue,$("#task-editor select#queue").val());
+			me.SaveAttribute('retry_schedule',retry_schedule,$("#task-editor select#retryschedule").val());
+			me.SaveAttribute('retry_retval',retry_retval,$("#task-editor select#retryretval").val());
+			me.SaveAttribute('stdinmode',stdin_mode,$("#task-editor select#stdinmode").val());
+			
+			wf.Draw();
+		}
+	});
+}
+
+TaskEditor.prototype.SaveAttribute = function(name,old_val,new_val)
+{
+	if(old_val==new_val)
+		return;
+	
+	if(!this.wfbackupdone)
+	{
+		wf.Backup();
+		this.wfbackupdone = true;
+	}
+	
+	this.task.SetAttribute(name,new_val);
 }
 
 TaskEditor.prototype.RefreshInputs = function()
@@ -24,79 +125,179 @@ TaskEditor.prototype.RefreshInputs = function()
 	if(this.id==false)
 		return;
 	
+	//  Refresh task
 	this.task = wf.GetTaskByID(this.id);
+	
 	var inputs = this.task.GetInputs();
 	
 	$('#tab-inputs .inputs').html('');
+	$('#tab-stdin .value').html('');
+	
 	for(var i=0;i<inputs.length;i++)
 	{
-		var html = '';
-		html += "<div class='input_line'>";
-		html += "<div class='input' data-name='"+inputs[i].name+"'><span class='faicon fa-remove' title='Delete input'></span> "+inputs[i].name+"</div>";
-		html += "<div class='value'>";
-		for(var j=0;j<inputs[i].value.length;j++)
+		if(inputs[i].type=='input')
 		{
-			var part = inputs[i].value[j];
-			if(part.type=='text')
-				val = part.val;
-			else
-			{
-				if(part.task && part.node)
-					val = "task:"+part.task+", node:"+part.node;
-				else if(part.parameter)
-					val = "parameter:"+part.parameter;
-				else
-					val = part.val;
-			}
-				
-			html += "<div class='input_part input_part_type_"+part.type+"'>"+val+"</div>";
+			var div = $("<div class='input_line' data-inputtype='input' >");
+			
+			var input_div = $("<div class='input'>");
+			input_div.append("<span class='faicon fa-remove' title='Delete input'></span>&nbsp;");
+			var input_name_span = $("<span>",{class:'input_name',text:inputs[i].name!=''?inputs[i].name:"Input "+(i+1)});
+			if(inputs[i].name=="")
+				input_name_span.addClass('greyed');
+			input_div.append(input_name_span);
+			div.append(input_div);
+			
+			var value_div = $("<div class='value'>");
+			div.append(value_div);
+			this.RefreshInputParts(inputs[i],value_div);
+			$('#tab-inputs .inputs').append(div);
 		}
-		html += "<span class='faicon fa-plus' title='Add input part'></span></div>";
-		html += "</div>";
-		$('#tab-inputs .inputs').append(html);
+		else if(inputs[i].type=='stdin')
+			this.RefreshInputParts(inputs[i],$('#tab-stdin .value'));
 	}
+	
+	$('#tab-inputs .input span.input_name').click(function() {
+		var el = $(this);
+		el.hide();
+		var input_el = $('<input />');
+		input_el.val(el.text());
+		input_el.css('width','130px');
+		el.after(input_el);
+		input_el.focus();
+		
+		input_el.blur(function() {
+			wf.Backup();
+			
+			task_editor.task.RenameInput(input_el.parent().parent().index(),input_el.val());
+			input_el.remove();
+			el.show();
+			
+			task_editor.RefreshInputs();
+		});
+	});
 	
 	$('#tab-inputs .input span.fa-remove').click(this.DeleteInput);
 	
-	$('#tab-inputs .value span.fa-plus').click(function() {
-		$('#value_selector_input_name').val($(this).parent().prev().data('name'));
-		$('#input_type_text').val('');
-		$('#input_type_xpath').val('');
+	$('#tab-inputs .value span.fa-remove,#tab-stdin .value span.fa-remove').click(function() {
+		wf.Backup();
 		
-		$('#input_type_xpathvalue').html('');
+		var idx;
+		if($(this).parent().parent().parent().data('inputtype')=='input')
+			idx = $(this).parent().parent().parent().index();
+		else
+			idx = 'stdin';
 		
-		var wfparameters = wf.GetParameters();
-		if(wfparameters.length>0)
-		{
-			$('#input_type_xpathvalue').append($('<optgroup>', {label: "Workflow parameters"}));
-			for(var i=0;i<wfparameters.length;i++)
-				$('#input_type_xpathvalue').append($('<option>', {value: "evqGetWorkflowParameter('"+wfparameters[i]+"')",text:wfparameters[i]}));
-		}
+		task_editor.task.DeleteInputPart(idx,$(this).parent().index());
+		task_editor.RefreshInputs();
+	});
+	
+	$('#tab-inputs .value .input_part,#tab-stdin .value .input_part').click(function() {
+		var idx;
+		if($(this).parent().parent().data('inputtype')=='input')
+			idx = $(this).parent().parent().index();
+		else
+			idx = 'stdin';
 		
-		var job = task_editor.task.GetParentJob();
-		var i = 1;
-		while(job = job.GetParent())
-		{
-			var tasks = job.GetTasks();
-			for(var j=0;j<tasks.length;j++)
+		var part_idx = $(this).index();
+		
+		OpenValueSelector($(this).data('type'),$(this).data('val'));
+		
+		$('#value-selector .add_value').off('click').on('click',function() {
+			wf.Backup();
+	
+			$('#value-selector').dialog('close');
+			
+			var type = $(this).data('type');
+			var val;
+			if(type=='text')
+				val = $('#value-selector .input_type_text').val();
+			else if(type=='xpathvalue')
+				val = XPathHelperPath($('#value-selector #tab-value'));
+			else if(type=='xpathcopy')
+				val = XPathHelperPath($('#value-selector #tab-copy'));
+			else if(type=='advanced')
 			{
-				if(j==0)
-					 $('#input_type_xpathvalue').append($('<optgroup>', {label: "Parent job"+i}));
-				$('#input_type_xpathvalue').append($('<option>', {value: "evqGetParentJob("+(i-1)+")/evqGetOutput('"+tasks[j].GetName()+"')",text:tasks[j].GetName()}));
+				val = $('#value-selector .input_type_advanced').val();
+				type = $('#value-selector #advanced_mode').val();
 			}
 			
-			i++;
+			task_editor.task.EditInputPart(idx,part_idx,val);
+			task_editor.RefreshInputs();
+		});
+	});
+	
+	$('#tab-inputs .value span.fa-plus,#tab-stdin .value span.fa-plus').click(function() {
+		var idx;
+		if($(this).parent().parent().data('inputtype')=='input')
+			idx = $(this).parent().parent().index();
+		else
+			idx = 'stdin';
+		
+		OpenValueSelector();
+		
+		$('#value-selector .add_value').off('click').on('click',function() {
+			wf.Backup();
+	
+			$('#value-selector').dialog('close');
+			
+			var type = $(this).data('type');
+			var val;
+			if(type=='text')
+				val = $('#value-selector .input_type_text').val();
+			else if(type=='xpathvalue')
+				val = XPathHelperPath($('#value-selector #tab-value'));
+			else if(type=='xpathcopy')
+				val = XPathHelperPath($('#value-selector #tab-copy'));
+			else if(type=='advanced')
+			{
+				val = $('#value-selector .input_type_advanced').val();
+				type = $('#value-selector #advanced_mode').val();
+			}
+			
+			task_editor.task.AddInputPart(idx,type,val);
+			task_editor.RefreshInputs();
+		});
+	});
+}
+
+TaskEditor.prototype.RefreshInputParts = function(input,value_div)
+{
+	for(var j=0;j<input.value.length;j++)
+	{
+		var title = '';
+		var part = input.value[j];
+		if(part.type=='text')
+			val = part.val;
+		else
+		{
+			if(part.type=='xpathvalue')
+				title += " (value)";
+			else
+				title += " (copy)";
+			
+			if(part.task && part.node)
+				val = "task:"+part.task+", node:"+part.node;
+			else if(part.parameter)
+				val = "parameter:"+part.parameter;
+			else
+				val = part.val;
 		}
 		
-		$('#value-selector').dialog({width: 800,height: 300});
-	});
+		var value_part_div = $("<div>",{class:"input_part input_part_type_"+part.type,title:part.val+title,text:val,'data-type':part.type,'data-val':part.val});
+		value_part_div.append(" <span class='faicon fa-remove' title='Remove input part'></span>");
+		value_div.append(value_part_div);
+	}
+	value_div.append("<span class='faicon fa-plus' title='Add input part'></span>");
 }
 
 TaskEditor.prototype.AddInput = function()
 {
+	var name = prompt("Input name", "");
+	if(name==null)
+		return;
+	
 	wf.Backup();
 	
-	var name = prompt("Task name", "");
 	if(task_editor.task.AddInput(name))
 		task_editor.RefreshInputs();
 }
@@ -105,30 +306,6 @@ TaskEditor.prototype.DeleteInput = function()
 {
 	wf.Backup();
 	
-	if(task_editor.task.DeleteInput($(this).parent().data('name')))
-		task_editor.RefreshInputs();
-}
-
-TaskEditor.prototype.AddTextInputPart = function()
-{
-	$('#value-selector').dialog('close');
-	var name = $('#value_selector_input_name').val();
-	var val = $('#input_type_text').val();
-	if(task_editor.task.AddInputPart(name,'text',val))
-		task_editor.RefreshInputs();
-}
-
-TaskEditor.prototype.AddValueInputPart = function()
-{
-	$('#value-selector').dialog('close');
-	var name = $('#value_selector_input_name').val();
-	
-	var parent_task = $('#input_type_xpathvalue').val();
-	var node = $('#input_type_xpathvalue_nodes').val();
-	var val = parent_task;
-	if(node)
-		val += "/"+node;
-	
-	if(task_editor.task.AddInputPart(name,'xpathvalue',val))
+	if(task_editor.task.DeleteInput($(this).parent().parent().index()))
 		task_editor.RefreshInputs();
 }

@@ -18,11 +18,49 @@ Task.prototype.GetName = function()
 	return this.task.getAttribute('name');
 }
 
+Task.prototype.GetAttribute = function(name)
+{
+	if(name=='stdinmode')
+		return  this.GetStdinMode();
+	
+	if(this.task.hasAttribute(name))
+		return this.task.getAttribute(name);
+	return '';
+}
+
+Task.prototype.SetAttribute = function(name, value)
+{
+	if(name=='stdinmode')
+		return  this.SetStdinMode(value);
+	
+	if(value)
+		this.task.setAttribute(name,value);
+	else
+		this.task.removeAttribute(name);
+}
+
+Task.prototype.GetStdinMode = function()
+{
+	var nodes = this.task.ownerDocument.Query('stdin',this.task);
+	if(nodes.length>0)
+		return nodes[0].hasAttribute('mode')?nodes[0].getAttribute('mode'):'xml';
+	else
+		return 'xml';
+}
+
+Task.prototype.SetStdinMode = function(mode)
+{
+	var nodes = this.task.ownerDocument.Query('stdin',this.task);
+	if(nodes.length>0)
+		return nodes[0].setAttribute('mode',mode);
+}
+
 Task.prototype.GetInputs = function()
 {
 	var ret = [];
+	var has_stdin = false;
 	
-	var inputs = this.task.ownerDocument.Query('input',this.task);
+	var inputs = this.task.ownerDocument.Query('input|stdin',this.task);
 	for(var i=0;i<inputs.length;i++)
 	{
 		var node = inputs[i].firstChild;
@@ -42,18 +80,29 @@ Task.prototype.GetInputs = function()
 				value.task = false;
 				value.node = false;
 				value.parameter = false;
-				var matches = value.val.match(/evqGetParentJob\([0-9]+\)\/evqGetOutput\(['"]([a-zA-Z0-9_ ]+)['"]\)\/(.*)/);
-				if(matches!=null)
+				var matches;
+				if((matches = value.val.match(/^evqGetParentJob\([0-9]+\)\/evqGetOutput\(['"]([a-zA-Z0-9_ ]+)['"]\)\/(.*)$/))!=null)
 				{
 					value.task = matches[1];
 					value.node = matches[2];
 				}
-				else
+				else if((matches = value.val.match(/^evqGetCurrentJob\(\)\/evqGetContext\(\)\/(.*)$/))!=null)
 				{
-					var matches = value.val.match(/evqGetWorkflowParameter\(['"]([a-zA-Z0-9_ ]+)['"]\)/);
-					if(matches!=null)
-						value.parameter = matches[1];
+					value.task ='Current job context';
+					value.node = matches[1];
 				}
+				else if((matches = value.val.match(/^evqGetParentJob\([0-9]+\)\/evqGetContext\(\)\/(.*)$/))!=null)
+				{
+					value.task ='Parent context';
+					value.node = matches[1];
+				}
+				else if((matches = value.val.match(/^\.\/(.*)$/))!=null)
+				{
+					value.task ='Context';
+					value.node = matches[1];
+				}
+				else if((matches = value.val.match(/^evqGetWorkflowParameter\(['"]([a-zA-Z0-9_ ]+)['"]\)$/))!=null)
+					value.parameter = matches[1];
 			}
 			else if(node.nodeType==Node.TEXT_NODE)
 			{
@@ -65,8 +114,14 @@ Task.prototype.GetInputs = function()
 			node = node.nextSibling;
 		}
 		
-		ret.push({name:inputs[i].getAttribute('name'),value:values});
+		ret.push({name:inputs[i].hasAttribute('name')?inputs[i].getAttribute('name'):'',type:inputs[i].nodeName,value:values});
+		if(inputs[i].nodeName=='stdin')
+			has_stdin = true;
 	}
+	
+	if(!has_stdin)
+		ret.push({name:'',type:'stdin',value:''});
+	
 	return ret;
 }
 
@@ -96,45 +151,95 @@ Task.prototype.AddInput = function(name)
 	return true;
 }
 
-Task.prototype.DeleteInput = function(name)
+Task.prototype.DeleteInput = function(idx)
 {
 	var inputs = this.task.ownerDocument.Query('input',this.task);
-	for(var i=0;i<inputs.length;i++)
-	{
-		if(inputs[i].getAttribute('name')==name)
-		{
-			this.task.removeChild(inputs[i]);
-			return true;
-		}
-	}
-	
-	return false;
+	this.task.removeChild(inputs[idx]);
+	return true;
 }
 
-Task.prototype.AddInputPart = function(name,type,value)
+Task.prototype.RenameInput = function(idx,new_name)
 {
 	var inputs = this.task.ownerDocument.Query('input',this.task);
-	for(var i=0;i<inputs.length;i++)
+	inputs[idx].setAttribute('name',new_name);
+	return true;
+}
+
+Task.prototype.AddInputPart = function(idx,type,value)
+{
+	var input;
+	
+	if(idx=='stdin')
 	{
-		if(inputs[i].getAttribute('name')==name)
+		var nodes = this.task.ownerDocument.Query('stdin',this.task);
+		if(nodes.length>0)
+			input = nodes[0];
+		else
 		{
-			if(type=='text')
-				inputs[i].appendChild(this.task.ownerDocument.createTextNode(value));
-			else if(type=='xpathvalue')
-			{
-				var node = this.task.ownerDocument.createElement('value');
-				node.setAttribute('select',value);
-				inputs[i].appendChild(node);
-			}
-			else if(type=='xpathcopy')
-			{
-				var node = this.task.ownerDocument.createElement('copy');
-				node.setAttribute('select',value);
-				inputs[i].appendChild(node);
-			}
-			return true;
+			input = this.task.ownerDocument.createElement('stdin');
+			this.task.appendChild(input);
 		}
 	}
+	else
+	{
+		var inputs = this.task.ownerDocument.Query('input',this.task);
+		input = inputs[idx];
+	}
 	
-	return false;
+	if(type=='text')
+		input.appendChild(this.task.ownerDocument.createTextNode(value));
+	else if(type=='xpathvalue')
+	{
+		var node = this.task.ownerDocument.createElement('value');
+		node.setAttribute('select',value);
+		input.appendChild(node);
+	}
+	else if(type=='xpathcopy')
+	{
+		var node = this.task.ownerDocument.createElement('copy');
+		node.setAttribute('select',value);
+		input.appendChild(node);
+	}
+	return true;
+}
+
+Task.prototype.DeleteInputPart = function(input_idx, part_idx)
+{
+	var input;
+	
+	if(input_idx=='stdin')
+	{
+		var nodes = this.task.ownerDocument.Query('stdin',this.task);
+		input = nodes[0];
+	}
+	else
+	{
+		var inputs = this.task.ownerDocument.Query('input',this.task);
+		input = inputs[input_idx];
+	}
+	
+	var parts = input.childNodes;
+	input.removeChild(parts[part_idx]);
+}
+
+Task.prototype.EditInputPart = function(input_idx, part_idx, new_value)
+{
+	var input;
+	
+	if(input_idx=='stdin')
+	{
+		var nodes = this.task.ownerDocument.Query('stdin',this.task);
+		input = nodes[0];
+	}
+	else
+	{
+		var inputs = this.task.ownerDocument.Query('input',this.task);
+		input = inputs[input_idx];
+	}
+	
+	var parts = input.childNodes;
+	if(parts[part_idx].nodeType==Node.ELEMENT_NODE)
+		parts[part_idx].setAttribute('select',new_value);
+	else if(parts[part_idx].nodeType==Node.TEXT_NODE)
+		parts[part_idx].nodeValue=new_value;
 }

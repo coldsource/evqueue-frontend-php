@@ -2,6 +2,7 @@
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
 	<xsl:import href="templates/main-template.xsl" />
 	<xsl:import href="templates/workflow-ui/task-editor.xsl" />
+	<xsl:import href="templates/workflow-ui/job-editor.xsl" />
 
 	<xsl:variable name="topmenu" select="'settings'" />
 	<xsl:variable name="FULLSCREEN" select="'yes'" />
@@ -16,6 +17,8 @@
 		<src>js/objects/task.js</src>
 		<src>js/ui-elements/tasks-library.js</src>
 		<src>js/ui-elements/task-editor.js</src>
+		<src>js/ui-elements/job-editor.js</src>
+		<src>js/ui-elements/xpath-helper.js</src>
 		<src>js/workflow-ui.js</src>
 	</xsl:variable>
 
@@ -39,7 +42,9 @@
 			<button id='import_xml_action'>Import</button>
 		</div>
 		
+		<xsl:call-template name="xpath-selector" />
 		<xsl:call-template name='task-editor' />
+		<xsl:call-template name='job-editor' />
 		
 		<script type="text/javascript">
 			

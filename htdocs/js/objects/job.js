@@ -21,6 +21,21 @@ Job.prototype.GetParent = function()
 	return new Job(this.job.parentNode.parentNode);
 }
 
+Job.prototype.GetAttribute = function(name)
+{
+	if(this.job.hasAttribute(name))
+		return this.job.getAttribute(name);
+	return '';
+}
+
+Job.prototype.SetAttribute = function(name, value)
+{
+	if(value)
+		this.job.setAttribute(name,value);
+	else
+		this.job.removeAttribute(name);
+}
+
 Job.prototype.GetSubjobs = function()
 {
 	var ret = [];
@@ -70,6 +85,9 @@ Job.prototype.AddSubjob = function(sibling_pos,new_job)
 
 Job.prototype.MoveTo = function(parent_job, sibling_pos, depth)
 {
+	if(this.job==parent_job.job)
+		parent_job = parent_job.GetParent();
+	
 	if(depth)
 	{
 		this.job.parentNode.removeChild(this.job);
@@ -128,8 +146,22 @@ Job.prototype.Draw = function()
 {
 	var tasks = this.GetTasks();
 	
-	var html = '';
+	var html = '<div class="title">&nbsp;';
+	if(this.GetAttribute('condition') || this.GetAttribute('iteration-condition'))
+		html += '<span class="faicon fa-code-fork">&nbsp;</span>';
+	if(this.GetAttribute('loop'))
+		html += '<span class="faicon fa-repeat">&nbsp;</span>';
+	if(this.GetAttribute('name'))
+		html += this.GetAttribute('name');
+	html += '</div>';
 	for(var i=0;i<tasks.length;i++)
-		html += '<div class="jobtask" data-type="jobtask" data-id="'+tasks[i].GetID()+'">'+tasks[i].GetName()+'</div>';
+	{
+		html += '<div class="jobtask" data-type="jobtask" coucou="caca" data-id="'+tasks[i].GetID()+'">'+tasks[i].GetName();
+		if(tasks[i].GetAttribute('condition') || tasks[i].GetAttribute('iteration-condition'))
+			html += '&nbsp;<span class="faicon fa-code-fork"></span>';
+		if(tasks[i].GetAttribute('loop'))
+			html += '&nbsp;<span class="faicon fa-repeat"></span>';
+		html += '</div>';
+	}
 	return html;
 }

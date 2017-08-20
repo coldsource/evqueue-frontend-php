@@ -1,11 +1,20 @@
 /* General */
 .faicon {
 	font-family:FontAwesome;
+	cursor:pointer;
 }
 
 .help {
 	font-size:12px;
 	vertical-align:top;
+}
+
+.hover {
+	background-color: #fffbe1;
+}
+
+.greyed {
+	color: #cccccc;
 }
 
 /* Workflow display */
@@ -51,6 +60,14 @@ div.node {
 	background-color:white;
 	vertical-align:top;
 	font-size:12px;
+}
+
+div.node div.title {
+	background-color:#d0d0d0;
+}
+
+div.node div.title span {
+	float:left;
 }
 
 div.nodesep {
@@ -135,6 +152,21 @@ div#value-selector {
 	display:none;
 }
 
+div#xpath-selector {
+	display:none;
+}
+
+div #value-selector input {
+	margin-top:5px;
+	width:100%;
+}
+
+/* Job editor */
+/* Task editor */
+div#job-editor {
+	display:none;
+}
+
 /* Task editor */
 div#task-editor {
 	display:none;
@@ -152,6 +184,10 @@ div#task-editor div.input {
 
 div#task-editor div.value {
 	display:inline-block;
+}
+
+div#tab-inputs .input span.input_name {
+	cursor: pointer;
 }
 
 div.input_part {

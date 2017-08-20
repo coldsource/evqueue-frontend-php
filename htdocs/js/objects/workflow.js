@@ -177,6 +177,7 @@ Workflow.prototype.Draw = function()
 		cursor:'grabbing',
 		start:function(event, ui) {
 			$(this).draggable('instance').offset.click = { left: Math.floor(ui.helper.width() / 2), top: Math.floor(ui.helper.height() / 2) };
+			$(this).css('opacity','0.7');
 		},
 		stop:function(event, ui) {
 			wf.Draw();
@@ -187,6 +188,7 @@ Workflow.prototype.Draw = function()
 		start:function(event, ui) {
 			$(this).find('.sep:first').remove();
 			$(this).draggable('instance').offset.click = { left: Math.floor(ui.helper.width() / 2), top: Math.floor(ui.helper.height() / 2) };
+			$(this).css('opacity','0.7');
 		},
 		stop:function(event, ui) {
 			wf.Draw();
@@ -254,6 +256,10 @@ Workflow.prototype.Draw = function()
 		out: function(event,ui) {
 			$(this).css('border-style','solid');
 		}
+	});
+	
+	$('.node div.title').click(function() {
+		job_editor.Open($(this).parent().data('id'));
 	});
 	
 	$('.jobtask').click(function() {

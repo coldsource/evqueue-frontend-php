@@ -5,7 +5,7 @@ $(document).ready(function() {
 	$('body').css('height','100%');
 	$('body').css("cursor", "wait");
 	
-	evqueueAPI(false,'workflow','get',{'id':139},[],function(xml) {
+	evqueueAPI(false,'workflow','get',{'id':8},[],function(xml) {
 		xml.replaceChild(xml.documentElement.firstChild.firstChild,xml.documentElement);
 		wf = new Workflow($('#workflow'),xml);
 		
@@ -19,6 +19,7 @@ $(document).ready(function() {
 	tasks_library = new TasksLibrary();
 	
 	task_editor = new TaskEditor();
+	job_editor = new JobEditor();
 	
 	$('#trash').droppable({
 		drop: function(event, ui) {

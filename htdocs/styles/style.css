@@ -236,7 +236,7 @@ div.formdiv input[type='submit'] {
 }
 
 div.formdiv input[type='checkbox'] {
-  min-width:3em;
+  min-width:0em;
 }
 
 div.formdiv select {
