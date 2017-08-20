@@ -2,6 +2,8 @@ function Workflow(el,xml)
 {
 	this.el = el;
 	
+	this.attributes = new Object();
+	
 	this.undo_stack = [];
 	this.redo_stack = [];
 	
@@ -36,6 +38,16 @@ function Workflow(el,xml)
 		jobs[i].setAttribute('id',++this.gnid);
 }
 
+Workflow.prototype.GetAttribute = function(name)
+{
+	return this.attributes[name];
+}
+
+Workflow.prototype.SetAttribute = function(name,value)
+{
+	this.attributes[name] = value;
+}
+
 Workflow.prototype.Backup = function()
 {
 	this.redo_stack = [];
@@ -61,10 +73,24 @@ Workflow.prototype.Redo = function()
 	this.xmldoc = jQuery.parseXML(this.redo_stack.pop());
 }
 
-Workflow.prototype.GetXML = function()
+Workflow.prototype.GetXML = function(remove_id = false)
 {
-	var xml = new XMLSerializer().serializeToString(this.xmldoc);
-	return xml;
+	if(!remove_id)
+	{
+		var xml = new XMLSerializer().serializeToString(this.xmldoc);
+		return xml;
+	}
+	else
+	{
+		var newdom = document.implementation.createDocument(null,null);
+		var root = newdom.importNode(this.xmldoc.documentElement,true);
+		newdom.appendChild(root);
+		var nodes = newdom.Query('//*',newdom);
+		for(var i=0;i<nodes.length;i++)
+			nodes[i].removeAttribute('id');
+		var xml = new XMLSerializer().serializeToString(newdom);
+		return xml;
+	}
 }
 
 Workflow.prototype.GetRoot = function()
@@ -79,6 +105,37 @@ Workflow.prototype.GetParameters = function()
 	for(var i=0;i<parameters.length;i++)
 		ret.push(parameters[i].getAttribute('name'));
 	return ret;
+}
+
+Workflow.prototype.AddParameter = function(name)
+{
+	var parameters = this.xmldoc.Query('/workflow/parameters/parameter',this.xmldoc);
+	for(var i=0;i<parameters.length;i++)
+		if(parameters[i].getAttribute('name')==name)
+			return false;
+	
+	var parameters_nodes =  this.xmldoc.Query('/workflow/parameters',this.xmldoc);
+	var parameters_node;
+	if(parameters_nodes.length>0)
+		parameters_node = parameters_nodes[0];
+	else
+	{
+		parameters_node = this.job.ownerDocument.createElement('parameters');
+		this.xmldoc.documentElement.appendChild(parameters_node);
+	}
+	
+	var parameter = this.xmldoc.createElement('parameter');
+	parameter.setAttribute('name',name);
+	
+	parameters_node.appendChild(parameter);
+	
+	return true;
+}
+
+Workflow.prototype.DeleteParameter = function(idx)
+{
+	var parameters = this.xmldoc.Query('/workflow/parameters/parameter',this.xmldoc);
+	parameters[idx].parentNode.removeChild(parameters[idx]);
 }
 
 Workflow.prototype.GetJobByID = function(id)
@@ -168,6 +225,7 @@ Workflow.prototype.draw = function(branch,job,level)
 Workflow.prototype.Draw = function()
 {
 	this.el.html('');
+	
 	this.draw(this.el,this.GetRoot(),0);
 	
 	var tasks_width = this.GetTasksWidth();

@@ -27,13 +27,23 @@ div#sticky_menu {
 	width:100%;
 	border-bottom:1px solid;
 	padding:4px;
-	font-family:FontAwesome;
 	font-size:20px;
 }
 
 div#sticky_menu span {
 	margin-left:5px;
 	margin-right:5px;
+}
+
+div#sticky_menu span#message {
+	font-size:14px;
+	color:green;
+	font-weight:bold;
+}
+
+div#sticky_menu span#exit {
+	float:right;
+	margin-right:10px;
 }
 
 div#workflow {
@@ -162,8 +172,12 @@ div #value-selector input {
 }
 
 /* Job editor */
-/* Task editor */
 div#job-editor {
+	display:none;
+}
+
+/* Workflow editor */
+div#workflow-editor {
 	display:none;
 }
 

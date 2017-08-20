@@ -5,9 +5,17 @@ $(document).ready(function() {
 	$('body').css('height','100%');
 	$('body').css("cursor", "wait");
 	
-	evqueueAPI(false,'workflow','get',{'id':8},[],function(xml) {
+	evqueueAPI(false,'workflow','get',{'id':workflow_id},[],function(xml) {
+		var name = xml.documentElement.firstChild.getAttribute('name');
+		var group = xml.documentElement.firstChild.getAttribute('group');
+		var comment = xml.documentElement.firstChild.getAttribute('comment');
+		
 		xml.replaceChild(xml.documentElement.firstChild.firstChild,xml.documentElement);
+		
 		wf = new Workflow($('#workflow'),xml);
+		wf.SetAttribute('name',name);
+		wf.SetAttribute('group',group);
+		wf.SetAttribute('comment',comment);
 		
 		$('body').css('cursor', 'default');
 		$('html').css('height','auto');
@@ -16,10 +24,13 @@ $(document).ready(function() {
 		wf.Draw();
 	});
 	
-	tasks_library = new TasksLibrary();
-	
 	task_editor = new TaskEditor();
 	job_editor = new JobEditor();
+	workflow_editor = new WorkflowEditor();
+	
+	want_exit = false;
+	
+	tasks_library = new TasksLibrary();
 	
 	$('#trash').droppable({
 		drop: function(event, ui) {
@@ -43,17 +54,37 @@ $(document).ready(function() {
 			wf.Draw();
 		}
 	});
-
+	
+	$('#save').click(function() {
+		SaveWorkflow();
+	});
+	
+	$('#exit').click(function() {
+		if(confirm("Do you want to save your modifications"))
+		{
+			want_exit = true;
+			SaveWorkflow();
+		}
+		else
+			window.location = "list-workflows.php";
+	});
+	
+	$('#open-workflow-editor').click(function() {
+		workflow_editor.Open();
+	});
+	
 	$('#undo').click(function() {
 		wf.Undo();
 		wf.Draw();
 		task_editor.RefreshInputs();
+		workflow_editor.RefreshParameters();
 	});
 
 	$('#redo').click(function() {
 		wf.Redo();
 		wf.Draw();
 		task_editor.RefreshInputs();
+		workflow_editor.RefreshParameters();
 	});
 
 	$('#open-tasks-library').click(function() {
@@ -61,7 +92,7 @@ $(document).ready(function() {
 	});
 
 	$('#export_xml').click(function() {
-		alert(wf.GetXML());
+		alert(wf.GetXML(true));
 	});
 
 	$('#import_xml').click(function() {
@@ -87,3 +118,22 @@ $(document).ready(function() {
 		$('#task_input').append("<div class='input_part input_type_xpathvalue'>"+val+"</div>");
 	});
 });
+
+function SaveWorkflow()
+{
+	evqueueAPI(false,'workflow','edit',{
+		'id':workflow_id,
+		'name':wf.GetAttribute('name'),
+		'group':wf.GetAttribute('group'),
+		'comment':wf.GetAttribute('comment'),
+		'content':btoa(wf.GetXML(true))
+		},[],function(xml) {
+			$('#message').html('Workflow has been saved');
+			$('#message').show();
+			$('#message').delay(2000).fadeOut();
+			
+			if(want_exit)
+				window.location = "list-workflows.php";
+		;
+	});
+}
