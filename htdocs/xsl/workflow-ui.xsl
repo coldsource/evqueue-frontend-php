@@ -44,9 +44,9 @@
 
 		<div id="workflow"></div>
 		
-		<div id="tasks-library" title="Tasks library"></div>
+		<div id="tasks-library" class="dialog" title="Tasks library"></div>
 		
-		<div id='import_xml_dlg' style='display:none;'>
+		<div id='import_xml_dlg' class="dialog">
 			<textarea rows='30' cols='80' name='xml'></textarea>
 			<button id='import_xml_action'>Import</button>
 		</div>

@@ -5,9 +5,9 @@ $(document).ready( function() {
 			$('ul.submenu#submenu-'+event.target.id).show();
 		}
 	);
+	
+	$('.tabs').tabs();
 });
-
-
 
 function evqueueAPI(element, group, action, attributes = [], parameters = [], cbk = false){
 	if ($(element).attr('data-confirm')) {
@@ -15,15 +15,18 @@ function evqueueAPI(element, group, action, attributes = [], parameters = [], cb
 			return;
 	}
 	
-	$.ajax({
+	return $.ajax({
 		data:{'group':group, 'action':action, 'parameters':parameters, 'attributes':attributes},
 		type: 'post',
 		url: 'ajax/evqueue_api.php',
 		content:'xml',
 	}).done(function(xml){
+		$('body').css("cursor", "default");
+		
 		error = $(xml).find('error');
 		if ($(error).length > 0) {
 			alert(error.html());
+			return;
 		}
 		
 		if(cbk)
@@ -31,17 +34,23 @@ function evqueueAPI(element, group, action, attributes = [], parameters = [], cb
 	});
 }
 
-function commit(element, name, group = 'workflow', force = 'no', id='-1'){
-	$("input[name='commit-name']").val(name);
-	$("input[name='commit-force']").val(force);
-	$("input[name='commit-id']").val(id);
-	$("#dialog-commit").dialog();
+function Wait()
+{
+	$('html').css('height','100%');
+	$('body').css('height','100%');
+	$('body').css("cursor", "wait");
 }
 
-function retryAllTasks(){
-	$.ajax({
-		url: 'ajax/retry.php'
-	}).done(function(xml){
+function Ready()
+{
+	$('html').css('height','auto');
+	$('body').css('height','auto');
+	$('body').css("cursor", "default");
+}
 
-	});
+function Message(msg)
+{
+	$('#message').html(msg);
+	$('#message').show();
+	$('#message').delay(2000).fadeOut();
 }

@@ -1,14 +1,4 @@
 /* General */
-.faicon {
-	font-family:FontAwesome;
-	cursor:pointer;
-}
-
-.help {
-	font-size:12px;
-	vertical-align:top;
-}
-
 .hover {
 	background-color: #fffbe1;
 }
@@ -35,19 +25,12 @@ div#sticky_menu span {
 	margin-right:5px;
 }
 
-div#sticky_menu span#message {
-	font-size:14px;
-	color:green;
-	font-weight:bold;
-}
-
 div#sticky_menu span#exit {
 	float:right;
 	margin-right:10px;
 }
 
 div#workflow {
-	margin-top:50px;
 	margin-left:auto;
 	margin-right:auto;
 	border:1px solid;
@@ -129,10 +112,6 @@ div.postsep {
 }
 
 /* Library task */
-div#tasks-library {
-	display:none;
-}
-
 div.task_icon
 {
 	display:inline-block;
@@ -158,34 +137,12 @@ div.task p
 }
 
 /* Task input selector */
-div#value-selector {
-	display:none;
-}
-
-div#xpath-selector {
-	display:none;
-}
-
 div #value-selector input {
 	margin-top:5px;
 	width:100%;
 }
 
-/* Job editor */
-div#job-editor {
-	display:none;
-}
-
-/* Workflow editor */
-div#workflow-editor {
-	display:none;
-}
-
 /* Task editor */
-div#task-editor {
-	display:none;
-}
-
 div#task-editor div.input_line {
 	margin-top:5px;
 	margin-bottom:5px;

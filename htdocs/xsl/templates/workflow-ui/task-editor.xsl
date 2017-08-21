@@ -4,7 +4,7 @@
 <xsl:import href="value-selector.xsl" />
 	
 <xsl:template name="task-editor">
-	<div id='task-editor' class="tabs" title="Edit task">
+	<div id='task-editor' class="tabs dialog" title="Edit task">
 		<ul>
 			<li><a href="#tab-inputs">Inputs</a></li>
 			<li><a href="#tab-conditionsloops">Conditions &amp; loops</a></li>

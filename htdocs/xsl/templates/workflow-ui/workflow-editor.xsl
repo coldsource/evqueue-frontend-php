@@ -2,7 +2,7 @@
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
 
 <xsl:template name="workflow-editor">
-	<div id='workflow-editor' class="tabs" title="Edit workflow">
+	<div id='workflow-editor' class="tabs dialog" title="Edit workflow">
 		<ul>
 			<li><a href="#tab-workflowproperties">Properties</a></li>
 			<li><a href="#tab-workflowparameters">Parameters</a></li>

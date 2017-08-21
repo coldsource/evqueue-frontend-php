@@ -4,7 +4,7 @@
 <xsl:import href="value-selector.xsl" />
 	
 <xsl:template name="job-editor">
-	<div id='job-editor' class="tabs" title="Edit job">
+	<div id='job-editor' class="tabs dialog" title="Edit job">
 		<ul>
 			<li><a href="#tab-jobproperties">Properties</a></li>
 			<li><a href="#tab-jobconditionsloops">Conditions &amp; loops</a></li>

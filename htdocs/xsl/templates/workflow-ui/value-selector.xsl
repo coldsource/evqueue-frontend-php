@@ -17,7 +17,7 @@
 </xsl:template>
 
 <xsl:template name="value-selector">
-	<div id='value-selector' class="tabs" title="Value selector">
+	<div id='value-selector' class="tabs dialog" title="Value selector">
 		<ul>
 			<li><a href="#tab-text">Simple text</a></li>
 			<li><a href="#tab-value">XPath value</a></li>
@@ -72,7 +72,7 @@
 </xsl:template>
 
 <xsl:template name="xpath-selector">
-	<div id='xpath-selector' title="XPath Helper">
+	<div id='xpath-selector' class="dialog" title="XPath Helper">
 		<div>
 			<p>This helper allows you to write XPath expression to match a specific node in the workflow document.</p>
 			

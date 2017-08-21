@@ -112,22 +112,11 @@ class XSLEngine
 			}
 		}
 		$this->SetParameter('NOW', date('Y-m-d H:i:s'));
-		$this->SetParameter('EDITION', '0');
 		$this->SetParameter('PROFILE', isset($_SESSION['user_profile']) ? $_SESSION['user_profile']:'');
 		$this->SetParameter('LOGIN', isset($_SESSION['user_login']) ? $_SESSION['user_login']:'');
-		$this->SetParameter('USE_GIT', 1); //TODO
+		$this->SetParameter('USE_GIT', $_SESSION['git_enabled']);
 
 		$this->display_xml = isset($_GET['display_xml']);
-
-		if(isset($_SESSION['edition']) && is_array($_SESSION['edition'])){
-			$session = $this->xmldoc->createElement('session');
-			foreach ($_SESSION['edition'] as $key => $value) {
-				$wf = $this->xmldoc->createElement('workflow');
-				$wf->setAttribute("original-id", $key);
-				$session->appendChild($wf);
-			}
-			$this->root_node->appendChild($session);
-		}
 	}
 
 

@@ -44,16 +44,15 @@ if (isset($_GET['action']))
 
 $xsl = new XSLEngine();
 if (isset($_POST['login']) && isset($_POST['password'])) {
-
-
-
 	try
 	{
 		if($evqueue === false)
 			throw new Exception('There is no running node.');
+		
 		$pwd = sha1($_POST['password'], true);
 		$evqueue->SetUserLogin($_POST['login']);
 		$evqueue->SetUserPwd($pwd, true);
+		
 		$nodes = [];
 
 		$xml = $xsl->Api('ping');

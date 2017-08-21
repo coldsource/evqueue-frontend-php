@@ -58,19 +58,6 @@
 						<xsl:call-template name="topmenu" />
 					</xsl:if>
 
-					<!-- Form page -->
-					<xsl:if test="$ISFORM = '1'">
-						<div class="contentManage">
-							<div class="boxTitle"><xsl:value-of select="$FORMTITLE" /></div>
-							<div class="formdiv">
-								<xsl:call-template name="content" />
-							</div>
-						</div>
-					</xsl:if>
-				</xsl:if>
-
-				<!-- Display page -->
-				<xsl:if test="$ISFORM != '1'">
 					<div class="content">
 						<xsl:call-template name="content" />
 					</div>
@@ -121,8 +108,9 @@
 	</xsl:template>
 
 	<xsl:template name="topmenu">
+		<div class="topmenu"><a href="{$SITE_BASE}index.php"><img src="images/evQueue-small.svg" title="evQueue" /></a></div>
 		<ul class="topmenu">
-			<li class="logo"><a href="{$SITE_BASE}index.php">evQueue</a></li>
+			<li class="logo"></li>
 			<li id="system-state">
 				<xsl:if test="$topmenu='system-state'"><xsl:attribute name="class">selected</xsl:attribute></xsl:if>
 				System state
@@ -139,16 +127,7 @@
 				<xsl:if test="$topmenu='logging'"><xsl:attribute name="class">selected</xsl:attribute></xsl:if>
 				Logging
 			</li>
-			<xsl:for-each select="/page/session/workflow">
-				<xsl:choose>
-					<xsl:when test="@original-id = 'new'">
-						<li><a style="color: #51d551;" href="{$SITE_BASE}manage-workflow.php">Creating workflow</a></li>
-					</xsl:when>
-					<xsl:otherwise>
-						<li><a style="color: #51d551;" href="{$SITE_BASE}manage-workflow.php?workflow_id={@original-id}">Editing workflow <xsl:value-of select="@original-id" /></a></li>
-					</xsl:otherwise>
-				</xsl:choose>
-			</xsl:for-each>
+			<span id="message"></span>
 		</ul>
 		<ul class="submenu" id="submenu-system-state">
 			<xsl:if test="$topmenu!='system-state'"><xsl:attribute name="style">display:none;</xsl:attribute></xsl:if>
@@ -160,8 +139,8 @@
 		<xsl:if test="$PROFILE = 'ADMIN'">
 			<ul class="submenu" id="submenu-settings">
 				<xsl:if test="$topmenu!='settings'"><xsl:attribute name="style">display:none;</xsl:attribute></xsl:if>
-				<li><a href="{$SITE_BASE}list-tasks.php">Tasks</a></li>
-				<li><a href="{$SITE_BASE}list-workflows.php">Workflows</a></li>
+				<li><a href="{$SITE_BASE}task.php">Tasks</a></li>
+				<li><a href="{$SITE_BASE}workflow.php">Workflows</a></li>
 				<li><a href="{$SITE_BASE}list-workflow-schedules.php?display=settings">Scheduled workflows</a></li>
 				<li><a href="{$SITE_BASE}list-schedules.php">Retry Schedules</a></li>
 				<li><a href="{$SITE_BASE}list-queues.php">Queues</a></li>

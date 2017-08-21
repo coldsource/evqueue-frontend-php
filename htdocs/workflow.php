@@ -109,14 +109,6 @@ if(isset($_POST['commit-name'])){
 	}
 }
 
-$xsl->AddFragment(["workflows" => $xsl->Api("workflows", "list")]);
-
-if($_SESSION['git_enabled'])
-{
-	$xsl->Api("git", "pull");
-	$xsl->AddFragment(["git-workflows" => $xsl->Api("git", "list_workflows")]);
-}
-
-$xsl->DisplayXHTML('xsl/list_workflows.xsl');
+$xsl->DisplayXHTML('xsl/workflow.xsl');
 
 ?>

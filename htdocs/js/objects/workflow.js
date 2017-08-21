@@ -191,6 +191,7 @@ Workflow.prototype.CreateTask = function(name)
 	var new_task = this.xmldoc.createElement('task');
 	new_task.setAttribute('id',++this.gnid);
 	new_task.setAttribute('name',name);
+	new_task.setAttribute('queue','default');
 	return new Task(new_task);
 }
 

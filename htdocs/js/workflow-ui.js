@@ -1,28 +1,33 @@
 $(document).ready(function() {
-	$('.tabs').tabs();
-	
-	$('html').css('height','100%');
-	$('body').css('height','100%');
-	$('body').css("cursor", "wait");
-	
-	evqueueAPI(false,'workflow','get',{'id':workflow_id},[],function(xml) {
-		var name = xml.documentElement.firstChild.getAttribute('name');
-		var group = xml.documentElement.firstChild.getAttribute('group');
-		var comment = xml.documentElement.firstChild.getAttribute('comment');
-		
-		xml.replaceChild(xml.documentElement.firstChild.firstChild,xml.documentElement);
-		
-		wf = new Workflow($('#workflow'),xml);
-		wf.SetAttribute('name',name);
-		wf.SetAttribute('group',group);
-		wf.SetAttribute('comment',comment);
-		
-		$('body').css('cursor', 'default');
-		$('html').css('height','auto');
-		$('body').css('height','auto');
-		
+	if(workflow_id==-1)
+	{
+		wf = new Workflow($('#workflow'),"<workflow><subjobs><job /></subjobs></workflow>");
 		wf.Draw();
-	});
+	}
+	else
+	{
+		$('html').css('height','100%');
+		$('body').css('height','100%');
+		$('body').css("cursor", "wait");
+		
+		evqueueAPI(false,'workflow','get',{'id':workflow_id},[],function(xml) {
+			var name = xml.documentElement.firstChild.getAttribute('name');
+			var group = xml.documentElement.firstChild.getAttribute('group');
+			var comment = xml.documentElement.firstChild.getAttribute('comment');
+			
+			xml.replaceChild(xml.documentElement.firstChild.firstChild,xml.documentElement);
+			
+			wf = new Workflow($('#workflow'),xml);
+			wf.SetAttribute('name',name);
+			wf.SetAttribute('group',group);
+			wf.SetAttribute('comment',comment);
+			
+			$('html').css('height','auto');
+			$('body').css('height','auto');
+			
+			wf.Draw();
+		});
+	}
 	
 	task_editor = new TaskEditor();
 	job_editor = new JobEditor();
@@ -66,7 +71,7 @@ $(document).ready(function() {
 			SaveWorkflow();
 		}
 		else
-			window.location = "list-workflows.php";
+			window.location = "workflow.php";
 	});
 	
 	$('#open-workflow-editor').click(function() {
@@ -121,19 +126,39 @@ $(document).ready(function() {
 
 function SaveWorkflow()
 {
-	evqueueAPI(false,'workflow','edit',{
-		'id':workflow_id,
-		'name':wf.GetAttribute('name'),
-		'group':wf.GetAttribute('group'),
-		'comment':wf.GetAttribute('comment'),
-		'content':btoa(wf.GetXML(true))
-		},[],function(xml) {
-			$('#message').html('Workflow has been saved');
-			$('#message').show();
-			$('#message').delay(2000).fadeOut();
-			
-			if(want_exit)
-				window.location = "list-workflows.php";
-		;
-	});
+	if(workflow_id==-1)
+	{
+		evqueueAPI(false,'workflow','create',{
+			'name':wf.GetAttribute('name'),
+			'group':wf.GetAttribute('group'),
+			'comment':wf.GetAttribute('comment'),
+			'content':btoa(wf.GetXML(true))
+			},[],function(xml) {
+				$('#message').html('Workflow has been created');
+				$('#message').show();
+				$('#message').delay(2000).fadeOut();
+				
+				workflow_id = xml.firstChild.getAttribute('workflow-id');
+				
+				if(want_exit)
+					window.location = "workflow.php";
+		});
+	}
+	else
+	{
+		evqueueAPI(false,'workflow','edit',{
+			'id':workflow_id,
+			'name':wf.GetAttribute('name'),
+			'group':wf.GetAttribute('group'),
+			'comment':wf.GetAttribute('comment'),
+			'content':btoa(wf.GetXML(true))
+			},[],function(xml) {
+				$('#message').html('Workflow has been saved');
+				$('#message').show();
+				$('#message').delay(2000).fadeOut();
+				
+				if(want_exit)
+					window.location = "workflow.php";
+		});
+	}
 }
