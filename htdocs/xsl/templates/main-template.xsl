@@ -63,11 +63,13 @@
 					</div>
 				</xsl:if>
 
-				<xsl:if test="$FULLSCREEN = 'no'">
-					<div id="footer">
-						Licensed under GPLv3 (<a href="http://evqueue.net">evqueue.net</a>)
-					</div>
+				<xsl:if test="$FULLSCREEN = 'yes'">
+					<xsl:call-template name="content" />
 				</xsl:if>
+				
+				<div id="footer">
+					Licensed under GPLv3 (<a href="http://evqueue.net">evqueue.net</a>)
+				</div>
 			</body>
 		</html>
 	</xsl:template>

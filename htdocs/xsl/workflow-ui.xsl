@@ -24,7 +24,7 @@
 		<src>js/workflow-ui.js</src>
 	</xsl:variable>
 
-	<xsl:template name="content">
+	<xsl:template name="content">toto
 		<script type="text/javascript">
 			var workflow_id = <xsl:value-of select="/page/@workflow_id" />;
 		</script>
