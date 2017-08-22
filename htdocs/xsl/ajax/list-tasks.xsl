@@ -16,6 +16,9 @@
 					<th>Binary</th>
 					<th>Parameters mode</th>
 					<th>Host</th>
+					<xsl:if test="$USE_GIT = 1">
+						<th>Git</th>
+					</xsl:if>
 					<th class="thActions">Actions</th>
 				</tr>
 
@@ -40,27 +43,35 @@
 					</tr>
 
 					<xsl:for-each select="/page/tasks/task[@group = $groupName]">
+						<xsl:variable name="is-in-git" select="$USE_GIT = 1 and count(/page/git-tasks/entry[@name=current()/@name]) > 0" />
+						<xsl:variable name="is-same-git-version" select="$USE_GIT = 1  and count(/page/git-tasks/entry[@name=current()/@name and @lastcommit=current()/@lastcommit]) != 0" />
+						<xsl:variable name="git-status">
+							<xsl:choose>
+								<xsl:when test="$is-same-git-version and @modified=0">uptodate</xsl:when>
+								<xsl:when test="$is-same-git-version and @modified=1">needpush</xsl:when>
+								<xsl:when test="@lastcommit!='' and not($is-same-git-version) and @modified=0">needpull</xsl:when>
+								<xsl:otherwise>conflict</xsl:otherwise>
+							</xsl:choose>
+						</xsl:variable>
+						<xsl:variable name="git-status-human">
+							<xsl:choose>
+								<xsl:when test="$git-status = 'uptodate'">Up-to-date with git version</xsl:when>
+								<xsl:when test="$git-status = 'needpush'">You have local modifications that can be pushed to git</xsl:when>
+								<xsl:when test="$git-status = 'needpull'">Git version is more recent, update local version to avoid conflicts</xsl:when>
+								<xsl:otherwise>Conflict with git version</xsl:otherwise>
+							</xsl:choose>
+						</xsl:variable>
+						
 						<tr class="evenOdd" data-id="{@id}">
 							<td>
 								<span>
-									<xsl:if test="$USE_GIT = 1">
-										<xsl:choose>
-											<xsl:when test="count(/page/git-tasks/entry[@name=current()/@name]) > 0 and
-											count(/page/git-tasks/entry[@lastcommit=current()/@lastcommit]) = 0">
-												<xsl:attribute name="class">gitNeedUpdate</xsl:attribute>
-												<xsl:attribute name="title">A newer version of this task exists</xsl:attribute>
-											</xsl:when>
-											<xsl:when test="@modified = 1">
-												<xsl:attribute name="class">gitModified</xsl:attribute>
-												<xsl:attribute name="title">This task as been modified</xsl:attribute>
-											</xsl:when>
-											<xsl:when test="count(/page/git-tasks/entry[@name=current()/@name]) = 0">
-												<xsl:attribute name="class">gitNew</xsl:attribute>
-												<xsl:attribute name="title">This task is not yet versionned</xsl:attribute>
-											</xsl:when>
-										</xsl:choose>
-									</xsl:if>
 									<xsl:value-of select="@name" />
+									<xsl:if test="$USE_GIT = 1">
+										<xsl:if test="$is-in-git">
+											<xsl:text>&#160;</xsl:text>
+											<span class="faicon fa-git git_{$git-status}" title="{$git-status-human}"></span>
+										</xsl:if>
+									</xsl:if>
 								</span>
 							</td>
 							<td>
@@ -75,24 +86,38 @@
 									<xsl:otherwise>localhost</xsl:otherwise>
 								</xsl:choose>
 							</td>
+							<xsl:if test="$USE_GIT = 1">
+								<td class="tdActions">
+									<xsl:if test="not($is-in-git) or $git-status='needpush' or $git-status='conflict'">
+										<span data-name="{@name}" class="faicon fa-upload git" title="Commit this task to Git">
+											<xsl:choose>
+												<xsl:when test="$is-in-git and $git-status='conflict'">
+													<xsl:attribute name="data-confirm">You are about to overwrite changes to the repository</xsl:attribute>
+													<xsl:attribute name="data-force">yes</xsl:attribute>
+												</xsl:when>
+												<xsl:otherwise>
+													<xsl:attribute name="data-force">no</xsl:attribute>
+												</xsl:otherwise>
+											</xsl:choose>
+										</span>
+										<xsl:text>&#160;</xsl:text>
+									</xsl:if>
+									<xsl:if test="$is-in-git and ($git-status='needpull' or $git-status='conflict')">
+										<span data-name="{@name}" class="faicon fa-download git" title="Load Git version">
+											<xsl:choose>
+												<xsl:when test="$is-in-git and $git-status='conflict'">
+													<xsl:attribute name="data-confirm">You are about to overwrite changes of your local copy</xsl:attribute>
+												</xsl:when>
+												<xsl:otherwise>
+													<xsl:attribute name="data-force">no</xsl:attribute>
+												</xsl:otherwise>
+											</xsl:choose>
+										</span>
+										<xsl:text>&#160;</xsl:text>
+									</xsl:if>
+								</td>
+							</xsl:if>
 							<td class="tdActions">
-								<xsl:if test="$USE_GIT = 1 and (@modified = 1 or @lastcommit = '')">
-									<xsl:choose>
-										<xsl:when test="count(/page/git-tasks/entry[@name=current()/@name]) > 0 and
-										(count(/page/git-tasks/entry[@lastcommit=current()/@lastcommit]) > 0 or @lastcommit = '')">
-											<img src="images/database_go.png" onclick="commit(this,'{@name}', 'task')" class="pointer" title="Save this workflow to Git"/>
-										</xsl:when>
-										<xsl:when test="count(/page/git-tasks/entry[@name=current()/@name]) = 0">
-											<img src="images/database_go.png" onclick="commit(this,'{@name}', 'task')" class="pointer" title="Save this workflow to Git"/>
-										</xsl:when>
-										<xsl:when test="count(/page/git-tasks/entry[@name=current()/@name]) > 0 and
-										count(/page/git-tasks/entry[@lastcommit=current()/@lastcommit]) = 0">
-											<img src="images/database_go2.png" onclick="confirm('You are about to overwrite changes to the repository');commit(this,'{@name}', 'task', 'yes')" class="pointer" title="Save this workflow to Git"/>
-											<img src="images/database_refresh.png" onclick="evqueueAPI(this, 'git', 'load_task', {{ 'name':'{@name}' }});location.reload();" class="pointer" title="Load this workflow from Git"/>
-										</xsl:when>
-									</xsl:choose>
-								</xsl:if>
-
 								<span class="faicon fa-edit" title="Edit task"></span>
 								<xsl:text>&#160;</xsl:text>
 								<span class="faicon fa-remove" title="Delete task" data-confirm="You are about to delete the selected task"></span>
@@ -101,23 +126,26 @@
 					</xsl:for-each>
 				</xsl:for-each>
 
-				<tr class="groupspace"><td></td></tr>
-				<tr class="group">
-					<td colspan="6">Git only</td>
-				</tr>
-				<xsl:for-each select="/page/git-tasks/entry">
-					<xsl:if test="count(/page/tasks/task[@name = current()/@name]) = 0">
-						<tr class="evenOdd">
-							<td colspan="5">
-								<xsl:value-of select="@name" />
-							</td>
-							<td class="tdActions" style="min-width: 80px;">
-								<img src="images/database_refresh.png" onclick="evqueueAPI(this, 'git', 'load_task', {{ 'name':'{@name}' }});location.reload();" class="pointer"/>
-								<img data-confirm="Delete task {@name}" src="images/delete.gif" onclick="evqueueAPI(this, 'git', 'remove_task', {{ 'name':'{@name}', 'commit_log':'{@name} removed' }});location.reload();" class="pointer" />
-							</td>
-						</tr>
-					</xsl:if>
-				</xsl:for-each>
+				<xsl:if test="$USE_GIT = 1">
+					<tr class="groupspace"><td></td></tr>
+					<tr class="group">
+						<td colspan="6">These workflows are in the git repository but are present locally</td>
+					</tr>
+					<xsl:for-each select="/page/git-tasks/entry">
+						<xsl:if test="count(/page/tasks/task[@name = current()/@name]) = 0">
+							<tr class="evenOdd">
+								<td colspan="5">
+									<xsl:value-of select="@name" />
+								</td>
+								<td class="tdActions" style="min-width: 80px;">
+									<span data-name="{@name}" class="faicon fa-download git" title="Import from Git"></span>
+									<xsl:text>&#160;</xsl:text>
+									<span class="faicon fa-remove git" title="Delete from git repository" data-name="{@name}" data-confirm="You are about to remove a task from the git repository"></span>
+								</td>
+							</tr>
+						</xsl:if>
+					</xsl:for-each>
+				</xsl:if>
 			</table>
 		</div>
 	</xsl:template>

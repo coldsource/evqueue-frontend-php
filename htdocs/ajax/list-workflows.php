@@ -28,10 +28,7 @@ $xsl->AddFragment(["workflows" => $xsl->Api("workflows", "list")]);
 
 // Get git only workflows
 if($_SESSION['git_enabled'])
-{
-	$xsl->Api("git", "pull");
 	$xsl->AddFragment(["git-workflows" => $xsl->Api("git", "list_workflows")]);
-}
 
 $xsl->DisplayXHTML('../xsl/ajax/list-workflows.xsl');
 ?>

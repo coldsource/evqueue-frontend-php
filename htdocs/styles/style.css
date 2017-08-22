@@ -274,7 +274,7 @@ div#login div.form {
 }
 
 .git_needpush {
-	color:greed;
+	color:green;
 }
 
 .git_conflict {

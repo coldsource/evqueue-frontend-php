@@ -24,6 +24,10 @@ require_once 'lib/XSLEngine.php';
 
 
 $xsl = new XSLEngine();
+
+// Get git only tasks
 $xsl->AddFragment(["tasks" => $xsl->Api("tasks", "list")]);
+	$xsl->AddFragment(["git-tasks" => $xsl->Api("git", "list_tasks")]);
+
 $xsl->DisplayXHTML('../xsl/ajax/list-tasks.xsl');
 ?>

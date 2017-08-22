@@ -56,6 +56,7 @@ function RefreshPage()
 		});
 		
 		$('.fa-remove:not(.git)').click(function() {
+			Wait();
 			evqueueAPI(this, 'workflow', 'delete', { 'id':$(this).parents('tr').data('id') }, [], function() {
 				Message('Workflow has been deleted');
 				RefreshPage();

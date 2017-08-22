@@ -25,15 +25,9 @@ require_once 'lib/XSLEngine.php';
 
 $xsl = new XSLEngine();
 
-if(isset($_POST['commit-name'])){
-	$xsl->Api('git','save_task',['name' => $_POST['commit-name'],'commit_log' => $_POST['commit-log'],'force' => $_POST['commit-force']]);
-}
-
 if($_SESSION['git_enabled'])
-{
 	$xsl->Api("git", "pull");
-	$xsl->AddFragment(["git-tasks" => $xsl->Api("git", "list_tasks")]);
-}
+
 $xsl->DisplayXHTML('xsl/task.xsl');
 
 ?>

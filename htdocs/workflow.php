@@ -85,29 +85,8 @@ if(isset($_FILES['workflow_zip_file']))
 	}
 }
 
-if(isset($_POST['commit-name'])){
-	$xsl->Api('git','save_workflow',['name' => $_POST['commit-name'],'commit_log' => $_POST['commit-log'],'force' => $_POST['commit-force']]);
-
-	if(isset($_POST['commit-tasks']) && $_POST['commit-tasks'] == true){
-		$xml = $xsl->Api('workflow','get',['id' => $_POST['commit-id']]);
-		$workflow_dom = new DOMDocument();
-		$workflow_dom->LoadXML($xml);
-		$workflow_xpath = new DOMXPath($workflow_dom);
-
-		$tasks = $workflow_xpath->query('//task');
-		foreach($tasks as $task)
-		{
-			try
-			{
-				$evqueue->Api('git','save_task',['name' => $task->getAttribute('name'),'commit_log' => $_POST['commit-log'],'force' => 'no']); //we use $evqueue in place of $xsl for handle the error manually
-			}
-			catch(Exception $e)
-			{
-				$xsl->AddError($task->getAttribute('name').' - '.$e->getMessage());
-			}
-		}
-	}
-}
+if($_SESSION['git_enabled'])
+	$xsl->Api("git", "pull");
 
 $xsl->DisplayXHTML('xsl/workflow.xsl');
 

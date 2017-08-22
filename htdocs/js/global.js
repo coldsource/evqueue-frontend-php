@@ -12,7 +12,10 @@ $(document).ready( function() {
 function evqueueAPI(element, group, action, attributes = [], parameters = [], cbk = false){
 	if ($(element).attr('data-confirm')) {
 		if(!confirm($(element).data('confirm')))
+		{
+			$('body').css("cursor", "default");
 			return;
+		}
 	}
 	
 	return $.ajax({

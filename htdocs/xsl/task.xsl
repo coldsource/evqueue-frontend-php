@@ -13,10 +13,6 @@
    <xsl:template name="content">
 		<div id="list-tasks"></div>
 		
-		<xsl:call-template name="git_commit_dialog">
-			<xsl:with-param name="group" value="task" />
-		</xsl:call-template>
-		
 		<xsl:call-template name="tpltask-editor" />
 	</xsl:template>
 
