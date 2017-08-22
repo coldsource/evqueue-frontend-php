@@ -264,3 +264,19 @@ div#login div.form {
 	display:inline-block;
 	margin-left:20px;
 }
+
+/* Git */
+.git_uptodate {
+}
+
+.git_needpull {
+	color:orange;
+}
+
+.git_needpush {
+	color:greed;
+}
+
+.git_conflict {
+	color:red;
+}
