@@ -42,14 +42,33 @@
 					</tr>
 
 					<xsl:for-each select="/page/workflows/workflow[@group = $groupName]">
+						<xsl:variable name="is-in-git" select="$USE_GIT = 1 and count(/page/git-workflows/entry[@name=current()/@name]) > 0" />
+						<xsl:variable name="is-same-git-version" select="$USE_GIT = 1  and count(/page/git-workflows/entry[@name=current()/@name and @lastcommit=current()/@lastcommit]) != 0" />
+						<xsl:variable name="git-status">
+							<xsl:choose>
+								<xsl:when test="$is-same-git-version and @modified=0">uptodate</xsl:when>
+								<xsl:when test="$is-same-git-version and @modified=1">needpush</xsl:when>
+								<xsl:when test="@lastcommit!='' and not($is-same-git-version) and @modified=0">needpull</xsl:when>
+								<xsl:otherwise>conflict</xsl:otherwise>
+							</xsl:choose>
+						</xsl:variable>
+						<xsl:variable name="git-status-human">
+							<xsl:choose>
+								<xsl:when test="$git-status = 'uptodate'">Up-to-date with git version</xsl:when>
+								<xsl:when test="$git-status = 'needpush'">You have local modifications that can be pushed to git</xsl:when>
+								<xsl:when test="$git-status = 'needpull'">Git version is more recent, update local version to avoid conflicts</xsl:when>
+								<xsl:otherwise>Conflict with git version</xsl:otherwise>
+							</xsl:choose>
+						</xsl:variable>
+						
 						<tr class="evenOdd" data-id = "{@id}">
 							<td>
 								<span>
 									<xsl:value-of select="@name" />
-									
 									<xsl:if test="$USE_GIT = 1">
-										<xsl:if test="count(/page/git-workflows/entry[@name=current()/@name])">
-											<xsl:text>&#160;</xsl:text><span class="faicon fa-git" title="This workflow is versioned"></span>
+										<xsl:if test="$is-in-git">
+											<xsl:text>&#160;</xsl:text>
+											<span class="faicon fa-git git_{$git-status}" title="{$git-status-human}"></span>
 										</xsl:if>
 									</xsl:if>
 								</span>
@@ -60,19 +79,32 @@
 							</td>
 							<xsl:if test="$USE_GIT = 1">
 								<td class="tdActions">
-									<xsl:if test="@modified = 1 or @lastcommit = ''">
-										<span class="faicon fa-upload" title="Commit this workflow to Git">
-											<xsl:if test="count(/page/git-workflows/entry[@name=current()/@name]) > 0 and count(/page/git-workflows/entry[@lastcommit=current()/@lastcommit]) = 0">
-												<xsl:attribute name="data-confirm">You are about to overwrite changes to the repository</xsl:attribute>
-												<xsl:attribute name="data-force">yes</xsl:attribute>
-											</xsl:if>
+									<xsl:if test="not($is-in-git) or $git-status='needpush' or $git-status='conflict'">
+										<span data-name="{@name}" class="faicon fa-upload git" title="Commit this workflow to Git">
+											<xsl:choose>
+												<xsl:when test="$is-in-git and $git-status='conflict'">
+													<xsl:attribute name="data-confirm">You are about to overwrite changes to the repository</xsl:attribute>
+													<xsl:attribute name="data-force">yes</xsl:attribute>
+												</xsl:when>
+												<xsl:otherwise>
+													<xsl:attribute name="data-force">no</xsl:attribute>
+												</xsl:otherwise>
+											</xsl:choose>
 										</span>
 										<xsl:text>&#160;</xsl:text>
-										
-										<xsl:if test="count(/page/git-workflows/entry[@name=current()/@name]) > 0 and count(/page/git-workflows/entry[@lastcommit=current()/@lastcommit]) = 0">
-											<span class="faicon fa-download" title="Load Git version (erase local modifications)"></span>
-											<xsl:text>&#160;</xsl:text>
-										</xsl:if>
+									</xsl:if>
+									<xsl:if test="$is-in-git and ($git-status='needpull' or $git-status='conflict')">
+										<span data-name="{@name}" class="faicon fa-download git" title="Load Git version">
+											<xsl:choose>
+												<xsl:when test="$is-in-git and $git-status='conflict'">
+													<xsl:attribute name="data-confirm">You are about to overwrite changes of your local copy</xsl:attribute>
+												</xsl:when>
+												<xsl:otherwise>
+													<xsl:attribute name="data-force">no</xsl:attribute>
+												</xsl:otherwise>
+											</xsl:choose>
+										</span>
+										<xsl:text>&#160;</xsl:text>
 									</xsl:if>
 								</td>
 							</xsl:if>
@@ -88,23 +120,26 @@
 				</xsl:for-each>
 
 
-				<tr class="groupspace"><td></td></tr>
-				<tr class="group">
-					<td colspan="5">Git only</td>
-				</tr>
-				<xsl:for-each select="/page/git-workflows/entry">
-					<xsl:if test="count(/page/workflows/workflow[@name = current()/@name]) = 0">
-						<tr class="evenOdd">
-							<td colspan="2">
-								<xsl:value-of select="@name" />
-							</td>
-							<td class="tdActions" style="min-width: 80px;">
-								<img src="images/database_refresh.png" onclick="evqueueAPI(this, 'git', 'load_workflow', {{ 'name':'{@name}' }});location.reload();" class="pointer"/>
-								<img data-confirm="Delete workflow {@name}" src="images/delete.gif" onclick="evqueueAPI(this, 'git', 'remove_workflow', {{ 'name':'{@name}', 'commit_log':'{@name} removed' }});location.reload();" class="pointer" />
-							</td>
-						</tr>
-					</xsl:if>
-				</xsl:for-each>
+				<xsl:if test="$USE_GIT = 1">
+					<tr class="groupspace"><td></td></tr>
+					<tr class="group">
+						<td colspan="4">These workflows are in the git repository but are present locally</td>
+					</tr>
+					<xsl:for-each select="/page/git-workflows/entry">
+						<xsl:if test="count(/page/workflows/workflow[@name = current()/@name]) = 0">
+							<tr class="evenOdd">
+								<td colspan="3">
+									<xsl:value-of select="@name" />
+								</td>
+								<td class="tdActions" style="min-width: 80px;">
+									<span data-name="{@name}" class="faicon fa-download git" title="Import from Git"></span>
+									<xsl:text>&#160;</xsl:text>
+									<span class="faicon fa-remove git" title="Delete from git repository" data-name="{@name}" data-confirm="You are about to remove a workflow from the git repository"></span>
+								</td>
+							</tr>
+						</xsl:if>
+					</xsl:for-each>
+				</xsl:if>
 			</table>
 		</div>
 	</xsl:template>
