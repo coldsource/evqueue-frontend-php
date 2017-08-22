@@ -145,7 +145,7 @@
 				<li><a href="{$SITE_BASE}workflow.php">Workflows</a></li>
 				<li><a href="{$SITE_BASE}list-workflow-schedules.php?display=settings">Scheduled workflows</a></li>
 				<li><a href="{$SITE_BASE}list-schedules.php">Retry Schedules</a></li>
-				<li><a href="{$SITE_BASE}list-queues.php">Queues</a></li>
+				<li><a href="{$SITE_BASE}queue.php">Queues</a></li>
 				<li><a href="{$SITE_BASE}list-users.php">Users</a></li>
 				<li><a href="{$SITE_BASE}system_configuration.php">Running configuration</a></li>
 			</ul>
