@@ -79,7 +79,7 @@ function evqueueSubmitFormAPI(el, group, id, message)
 	
 	Wait();
 	
-	evqueueAPI(false,group,action,values,[],function() {
+	return evqueueAPI(false,group,action,values,[],function() {
 		Message(message);
 	});
 }
@@ -113,4 +113,38 @@ function evqueuePrepareFormAPI(el, group, id)
 		
 		return new jQuery.Deferred().resolve();
 	}
+}
+
+function evqueueCreateFormHandler(event)
+{
+	options = event.data;
+	
+	options.form_div.find('.submit').text(options.title);
+	options.form_div.find('.submit').off('click').on('click',function() {
+		evqueueSubmitFormAPI(options.form_div,options.group,false,options.message).done(function() {
+		options.form_div.dialog('close');
+		RefreshPage();
+		});
+	});
+	
+	evqueuePrepareFormAPI($('#queue-editor'),options.group,false).done(function() {
+		$('#queue-editor').dialog({title:options.title,width:options.form_div.data('width'),height:options.form_div.data('height')});
+	});
+}
+
+function evqueueEditFormHandler(event)
+{
+	options = event.data;
+	
+	var id = $(this).parents('tr').data('id');
+	options.form_div.find('.submit').text(options.title);
+	options.form_div.find('.submit').off('click').on('click',function() {
+		evqueueSubmitFormAPI(options.form_div,options.group,id,options.message);
+		options.form_div.dialog('close');
+		RefreshPage();
+	});
+	
+	evqueuePrepareFormAPI(options.form_div,options.group,id).done(function() {
+		options.form_div.dialog({title:options.title,width:options.form_div.data('width'),height:options.form_div.data('height')});
+	});
 }

@@ -15,7 +15,7 @@
 	</xsl:template>
 	
 	<xsl:template name="queue-editor">
-		<div id="queue-editor" class="dialog formdiv">
+		<div id="queue-editor" class="dialog formdiv" data-width="900" data-height="300">
 			<h2>
 				Queue properties
 				<span class="help faicon fa-question-circle" title="Queues are used to limit tasks parallelism. Queues are global amongst jobs and workflows.&#10;&#10;Concurrency defines the maximum number of tasks in this queue that can be executed simultaneously. Other tasks will be queued and executed when other tasks are terminated.&#10;&#10;Scheduler defines how the queue behaves. Fifo scheduler guarantees that tasks are executed in the same order they are placed in the queue. Prio scheduler will first execute tasks of older workflows, even if they are added later in the queue.&#10;&#10;Dynamic queues are used for remote execution. A dynamic queue will be created for each different host, and then destructed when it is no longer needed. So the concurrency is intended per host."></span>
