@@ -15,7 +15,7 @@
   * You should have received a copy of the GNU General Public License
   * along with evQueue. If not, see <http://www.gnu.org/licenses/>.
   * 
-  * Authors: Nicolas Jean, Christophe Marti 
+  * Author: Thibault KUMMER
   */
 
 require_once 'inc/auth_check.php';
@@ -24,7 +24,7 @@ require_once 'lib/XSLEngine.php';
 
 
 $xsl = new XSLEngine();
-$xsl->AddFragment(['response-queues' => $xsl->Api('queuepool', 'list')]);
-$xsl->DisplayXHTML('xsl/list_queues.xsl');
 
+$xsl->AddFragment(['queues' => $xsl->Api('queuepool', 'list')]);
+$xsl->DisplayXHTML('../xsl/ajax/list-queues.xsl');
 ?>

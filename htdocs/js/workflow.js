@@ -12,7 +12,7 @@ function RefreshPage()
 		Ready();
 		
 		$('.fa-file-o').click(function() {
-			document.location="manage-workflow.php?workflow_id=-1";
+			document.location="workflow-ui.php?workflow_id=-1";
 		});
 		
 		$('.fa-file-archive-o').click(function() {
@@ -52,7 +52,7 @@ function RefreshPage()
 		});
 		
 		$('.fa-edit').click(function() {
-			document.location="manage-workflow.php?workflow_id="+$(this).parents('tr').data('id');
+			document.location="workflow-ui.php?workflow_id="+$(this).parents('tr').data('id');
 		});
 		
 		$('.fa-remove:not(.git)').click(function() {

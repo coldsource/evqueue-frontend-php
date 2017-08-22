@@ -194,6 +194,10 @@ table th, td {
 	padding: 2px 3px;
 }
 
+th.thActions {
+	width:80px;
+}
+
 table.highlight_row tr:hover {
 	border-left: 3px solid #647FE0;
 	border-right: 3px solid #647FE0;
