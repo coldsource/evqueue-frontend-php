@@ -28,6 +28,40 @@ $(document).on('keyup click', '.filenameInput' , function(){
 	}
 })
 
+$(document).ready( function() {
+	$('.evq-autocomplete').each(function() {
+		var el = $(this);
+		
+		if(el.data('type')=='taskgroup')
+		{
+			evqueueAPI(false,'tasks','list',{}, [],function(xml) {
+				data = new Set();
+				$(xml).find('task').each(function() {
+					if($(this).attr('group')!='')
+						data.add($(this).attr('group'));
+				});
+				el.data('autocomplete',Array.from(data));
+			});
+		}
+		else if(el.data('type')=='workflowgroup')
+		{
+			evqueueAPI(false,'workflows','list',{}, [],function(xml) {
+				data = new Set();
+				$(xml).find('workflow').each(function() {
+					if($(this).attr('group')!='')
+						data.add($(this).attr('group'));
+				});
+				el.data('autocomplete',Array.from(data));
+			});
+		}
+		
+		el.on('focus',function() {
+			el.off('focus');
+			el.autocomplete({source: $(this).data('autocomplete'),minLength:0});
+		});
+	});
+});
+
 function evqueueSubmitFormAPI(el, group, id, message)
 {
 	var action = id?'edit':'create';

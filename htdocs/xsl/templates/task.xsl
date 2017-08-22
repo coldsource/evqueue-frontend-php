@@ -29,7 +29,7 @@
 					</div>
 					<div>
 						<label>Task group</label>
-						<input type="text" name="group" />
+						<input type="text" name="group" class="evq-autocomplete" data-type="taskgroup" />
 					</div>
 					<div>
 						<label>Task comment</label>

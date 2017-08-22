@@ -114,7 +114,7 @@ class XSLEngine
 		$this->SetParameter('NOW', date('Y-m-d H:i:s'));
 		$this->SetParameter('PROFILE', isset($_SESSION['user_profile']) ? $_SESSION['user_profile']:'');
 		$this->SetParameter('LOGIN', isset($_SESSION['user_login']) ? $_SESSION['user_login']:'');
-		$this->SetParameter('USE_GIT', $_SESSION['git_enabled']);
+		$this->SetParameter('USE_GIT', isset($_SESSION['git_enabled'])?$_SESSION['git_enabled']:'');
 
 		$this->display_xml = isset($_GET['display_xml']);
 	}

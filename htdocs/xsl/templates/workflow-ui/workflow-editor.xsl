@@ -20,7 +20,7 @@
 					</div>
 					<div>
 						<label class="formLabel" for="wfgroup">Group</label>
-						<input id="wfgroup" />
+						<input id="wfgroup" class="evq-autocomplete" data-type="workflowgroup" />
 					</div>
 					<div>
 						<label class="formLabel" for="wfcomment">Comment</label>
