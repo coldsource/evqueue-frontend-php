@@ -99,6 +99,9 @@ TaskEditor.prototype.Open = function(id)
 			me.SaveAttribute('queue',queue,$("#task-editor select#queue").val());
 			me.SaveAttribute('retry_schedule',retry_schedule,$("#task-editor select#retryschedule").val());
 			me.SaveAttribute('retry_retval',retry_retval,$("#task-editor select#retryretval").val());
+			me.SaveAttribute('user',queue,$("#task-editor input#user").val());
+			me.SaveAttribute('host',queue,$("#task-editor input#host").val());
+			me.SaveAttribute('queue_host',queue,$("#task-editor input#queue_host").val());
 			me.SaveAttribute('stdinmode',stdin_mode,$("#task-editor select#stdinmode").val());
 			
 			wf.Draw();

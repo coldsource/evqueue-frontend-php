@@ -11,18 +11,19 @@ function RefreshPage()
 		
 		Ready();
 		
-		$('.fa-file-o').click(function() {
-			$('#tpltask-editor .submit').text('Create task');
-			$('#tpltask-editor .submit').off('click').on('click',function() {
-				evqueueSubmitFormAPI($('#tpltask-editor'),'task',false,'Task created');
-				$('#tpltask-editor').dialog('close');
-				RefreshPage();
-			});
-			
-			evqueuePrepareFormAPI($('#tpltask-editor'),'task',false).done(function() {
-				$('#tpltask-editor').dialog({title:'Create task',width:900,height:400});
-			});
-		});
+		$('.fa-file-o').click({
+			form_div:$('#tpltask-editor'),
+			group:'task',
+			title:'Create task',
+			message:'Task created'
+		}, evqueueCreateFormHandler);
+		
+		$('.fa-edit').click({
+			form_div:$('#tpltask-editor'),
+			group:'task',
+			title:'Edit task',
+			message:'Task saved'
+		}, evqueueEditFormHandler);
 		
 		$('.git.fa-upload').click(function() {
 			var log = prompt("Enter your commit log");
@@ -53,20 +54,6 @@ function RefreshPage()
 			evqueueAPI($(this),'git','remove_task',{name:$(this).data('name'),commit_log:log},[],function() {
 				Message('Removed task from git');
 				RefreshPage();
-			});
-		});
-		
-		$('.fa-edit').click(function() {
-			var id = $(this).parents('tr').data('id');
-			$('#tpltask-editor .submit').text('Save task');
-			$('#tpltask-editor .submit').off('click').on('click',function() {
-				evqueueSubmitFormAPI($('#tpltask-editor'),'task',id,'Task saved');
-				$('#tpltask-editor').dialog('close');
-				RefreshPage();
-			});
-			
-			evqueuePrepareFormAPI($('#tpltask-editor'),'task',id).done(function() {
-				$('#tpltask-editor').dialog({title:'Edit task',width:900,height:400});
 			});
 		});
 		

@@ -6,9 +6,7 @@ $(document).ready(function() {
 	}
 	else
 	{
-		$('html').css('height','100%');
-		$('body').css('height','100%');
-		$('body').css("cursor", "wait");
+		Wait();
 		
 		evqueueAPI(false,'workflow','get',{'id':workflow_id},[],function(xml) {
 			var name = xml.documentElement.firstChild.getAttribute('name');
@@ -22,8 +20,7 @@ $(document).ready(function() {
 			wf.SetAttribute('group',group);
 			wf.SetAttribute('comment',comment);
 			
-			$('html').css('height','auto');
-			$('body').css('height','auto');
+			Ready()
 			
 			wf.Draw();
 		});
