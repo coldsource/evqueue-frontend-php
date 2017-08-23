@@ -127,8 +127,8 @@ function evqueueCreateFormHandler(event)
 		});
 	});
 	
-	evqueuePrepareFormAPI($('#queue-editor'),options.group,false).done(function() {
-		$('#queue-editor').dialog({title:options.title,width:options.form_div.data('width'),height:options.form_div.data('height')});
+	evqueuePrepareFormAPI(options.form_div,options.group,false).done(function() {
+		options.form_div.dialog({title:options.title,width:options.form_div.data('width'),height:options.form_div.data('height')});
 	});
 }
 
