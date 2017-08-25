@@ -2,9 +2,6 @@
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:exsl="http://exslt.org/common" xmlns:php="http://php.net/xsl" version="1.0">
 	<xsl:import href="datetime.xsl" />
 	<xsl:import href="xmlhighlight.xsl" />
-	<xsl:import href="list_queues.xsl" />
-	<xsl:import href="list_schedules.xsl" />
-	<!-- <xsl:import href="list_tasks.xsl" /> -->
 
 	<xsl:template match="workflow">
 		<tr>
