@@ -36,6 +36,14 @@ a, a:visited {
 	display:none;
 }
 
+.center {
+	text-align:center;
+}
+
+.hidden {
+	display:none;
+}
+
 div.error {
 	color:red;
 	font-weight:bold;
@@ -159,8 +167,8 @@ div.formdiv label {
 	margin-right:1em;
 }
 
-div.formdiv input {
-	min-width:20em;
+div.formdiv input:not(.select2-search__field) {
+	min-width:22em;
 }
 
 div.formdiv input[type='submit'] {
@@ -176,16 +184,16 @@ div.formdiv input[type='checkbox'] {
 }
 
 div.formdiv select {
-	min-width:20em;
-}
-
-div.formdiv select.custom-schedule-select{
-	min-width: unset;
+	width:25em;
 }
 
 div.formdiv form > div {
 	margin-top: 10px;
 	margin-bottom:10px;
+}
+
+div#wfs-editor fieldset {
+	border-radius:5px;
 }
 
 .submit {
@@ -234,6 +242,23 @@ td.tdActions {
 }
 
 /* Boxes */
+ul.scheduleParameters {
+	display:inline-block;
+	float:right;
+	margin:0px;
+}
+
+ul.scheduleParameters li {
+	display:inline-block;
+	list-style-type: none;
+	border:1px solid;
+	margin-left:3px;
+	margin-right:3px;
+	padding-left:3px;
+	padding-right:3px;
+	border-radius:5px;
+}
+
 div.boxTitle {
 	background-color: #DEE0E3;
 	border-top-left-radius: 10px;
