@@ -1,51 +1,50 @@
 
-$(document).ready( function() {
+$(document).delegate( 'img.relaunch', 'click', function() {
+	var id = $(this).data("wfiid");
+	var node_name = $(this).data("node-name");
 	
-	$(document).delegate( 'img.relaunch', 'click', function() {
-		var id = $(this).data("wfiid");
-		var node_name = $(this).data("node-name");
-		
-		$("#relaunch_"+id).dialog({
-			minHeight: 300, 
-			minWidth: 650, 
-			modal: true, 
-			title: "Relaunch workflow"
-		});
-		$('div.makeMeTabz:visible').tabs().removeClass('makeMeTabz');
+	$("#relaunch_"+id).dialog({
+		minHeight: 300, 
+		minWidth: 650, 
+		modal: true, 
+		title: "Relaunch workflow"
 	});
-	
-	// LAUNCH WORKFLOW
-	$('select#launchWF').change( function () {
-		launchWF($(this).val());
-	});
-	$('select#launchWF option').click( function () {
-		if($(this).val() == $(this).closest("select").val())
-			launchWF($(this).val());
-	});
-	
-	$('#searchByWorkflow #searchByWorkflowSelect').change(function(){
-		window.location.href = 'index.php?wf_name='+$(this).val();
-	});
-	
-	$(document).delegate('form[id*=launchForm_]', 'submit', function(event) {
-		event.preventDefault();
-		$(this).parents('[id*=launch_]').dialog('close');  // close the dialog box so that the user does not click twice on submit
-		
-		var wfparams = {};
-		$(this).find('.paramsTab :input').not('').each( function (i,input) {
-			wfparams[$(input).attr('name')] = $(input).val();
-		});
-		
-		var attr = {
-			name: $(this).find('input[name=id]').val(),
-			user: $(this).find('.hostTab input[name=user]').val(),
-			host: $(this).find('.hostTab input[name=host]').val()
-		};
-		
-		evqueueAPI(this, "instance", "launch", attr, wfparams, $(this).find('.nodeTab select').val());	
-		refreshWorkflows("executing");
-	});
+	$('div.makeMeTabz:visible').tabs().removeClass('makeMeTabz');
 });
+
+// LAUNCH WORKFLOW
+$(document).delegate('select#launchWF', 'change', function () {
+	launchWF($(this).val());
+});
+
+$(document).delegate('select#launchWF option', 'click', function () {
+	if($(this).val() == $(this).closest("select").val())
+		launchWF($(this).val());
+});
+
+$(document).delegate('#searchByWorkflow #searchByWorkflowSelect', 'change', function(){
+	window.location.href = 'index.php?wf_name='+$(this).val();
+});
+
+$(document).delegate('form[id*=launchForm_]', 'submit', function(event) {
+	event.preventDefault();
+	$(this).parents('[id*=launch_]').dialog('close');  // close the dialog box so that the user does not click twice on submit
+	
+	var wfparams = {};
+	$(this).find('.paramsTab :input').not('').each( function (i,input) {
+		wfparams[$(input).attr('name')] = $(input).val();
+	});
+	
+	var attr = {
+		name: $(this).find('input[name=id]').val(),
+		user: $(this).find('.hostTab input[name=user]').val(),
+		host: $(this).find('.hostTab input[name=host]').val()
+	};
+	
+	evqueueAPI(this, "instance", "launch", attr, wfparams, $(this).find('.nodeTab select').val());	
+	refreshWorkflows("executing");
+});
+
 
 $(document).ready( function () {
 	get.p = typeof(get.p) != 'undefined' ? get.p : 1;

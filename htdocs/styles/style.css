@@ -22,8 +22,17 @@ a, a:visited {
 	font-family:FontAwesome;
 	cursor:pointer;
 }
+.action {
+	cursor: pointer;
+}
+.faicon, .fa-spinner {
+	margin: 0 5px;
+}
+.fa-check { color: #27ae60 }
+.fa-exclamation, .fa-exclamation-circle { color: #c0392b; }
 
-.dialog {
+
+.hidden, .dialog {
 	display:none;
 }
 
@@ -32,6 +41,8 @@ div.error {
 	font-weight:bold;
 	margin:5px;
 }
+
+
 
 /* XML Formatter */
 span.xml_tagname {
@@ -136,7 +147,7 @@ div#footer {
   margin-top: 10px;
   margin-bottom: 10px; }
 
-  /* Global styles for forms */
+/* Global styles for forms */
 div.formdiv form {
 	display:block;
 }
@@ -222,7 +233,7 @@ td.tdActions {
 	text-align:center;
 }
 
-  /* Boxes */
+/* Boxes */
 div.boxTitle {
 	background-color: #DEE0E3;
 	border-top-left-radius: 10px;

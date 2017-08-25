@@ -6,6 +6,10 @@
 	<xsl:variable name="topmenu" select="'system-state'" />
 	<xsl:variable name="title" select="'Board'" />
 	
+	<xsl:variable name="css">
+		<src>styles/workflow-instance.css</src>
+	</xsl:variable>
+	
 	<xsl:variable name="javascript">
 		<src>js/index.js</src>
 		<src>js/workflow-instance.js</src>

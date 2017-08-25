@@ -1,0 +1,75 @@
+
+
+/***** Workflow instances (home page) *****/
+
+.job {
+	position: relative;
+	padding-left: 2em;
+	padding-bottom: 0.5em;
+}
+
+.skipped {
+	color: #95a5a6;
+}
+
+.taskState {
+	width: 1.5em;
+	display: inline-block;
+	text-align: center;
+}
+
+/* minus-plus icon to fold/unfold subjobs */
+.tasks {
+	position: relative;
+}
+.foldSubjobs {
+	position: absolute;
+	left: -0.3em;
+	bottom: -1em;
+	z-index: 50;
+}
+.foldSubjobs.fa-minus-square-o {
+	display: none;
+}
+.job:hover > .tasks .foldSubjobs {
+	display: inline-block;
+}
+
+
+
+/***** Draw lines to display a workflow's hierarchy of jobs & tasks *****/
+
+/* vertical line that goes down to a job's subjobs */
+.job:not(:last-child):before {
+	position: absolute;
+	content: "";
+	width: 1px;
+	height: 100%;
+	left: 0;
+	background-color: black;
+}
+.tasks {
+	border-left: 1px solid black;
+	padding-left: 0.5em;
+}
+
+/* horizontal line that goes from the job line to its tasks list */
+.tasks:after {
+	position: absolute;
+	content: "";
+	height: 1px;
+	width: 2em;
+	top: 50%;
+	left: -2em;
+	background-color: black;
+}
+
+/* vertical line that goes from parent, half way down its tasks */
+.tasks:before {
+	position: absolute;
+	content: "";
+	width: 1px;
+	height: 50%;
+	left: calc(-2em - 1px);
+	background-color: black;
+}
