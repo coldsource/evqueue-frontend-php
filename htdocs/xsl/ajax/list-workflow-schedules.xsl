@@ -1,30 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
-	<xsl:import href="templates/main-template.xsl" />
-	<xsl:import href="templates/datetime.xsl" />
+	<xsl:import href="../templates/datetime.xsl" />
 	
 	<xsl:key name="groups" match="/page/workflows/workflow/@group" use="." />
 	
-	<xsl:variable name="topmenu">
-		<xsl:if test="$DISPLAY='state'">system-state</xsl:if>
-		<xsl:if test="$DISPLAY='settings'">settings</xsl:if>
-	</xsl:variable>
+	<xsl:variable name="DISPLAY">settings</xsl:variable>
 	
-	<xsl:variable name="javascript">
-	</xsl:variable>
-	
-	<xsl:template name="content">
+	<xsl:template match="/">
 		<div class="contentList">
 			<div class="boxTitle">
 				<span class="title">Planned workflows</span>
-				<xsl:if test="$DISPLAY = 'settings'">
-					<a href="plan-workflow.php"><img class="action" src="images/plus3.png" title="Schedule a new workflow" /></a>
-				</xsl:if>
+				<span class="faicon fa-file-o action" title="Plan a new workflow"></span>
 			</div>
 			<table>
 				<tbody>
 					<tr>
-						<th style="width:50px;">ID</th>
 						<th>Workflow</th>
 						<xsl:if test="$DISPLAY = 'settings'">
 							<th>On failure</th>
@@ -71,10 +61,7 @@
 						
 						<xsl:for-each select="/page/schedules/workflow_schedule">
 							<xsl:if test="/page/workflows/workflow[@id = current()/@workflow_id]/@group = $groupName">
-								<tr class="evenOdd">
-									<td class="center">
-										<xsl:value-of select="@id" />
-									</td>
+								<tr class="evenOdd" data-id="{@id}">
 									<td>
 										<xsl:value-of select="/page/workflows/workflow[@id = current()/@workflow_id]/@name" />
 										<xsl:if test="@comment != ''">
@@ -132,23 +119,24 @@
 										</xsl:call-template>
 									</td>
 									<xsl:if test="$DISPLAY = 'settings'">
-										<td class="center">
+										<td class="tdActions">
 											<xsl:choose>
-												<xsl:when test="@active = 1"><img src="images/ok.png" /></xsl:when>
-												<xsl:otherwise test="@active = 1"><img src="images/locked.png" /></xsl:otherwise>
+												<xsl:when test="@active = 1"><span class="faicon fa-check" title="Disable this schedule"></span></xsl:when>
+												<xsl:otherwise test="@active = 1"><span class="faicon fa-lock" title="Enable this schedule"></span></xsl:otherwise>
 												<xsl:otherwise>-</xsl:otherwise>
 											</xsl:choose>
 										</td>
 									</xsl:if>
-									<td class="center">
-										<a href="index.php?workflow_schedule_id={@id}" title="See workflows launched by this schedule" style="text-decoration: none;">
-											<img src="images/eye.png" />
-										</a>
+									<td class="tdActions">
+										<xsl:if test="$DISPLAY = 'state'">
+											<a href="index.php?workflow_schedule_id={@id}" title="See workflows launched by this schedule" style="text-decoration: none;">
+												<img src="images/eye.png" />
+											</a>
+										</xsl:if>
 										<xsl:if test="$DISPLAY = 'settings'">
+											<span class="faicon fa-edit" title="Edit schedule"></span>
 											<xsl:text>&#160;</xsl:text>
-											<a href="plan-workflow.php?id={@id}" style="text-decoration: none;"><img src="images/edit.gif" /></a>
-											<xsl:text>&#160;</xsl:text>
-											<img data-confirm="Really delete (and deactivate) workflow schedule '{@id}'?" onclick="evqueueAPI(this, 'workflow_schedule', 'delete', {{ 'id':'{@id}' }});location.reload();" src="images/delete.gif" class="pointer" />
+											<span class="faicon fa-remove" title="Delete schedule" data-confirm="You are about to delete the selected schedule"></span>
 										</xsl:if>
 									</td>
 								</tr>

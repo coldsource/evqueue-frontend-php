@@ -21,6 +21,7 @@
 
 				<!-- Load base CSS -->
 				<link rel="stylesheet" type="text/css" href="{$SITE_BASE}styles/jquery/jquery-ui.min.css"/>
+				<link rel="stylesheet" type="text/css" href="{$SITE_BASE}styles/jquery/select2.min.css"/>
 				<link rel="stylesheet" type="text/css" href="{$SITE_BASE}styles/font-awesome.css"/>
 				<link rel="stylesheet" type="text/css" href="{$SITE_BASE}styles/style.css"/>
 				
@@ -38,6 +39,7 @@
 				<!-- Load base javascript -->
 				<script type="text/javascript" src="{$SITE_BASE}js/jquery/jquery-1.12.4.min.js" />
 				<script type="text/javascript" src="{$SITE_BASE}js/jquery/jquery-ui.min.js" />
+				<script type="text/javascript" src="{$SITE_BASE}js/jquery/select2.full.min.js" />
 				
 				<script type="text/javascript" src="{$SITE_BASE}js/forms.js" />
 				<script type="text/javascript" src="{$SITE_BASE}js/progressbar.js" />
@@ -134,7 +136,7 @@
 		<ul class="submenu" id="submenu-system-state">
 			<xsl:if test="$topmenu!='system-state'"><xsl:attribute name="style">display:none;</xsl:attribute></xsl:if>
 			<li><a href="{$SITE_BASE}index.php">Workflows instances</a></li>
-			<li><a href="{$SITE_BASE}list-workflow-schedules.php?display=state">Scheduled workflows</a></li>
+			<li><a href="{$SITE_BASE}workflow-schedules.php?display=state">Scheduled workflows</a></li>
 			<li><a href="{$SITE_BASE}system_state.php">Queues</a></li>
 			<li><a href="{$SITE_BASE}system_statistics.php">Statistics</a></li>
 		</ul>
@@ -143,7 +145,7 @@
 				<xsl:if test="$topmenu!='settings'"><xsl:attribute name="style">display:none;</xsl:attribute></xsl:if>
 				<li><a href="{$SITE_BASE}task.php">Tasks</a></li>
 				<li><a href="{$SITE_BASE}workflow.php">Workflows</a></li>
-				<li><a href="{$SITE_BASE}list-workflow-schedules.php?display=settings">Scheduled workflows</a></li>
+				<li><a href="{$SITE_BASE}workflow-schedules.php?display=settings">Scheduled workflows</a></li>
 				<li><a href="{$SITE_BASE}list-schedules.php">Retry Schedules</a></li>
 				<li><a href="{$SITE_BASE}queue.php">Queues</a></li>
 				<li><a href="{$SITE_BASE}list-users.php">Users</a></li>

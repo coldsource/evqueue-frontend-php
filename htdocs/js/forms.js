@@ -60,6 +60,53 @@ $(document).ready( function() {
 			el.autocomplete({source: $(this).data('autocomplete'),minLength:0});
 		});
 	});
+	
+	$('.evq-autofill').each(function() {
+		var el = $(this);
+		
+		if(el.data('type')=='workflows')
+		{
+			el.append($('<option>'));
+			var valuetype = el.data('valuetype');
+			var groups = [];
+			var workflows = new Object();
+			evqueueAPI(false,'workflows','list',{}, [],function(xml) {
+				$(xml).find('workflow').each(function() {
+					var group = $(this).attr('group')!=''?$(this).attr('group'):'No group';
+					
+					if(!(group in workflows))
+					{
+						groups.push(group);
+						workflows[group] = [];
+					}
+					
+					workflows[group].push({value:valuetype=='id'?$(this).attr('id'):$(this).attr('name'),name:$(this).attr('name')});
+				});
+				
+				groups.sort(function (a, b) {
+					return a.toLowerCase().localeCompare(b.toLowerCase());
+				});
+				
+				for(var i=0;i<groups.length;i++)
+				{
+					var optgroup = $('<optgroup>', {label: groups[i]});
+					el.append(optgroup);
+					for(var j=0;j<workflows[groups[i]].length;j++)
+						optgroup.append($('<option>', {value: workflows[groups[i]][j].value,text:workflows[groups[i]][j].name}));
+				}
+			});
+			
+			el.select2();
+		}
+		else if(el.data('type')=='node')
+		{
+			$.getJSON('ajax/get-nodes.php',function(data) {
+				for(var node in data)
+					el.append($('<option>',{value:node,text:node}));
+			});
+		}
+		
+	});
 });
 
 function evqueueSubmitFormAPI(el, group, id, message)
@@ -67,20 +114,28 @@ function evqueueSubmitFormAPI(el, group, id, message)
 	var action = id?'edit':'create';
 	
 	var values = new Object();
+	var parameters = new Object();
 	if(id)
 		values['id'] = id;
 	
-	el.find('form :input').each(function() {
-		if($(this).attr('type')=='checkbox')
-			values[$(this).attr('name')] = $(this).prop('checked')?'yes':'no';
-		else
-			values[$(this).attr('name')] = $(this).val();
+	el.find('form :input:not(.select2-search__field)').each(function() {
+		if(!$(this).hasClass('nosubmit') && !$(this).parents('form').hasClass('nosubmit'))
+		{
+			if($(this).attr('name').substr(0,10)=='parameter_')
+				parameters[$(this).attr('name').substr(10)] = $(this).val();
+			else if($(this).attr('type')=='checkbox')
+				values[$(this).attr('name')] = $(this).prop('checked')?'yes':'no';
+			else
+				values[$(this).attr('name')] = $(this).val();
+		}
 	});
 	
 	Wait();
 	
-	return evqueueAPI(false,group,action,values,[],function() {
+	return evqueueAPI(false,group,action,values,parameters).done(function() {
 		Message(message);
+	}).always(function() {
+		Ready();
 	});
 }
 
@@ -122,8 +177,8 @@ function evqueueCreateFormHandler(event)
 	options.form_div.find('.submit').text(options.title);
 	options.form_div.find('.submit').off('click').on('click',function() {
 		evqueueSubmitFormAPI(options.form_div,options.group,false,options.message).done(function() {
-		options.form_div.dialog('close');
-		RefreshPage();
+			options.form_div.dialog('close');
+			RefreshPage();
 		});
 	});
 	
@@ -139,9 +194,10 @@ function evqueueEditFormHandler(event)
 	var id = $(this).parents('tr').data('id');
 	options.form_div.find('.submit').text(options.title);
 	options.form_div.find('.submit').off('click').on('click',function() {
-		evqueueSubmitFormAPI(options.form_div,options.group,id,options.message);
-		options.form_div.dialog('close');
-		RefreshPage();
+		evqueueSubmitFormAPI(options.form_div,options.group,id,options.message).done(function() {
+			options.form_div.dialog('close');
+			RefreshPage();
+		});
 	});
 	
 	evqueuePrepareFormAPI(options.form_div,options.group,id).done(function() {

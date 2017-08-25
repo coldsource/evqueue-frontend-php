@@ -15,40 +15,19 @@
   * You should have received a copy of the GNU General Public License
   * along with evQueue. If not, see <http://www.gnu.org/licenses/>.
   * 
-  * Authors: Nicolas Jean, Christophe Marti 
+  * Author: Thibault KUMMER
   */
 
 require_once 'inc/auth_check.php';
 require_once 'inc/logger.php';
 require_once 'lib/XSLEngine.php';
 
+
 $xsl = new XSLEngine();
-	
-$xml = $xsl->Api('workflow_schedules', 'list', ['display_parameters' => 'yes']);
 
-$dom = new DOMDocument();
-$dom->loadXML($xml);
-$xpath = new DOMXpath($dom);
-
-
-if(isset($_GET['display']) && $_GET['display'] == 'state'){
-	$xsl->SetParameter('DISPLAY', 'state');
-	$schedules = $xpath->evaluate('/response/workflow_schedule[@active = 0]');
-	foreach($schedules as $schedule){
-		$schedule->parentNode->removeChild($schedule);
-	}
-}
-else
-	$xsl->SetParameter('DISPLAY', 'settings');
-
-$xsl->AddFragment(['schedules' => $dom]);
-$schedules = $xpath->evaluate('/response/workflow_schedule/@id');
-foreach($schedules as $schedule){
-	$xsl->AddFragment(["workflow-schedules-instance" => $xsl->Api("instances", "list", ['filter_schedule_id' => $schedule->nodeValue, 'limit' => 1])]);
-}
+$xsl->AddFragment(["schedules" => $xsl->Api('workflow_schedules', 'list', ['display_parameters' => 'yes'])]);
 $xsl->AddFragment(["workflows" => $xsl->Api("workflows", "list")]);
 $xsl->AddFragment(["status" => $xsl->ClusterApi("status", "query", ['type' => 'scheduler'])]);
 
-$xsl->DisplayXHTML('xsl/list_workflow_schedules.xsl');
-
+$xsl->DisplayXHTML('../xsl/ajax/list-workflow-schedules.xsl');
 ?>
