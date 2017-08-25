@@ -18,11 +18,7 @@
 					<form method="post">
 						<xsl:for-each select="/page/errors/error">
 							<div class="error">
-								<xsl:choose>
-									<xsl:when test="/page/error = 'wrong-creds'">Authentication failed</xsl:when>
-									<xsl:when test="/page/error = 'evqueue-ko'">Unable to connect to evQueue : <xsl:value-of select="/page/error/@msg" /></xsl:when>
-									<xsl:otherwise>Unexpected error trying to authenticate</xsl:otherwise>
-								</xsl:choose>
+								<xsl:value-of select="." />
 							</div>
 						</xsl:for-each>
 					
