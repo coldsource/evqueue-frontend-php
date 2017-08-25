@@ -42,7 +42,12 @@ $(document).ready( function() {
 		}
 	});
 	
-	$('.custom-schedule-select').change(calculateSchedule);
+	$('#when_custom .custom-schedule-select').change(calculateSchedule);
+	
+	$('#when_daily input[name=time]').on('autocompletechange',function() {
+		console.log("adjust");
+		$('#when_daily input[name=schedule]').val(";"+$(this).val().substr(3,2)+";"+$(this).val().substr(0,2)+";;;");
+	});
 });
 
 function RefreshPage()

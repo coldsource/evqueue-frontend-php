@@ -54,10 +54,18 @@ $(document).ready( function() {
 				el.data('autocomplete',Array.from(data));
 			});
 		}
+		else if(el.data('type')=='time')
+		{
+			data = [];
+			for(var i=0;i<24;i++)
+				for(var j=0;j<60;j+=30)
+					data.push(('00'+i).slice(-2)+':'+('00'+j).slice(-2));
+				el.data('autocomplete',data);
+		}
 		
 		el.on('focus',function() {
-			el.off('focus');
 			el.autocomplete({source: $(this).data('autocomplete'),minLength:0});
+			el.autocomplete('search');
 		});
 	});
 	

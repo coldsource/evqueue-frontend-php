@@ -77,9 +77,11 @@
 					</legend>
 					<div class="formdiv" id="when_daily">
 						<form>
+							<input type='hidden' name='schedule' />
+							
 							<div>
 								<label>Every day at</label>
-								<input name="time" />
+								<input name="time" class="evq-autocomplete nosubmit" data-type="time" />
 							</div>
 						</form>
 					</div>
