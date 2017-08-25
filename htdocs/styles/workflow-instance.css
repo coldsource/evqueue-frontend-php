@@ -35,6 +35,10 @@
 	display: inline-block;
 }
 
+.taskName {
+	cursor: pointer;
+}
+
 
 
 /***** Draw lines to display a workflow's hierarchy of jobs & tasks *****/
