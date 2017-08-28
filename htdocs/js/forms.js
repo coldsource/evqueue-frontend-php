@@ -115,6 +115,8 @@ $(document).ready( function() {
 		}
 		
 	});
+	
+	$('.select2').select2();
 });
 
 function evqueueSubmitFormAPI(el, group, id, message)
@@ -162,6 +164,8 @@ function evqueuePrepareFormAPI(el, group, id)
 					input.prop('checked',attributes[i].value=='yes' || attributes[i].value=='1');
 				else
 					input.val(attributes[i].value);
+				
+				input.trigger('change',xml);
 			}
 		});
 	}
@@ -172,6 +176,9 @@ function evqueuePrepareFormAPI(el, group, id)
 				$(this).val($(this).find('option:first').val());
 			else
 				$(this).val('');
+			
+			if($(this).hasClass('select2'))
+				$(this).change();
 		});
 		
 		return new jQuery.Deferred().resolve();
@@ -184,9 +191,17 @@ function evqueueCreateFormHandler(event)
 	
 	options.form_div.find('.submit').text(options.title);
 	options.form_div.find('.submit').off('click').on('click',function() {
-		evqueueSubmitFormAPI(options.form_div,options.group,false,options.message).done(function() {
-			options.form_div.dialog('close');
-			RefreshPage();
+		var promise;
+		if(options.prehandler)
+			promise = options.prehandler();
+		else
+			promise = new jQuery.Deferred().resolve();
+		
+		promise.done(function() {
+			evqueueSubmitFormAPI(options.form_div,options.group,false,options.message).done(function() {
+				options.form_div.dialog('close');
+				RefreshPage();
+			});
 		});
 	});
 	
@@ -202,9 +217,17 @@ function evqueueEditFormHandler(event)
 	var id = $(this).parents('tr').data('id');
 	options.form_div.find('.submit').text(options.title);
 	options.form_div.find('.submit').off('click').on('click',function() {
-		evqueueSubmitFormAPI(options.form_div,options.group,id,options.message).done(function() {
-			options.form_div.dialog('close');
-			RefreshPage();
+		var promise;
+		if(options.prehandler)
+			promise = options.prehandler();
+		else
+			promise = new jQuery.Deferred().resolve();
+		
+		promise.done(function() {
+			evqueueSubmitFormAPI(options.form_div,options.group,id,options.message).done(function() {
+				options.form_div.dialog('close');
+				RefreshPage();
+			});
 		});
 	});
 	
