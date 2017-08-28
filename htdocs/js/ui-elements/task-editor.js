@@ -5,14 +5,20 @@ function TaskEditor()
 	
 	var me = this;
 	
-	evqueueAPI(false,'queuepool','list',{},[],function(xml) {
+	evqueueAPI({
+		group: 'queuepool',
+		action: 'list',
+	},function(xml) {
 		$(xml).find('queue').each(function(index, value) {
 			$('#task-editor select#queue').append($('<option>', {value: $(value).attr('name'),text:$(value).attr('name')+" ("+$(value).attr('concurrency')+")"}));
 		});
 	});
 	
 	$('#task-editor select#retryschedule').append($('<option>', {value: '',text:'None'}));
-	evqueueAPI(false,'retry_schedules','list',{},[],function(xml) {
+	evqueueAPI({
+		group: 'retry_schedules',
+		action: 'list'
+	},function(xml) {
 		$(xml).find('schedule').each(function(index, value) {
 			$('#task-editor select#retryschedule').append($('<option>', {value: $(value).attr('name'),text:$(value).attr('name')}));
 		});

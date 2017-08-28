@@ -23,7 +23,11 @@ $(document).ready( function() {
 		if($(this).val()=='')
 			return;
 		
-		evqueueAPI(false,'workflow','get',{id:$(this).val()},[],function(xml) {
+		evqueueAPI({
+			group: 'workflow',
+			action: 'get',
+			attributes: {id: $(this).val()}
+		},function(xml) {
 			$(xml).find('parameter').each(function() {
 				$('#what_workflow form').append('<div class="parameter"><label>'+$(this).attr('name')+'</label><input name="parameter_'+$(this).attr('name')+'"></input></div>');
 			});
@@ -116,21 +120,36 @@ function RefreshPage()
 		
 		
 		$('.fa-lock').click(function() {
-			evqueueAPI(this, 'workflow_schedule', 'unlock', { 'id':$(this).parents('tr').data('id') }).done(function() {
+			evqueueAPI({
+				element: this,
+				group: 'workflow_schedule',
+				action: 'unlock',
+				attributes: { 'id': $(this).parents('tr').data('id') }
+			}).done(function() {
 				Message('Schedule is now active');
 				RefreshPage();
 			});
 		});
 		
 		$('.fa-check').click(function() {
-			evqueueAPI(this, 'workflow_schedule', 'lock', { 'id':$(this).parents('tr').data('id') }).done(function() {
+			evqueueAPI({
+				element: this,
+				group: 'workflow_schedule',
+				action: 'lock',
+				attributes: { 'id': $(this).parents('tr').data('id') }
+			}).done(function() {
 				Message('Schedule is now inactive');
 				RefreshPage();
 			});
 		});
 		
 		$('.fa-remove').click(function() {
-			evqueueAPI(this, 'workflow_schedule', 'delete', { 'id':$(this).parents('tr').data('id') }, [], function() {
+			evqueueAPI({
+				element: this,
+				group: 'workflow_schedule',
+				action: 'delete',
+				attributes: { 'id': $(this).parents('tr').data('id') }
+			}, function() {
 				Message('Schedule has been deleted');
 				RefreshPage();
 			});

@@ -31,7 +31,12 @@ function RefreshPage()
 				return;
 			
 			Wait();
-			evqueueAPI($(this),'git','save_task',{name:$(this).data('name'),commit_log:log,force:$(this).data('force')},[],function() {
+			evqueueAPI({
+				element: this,
+				group: 'git',
+				action: 'save_task',
+				attributes: {name: $(this).data('name'), commit_log: log,force:$(this).data('force')}
+			},function() {
 				Message('Committed task to git');
 				RefreshPage();
 			});
@@ -39,7 +44,12 @@ function RefreshPage()
 		
 		$('.git.fa-download').click(function() {
 			Wait();
-			evqueueAPI($(this),'git','load_task',{name:$(this).data('name')},[],function() {
+			evqueueAPI({
+				element: this,
+				group: 'git',
+				action: 'load_task',
+				attributes: {name: $(this).data('name')}
+			},function() {
 				Message('Loaded task from git');
 				RefreshPage();
 			});
@@ -51,14 +61,24 @@ function RefreshPage()
 				return;
 			
 			Wait();
-			evqueueAPI($(this),'git','remove_task',{name:$(this).data('name'),commit_log:log},[],function() {
+			evqueueAPI({
+				element: this,
+				group: 'git',
+				action: 'remove_task',
+				attributes: {name: $(this).data('name'), commit_log: log}
+			},function() {
 				Message('Removed task from git');
 				RefreshPage();
 			});
 		});
 		
 		$('.fa-remove:not(.git)').click(function() {
-			evqueueAPI(this, 'task', 'delete', { 'id':$(this).parents('tr').data('id') }, [], function() {
+			evqueueAPI({
+				element: this,
+				group: 'task',
+				action: 'delete',
+				attributes: { 'id':$(this).parents('tr').data('id') }
+			}, function() {
 				Message('Task has been deleted');
 				RefreshPage();
 			});

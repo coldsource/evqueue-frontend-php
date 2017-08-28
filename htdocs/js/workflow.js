@@ -25,7 +25,12 @@ function RefreshPage()
 				return;
 			
 			Wait();
-			evqueueAPI($(this),'git','save_workflow',{name:$(this).data('name'),commit_log:log,force:$(this).data('force')},[],function() {
+			evqueueAPI({
+				element: this,
+				group: 'git',
+				action: 'save_workflow',
+				attributes: {name: $(this).data('name'), commit_log: log,force:$(this).data('force')}
+			},function() {
 				Message('Committed workflow to git');
 				RefreshPage();
 			});
@@ -33,7 +38,12 @@ function RefreshPage()
 		
 		$('.git.fa-download').click(function() {
 			Wait();
-			evqueueAPI($(this),'git','load_workflow',{name:$(this).data('name')},[],function() {
+			evqueueAPI({
+				element: this,
+				group: 'git',
+				action: 'load_workflow',
+				attributes: {name: $(this).data('name')}
+			},function() {
 				Message('Loaded workflow from git');
 				RefreshPage();
 			});
@@ -45,7 +55,12 @@ function RefreshPage()
 				return;
 			
 			Wait();
-			evqueueAPI($(this),'git','remove_workflow',{name:$(this).data('name'),commit_log:log},[],function() {
+			evqueueAPI({
+				element: this,
+				group: 'git',
+				action: 'remove_workflow',
+				attributes: {name: $(this).data('name'),commit_log:log}
+			},function() {
 				Message('Removed workflow from git');
 				RefreshPage();
 			});
@@ -57,7 +72,12 @@ function RefreshPage()
 		
 		$('.fa-remove:not(.git)').click(function() {
 			Wait();
-			evqueueAPI(this, 'workflow', 'delete', { 'id':$(this).parents('tr').data('id') }, [], function() {
+			evqueueAPI({
+				element: this,
+				group: 'workflow',
+				action: 'delete',
+				attributes: { id: $(this).parents('tr').data('id') }
+			}, function() {
 				Message('Workflow has been deleted');
 				RefreshPage();
 			});

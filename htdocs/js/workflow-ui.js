@@ -8,7 +8,11 @@ $(document).ready(function() {
 	{
 		Wait();
 		
-		evqueueAPI(false,'workflow','get',{'id':workflow_id},[],function(xml) {
+		evqueueAPI({
+			group: 'workflow',
+			action: 'get',
+			attributes: {'id': workflow_id}
+		},function(xml) {
 			var name = xml.documentElement.firstChild.getAttribute('name');
 			var group = xml.documentElement.firstChild.getAttribute('group');
 			var comment = xml.documentElement.firstChild.getAttribute('comment');
@@ -125,37 +129,45 @@ function SaveWorkflow()
 {
 	if(workflow_id==-1)
 	{
-		evqueueAPI(false,'workflow','create',{
-			'name':wf.GetAttribute('name'),
-			'group':wf.GetAttribute('group'),
-			'comment':wf.GetAttribute('comment'),
-			'content':btoa(wf.GetXML(true))
-			},[],function(xml) {
-				$('#message').html('Workflow has been created');
-				$('#message').show();
-				$('#message').delay(2000).fadeOut();
-				
-				workflow_id = xml.firstChild.getAttribute('workflow-id');
-				
-				if(want_exit)
-					window.location = "workflow.php";
+		evqueueAPI({
+			group: 'workflow',
+			action: 'create',
+			attributes: {
+				name: wf.GetAttribute('name'),
+				group: wf.GetAttribute('group'),
+				comment: wf.GetAttribute('comment'),
+				content: btoa(wf.GetXML(true))
+				}
+		}, function(xml) {
+			$('#message').html('Workflow has been created');
+			$('#message').show();
+			$('#message').delay(2000).fadeOut();
+			
+			workflow_id = xml.firstChild.getAttribute('workflow-id');
+			
+			if(want_exit)
+				window.location = "workflow.php";
 		});
 	}
 	else
 	{
-		evqueueAPI(false,'workflow','edit',{
-			'id':workflow_id,
-			'name':wf.GetAttribute('name'),
-			'group':wf.GetAttribute('group'),
-			'comment':wf.GetAttribute('comment'),
-			'content':btoa(wf.GetXML(true))
-			},[],function(xml) {
-				$('#message').html('Workflow has been saved');
-				$('#message').show();
-				$('#message').delay(2000).fadeOut();
-				
-				if(want_exit)
-					window.location = "workflow.php";
+		evqueueAPI({
+			group: 'workflow',
+			action: 'edit',
+			attributes: {
+				id: workflow_id,
+				name: wf.GetAttribute('name'),
+				group: wf.GetAttribute('group'),
+				comment: wf.GetAttribute('comment'),
+				content: btoa(wf.GetXML(true))
+			}
+		}, function(xml) {
+			$('#message').html('Workflow has been saved');
+			$('#message').show();
+			$('#message').delay(2000).fadeOut();
+			
+			if(want_exit)
+				window.location = "workflow.php";
 		});
 	}
 }

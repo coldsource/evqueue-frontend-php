@@ -1,5 +1,5 @@
 
-$(document).delegate( 'img.relaunch', 'click', function() {
+$(document).delegate( '.relaunch', 'click', function() {
 	var id = $(this).data("wfiid");
 	var node_name = $(this).data("node-name");
 	
@@ -41,8 +41,15 @@ $(document).delegate('form[id*=launchForm_]', 'submit', function(event) {
 		host: $(this).find('.hostTab input[name=host]').val()
 	};
 	
-	evqueueAPI(this, "instance", "launch", attr, wfparams, $(this).find('.nodeTab select').val());	
-	refreshWorkflows("executing");
+	evqueueAPI({
+		group: 'instance',
+		action: 'launch',
+		attributes: attr,
+		parameters: wfparams,
+		node: $(this).find('.nodeTab select').val()
+	}).done(function () {
+		refreshWorkflows('executing');
+	})
 });
 
 
@@ -99,3 +106,21 @@ function launchWF(name){
 	});
 	$('div.makeMeTabz:visible').tabs().removeClass('makeMeTabz');
 }
+
+
+$(document).delegate('.js-execs li', 'click', function () {
+	
+	// turn bold selected output 
+	$(this).parent('.js-execs').children('li').css({'font-weight': ''});
+	$(this).css({'font-weight': 'bold'});
+	
+	var taskDetails = $(this).parents('.taskDetails');
+	var outputData = taskDetails.children('.outputData');
+	var pos = $(this).index();
+	
+	taskDetails.find('#tab-taskStdout').html( outputData.find('.output').eq(pos).html() );
+	taskDetails.find('#tab-taskStderr').html( outputData.find('.stderr').eq(pos).html() );
+	taskDetails.find('#tab-taskLog'   ).html( outputData.find('.log'   ).eq(pos).html() );
+	
+	taskDetails.find('a[href="#tab-taskStdout"]').click();
+});

@@ -18,6 +18,14 @@
 	text-align: center;
 }
 
+.fa-check { color: #27ae60 }
+.fa-exclamation, .fa-exclamation-circle { color: #c0392b; }
+.error {
+	color: #c0392b;
+}
+
+
+
 /* minus-plus icon to fold/unfold subjobs */
 .tasks {
 	position: relative;

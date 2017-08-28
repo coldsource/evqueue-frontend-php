@@ -11,19 +11,21 @@ $(document).ready( function() {
 	$('.spinner').spinner();
 });
 
-function evqueueAPI(element, group, action, attributes = [], parameters = [], cbk = false){
-	if ($(element).attr('data-confirm')) {
-		if(!confirm($(element).data('confirm')))
+function evqueueAPI(options, cbk = false){
+	options = $.extend({attributes: [], parameters: []}, options);
+	
+	if ($(options.element).attr('data-confirm')) {
+		if(!confirm($(options.element).data('confirm')))
 			return;
 	}
+	delete options.element;
 	
 	var promise = new jQuery.Deferred();
 	
 	$.ajax({
-		data:{'group':group, 'action':action, 'parameters':parameters, 'attributes':attributes},
-		type: 'post',
 		url: 'ajax/evqueue_api.php',
-		content:'xml',
+		type: 'post',
+		data: options,
 	}).done(function(xml){
 		error = $(xml).find('error');
 		if ($(error).length > 0) {

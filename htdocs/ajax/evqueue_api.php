@@ -28,6 +28,14 @@ if(isset($_POST['group'])){
 	
 	header('content-type: text/xml');
 	
+  if (isset($_POST['node'])) {
+    $node_name = $_POST['node'];
+    if (!isset($_SESSION['nodes'][$node_name]))
+      die('<error>Node does not exist</error>');
+    
+    $evqueue = getevQueue($_SESSION['nodes'][$node_name]);
+  }
+  
 	try
 	{
 		$xml = $evqueue->Api($_POST['group'], $action, $attributes, $parameters);

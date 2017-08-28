@@ -34,7 +34,10 @@ $(document).ready( function() {
 		
 		if(el.data('type')=='taskgroup')
 		{
-			evqueueAPI(false,'tasks','list',{}, [],function(xml) {
+			evqueueAPI({
+				group: 'tasks',
+				action: 'list'
+			},function(xml) {
 				data = new Set();
 				$(xml).find('task').each(function() {
 					if($(this).attr('group')!='')
@@ -45,7 +48,10 @@ $(document).ready( function() {
 		}
 		else if(el.data('type')=='workflowgroup')
 		{
-			evqueueAPI(false,'workflows','list',{}, [],function(xml) {
+			evqueueAPI({
+				group: 'workflows',
+				action: 'list'
+			},function(xml) {
 				data = new Set();
 				$(xml).find('workflow').each(function() {
 					if($(this).attr('group')!='')
@@ -78,7 +84,10 @@ $(document).ready( function() {
 			var valuetype = el.data('valuetype');
 			var groups = [];
 			var workflows = new Object();
-			evqueueAPI(false,'workflows','list',{}, [],function(xml) {
+			evqueueAPI({
+				group: 'workflows',
+				action: 'list'
+			},function(xml) {
 				$(xml).find('workflow').each(function() {
 					var group = $(this).attr('group')!=''?$(this).attr('group'):'No group';
 					
@@ -142,7 +151,12 @@ function evqueueSubmitFormAPI(el, group, id, message)
 	
 	Wait();
 	
-	return evqueueAPI(false,group,action,values,parameters).done(function() {
+	return evqueueAPI({
+		group: group,
+		action: action,
+		attributes: values,
+		parameters: parameters,
+	}).done(function() {
 		Message(message);
 	}).always(function() {
 		Ready();
@@ -155,7 +169,11 @@ function evqueuePrepareFormAPI(el, group, id)
 	
 	if(id)
 	{
-		return evqueueAPI(false,group,'get',{id:id},[],function(xml) {
+		return evqueueAPI({
+			group: group,
+			action: 'get',
+			attributes: {id:id}
+		},function(xml) {
 			attributes = xml.documentElement.firstChild.attributes;
 			for(var i=0;i<attributes.length;i++)
 			{

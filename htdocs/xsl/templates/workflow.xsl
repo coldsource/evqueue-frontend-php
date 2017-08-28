@@ -76,11 +76,26 @@
 
 			<td class="tdActions">
 				<xsl:if test="@status='EXECUTING'">
-					<img src="images/stop.png" data-confirm="Are you sure you want to stop the execution of this workflow ?" alt="Stop execution of this workflow" title="Stop execution of this workflow" onclick="evqueueAPI(this, 'instance', 'cancel', {{ 'id':{@id} }}, {{}}, '{../@node}');"/>
+					<img src="images/stop.png" data-confirm="Are you sure you want to stop the execution of this workflow ?" alt="Stop execution of this workflow" title="Stop execution of this workflow" onclick="
+						evqueueAPI({{
+							element: this,
+							group: 'instance',
+							action: 'cancel',
+							attributes: {{ 'id':{@id} }},
+							node: '{../@node}'
+						}});"/>
 				</xsl:if>
 
 				<xsl:if test="@status='TERMINATED'">
-					<img data-confirm="Delete workflow instance {@id} ?" src="images/delete.gif" onclick="evqueueAPI(this, 'instance', 'delete', {{ 'id':'{@id}' }});location.reload();" class="pointer" />
+					<img data-confirm="Delete workflow instance {@id} ?" src="images/delete.gif" class="action" onclick="
+						evqueueAPI({{
+							element: this,
+							group: 'instance',
+							action: 'delete',
+							attributes: {{ 'id':'{@id}' }}
+						}}).done( function () {{
+							location.reload();
+						}});" />
 				</xsl:if>
 			</td>
 		</tr>
@@ -284,92 +299,26 @@
 		
 		<div class="task {$taskClass}" data-name="{@name}" data-type="task" data-queue="{@queue}" data-retry-schedule="{@retry_schedule}" data-loop="{@loop}" data-condition="{@condition}">
 			
-			<span class="taskState">
-				<xsl:if test="@status='ABORTED'">
-					<span class="faicon fa-exclamation-circle" title="{@status} - {@error}"></span>
-				</xsl:if>
-				<xsl:if test="@status='TERMINATED' and @retval != 0">
-					<span class="faicon fa-exclamation" title="Return value: {@retval}"></span>
-				</xsl:if>
-				<xsl:if test="@status='TERMINATED' and @retval = 0">
-					<span class="faicon fa-check" title="EXECUTING"></span>
-				</xsl:if>
-				
-				<xsl:if test="@status='TERMINATED' and @retry_at != ''">
-					<span class="faicon fa-clock" title="{@retry_at}"></span>
-				</xsl:if>
-				
-				<xsl:if test="@status='EXECUTING'">
-					<span class="fa fa-spinner fa-pulse fa-fw"></span>
-				</xsl:if>
-				
-				<xsl:if test="@status='QUEUED'">
-					<span class="faicon fa-hand-stop-o" title="QUEUED"></span>
-				</xsl:if>
-			</span>
+			<xsl:apply-templates select="." mode="status" />
 			
 			<span class="taskName" onclick="
-				$(this).next('.taskDetails').tabs();
+				$(this).next('.taskDetails').find('.tabs').tabs();
+				$(this).next('.taskDetails').find('.js-execs li:last').click();
 				$(this).next('.taskDetails').dialog().dialog('open');
 				">
 				<xsl:value-of select="@name" />
 			</span>
-			<div class="taskDetails dialog tabs" data-width="900" data-height="300">
-				<h2>
-					<xsl:value-of select="@name" />
-				</h2>
-				<ul>
-					<li><a href="#tab-taskOutput">Output</a></li>
-					<li><a href="#tab-taskInputs">Inputs</a></li>
-				</ul>
-				<div id="tab-taskOutput">
-					
-					<!-- Task Output -->
-					<xsl:if test="@status='TERMINATED' or @status='ABORTED'">
-						<div class="taskOutput">
-							<ul class="errors">
-								<xsl:if test="@status = 'ABORTED'">
-									<li>ABORTED</li>
-								</xsl:if>
-								<xsl:if test="@error">
-									<li>
-										<xsl:value-of select="@error" />
-									</li>
-								</xsl:if>
-							</ul>
-							<ul>
-								<xsl:choose>
-									<xsl:when test="@status='ABORTED' and @retval=0">
-										<div class="taskOutputContent">
-											<xsl:value-of select="stderr" />
-										</div>
-									</xsl:when>
-									<xsl:otherwise>
-										<xsl:apply-templates select="output" />
-									</xsl:otherwise>
-								</xsl:choose>
-							</ul>
-						</div>
-					</xsl:if>
-				</div>
-				<div id="tab-taskInputs">
-					<ul class="inputs">
-						<xsl:for-each select="input">
-							<li>
-								<xsl:if test="@name">
-									<b>
-										<xsl:value-of select="@name" />
-									</b>:
-								</xsl:if>
-								<xsl:value-of select="." />
-							</li>
-						</xsl:for-each>
-					</ul>
-				</div>
-			</div>
+			<xsl:apply-templates select="." mode="details" />
 			
 			<xsl:if test="@status='EXECUTING'">
-				<span class="faicon fa-bomb" data-confirm="Are you sure you want to kill this task ?" title="Kill Task" onclick="evqueueAPI(this, 'instance', 'killtask', {{ 'id':{ancestor::workflow[1]/@id}, 'pid':{@pid} }}, {{}}, '{/page/instance/@node}');"></span>
+				<span class="faicon fa-bomb" data-confirm="Are you sure you want to kill this task ?" title="Kill Task" onclick="
+					evqueueAPI({{
+						element: this,
+						group: 'instance',
+						action: 'killtask',
+						attributes: {{ 'id':{ancestor::workflow[1]/@id}, 'pid':{@pid} }},
+						node: '{/page/instance/@node}'
+					}});"></span>
 			</xsl:if>
 			
 			<xsl:if test="@progression != 0 and @progression != 100">
@@ -379,6 +328,97 @@
 				</div>
 			</xsl:if>
 		</div>
+	</xsl:template>
+	
+	
+	<xsl:template match="task" mode="details">
+		<div class="taskDetails dialog" data-width="900" data-height="300">
+			<h2>
+				<xsl:apply-templates select="." mode="status" />
+				<xsl:value-of select="@name" />
+			</h2>
+			
+			<div class="tabs">
+				<ul>
+					<li><a href="#tab-taskGeneral">General</a></li>
+					<li><a href="#tab-taskStdout">Stdout</a></li>
+					<li><a href="#tab-taskStderr">Stderr</a></li>
+					<li><a href="#tab-taskLog">Log</a></li>
+					<li><a href="#tab-taskPrevExecs">Previous Executions</a></li>
+				</ul>
+				<div id="tab-taskGeneral">
+					<xsl:if test="count(input) = 0">
+						<i>no input</i>
+					</xsl:if>
+					<ul class="inputs unstyled">
+						<xsl:for-each select="input">
+							<li>
+								<xsl:if test="@name">
+									<b><xsl:value-of select="@name" /></b>:
+								</xsl:if>
+								<xsl:value-of select="." />
+							</li>
+						</xsl:for-each>
+					</ul>
+					<ul class="error unstyled">
+						<xsl:if test="@status = 'ABORTED'">
+							<li>ABORTED</li>
+						</xsl:if>
+						<xsl:if test="@error">
+							<li>error from engine: <xsl:value-of select="@error" /></li>
+						</xsl:if>
+						<xsl:if test="@retval != '0'">
+							<li>return value <xsl:value-of select="@retval" /></li>
+						</xsl:if>
+					</ul>
+				</div>
+				<div id="tab-taskStdout"></div>
+				<div id="tab-taskStderr"></div>
+				<div id="tab-taskLog"></div>
+				<div id="tab-taskPrevExecs">
+					<ul class="js-execs unstyled">
+						<xsl:for-each select="output">
+							<li class="action">
+								<xsl:value-of select="@exit_time" />:
+								return code <xsl:value-of select="@retval" />
+							</li>
+						</xsl:for-each>
+					</ul>
+				</div>
+			</div>
+			
+			<ul class="outputData hidden">
+				<xsl:apply-templates select="output | stderr | log" />
+			</ul>
+			
+		</div>
+	</xsl:template>
+	
+	
+	<xsl:template match="task" mode="status">
+		<span class="taskState">
+			<xsl:if test="@status='ABORTED'">
+				<span class="faicon fa-exclamation-circle" title="{@status} - {@error}"></span>
+			</xsl:if>
+			<xsl:if test="@status='TERMINATED' and @retval != 0">
+				<span class="faicon fa-exclamation" title="Return value: {@retval}"></span>
+			</xsl:if>
+			<xsl:if test="@status='TERMINATED' and @retval = 0">
+				<span class="faicon fa-check" title="EXECUTING"></span>
+			</xsl:if>
+			
+			<xsl:if test="@status='TERMINATED' and @retry_at != ''">
+				<span class="faicon fa-clock" title="{@retry_at}"></span>
+			</xsl:if>
+			
+			<xsl:if test="@status='EXECUTING'">
+				<span class="fa fa-spinner fa-pulse fa-fw"></span>
+			</xsl:if>
+			
+			<xsl:if test="@status='QUEUED'">
+				<span class="faicon fa-hand-stop-o" title="QUEUED"></span>
+			</xsl:if>
+		</span>
 	</xsl:template>
 
 
@@ -524,75 +564,22 @@
 
 
 	<xsl:template match="output">
-		<xsl:variable name="output-id" select="generate-id()" />
-		
-		<li>
-			<span class="taskStats" onclick="$('#output-{$output-id}').toggle();">
-				<img src="images/minus.png" />
-				&#160;<b><xsl:value-of select="@exit_time" /></b> : Task returned code <xsl:value-of select="@retval" /> (execution took <xsl:value-of select="php:function('strtotime',string(@exit_time))-php:function('strtotime',string(@execution_time))" />&#160;s)
-			</span>
-			
-			<div id="output-{$output-id}" style="display:none;">
-				<ul class="pipes">
-					<li>
-						<a href="output-stdout-{$output-id}">
-							<xsl:if test=". != ''"><xsl:attribute name="style">font-weight:bold;</xsl:attribute></xsl:if>
-							<xsl:text>stdout</xsl:text>
-						</a>
-					</li>
-					<li>
-						<a href="output-stderr-{$output-id}">
-							<xsl:if test="following-sibling::*[1][name() = 'stderr'] != ''"><xsl:attribute name="style">font-weight:bold;</xsl:attribute></xsl:if>
-							<xsl:text>stderr</xsl:text>
-						</a>
-					</li>
-					<li>
-						<a href="output-log-{$output-id}">
-							<xsl:if test="following-sibling::*[1][name() = 'log'] | following-sibling::*[2][name() = 'log'] != ''"><xsl:attribute name="style">font-weight:bold;</xsl:attribute></xsl:if>
-							<xsl:text>log</xsl:text>
-						</a>
-					</li>
-				</ul>
-
-				<div class="taskOutputContent" id="output-stdout-{$output-id}">
-					<xsl:if test="@retval != 0">
-						<div class="error "><xsl:value-of select="." /></div>
-					</xsl:if>
-					<xsl:if test="@retval = 0">
-						<xsl:choose>
-							<xsl:when test="@method = 'text'">
-								<xsl:attribute name="style">white-space:pre-wrap;</xsl:attribute>
-								<xsl:value-of select="." />
-							</xsl:when>
-							<xsl:when test="@method = 'xml'">
-								<xsl:apply-templates select="." mode="xml_display" />
-							</xsl:when>
-						</xsl:choose>
-					</xsl:if>
-				</div>
-
-				<div class="taskOutputContent" id="output-stderr-{$output-id}">
-					<xsl:value-of select="following-sibling::*[1][name() = 'stderr']" />
-				</div>
-
-				<div class="taskOutputContent" id="output-log-{$output-id}">
-					<xsl:value-of select="following-sibling::*[1][name() = 'log'] | following-sibling::*[2][name() = 'log']" />
-				</div>
-			</div>
-			<script type="text/javascript">
-			$('#output-<xsl:value-of select="$output-id" /> '+String.fromCharCode(62)+' div').hide();
-			$('#output-<xsl:value-of select="$output-id" /> ul li a').bind('click',function(event) {
-				event.preventDefault();
-				$('#output-<xsl:value-of select="$output-id" /> '+String.fromCharCode(62)+' div').hide();
-				target_id = event.target.getAttribute('href');
-				$('#'+target_id).show();
-
-				$('#output-<xsl:value-of select="$output-id" /> ul li').css('background-color','');
-				$(event.target).parent().css('background-color','#B9F0BC');
-			});
-
-			$('#output-<xsl:value-of select="$output-id" /> ul li:first-child a').click();
-			</script>
+		<li class="output">
+			<xsl:choose>
+				<xsl:when test="@method = 'text'">
+					<xsl:attribute name="style">white-space:pre-wrap;</xsl:attribute>
+					<xsl:value-of select="." />
+				</xsl:when>
+				<xsl:when test="@method = 'xml'">
+					<xsl:apply-templates select="." mode="xml_display" />
+				</xsl:when>
+			</xsl:choose>
+		</li>
+	</xsl:template>
+	
+	<xsl:template match="stderr | log">
+		<li class="{name(.)}">
+			<xsl:value-of select="." />
 		</li>
 	</xsl:template>
 
