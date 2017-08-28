@@ -145,8 +145,8 @@
 				<xsl:if test="$topmenu!='settings'"><xsl:attribute name="style">display:none;</xsl:attribute></xsl:if>
 				<li><a href="{$SITE_BASE}task.php">Tasks</a></li>
 				<li><a href="{$SITE_BASE}workflow.php">Workflows</a></li>
-				<li><a href="{$SITE_BASE}workflow-schedules.php?display=settings">Scheduled workflows</a></li>
-				<li><a href="{$SITE_BASE}list-schedules.php">Retry Schedules</a></li>
+				<li><a href="{$SITE_BASE}workflow-schedules.php">Scheduled workflows</a></li>
+				<li><a href="{$SITE_BASE}schedule.php">Retry Schedules</a></li>
 				<li><a href="{$SITE_BASE}queue.php">Queues</a></li>
 				<li><a href="{$SITE_BASE}list-users.php">Users</a></li>
 				<li><a href="{$SITE_BASE}system_configuration.php">Running configuration</a></li>

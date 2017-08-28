@@ -177,8 +177,7 @@ function evqueuePrepareFormAPI(el, group, id)
 			else
 				$(this).val('');
 			
-			if($(this).hasClass('select2'))
-				$(this).change();
+			$(this).change();
 		});
 		
 		return new jQuery.Deferred().resolve();

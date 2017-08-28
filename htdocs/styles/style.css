@@ -167,9 +167,14 @@ div.formdiv label {
 	margin-right:1em;
 }
 
-div.formdiv input:not(.select2-search__field) {
+div.formdiv input:not(.select2-search__field):not(.spinner) {
 	min-width:22em;
 }
+
+div.formdiv input.spinner {
+	width:40px;
+}
+
 
 div.formdiv input[type='submit'] {
 	min-width:10em;

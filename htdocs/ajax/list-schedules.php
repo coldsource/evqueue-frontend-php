@@ -15,14 +15,16 @@
   * You should have received a copy of the GNU General Public License
   * along with evQueue. If not, see <http://www.gnu.org/licenses/>.
   * 
-  * Authors: Nicolas Jean, Christophe Marti 
+  * Author: Thibault KUMMER
   */
 
 require_once 'inc/auth_check.php';
 require_once 'inc/logger.php';
 require_once 'lib/XSLEngine.php';
 
+
 $xsl = new XSLEngine();
-$xsl->AddFragment(['response-schedules' => $xsl->Api('retry_schedules', 'list')]);
-$xsl->DisplayXHTML('xsl/list_schedules.xsl');
+
+$xsl->AddFragment(['schedules' => $xsl->Api('retry_schedules', 'list')]);
+$xsl->DisplayXHTML('../xsl/ajax/list-schedules.xsl');
 ?>

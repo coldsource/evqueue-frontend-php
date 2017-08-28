@@ -7,6 +7,8 @@ $(document).ready( function() {
 	);
 	
 	$('.tabs').tabs();
+	
+	$('.spinner').spinner();
 });
 
 function evqueueAPI(element, group, action, attributes = [], parameters = [], cbk = false){
