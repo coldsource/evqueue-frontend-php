@@ -5,14 +5,20 @@ function TaskEditor()
 	
 	var me = this;
 	
-	evqueueAPI(false,'queuepool','list',{},[],function(xml) {
+	evqueueAPI({
+		group: 'queuepool',
+		action: 'list',
+	},function(xml) {
 		$(xml).find('queue').each(function(index, value) {
 			$('#task-editor select#queue').append($('<option>', {value: $(value).attr('name'),text:$(value).attr('name')+" ("+$(value).attr('concurrency')+")"}));
 		});
 	});
 	
 	$('#task-editor select#retryschedule').append($('<option>', {value: '',text:'None'}));
-	evqueueAPI(false,'retry_schedules','list',{},[],function(xml) {
+	evqueueAPI({
+		group: 'retry_schedules',
+		action: 'list'
+	},function(xml) {
 		$(xml).find('schedule').each(function(index, value) {
 			$('#task-editor select#retryschedule').append($('<option>', {value: $(value).attr('name'),text:$(value).attr('name')}));
 		});
@@ -99,6 +105,9 @@ TaskEditor.prototype.Open = function(id)
 			me.SaveAttribute('queue',queue,$("#task-editor select#queue").val());
 			me.SaveAttribute('retry_schedule',retry_schedule,$("#task-editor select#retryschedule").val());
 			me.SaveAttribute('retry_retval',retry_retval,$("#task-editor select#retryretval").val());
+			me.SaveAttribute('user',queue,$("#task-editor input#user").val());
+			me.SaveAttribute('host',queue,$("#task-editor input#host").val());
+			me.SaveAttribute('queue_host',queue,$("#task-editor input#queue_host").val());
 			me.SaveAttribute('stdinmode',stdin_mode,$("#task-editor select#stdinmode").val());
 			
 			wf.Draw();

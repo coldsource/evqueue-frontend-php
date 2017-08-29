@@ -7,40 +7,46 @@ $(document).ready( function() {
 	);
 	
 	$('.tabs').tabs();
+	
+	$('.spinner').spinner();
 });
 
-function evqueueAPI(element, group, action, attributes = [], parameters = [], cbk = false){
-	if ($(element).attr('data-confirm')) {
-		if(!confirm($(element).data('confirm')))
-		{
-			$('body').css("cursor", "default");
-			return;
-		}
-	}
+function evqueueAPI(options, cbk = false){
+	options = $.extend({attributes: [], parameters: []}, options);
 	
-	return $.ajax({
-		data:{'group':group, 'action':action, 'parameters':parameters, 'attributes':attributes},
-		type: 'post',
+	if ($(options.element).attr('data-confirm')) {
+		if(!confirm($(options.element).data('confirm')))
+			return;
+	}
+	delete options.element;
+	
+	var promise = new jQuery.Deferred();
+	
+	$.ajax({
 		url: 'ajax/evqueue_api.php',
-		content:'xml',
+		type: 'post',
+		data: options,
 	}).done(function(xml){
-		$('body').css("cursor", "default");
-		
 		error = $(xml).find('error');
 		if ($(error).length > 0) {
 			alert(error.html());
+			promise.reject();
 			return;
 		}
 		
 		if(cbk)
 			cbk(xml);
+		
+		promise.resolve();
 	});
+	
+	return promise;
 }
 
 function Wait()
 {
-	$('html').css('height','100%');
-	$('body').css('height','100%');
+	$('html').css('height','calc(100% - 50px)');
+	$('body').css('height','calc(100% - 50px)');
 	$('body').css("cursor", "wait");
 }
 

@@ -26,7 +26,12 @@ function RefreshPage()
 		}, evqueueEditFormHandler);
 		
 		$('.fa-remove:not(.git)').click(function() {
-			evqueueAPI(this, 'queue', 'delete', { 'id':$(this).parents('tr').data('id') }, [], function() {
+			evqueueAPI({
+				element: this,
+				group: 'queue',
+				action: 'delete',
+				attributes: { 'id': $(this).parents('tr').data('id') }
+			}, function() {
 				Message('Queue has been deleted');
 				RefreshPage();
 			});

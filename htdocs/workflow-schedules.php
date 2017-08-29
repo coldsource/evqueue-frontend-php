@@ -20,30 +20,39 @@
 
 require_once 'inc/auth_check.php';
 require_once 'inc/logger.php';
+require_once 'lib/XSLEngine.php';
 
-if(isset($_POST['group'])){
-	$action = isset($_POST['action']) ? $_POST['action']:false;
-	$attributes = isset($_POST['attributes']) ? $_POST['attributes']:[];
-	$parameters = isset($_POST['parameters']) ? $_POST['parameters']:[];
+$xsl = new XSLEngine();
+
+for ($d=0; $d<31; $d++)
+	$days[$d] = $d+1;
+
+for ($m=0; $m<12; $m++)
+	$months[$m] = date("F", mktime(0, 0, 0, $m+1, 10));
+
+$dates = array(
+	'Seconds'	 => range(0,59),
+	'Minutes'	 => range(0,59),
+	'Hours'	   => range(0,23),
+	'Days'	   => $days,
+	'Months'	 => $months,
+	'Weekdays' => array(0=>'Sunday', 1=>'Monday', 2=>'Tuesday', 3=>'Wednesday', 4=>'Thursday', 5=>'Friday', 6=>'Saturday',),
+);
+
+$xml = '<units>';
+foreach ($dates as $label => $unit) {
 	
-	header('content-type: text/xml');
+	$xml .= "<unit label='$label' input_name='".strtolower($label)."'>";
 	
-  if (isset($_POST['node'])) {
-    $node_name = $_POST['node'];
-    if (!isset($_SESSION['nodes'][$node_name]))
-      die('<error>Node does not exist</error>');
-    
-    $evqueue = getevQueue($_SESSION['nodes'][$node_name]);
-  }
-  
-	try
-	{
-		$xml = $evqueue->Api($_POST['group'], $action, $attributes, $parameters);
+	foreach ($unit as $index => $value) {
+		$xml .= "<value index='$index' label='$value' />";
 	}
-	catch(Exception $e)
-	{
-		echo "<error>".htmlspecialchars($e->getMessage())."</error>";
-		die(-1);
-	}
-	echo $xml;
+	
+	$xml .= "</unit>";
 }
+$xml .= '</units>';
+$xsl->AddFragment($xml);
+	
+$xsl->DisplayXHTML('xsl/workflow-schedules.xsl');
+
+?>

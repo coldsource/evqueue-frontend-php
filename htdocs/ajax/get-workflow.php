@@ -30,7 +30,6 @@ if($_POST['mode'] == "xml"){
 
 
 $xsl = new XSLEngine();
-$xsl->setParameter('ACTION',1);
 $dom = new DOMDocument();
 $dom->loadXML($_SESSION['edition'][$_POST['id']]['workflow']);
 

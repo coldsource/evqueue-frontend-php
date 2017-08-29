@@ -47,7 +47,10 @@ if (isset($_POST['login']) && isset($_POST['password'])) {
 	try
 	{
 		if($evqueue === false)
-			throw new Exception('There is no running node.');
+		{
+			$xsl->AddError('There is no running node.');
+			throw new Exception;
+		}
 		
 		$pwd = sha1($_POST['password'], true);
 		$evqueue->SetUserLogin($_POST['login']);
@@ -73,12 +76,6 @@ if (isset($_POST['login']) && isset($_POST['password'])) {
 	}
 	catch(Exception $e)
 	{
-		if($e->getCode() != evQueue::ERROR_AUTH_FAILED){
-			$xsl->AddFragment('<error msg="'.$e->getMessage().'">evqueue-ko</error>');
-		}
-		else{
-			$xsl->AddFragment('<error>wrong-creds</error>');
-		}
 		$xsl->DisplayXHTML('xsl/auth.xsl');
 		die();
 	}

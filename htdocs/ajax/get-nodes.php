@@ -20,30 +20,9 @@
 
 require_once 'inc/auth_check.php';
 require_once 'inc/logger.php';
+require_once 'lib/XSLEngine.php';
 
-if(isset($_POST['group'])){
-	$action = isset($_POST['action']) ? $_POST['action']:false;
-	$attributes = isset($_POST['attributes']) ? $_POST['attributes']:[];
-	$parameters = isset($_POST['parameters']) ? $_POST['parameters']:[];
-	
-	header('content-type: text/xml');
-	
-  if (isset($_POST['node'])) {
-    $node_name = $_POST['node'];
-    if (!isset($_SESSION['nodes'][$node_name]))
-      die('<error>Node does not exist</error>');
-    
-    $evqueue = getevQueue($_SESSION['nodes'][$node_name]);
-  }
-  
-	try
-	{
-		$xml = $evqueue->Api($_POST['group'], $action, $attributes, $parameters);
-	}
-	catch(Exception $e)
-	{
-		echo "<error>".htmlspecialchars($e->getMessage())."</error>";
-		die(-1);
-	}
-	echo $xml;
-}
+
+header('Content-type: text/json');
+echo json_encode($_SESSION['nodes']);
+?>

@@ -9,6 +9,7 @@
 			<li><a href="#tab-inputs">Inputs</a></li>
 			<li><a href="#tab-conditionsloops">Conditions &amp; loops</a></li>
 			<li><a href="#tab-queueretry">Queue &amp; retry</a></li>
+			<li><a href="#tab-remote">Remote execution</a></li>
 			<li><a href="#tab-stdin">Stdin</a></li>
 		</ul>
 		<div id="tab-inputs">
@@ -62,6 +63,28 @@
 					<div>
 						<label class="formLabel" for="retryretval">Retry on</label>
 						<select id="retryretval" />
+					</div>
+				</form>
+			</div>
+		</div>
+		<div id="tab-remote">
+			<h2>
+				Remote execution
+				<span class="help faicon fa-question-circle" title="If the task should not be executed locally, enter the user and host used for remote SSH connection.&#10;&#10;If you are using dynamic a dynamic queue, the used will be used by default to create the dynamic queue name.&#10;&#10;It is possible to use dynamic queues with local execution with the queue host attribute. This can be useful for tasks operating on distant machines without SSH (SQL connections, rsync...) on which you want to limit concurrency for performance reasons.&#10;&#10;All these values can incorporate dynamic XPath parts surrounded with braces."></span>
+			</h2>
+			<div class="formdiv">
+				<form>
+					<div>
+						<label class="formLabel" for="user">User</label>
+						<input id="user" />
+					</div>
+					<div>
+						<label class="formLabel" for="host">Host</label>
+						<input id="host" />
+					</div>
+					<div>
+						<label class="formLabel" for="queue_host">Queue host</label>
+						<input id="queue_host" />
 					</div>
 				</form>
 			</div>

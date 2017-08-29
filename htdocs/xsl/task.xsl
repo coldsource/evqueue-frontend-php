@@ -16,7 +16,7 @@
 	</xsl:template>
 	
 	<xsl:template name="tpltask-editor">
-		<div id="tpltask-editor" class="tabs dialog">
+		<div id="tpltask-editor" class="tabs dialog" data-width="900" data-height="400">
 			<ul>
 				<li><a href="#tab-general">General</a></li>
 				<li><a href="#tab-io">Input / Output</a></li>
