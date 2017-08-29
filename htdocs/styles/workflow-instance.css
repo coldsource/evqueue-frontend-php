@@ -23,6 +23,9 @@
 .error {
 	color: #c0392b;
 }
+.errorThenSuccess {
+	color: #e67e22;
+}
 
 
 

@@ -39,6 +39,37 @@ function sumRetryTimes ($nodes) {
 	return $total_time;
 }
 
+function timeDiff ($dt1,$dt2) {
+  return strtotime($dt2) - strtotime($dt1);
+}
+
+function timeSpan ($dt1, $dt2=null) {
+  $duration = strtotime($dt2) - strtotime($dt1);
+  
+  if (explode(' ',$dt1)[0] == explode(' ',$dt2)[0])
+    $dt2 = preg_replace('/^\d{4}-\d{2}-\d{2}/','',$dt2);  // don't display same date twice
+  
+  $dts = [$dt1,$dt2];
+  foreach ($dts as &$dt) {
+    $dt = preg_replace('/^'.date('Y-m-d').'/','',$dt);  // don't display today's date
+    $dt = preg_replace('/^'.date('Y-m-d', strtotime('yesterday')).'/','yesterday',$dt);  // 'yesterday' instead of date
+    $dt = preg_replace('/:\d+$/','',$dt);  // don't display seconds
+  }
+  
+  if ($duration < 60)
+    $dts[1] = null;
+  
+  return $dts[1] ? "{$dts[0]} → {$dts[1]}" : $dts[0];
+}
+
+function humanTime ($seconds) {
+  return
+    ($seconds/86400 >= 1 ? floor($seconds/86400).'days, ' : '') .
+    ($seconds/3600 >= 1 ? (floor($seconds/3600)%24).'h ' : '') .
+    ($seconds/60 >= 1 ? (floor($seconds/60)%60).'m ' : '') .
+    ($seconds%60).'s';
+}
+
 class XSLEngine
 {
 	protected $xmldoc;
@@ -201,7 +232,7 @@ class XSLEngine
 	public function GetXHTML($xsl_filename)
 	{
 		$xsltproc = new \XSLTProcessor();
-		$xsltproc->registerPHPFunctions(['urlencode','strtotime','ucfirst', 'sumExecTimes', 'sumRetryTimes', 'addslashes', 'substr']);
+		$xsltproc->registerPHPFunctions(['urlencode', 'sumExecTimes', 'sumRetryTimes', 'timeSpan', 'timeDiff', 'humanTime']);
 		// Set static parameters
 		foreach($this->parameters as $name=>$value)
 			$xsltproc->setParameter('',$name,$value);

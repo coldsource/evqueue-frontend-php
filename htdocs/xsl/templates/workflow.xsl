@@ -44,11 +44,7 @@
 					<xsl:apply-templates select="." mode="total-time" />
 				</xsl:variable>
 
-				<xsl:text>(</xsl:text>
-				<xsl:call-template name="display-split-time">
-					<xsl:with-param name="seconds" select="$seconds" />
-				</xsl:call-template>
-				<xsl:text>)</xsl:text>
+				(<xsl:value-of select="php:function('humanTime',$seconds)" />)
 			</td>
 			<td class="tdHost">
 				<xsl:value-of select="@node_name | ../@node" />
@@ -60,20 +56,9 @@
 				</xsl:choose>
 			</td>
 			<td class="tdStarted">
-				<xsl:call-template name="displayDateAndTime">
-					<xsl:with-param name="datetime_start" select="@start_time" />
-				</xsl:call-template>
+				<xsl:value-of select="php:function('timeSpan',string(@start_time),string(@end_time))" />
 			</td>
-			<xsl:if test="count(@end_time) > 0">
-				<td class="tdFinished">
-					<xsl:if test="@end_time != '0000-00-00 00:00:00'">
-						<xsl:call-template name="displayDateAndTime">
-							<xsl:with-param name="datetime_end" select="@end_time" />
-						</xsl:call-template>
-					</xsl:if>
-				</td>
-			</xsl:if>
-
+			
 			<td class="tdActions">
 				<xsl:if test="@status='EXECUTING'">
 					<img src="images/stop.png" data-confirm="Are you sure you want to stop the execution of this workflow ?" alt="Stop execution of this workflow" title="Stop execution of this workflow" onclick="
@@ -110,32 +95,12 @@
 	<xsl:template match="instance|workflow" mode="total-time">
 		<xsl:choose>
 			<xsl:when test="count(@end_time) > 0">
-				<xsl:value-of select="php:function('strtotime',string(@end_time))-php:function('strtotime',string(@start_time))" />
+				<xsl:value-of select="php:function('timeDiff',string(@start_time),string(@end_time))" />
 			</xsl:when>
 			<xsl:otherwise>
-				<xsl:value-of select="php:function('strtotime',string($NOW))-php:function('strtotime',string(@start_time))" />
+				<xsl:value-of select="php:function('timeDiff',string(@start_time))" />
 			</xsl:otherwise>
 		</xsl:choose>
-	</xsl:template>
-
-
-	<xsl:template name="display-split-time">
-		<xsl:param name="seconds" />
-
-		<xsl:if test="$seconds div 86400 >= 1">
-			<xsl:value-of select="floor($seconds div 86400)" />
-			<xsl:text>days, </xsl:text>
-		</xsl:if>
-		<xsl:if test="$seconds div 3600 >= 1">
-			<xsl:value-of select="floor($seconds div 3600) mod 24" />
-			<xsl:text>h </xsl:text>
-		</xsl:if>
-		<xsl:if test="$seconds div 60 >= 1">
-			<xsl:value-of select="floor($seconds div 60) mod 60" />
-			<xsl:text>m </xsl:text>
-		</xsl:if>
-		<xsl:value-of select="$seconds mod 60" />
-		<xsl:text>s</xsl:text>
 	</xsl:template>
 
 
@@ -220,36 +185,33 @@
 				<div id="xmlcontent{@id}" style="display:none;">
 					<xsl:apply-templates select="." mode="xml_display" />
 				</div>
-
+				
 				<xsl:variable name="totalTime">
 					<xsl:apply-templates select="." mode="total-time" />
 				</xsl:variable>
-
+				
 				<xsl:variable name="execTime" select="php:function('sumExecTimes', .//task/output)" />
 				<xsl:variable name="retryTime" select="php:function('sumRetryTimes', .//task/output)" />
 				<xsl:variable name="queueTime" select="$totalTime - $execTime - $retryTime" />
-
+				
 				<span class="exectime" style="margin-left: 5px; background-color: rgba(0,255,0,0.1); padding: 2px 5px; /* TODO: move to stylesheet */">
 					<xsl:text>real time </xsl:text>
-					<xsl:call-template name="display-split-time">
-						<xsl:with-param name="seconds" select="$execTime" />
-					</xsl:call-template>
+					<xsl:value-of select="php:function('humanTime',$execTime)" />
 				</span>
 				<span class="queuetime" style="margin-left: 5px; background-color: rgba(0,0,255,0.1); padding: 2px 5px; /* TODO: move to stylesheet */">
 					<xsl:text>queued for </xsl:text>
-					<xsl:call-template name="display-split-time">
-						<xsl:with-param name="seconds" select="$queueTime" />
-					</xsl:call-template>
+					<xsl:value-of select="php:function('humanTime',$queueTime)" />
 				</span>
 				<span class="retrytime" style="margin-left: 5px; background-color: rgba(255,0,0,0.1); padding: 2px 5px; /* TODO: move to stylesheet */">
 					<xsl:text>waited </xsl:text>
-					<xsl:call-template name="display-split-time">
-						<xsl:with-param name="seconds" select="$retryTime" />
-					</xsl:call-template>
+					<xsl:value-of select="php:function('humanTime',$retryTime)" />
 					<xsl:text> for retrials</xsl:text>
 				</span>
 
 				<div class="workflowParameters hidden">
+					<xsl:if test="count(parameters/parameter) = 0">
+						<i>no parameters</i>
+					</xsl:if>
 					<xsl:apply-templates select="parameters" />
 				</div>
 
@@ -301,11 +263,7 @@
 			
 			<xsl:apply-templates select="." mode="status" />
 			
-			<span class="taskName" onclick="
-				$(this).next('.taskDetails').find('.tabs').tabs();
-				$(this).next('.taskDetails').find('.js-execs li:last').click();
-				$(this).next('.taskDetails').dialog().dialog('open');
-				">
+			<span class="taskName">
 				<xsl:value-of select="@name" />
 			</span>
 			<xsl:apply-templates select="." mode="details" />
@@ -379,6 +337,10 @@
 					<ul class="js-execs unstyled">
 						<xsl:for-each select="output">
 							<li class="action">
+								<xsl:choose>
+									<xsl:when test="@retval = '0'"><span class="faicon fa-check"></span></xsl:when>
+									<xsl:otherwise><span class="faicon fa-exclamation"></span></xsl:otherwise>
+								</xsl:choose>
 								<xsl:value-of select="@exit_time" />:
 								return code <xsl:value-of select="@retval" />
 							</li>
@@ -397,27 +359,32 @@
 	
 	<xsl:template match="task" mode="status">
 		<span class="taskState">
-			<xsl:if test="@status='ABORTED'">
-				<span class="faicon fa-exclamation-circle" title="{@status} - {@error}"></span>
-			</xsl:if>
-			<xsl:if test="@status='TERMINATED' and @retval != 0">
-				<span class="faicon fa-exclamation" title="Return value: {@retval}"></span>
-			</xsl:if>
-			<xsl:if test="@status='TERMINATED' and @retval = 0">
-				<span class="faicon fa-check" title="EXECUTING"></span>
-			</xsl:if>
+			<xsl:choose>
+				<xsl:when test="@status='ABORTED'">
+					<span class="faicon fa-exclamation-circle" title="{@status} - {@error}"></span>
+				</xsl:when>
+				<xsl:when test="@status='QUEUED'">
+					<span class="faicon fa-hand-stop-o" title="QUEUED"></span>
+				</xsl:when>
+				<xsl:when test="@status='EXECUTING'">
+					<span class="fa fa-spinner fa-pulse fa-fw"></span>
+				</xsl:when>
+				<xsl:when test="@status='TERMINATED' and @retval != 0">
+					<span class="faicon fa-exclamation" title="Return value: {@retval}"></span>
+				</xsl:when>
+				<xsl:when test="@status='TERMINATED' and @retval = 0 and count(./output[@retval != '0']) > 0">
+					<span class="faicon fa-check errorThenSuccess"></span>
+				</xsl:when>
+				<xsl:when test="@status='TERMINATED' and @retval = 0">
+					<span class="faicon fa-check"></span>
+				</xsl:when>
+			</xsl:choose>
 			
+			<!-- extra "alarm clock" icon if the task will be retried -->
 			<xsl:if test="@status='TERMINATED' and @retry_at != ''">
 				<span class="faicon fa-clock" title="{@retry_at}"></span>
 			</xsl:if>
 			
-			<xsl:if test="@status='EXECUTING'">
-				<span class="fa fa-spinner fa-pulse fa-fw"></span>
-			</xsl:if>
-			
-			<xsl:if test="@status='QUEUED'">
-				<span class="faicon fa-hand-stop-o" title="QUEUED"></span>
-			</xsl:if>
 		</span>
 	</xsl:template>
 
@@ -488,10 +455,7 @@
 							<th>ID &#8211; Name</th>
 							<th>Node</th>
 							<th class="thStarted">Host</th>
-							<th class="thStarted">Started</th>
-							<xsl:if test="$status = 'TERMINATED'">
-								<th class="thFinished">Finished</th>
-							</xsl:if>
+							<th class="thStarted">Time</th>
 							<th class="thActions">Actions</th>
 						</tr>
 						<xsl:apply-templates select="exsl:node-set($instances)[@status = $status]">
@@ -509,9 +473,9 @@
 
 	<xsl:template match="parameters">
 		Parameters list:
-		<ul class="inputs">
+		<ul class="unstyled">
 			<xsl:for-each select="parameter">
-				<li class="parameter" data-name="{@name}">
+				<li>
 					<xsl:value-of select="@name" />: <xsl:value-of select="." />
 				</li>
 			</xsl:for-each>

@@ -107,10 +107,24 @@ function launchWF(name){
 	$('div.makeMeTabz:visible').tabs().removeClass('makeMeTabz');
 }
 
+// TASK OUTPUT POPINS
+$(document).delegate('.taskName', 'click', function () {
+	
+	if ($(this).data('dialog-id')) {  // dialog was already created
+		$('#'+$(this).data('dialog-id')).dialog('open');
+		return;
+	}
+	
+	var taskDetails = $(this).next('.taskDetails');
+	taskDetails.find('.tabs').tabs();
+	taskDetails.find('.js-execs li:last').click();
+	
+	var dialog = taskDetails.dialog();
+	$(this).data('dialog-id', dialog.attr('id'));
+});
 
 $(document).delegate('.js-execs li', 'click', function () {
 	
-	// turn bold selected output 
 	$(this).parent('.js-execs').children('li').css({'font-weight': ''});
 	$(this).css({'font-weight': 'bold'});
 	
