@@ -42,7 +42,6 @@
 				<script type="text/javascript" src="{$SITE_BASE}js/jquery/select2.full.min.js" />
 				
 				<script type="text/javascript" src="{$SITE_BASE}js/forms.js" />
-				<script type="text/javascript" src="{$SITE_BASE}js/progressbar.js" />
 				<script type="text/javascript" src="{$SITE_BASE}js/global.js" />
 
 				<!-- Load additional javascript -->
