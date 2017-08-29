@@ -117,7 +117,7 @@ function RefreshPage()
 			prehandler:WFSFormHandler
 		}, evqueueCreateFormHandler);
 		
-		$('.fa-edit').click({
+		$('.tdActions .fa-edit').click({
 			form_div:$('#wfs-editor'),
 			group:'workflow_schedule',
 			title:'Edit workflow schedule',
@@ -126,9 +126,8 @@ function RefreshPage()
 		}, evqueueEditFormHandler);
 		
 		
-		$('.fa-lock').click(function() {
+		$('.tdActions .fa-lock').click(function() {
 			evqueueAPI({
-				element: this,
 				group: 'workflow_schedule',
 				action: 'unlock',
 				attributes: { 'id': $(this).parents('tr').data('id') }
@@ -138,9 +137,8 @@ function RefreshPage()
 			});
 		});
 		
-		$('.fa-check').click(function() {
+		$('.tdActions .fa-check').click(function() {
 			evqueueAPI({
-				element: this,
 				group: 'workflow_schedule',
 				action: 'lock',
 				attributes: { 'id': $(this).parents('tr').data('id') }
@@ -150,7 +148,7 @@ function RefreshPage()
 			});
 		});
 		
-		$('.fa-remove').click(function() {
+		$('.tdActions .fa-remove').click(function() {
 			evqueueAPI({
 				confirm: 'You are about to delete the selected schedule',
 				group: 'workflow_schedule',
@@ -167,12 +165,15 @@ function RefreshPage()
 			{
 				var tr_el = $(this);
 				evqueueAPI({group:'instances',action:'list',attributes:{filter_schedule_id:$(this).data('id'),limit:1}}).done(function(xml) {
-					tr_el.find('td:eq(4)').text(xml.documentElement.firstChild.getAttribute('start_time'));
-					var instance_id = xml.documentElement.firstChild.getAttribute('id');
-					if(xml.documentElement.firstChild.getAttribute('errors')==0)
-						tr_el.find('td:eq(4)').append('<a href="index.php?filter_id='+instance_id+'"><span class="faicon fa-check" title="Instance has been successfully executed"></span></a>');
-					else
-						tr_el.find('td:eq(4)').append('<a href="index.php?filter_id='+instance_id+'"><span class="faicon fa-exclamation" title="Errors executing instance"></span></a>');
+					if(xml.documentElement.firstChild)
+					{
+						tr_el.find('td:eq(4)').text(xml.documentElement.firstChild.getAttribute('start_time'));
+						var instance_id = xml.documentElement.firstChild.getAttribute('id');
+						if(xml.documentElement.firstChild.getAttribute('errors')==0)
+							tr_el.find('td:eq(4)').append('<a href="index.php?filter_id='+instance_id+'"><span class="faicon fa-check" title="Instance has been successfully executed"></span></a>');
+						else
+							tr_el.find('td:eq(4)').append('<a href="index.php?filter_id='+instance_id+'"><span class="faicon fa-exclamation" title="Errors executing instance"></span></a>');
+					}
 				});
 			}
 		});
