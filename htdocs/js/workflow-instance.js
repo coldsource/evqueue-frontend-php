@@ -107,34 +107,38 @@ function launchWF(name){
 	$('div.makeMeTabz:visible').tabs().removeClass('makeMeTabz');
 }
 
-// TASK OUTPUT POPINS
+/**** TASK OUTPUT POPINS ****/
 $(document).delegate('.taskName', 'click', function () {
-	
-	if ($(this).data('dialog-id')) {  // dialog was already created
-		$('#'+$(this).data('dialog-id')).dialog('open');
-		return;
-	}
-	
-	var taskDetails = $(this).next('.taskDetails');
-	taskDetails.find('.tabs').tabs();
-	taskDetails.find('.js-execs li:last').click();
-	
-	var dialog = taskDetails.dialog();
-	$(this).data('dialog-id', dialog.attr('id'));
+	$(this).next('.taskDetails').find('.js-execs li:last').click();
 });
 
 $(document).delegate('.js-execs li', 'click', function () {
 	
-	$(this).parent('.js-execs').children('li').css({'font-weight': ''});
-	$(this).css({'font-weight': 'bold'});
+	var d = $(this).data('dialog-id')
+	if (d) {
+		console.log('existing dialog '+d);
+		$('#'+d).dialog('open');
+		return;
+	}
 	
-	var taskDetails = $(this).parents('.taskDetails');
-	var outputData = taskDetails.children('.outputData');
+	var dialog = $(this).parents('.taskDetails').clone().attr('id','').dialogTiled({width: 660,height: 500});
+	$(this).data('dialog-id', dialog.attr('id'));
+	
+	console.log('new dialog '+$(this).data('dialog-id'));
+	
+	dialog.find('.tabs').tabs();
+	
+	var outputData = dialog.children('.outputData');
 	var pos = $(this).index();
 	
-	taskDetails.find('#tab-taskStdout').html( outputData.find('.output').eq(pos).html() );
-	taskDetails.find('#tab-taskStderr').html( outputData.find('.stderr').eq(pos).html() );
-	taskDetails.find('#tab-taskLog'   ).html( outputData.find('.log'   ).eq(pos).html() );
+	// if this not the first dialog we open for this task, remove the 'previous executions' tab
+	if (!$(this).is(':last-child')) {
+		dialog.find('a[href="#tab-taskPrevExecs"], #tab-taskPrevExecs').remove();
+	}
 	
-	taskDetails.find('a[href="#tab-taskStdout"]').click();
+	dialog.find('#tab-taskStdout .output').hide().eq(pos).show();
+	dialog.find('#tab-taskStderr .stderr').hide().eq(pos).show();
+	dialog.find('#tab-taskLog    .log'   ).hide().eq(pos).show();
+	
+	dialog.find('a[href="#tab-taskStdout"]').click();
 });

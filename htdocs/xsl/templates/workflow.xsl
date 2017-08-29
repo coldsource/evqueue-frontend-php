@@ -3,6 +3,7 @@
 	<xsl:import href="datetime.xsl" />
 	<xsl:import href="xmlhighlight.xsl" />
 
+
 	<xsl:template match="workflow">
 		<tr>
 			<td class="workflowStatus">
@@ -261,9 +262,8 @@
 		
 		<div class="task {$taskClass}" data-name="{@name}" data-type="task" data-queue="{@queue}" data-retry-schedule="{@retry_schedule}" data-loop="{@loop}" data-condition="{@condition}">
 			
-			<xsl:apply-templates select="." mode="status" />
-			
 			<span class="taskName">
+				<xsl:apply-templates select="." mode="status" />
 				<xsl:value-of select="@name" />
 			</span>
 			<xsl:apply-templates select="." mode="details" />
@@ -290,7 +290,7 @@
 	
 	
 	<xsl:template match="task" mode="details">
-		<div class="taskDetails dialog" data-width="900" data-height="300">
+		<div class="taskDetails dialog">
 			<h2>
 				<xsl:apply-templates select="." mode="status" />
 				<xsl:value-of select="@name" />
@@ -302,7 +302,9 @@
 					<li><a href="#tab-taskStdout">Stdout</a></li>
 					<li><a href="#tab-taskStderr">Stderr</a></li>
 					<li><a href="#tab-taskLog">Log</a></li>
-					<li><a href="#tab-taskPrevExecs">Previous Executions</a></li>
+					<xsl:if test="count(output) > 1">
+						<li><a href="#tab-taskPrevExecs">Previous Executions</a></li>
+					</xsl:if>
 				</ul>
 				<div id="tab-taskGeneral">
 					<xsl:if test="count(input) = 0">
@@ -330,29 +332,55 @@
 						</xsl:if>
 					</ul>
 				</div>
-				<div id="tab-taskStdout"></div>
-				<div id="tab-taskStderr"></div>
-				<div id="tab-taskLog"></div>
-				<div id="tab-taskPrevExecs">
-					<ul class="js-execs unstyled">
+				<div id="tab-taskStdout">
+					<ul class="unstyled">
 						<xsl:for-each select="output">
-							<li class="action">
+							<li class="output">
 								<xsl:choose>
-									<xsl:when test="@retval = '0'"><span class="faicon fa-check"></span></xsl:when>
-									<xsl:otherwise><span class="faicon fa-exclamation"></span></xsl:otherwise>
+									<xsl:when test="@method = 'text'">
+										<xsl:attribute name="style">white-space:pre-wrap;</xsl:attribute>
+										<xsl:value-of select="." />
+									</xsl:when>
+									<xsl:when test="@method = 'xml'">
+										<xsl:apply-templates select="." mode="xml_display" />
+									</xsl:when>
 								</xsl:choose>
-								<xsl:value-of select="@exit_time" />:
-								return code <xsl:value-of select="@retval" />
 							</li>
 						</xsl:for-each>
 					</ul>
 				</div>
+				<div id="tab-taskStderr">
+					<ul class="unstyled">
+						<xsl:for-each select="stderr">
+							<li class="stderr"><xsl:value-of select="." /></li>
+						</xsl:for-each>
+					</ul>
+				</div>
+				<div id="tab-taskLog">
+					<ul class="unstyled">
+						<xsl:for-each select="log">
+							<li class="log"><xsl:value-of select="." /></li>
+						</xsl:for-each>
+					</ul>
+				</div>
+				<xsl:if test="count(output) > 1">
+					<div id="tab-taskPrevExecs">
+						<ul class="js-execs unstyled">
+							<xsl:for-each select="output">
+								<li class="action">
+									<xsl:if test="position() = last()"><xsl:attribute name="style">font-weight: bold;</xsl:attribute></xsl:if>
+									<xsl:choose>
+										<xsl:when test="@retval = '0'"><span class="faicon fa-check"></span></xsl:when>
+										<xsl:otherwise><span class="faicon fa-exclamation"></span></xsl:otherwise>
+									</xsl:choose>
+									<xsl:value-of select="@exit_time" />:
+									return code <xsl:value-of select="@retval" />
+								</li>
+							</xsl:for-each>
+						</ul>
+					</div>
+				</xsl:if>
 			</div>
-			
-			<ul class="outputData hidden">
-				<xsl:apply-templates select="output | stderr | log" />
-			</ul>
-			
 		</div>
 	</xsl:template>
 	
@@ -523,27 +551,6 @@
 					</xsl:if>
 				</xsl:for-each>
 			</div>
-		</li>
-	</xsl:template>
-
-
-	<xsl:template match="output">
-		<li class="output">
-			<xsl:choose>
-				<xsl:when test="@method = 'text'">
-					<xsl:attribute name="style">white-space:pre-wrap;</xsl:attribute>
-					<xsl:value-of select="." />
-				</xsl:when>
-				<xsl:when test="@method = 'xml'">
-					<xsl:apply-templates select="." mode="xml_display" />
-				</xsl:when>
-			</xsl:choose>
-		</li>
-	</xsl:template>
-	
-	<xsl:template match="stderr | log">
-		<li class="{name(.)}">
-			<xsl:value-of select="." />
 		</li>
 	</xsl:template>
 

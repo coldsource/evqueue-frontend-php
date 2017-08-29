@@ -39,7 +39,9 @@ function sumRetryTimes ($nodes) {
 	return $total_time;
 }
 
-function timeDiff ($dt1,$dt2) {
+function timeDiff ($dt1,$dt2=null) {
+  if (!$dt2)
+    $dt2 = date('Y-m-d H:i:s');
   return strtotime($dt2) - strtotime($dt1);
 }
 

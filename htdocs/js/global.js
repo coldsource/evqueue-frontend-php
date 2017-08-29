@@ -63,3 +63,22 @@ function Message(msg)
 	$('#message').show();
 	$('#message').delay(2000).fadeOut();
 }
+
+
+var dialog_currpos = 0;
+var dialog_positions = ['left top', 'right top', 'left bottom', 'right bottom'];
+jQuery.fn.extend({
+  dialogTiled: function(options) {
+    return this.each(function() {
+			var pos = dialog_positions[dialog_currpos];
+			dialog_currpos = (dialog_currpos + 1) % 4;
+			
+			options.position = {
+				my: pos,
+				at: pos,
+				of: window
+			};
+      $(this).dialog(options);
+    });
+  }
+});

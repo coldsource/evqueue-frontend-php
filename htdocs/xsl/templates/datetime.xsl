@@ -45,32 +45,6 @@
 		<xsl:value-of select="substring($timestamp,12,8)" />
 	</xsl:template>
 	
-	<xsl:template name="startEndTimes">
-		<xsl:param name="start" />
-		<xsl:param name="end" />
-		
-		<xsl:variable name="theEnd">
-			<xsl:choose>
-				<xsl:when test="$end = '0000-00-00 00:00:00'">
-					<xsl:text>?</xsl:text>
-				</xsl:when>
-				<xsl:when test="substring($start,1,10) = substring($end,1,10)">
-					<xsl:value-of select="substring($end,12,8)" />
-				</xsl:when>
-				<xsl:otherwise>
-					<xsl:value-of select="substring($end,1,16)" />
-				</xsl:otherwise>
-			</xsl:choose>
-		</xsl:variable>
-		
-		<xsl:call-template name="display-time">
-			<xsl:with-param name="timestamp" select="$start" />
-		</xsl:call-template>
-		<xsl:text> - </xsl:text>
-		<xsl:value-of select="$theEnd" />
-		
-	</xsl:template>
-	
 	<xsl:template name="startTimes">
 		<xsl:param name="start" />
 		<xsl:call-template name="display-time">
