@@ -37,7 +37,7 @@ function evqueueAPI(options, cbk = false){
 		if(cbk)
 			cbk(xml);
 		
-		promise.resolve();
+		promise.resolve(xml);
 	});
 	
 	return promise;

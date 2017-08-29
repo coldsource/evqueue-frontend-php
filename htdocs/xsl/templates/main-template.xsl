@@ -136,7 +136,6 @@
 		<ul class="submenu" id="submenu-system-state">
 			<xsl:if test="$topmenu!='system-state'"><xsl:attribute name="style">display:none;</xsl:attribute></xsl:if>
 			<li><a href="{$SITE_BASE}index.php">Workflows instances</a></li>
-			<li><a href="{$SITE_BASE}workflow-schedules.php?display=state">Scheduled workflows</a></li>
 			<li><a href="{$SITE_BASE}system_state.php">Queues</a></li>
 			<li><a href="{$SITE_BASE}system_statistics.php">Statistics</a></li>
 		</ul>

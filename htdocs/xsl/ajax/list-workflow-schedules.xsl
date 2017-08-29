@@ -4,8 +4,6 @@
 	
 	<xsl:key name="groups" match="/page/workflows/workflow/@group" use="." />
 	
-	<xsl:variable name="DISPLAY">settings</xsl:variable>
-	
 	<xsl:template match="/">
 		<div class="contentList">
 			<div class="boxTitle">
@@ -16,20 +14,12 @@
 				<tbody>
 					<tr>
 						<th>Workflow</th>
-						<xsl:if test="$DISPLAY = 'settings'">
-							<th>On failure</th>
-						</xsl:if>
+						<th>On failure</th>
 						<th style="width:100px;">Node</th>
-						<xsl:if test="$DISPLAY = 'settings'">
-							<th>Host</th>
-						</xsl:if>
-						<xsl:if test="$DISPLAY = 'state'">
-							<th style="width:140px;">Last execution</th>
-						</xsl:if>
+						<th>Host</th>
+						<th style="width:170px;">Last execution</th>
 						<th style="width:140px;">Next execution time</th>
-						<xsl:if test="$DISPLAY = 'settings'">
-							<th style="width:60px;">Status</th>
-						</xsl:if>
+						<th style="width:60px;">Status</th>
 						<th class="thActions">Actions</th>
 					</tr>
 					
@@ -73,71 +63,57 @@
 											</xsl:for-each>
 										</ul>
 									</td>
-									<xsl:if test="$DISPLAY = 'settings'">
 										<td class="center">
 											<xsl:value-of select="@onfailure" />
 										</td>
-									</xsl:if>
 									<td class="center">
 										<xsl:value-of select="@node" />
 									</td>
-									<xsl:if test="$DISPLAY = 'settings'">
-										<td class="center">
+									<td class="center">
+										<xsl:choose>
+											<xsl:when test="@host != ''"><xsl:value-of select="@host" /></xsl:when>
+											<xsl:otherwise>localhost</xsl:otherwise>
+										</xsl:choose>
+									</td>
+									<td class="center">
+										<a href="index.php?workflow_instance_id={/page/workflow-schedules-instance/workflow[@schedule_id = current()/@id]/@id}">
 											<xsl:choose>
-												<xsl:when test="@host != ''"><xsl:value-of select="@host" /></xsl:when>
-												<xsl:otherwise>localhost</xsl:otherwise>
-											</xsl:choose>
-										</td>
-									</xsl:if>
-									<xsl:if test="$DISPLAY = 'state'">
-										<td class="center">
-											<a href="index.php?workflow_instance_id={/page/workflow-schedules-instance/workflow[@schedule_id = current()/@id]/@id}">
-												<xsl:choose>
-													<xsl:when test="/page/workflow-schedules-instance/workflow[@schedule_id = current()/@id]/@errors>0">
-														<img src="images/exclamation.png" alt="Errors" title="Errors" />
-													</xsl:when>
-													<xsl:when test="count(/page/workflow-schedules-instance/workflow[@schedule_id = current()/@id]/@end_time) > 0">
-														<img src="images/ok.png" />
-													</xsl:when>
-													<xsl:when test="count(/page/workflow-schedules-instance/workflow[@schedule_id = current()/@id]) = 0">
+												<xsl:when test="/page/workflow-schedules-instance/workflow[@schedule_id = current()/@id]/@errors>0">
+													<img src="images/exclamation.png" alt="Errors" title="Errors" />
+												</xsl:when>
+												<xsl:when test="count(/page/workflow-schedules-instance/workflow[@schedule_id = current()/@id]/@end_time) > 0">
+													<img src="images/ok.png" />
+												</xsl:when>
+												<xsl:when test="count(/page/workflow-schedules-instance/workflow[@schedule_id = current()/@id]) = 0">
 
-													</xsl:when>
-													<xsl:otherwise>
-														<img src="images/ajax-loader.gif" />
-													</xsl:otherwise>
-												</xsl:choose>
-											</a>
-											<xsl:text>&#160;</xsl:text>
-											<xsl:call-template name="displayDateAndTime">
-												<xsl:with-param name="datetime_start" select="/page/workflow-schedules-instance/workflow[@schedule_id = current()/@id]/@start_time" />
-											</xsl:call-template>
-										</td>
-									</xsl:if>
+												</xsl:when>
+												<xsl:otherwise>
+													<img src="images/ajax-loader.gif" />
+												</xsl:otherwise>
+											</xsl:choose>
+										</a>
+										<xsl:text>&#160;</xsl:text>
+										<xsl:call-template name="displayDateAndTime">
+											<xsl:with-param name="datetime_start" select="/page/workflow-schedules-instance/workflow[@schedule_id = current()/@id]/@start_time" />
+										</xsl:call-template>
+									</td>
 									<td class="center">
 										<xsl:call-template name="displayDateAndTime">
 											<xsl:with-param name="datetime_start" select="/page/status/response/status/workflow[@workflow_schedule_id = current()/@id]/@scheduled_at" />
 										</xsl:call-template>
 									</td>
-									<xsl:if test="$DISPLAY = 'settings'">
-										<td class="tdActions">
-											<xsl:choose>
-												<xsl:when test="@active = 1"><span class="faicon fa-check" title="Disable this schedule"></span></xsl:when>
-												<xsl:otherwise test="@active = 1"><span class="faicon fa-lock" title="Enable this schedule"></span></xsl:otherwise>
-												<xsl:otherwise>-</xsl:otherwise>
-											</xsl:choose>
-										</td>
-									</xsl:if>
 									<td class="tdActions">
-										<xsl:if test="$DISPLAY = 'state'">
-											<a href="index.php?workflow_schedule_id={@id}" title="See workflows launched by this schedule" style="text-decoration: none;">
-												<img src="images/eye.png" />
-											</a>
-										</xsl:if>
-										<xsl:if test="$DISPLAY = 'settings'">
-											<span class="faicon fa-edit" title="Edit schedule"></span>
-											<xsl:text>&#160;</xsl:text>
-											<span class="faicon fa-remove" title="Delete schedule" data-confirm="You are about to delete the selected schedule"></span>
-										</xsl:if>
+										<a href="index.php?workflow_schedule_id={@id}"><span class="faicon fa-eye" title="View launched instances"></span></a>
+										<xsl:choose>
+											<xsl:when test="@active = 1"><span class="faicon fa-check" title="Disable this schedule"></span></xsl:when>
+											<xsl:otherwise test="@active = 1"><span class="faicon fa-lock" title="Enable this schedule"></span></xsl:otherwise>
+											<xsl:otherwise>-</xsl:otherwise>
+										</xsl:choose>
+									</td>
+									<td class="tdActions">
+										<span class="faicon fa-edit" title="Edit schedule"></span>
+										<xsl:text>&#160;</xsl:text>
+										<span class="faicon fa-remove" title="Delete schedule" data-confirm="You are about to delete the selected schedule"></span>
 									</td>
 								</tr>
 							</xsl:if>

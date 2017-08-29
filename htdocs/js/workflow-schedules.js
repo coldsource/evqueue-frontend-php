@@ -64,6 +64,9 @@ $(document).ready( function() {
 	});
 	
 	$('#when_daily form input[name=schedule]').change(function() {
+		if($(this).val()=='')
+			$(this).val(';;;;;');
+		
 		var schedule = $(this).val().split(';');
 		var seconds = schedule[0].split(',');
 		var minutes = schedule[1].split(',');
@@ -101,6 +104,10 @@ function RefreshPage()
 		$('#list-workflow-schedules').html(data);
 		
 		Ready();
+		
+		$(document).delegate('.fa-file-o','click', function () {
+			
+		});
 		
 		$('.fa-file-o').click({
 			form_div:$('#wfs-editor'),
@@ -153,6 +160,21 @@ function RefreshPage()
 				Message('Schedule has been deleted');
 				RefreshPage();
 			});
+		});
+		
+		$('#list-workflow-schedules tr').each(function() {
+			if($(this).data('id'))
+			{
+				var tr_el = $(this);
+				evqueueAPI({group:'instances',action:'list',attributes:{filter_schedule_id:$(this).data('id'),limit:1}}).done(function(xml) {
+					tr_el.find('td:eq(4)').text(xml.documentElement.firstChild.getAttribute('start_time'));
+					var instance_id = xml.documentElement.firstChild.getAttribute('id');
+					if(xml.documentElement.firstChild.getAttribute('errors')==0)
+						tr_el.find('td:eq(4)').append('<a href="index.php?filter_id='+instance_id+'"><span class="faicon fa-check" title="Instance has been successfully executed"></span></a>');
+					else
+						tr_el.find('td:eq(4)').append('<a href="index.php?filter_id='+instance_id+'"><span class="faicon fa-exclamation" title="Errors executing instance"></span></a>');
+				});
+			}
 		});
 	});
 }
