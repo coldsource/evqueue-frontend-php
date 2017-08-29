@@ -284,3 +284,7 @@ div#login div.form {
 .git_conflict {
 	color:red;
 }
+
+.task div.task_icon{
+	border:none;
+}
