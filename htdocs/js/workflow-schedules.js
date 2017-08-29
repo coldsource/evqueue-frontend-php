@@ -65,7 +65,10 @@ $(document).ready( function() {
 	
 	$('#when_daily form input[name=schedule]').change(function() {
 		if($(this).val()=='')
+		{
 			$(this).val(';;;;;');
+			return;
+		}
 		
 		var schedule = $(this).val().split(';');
 		var seconds = schedule[0].split(',');
