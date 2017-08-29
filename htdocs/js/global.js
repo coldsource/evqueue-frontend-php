@@ -55,11 +55,11 @@ $(document).ready( function() {
 function evqueueAPI(options){
 	options = $.extend({confirm: '', attributes: [], parameters: []}, options);
 	
-	if (options.confirm && !confirm(options.confirm))
-		return;
-	delete options.confirm;
-	
 	var promise = new jQuery.Deferred();
+	
+	if (options.confirm && !confirm(options.confirm))
+		return promise.reject();
+	delete options.confirm;
 	
 	$.ajax({
 		url: 'ajax/evqueue_api.php',

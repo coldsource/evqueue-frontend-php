@@ -43,6 +43,8 @@ function RefreshPage()
 			}).done(function() {
 				Message('Committed task to git');
 				RefreshPage();
+			}).always(function() {
+				Ready();
 			});
 		});
 		
@@ -56,6 +58,8 @@ function RefreshPage()
 			}).done(function() {
 				Message('Loaded task from git');
 				RefreshPage();
+			}).always(function() {
+				Ready();
 			});
 		});
 		
@@ -73,6 +77,8 @@ function RefreshPage()
 			}).done(function() {
 				Message('Removed task from git');
 				RefreshPage();
+			}).always(function() {
+				Ready();
 			});
 		});
 		

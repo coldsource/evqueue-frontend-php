@@ -37,6 +37,8 @@ function RefreshPage()
 			}).done(function() {
 				Message('Committed workflow to git');
 				RefreshPage();
+			}).always(function() {
+				Ready();
 			});
 		});
 		
@@ -50,6 +52,8 @@ function RefreshPage()
 			}).done(function() {
 				Message('Loaded workflow from git');
 				RefreshPage();
+			}).always(function() {
+				Ready();
 			});
 		});
 		
@@ -67,6 +71,8 @@ function RefreshPage()
 			}).done(function() {
 				Message('Removed workflow from git');
 				RefreshPage();
+			}).always(function() {
+				Ready();
 			});
 		});
 		
@@ -84,6 +90,8 @@ function RefreshPage()
 			}).done(function() {
 				Message('Workflow has been deleted');
 				RefreshPage();
+			}).always(function() {
+				Ready();
 			});
 		});
 	});
