@@ -52,7 +52,7 @@ $(document).ready( function() {
 	});
 });
 
-function evqueueAPI(options, cbk = false){
+function evqueueAPI(options){
 	options = $.extend({attributes: [], parameters: []}, options);
 	
 	if ($(options.element).attr('data-confirm')) {
@@ -74,9 +74,6 @@ function evqueueAPI(options, cbk = false){
 			promise.reject();
 			return;
 		}
-		
-		if(cbk)
-			cbk(xml);
 		
 		promise.resolve(xml);
 	});

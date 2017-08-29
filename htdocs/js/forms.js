@@ -37,7 +37,7 @@ $(document).ready( function() {
 			evqueueAPI({
 				group: 'tasks',
 				action: 'list'
-			},function(xml) {
+			}).done(function(xml) {
 				data = new Set();
 				$(xml).find('task').each(function() {
 					if($(this).attr('group')!='')
@@ -51,7 +51,7 @@ $(document).ready( function() {
 			evqueueAPI({
 				group: 'workflows',
 				action: 'list'
-			},function(xml) {
+			}).done(function(xml) {
 				data = new Set();
 				$(xml).find('workflow').each(function() {
 					if($(this).attr('group')!='')
@@ -87,7 +87,7 @@ $(document).ready( function() {
 			evqueueAPI({
 				group: 'workflows',
 				action: 'list'
-			},function(xml) {
+			}).done(function(xml) {
 				$(xml).find('workflow').each(function() {
 					var group = $(this).attr('group')!=''?$(this).attr('group'):'No group';
 					
@@ -173,7 +173,7 @@ function evqueuePrepareFormAPI(el, group, id)
 			group: group,
 			action: 'get',
 			attributes: {id:id}
-		},function(xml) {
+		}).done(function(xml) {
 			attributes = xml.documentElement.firstChild.attributes;
 			for(var i=0;i<attributes.length;i++)
 			{

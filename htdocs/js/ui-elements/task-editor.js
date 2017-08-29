@@ -8,7 +8,7 @@ function TaskEditor()
 	evqueueAPI({
 		group: 'queuepool',
 		action: 'list',
-	},function(xml) {
+	}).done(function(xml) {
 		$(xml).find('queue').each(function(index, value) {
 			$('#task-editor select#queue').append($('<option>', {value: $(value).attr('name'),text:$(value).attr('name')+" ("+$(value).attr('concurrency')+")"}));
 		});
@@ -18,7 +18,7 @@ function TaskEditor()
 	evqueueAPI({
 		group: 'retry_schedules',
 		action: 'list'
-	},function(xml) {
+	}).done(function(xml) {
 		$(xml).find('schedule').each(function(index, value) {
 			$('#task-editor select#retryschedule').append($('<option>', {value: $(value).attr('name'),text:$(value).attr('name')}));
 		});

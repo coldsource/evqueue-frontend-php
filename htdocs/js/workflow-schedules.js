@@ -27,7 +27,7 @@ $(document).ready( function() {
 			group: 'workflow',
 			action: 'get',
 			attributes: {id: $(this).val()}
-		},function(xml) {
+		}).done(function(xml) {
 			$(xml).find('parameter').each(function() {
 				$('#what_workflow form').append('<div class="parameter"><label>'+$(this).attr('name')+'</label><input name="parameter_'+$(this).attr('name')+'"></input></div>');
 			});
@@ -156,7 +156,7 @@ function RefreshPage()
 				group: 'workflow_schedule',
 				action: 'delete',
 				attributes: { 'id': $(this).parents('tr').data('id') }
-			}, function() {
+			}).done(function() {
 				Message('Schedule has been deleted');
 				RefreshPage();
 			});
@@ -223,7 +223,11 @@ function WFSFormHandler()
 	
 	var workflow = btoa(new XMLSerializer().serializeToString(xmldoc));
 	
-	return evqueueAPI(false,'workflow','create',{name:name,content:workflow,group:group,comment:comment}, [],function(xml) {
+	return evqueueAPI({
+		group: 'workflow',
+		action: 'create',
+		attributes: {name:name,content:workflow,group:group,comment:comment}
+	}).done(function(xml) {
 		$('#what_script input[name=workflow_id]').val(xml.documentElement.getAttribute('workflow-id'));
 	});
 }

@@ -116,15 +116,12 @@ $(document).delegate('.js-execs li', 'click', function () {
 	
 	var d = $(this).data('dialog-id')
 	if (d) {
-		console.log('existing dialog '+d);
 		$('#'+d).dialog('open');
 		return;
 	}
 	
 	var dialog = $(this).parents('.taskDetails').clone().attr('id','').dialogTiled({width: 660,height: 500});
 	$(this).data('dialog-id', dialog.attr('id'));
-	
-	console.log('new dialog '+$(this).data('dialog-id'));
 	
 	dialog.find('.tabs').tabs();
 	

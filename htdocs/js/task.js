@@ -36,7 +36,7 @@ function RefreshPage()
 				group: 'git',
 				action: 'save_task',
 				attributes: {name: $(this).data('name'), commit_log: log,force:$(this).data('force')}
-			},function() {
+			}).done(function() {
 				Message('Committed task to git');
 				RefreshPage();
 			});
@@ -49,7 +49,7 @@ function RefreshPage()
 				group: 'git',
 				action: 'load_task',
 				attributes: {name: $(this).data('name')}
-			},function() {
+			}).done(function() {
 				Message('Loaded task from git');
 				RefreshPage();
 			});
@@ -66,7 +66,7 @@ function RefreshPage()
 				group: 'git',
 				action: 'remove_task',
 				attributes: {name: $(this).data('name'), commit_log: log}
-			},function() {
+			}).done(function() {
 				Message('Removed task from git');
 				RefreshPage();
 			});
@@ -78,7 +78,7 @@ function RefreshPage()
 				group: 'task',
 				action: 'delete',
 				attributes: { 'id':$(this).parents('tr').data('id') }
-			}, function() {
+			}).done(function() {
 				Message('Task has been deleted');
 				RefreshPage();
 			});

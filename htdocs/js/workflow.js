@@ -30,7 +30,7 @@ function RefreshPage()
 				group: 'git',
 				action: 'save_workflow',
 				attributes: {name: $(this).data('name'), commit_log: log,force:$(this).data('force')}
-			},function() {
+			}).done(function() {
 				Message('Committed workflow to git');
 				RefreshPage();
 			});
@@ -43,7 +43,7 @@ function RefreshPage()
 				group: 'git',
 				action: 'load_workflow',
 				attributes: {name: $(this).data('name')}
-			},function() {
+			}).done(function() {
 				Message('Loaded workflow from git');
 				RefreshPage();
 			});
@@ -60,7 +60,7 @@ function RefreshPage()
 				group: 'git',
 				action: 'remove_workflow',
 				attributes: {name: $(this).data('name'),commit_log:log}
-			},function() {
+			}).done(function() {
 				Message('Removed workflow from git');
 				RefreshPage();
 			});
@@ -77,7 +77,7 @@ function RefreshPage()
 				group: 'workflow',
 				action: 'delete',
 				attributes: { id: $(this).parents('tr').data('id') }
-			}, function() {
+			}).done(function() {
 				Message('Workflow has been deleted');
 				RefreshPage();
 			});

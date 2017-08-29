@@ -31,7 +31,7 @@ function RefreshPage()
 				group: 'queue',
 				action: 'delete',
 				attributes: { 'id': $(this).parents('tr').data('id') }
-			}, function() {
+			}).done(function() {
 				Message('Queue has been deleted');
 				RefreshPage();
 			});

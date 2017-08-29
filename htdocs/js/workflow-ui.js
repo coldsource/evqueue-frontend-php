@@ -12,7 +12,7 @@ $(document).ready(function() {
 			group: 'workflow',
 			action: 'get',
 			attributes: {'id': workflow_id}
-		},function(xml) {
+		}).done(function(xml) {
 			var name = xml.documentElement.firstChild.getAttribute('name');
 			var group = xml.documentElement.firstChild.getAttribute('group');
 			var comment = xml.documentElement.firstChild.getAttribute('comment');
@@ -138,7 +138,7 @@ function SaveWorkflow()
 				comment: wf.GetAttribute('comment'),
 				content: btoa(wf.GetXML(true))
 				}
-		}, function(xml) {
+		}).done(function(xml) {
 			$('#message').html('Workflow has been created');
 			$('#message').show();
 			$('#message').delay(2000).fadeOut();
@@ -161,7 +161,7 @@ function SaveWorkflow()
 				comment: wf.GetAttribute('comment'),
 				content: btoa(wf.GetXML(true))
 			}
-		}, function(xml) {
+		}).done(function(xml) {
 			$('#message').html('Workflow has been saved');
 			$('#message').show();
 			$('#message').delay(2000).fadeOut();
