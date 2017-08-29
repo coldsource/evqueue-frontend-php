@@ -123,10 +123,19 @@ function autorefresh(el,toggle)
 {
 	var interval = el.data('interval')?el.data('interval'):0;
 	var url = el.data('url');
-	var pannel = el.find('div.evq-autorefresh-pannel').first();
+	var pannels = el.find('div.evq-autorefresh-pannel');
 	
 	return $.ajax({url: url}).done(function(data) {
-		pannel.html(data);
+		if(pannels.length==1)
+			$(pannels[0]).html(data);
+		else
+		{
+			for(var i=0;i<pannels.length;i++)
+			{
+				var pannel_id = $(pannels[i]).attr('id');
+				$(pannels[i]).html($(data).find('#'+pannel_id).html());
+			}
+		}
 		
 		if(interval>0 && toggle.hasClass('fa-spin'))
 		{

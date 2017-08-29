@@ -1,4 +1,4 @@
-$(document).ready(function() {
+/*$(document).ready(function() {
 	
 	$('body').find('div.progressBar').each(function(){
 		
@@ -58,3 +58,4 @@ function getcolor(pct) {
 	}
 
 }
+*/

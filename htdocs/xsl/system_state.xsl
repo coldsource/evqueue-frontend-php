@@ -8,64 +8,24 @@
 	</xsl:variable>
 	
 	<xsl:template name="content">
-		<div class="contentManage">
+		<div class="evq-autorefresh" data-url="ajax/system_state.php" data-interval="1">
 			<div class="boxTitle">
-				<span class="title">Queues States</span>
+				<span class="title">Queues States <span class="faicon fa-refresh action evq-autorefresh-toggle"></span></span>
 			</div>
 			
-			<div class="makeMeTabz">
+			<div class="tabs">
 				<ul>
-					<xsl:for-each select="/page/stats">
-						<li><a href="#{@node_name}"><xsl:value-of select="@node_name" /></a></li>
+					<xsl:for-each select="/page/evqueue-nodes/node">
+						<li><a href="#node-{@name}"><xsl:value-of select="@name" /></a></li>
 					</xsl:for-each>
 				</ul>
 			
-				<xsl:for-each select="/page/stats">
-					<div id="{@node_name}">
-						<table>
-							<tr>
-								<th>Name</th>
-								<th>Scheduler</th>
-								<th>Concurrency</th>
-								<th>Running tasks</th>
-								<th>Queued tasks</th>
-							</tr>
-
-							<xsl:for-each select="statistics/queue">
-								<tr class="evenOdd">
-									<td>
-										<xsl:value-of select="@name" />
-									</td>
-									<td class="txtcenter">
-										<xsl:value-of select="@scheduler" />
-									</td>
-									<td class="txtcenter">
-										<xsl:value-of select="@concurrency" />
-									</td>
-									<td class="txtcenter">
-										<div class="progressBar default" actualVal="{@running_tasks}" maxVal="{@concurrency}">
-											<div></div>
-										</div>
-										<xsl:value-of select="@running_tasks" /> task<xsl:if test="@running_tasks > 1">s </xsl:if>
-										<xsl:text> running.</xsl:text>
-									</td>
-									<td class="txtcenter">
-
-										<div class="progressBar2 default" actualVal="{@size}" maxVal="{@concurrency}">
-											<div></div>
-										</div>
-										<xsl:value-of select="@size" /> awaiting task<xsl:if test="@running_tasks > 1">s </xsl:if>
-										<xsl:text> in queue.</xsl:text>
-
-									</td>
-								</tr>
-							</xsl:for-each>
-						</table>
-					</div>
+				<xsl:for-each select="/page/evqueue-nodes/node">
+					<div class="evq-autorefresh-pannel" id="node-{@name}"></div>
 				</xsl:for-each>
+				
 			</div>
 		</div>
-		<script type="text/javascript">$('div.makeMeTabz:visible').tabs().removeClass('makeMeTabz');</script>
 	</xsl:template>
 
 </xsl:stylesheet>

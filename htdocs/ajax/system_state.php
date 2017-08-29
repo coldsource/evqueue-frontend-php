@@ -24,6 +24,8 @@ require_once 'lib/XSLEngine.php';
 
 $xsl = new XSLEngine();
 
-$xsl->DisplayXHTML('xsl/system_state.xsl');
+$xsl->AddFragment(['statistics' => $xsl->ClusterApi('statistics', 'query', ['type' => 'queue'])] );
+
+$xsl->DisplayXHTML('../xsl/ajax/system_state.xsl');
 
 ?>
