@@ -1,16 +1,35 @@
+var schedule;
+
 $(document).ready( function() {
 	RefreshPage();
 	
-	$('.fa-plus').click(function() {
+	$('#schedule-editor .fa-plus').click(function() {
+		schedule.AddLevel();
 		AddScheduleLevel(false);
 	});
 	
 	$('#schedule-editor input[name=content]').change(function() {
 		if($(this).val()=='')
 		{
+			schedule = new RetrySchedule();
+			schedule.AddLevel();
 			$('#schedule-editor form div.level').remove();
 			AddScheduleLevel(true);
 		}
+		else
+		{
+			$('#schedule-editor form div.level').remove();
+			UpdateSchedule();
+		}
+	});
+	
+	$('#schedule-editor input[name=id]').change(function(event,data) {
+		if($(this).val()=='')
+			return;
+		
+		schedule = new RetrySchedule(new XMLSerializer().serializeToString(data.documentElement.firstChild));
+		$('#schedule-editor input[name=content]').val(btoa(schedule.GetXML()));
+		$('#schedule-editor input[name=content]').trigger('change');
 	});
 });
 
@@ -30,15 +49,15 @@ function RefreshPage()
 			message:'Schedule created'
 		}, evqueueCreateFormHandler);
 		
-		$('.fa-edit').click({
+		$('td.tdActions .fa-edit').click({
 			form_div:$('#schedule-editor'),
 			group:'retry_schedule',
 			title:'Edit retry schedule',
 			message:'Schedule saved'
 		}, evqueueEditFormHandler);
 		
-		$('.fa-remove:not(.git)').click(function() {
-			evqueueAPI(this, 'retry_schedule', 'delete', { 'id':$(this).parents('tr').data('id') }, [], function() {
+		$('td.tdActions .fa-remove').click(function() {
+			evqueueAPI({element:this,group:'retry_schedule',action:'delete',attributes:{ 'id':$(this).parents('tr').data('id') }}, function() {
 				Message('Schedule has been deleted');
 				RefreshPage();
 			});
@@ -46,18 +65,42 @@ function RefreshPage()
 	});
 }
 
-function AddScheduleLevel(isfirst)
+function AddScheduleLevel(isfirst,retry_delay='',retry_times='')
 {
 	var label = 'If task fails, retry';
+	var remove = '';
 	if(!isfirst)
+	{
 		label = 'then';
+		remove = '<span class="faicon fa-remove"></span>';
+	}
 	
-	var html = $('<div class="level"><label>'+label+'</label>every <input type="text" name="seconds" class="spinner nosubmit" /> seconds for <input type="text" name="times" class="spinner nosubmit" /> times</div>');
+	var html = $('<div class="level"><label>'+label+'</label>every <input type="text" name="retry_delay" class="spinner nosubmit" value="'+retry_delay+'" /> seconds for <input type="text" name="retry_times" class="spinner nosubmit" value="'+retry_times+'" /> times'+remove+'</div>');
 	html.find('.spinner').spinner();
 	
 	html.find('.spinner').on('spinchange', function() {
-		console.log("change");
+		var idx = $(this).parent().parent().index('div.level');
+		schedule.SetLevelAttribute(idx,$(this).attr('name'),$(this).val());
+		$('#schedule-editor input[name=content]').val(btoa(schedule.GetXML()));
+	});
+	
+	html.find('.fa-remove').click(function() {
+		var idx = $(this).parent().index('div.level');
+		schedule.DeleteLevel(idx);
+		$('#schedule-editor input[name=content]').val(btoa(schedule.GetXML()));
+		$(this).parent().remove();
 	});
 	
 	$('#schedule-editor form div').last().prev().after(html);
+	
+	if(retry_delay=='' && retry_times=='')
+		$('#schedule-editor input[name=content]').val(btoa(schedule.GetXML()));
+}
+
+function UpdateSchedule()
+{
+	var levels = schedule.GetLevels();
+	console.log(levels);
+	for(var i=0;i<levels.length;i++)
+		AddScheduleLevel(i==0,levels[i].retry_delay,levels[i].retry_times);
 }

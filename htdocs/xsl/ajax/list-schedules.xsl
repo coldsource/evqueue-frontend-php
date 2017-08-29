@@ -19,7 +19,7 @@
 						<td>
 							<xsl:value-of select="@name" />
 						</td>
-						<td class="center">
+						<td class="tdActions">
 							<span class="faicon fa-edit" title="Edit retry schedule"></span>
 							<xsl:text>&#160;</xsl:text>
 							<span class="faicon fa-remove" title="Delete retry schedule" data-confirm="You are about to delete the selected retry schedule"></span>
