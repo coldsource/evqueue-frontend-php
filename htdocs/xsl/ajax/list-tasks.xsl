@@ -87,32 +87,18 @@
 								</xsl:choose>
 							</td>
 							<xsl:if test="$USE_GIT = 1">
+								
+								<xsl:variable name="clsConflict">
+									<xsl:if test="$is-in-git and $git-status='conflict'">conflict</xsl:if>
+								</xsl:variable>
+								
 								<td class="tdActions">
 									<xsl:if test="not($is-in-git) or $git-status='needpush' or $git-status='conflict'">
-										<span data-name="{@name}" class="faicon fa-upload git" title="Commit this task to Git">
-											<xsl:choose>
-												<xsl:when test="$is-in-git and $git-status='conflict'">
-													<xsl:attribute name="data-confirm">You are about to overwrite changes to the repository</xsl:attribute>
-													<xsl:attribute name="data-force">yes</xsl:attribute>
-												</xsl:when>
-												<xsl:otherwise>
-													<xsl:attribute name="data-force">no</xsl:attribute>
-												</xsl:otherwise>
-											</xsl:choose>
-										</span>
+										<span data-name="{@name}" class="faicon fa-upload git {$clsConflict}" title="Commit this task to Git"></span>
 										<xsl:text>&#160;</xsl:text>
 									</xsl:if>
 									<xsl:if test="$is-in-git and ($git-status='needpull' or $git-status='conflict')">
-										<span data-name="{@name}" class="faicon fa-download git" title="Load Git version">
-											<xsl:choose>
-												<xsl:when test="$is-in-git and $git-status='conflict'">
-													<xsl:attribute name="data-confirm">You are about to overwrite changes of your local copy</xsl:attribute>
-												</xsl:when>
-												<xsl:otherwise>
-													<xsl:attribute name="data-force">no</xsl:attribute>
-												</xsl:otherwise>
-											</xsl:choose>
-										</span>
+										<span data-name="{@name}" class="faicon fa-download git {$clsConflict}" title="Load Git version"></span>
 										<xsl:text>&#160;</xsl:text>
 									</xsl:if>
 								</td>
@@ -120,7 +106,7 @@
 							<td class="tdActions">
 								<span class="faicon fa-edit" title="Edit task"></span>
 								<xsl:text>&#160;</xsl:text>
-								<span class="faicon fa-remove" title="Delete task" data-confirm="You are about to delete the selected task"></span>
+								<span class="faicon fa-remove" title="Delete task"></span>
 							</td>
 						</tr>
 					</xsl:for-each>
@@ -140,7 +126,7 @@
 								<td class="tdActions" style="min-width: 80px;">
 									<span data-name="{@name}" class="faicon fa-download git" title="Import from Git"></span>
 									<xsl:text>&#160;</xsl:text>
-									<span class="faicon fa-remove git" title="Delete from git repository" data-name="{@name}" data-confirm="You are about to remove a task from the git repository"></span>
+									<span class="faicon fa-remove git" title="Delete from git repository" data-name="{@name}"></span>
 								</td>
 							</tr>
 						</xsl:if>

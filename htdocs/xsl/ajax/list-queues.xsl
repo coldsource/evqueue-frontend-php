@@ -32,7 +32,7 @@
 						<td class="tdActions">
 							<span class="faicon fa-edit" title="Edit queue"></span>
 							<xsl:text>&#160;</xsl:text>
-							<span class="faicon fa-remove" title="Delete queue" data-confirm="You are about to delete the selected queue"></span>
+							<span class="faicon fa-remove" title="Delete queue"></span>
 						</td>
 					</tr>
 				</xsl:for-each>

@@ -27,7 +27,7 @@ function RefreshPage()
 		
 		$('.fa-remove:not(.git)').click(function() {
 			evqueueAPI({
-				element: this,
+				confirm: 'You are about to delete the selected queue',
 				group: 'queue',
 				action: 'delete',
 				attributes: { 'id': $(this).parents('tr').data('id') }

@@ -113,7 +113,7 @@
 									<td class="tdActions">
 										<span class="faicon fa-edit" title="Edit schedule"></span>
 										<xsl:text>&#160;</xsl:text>
-										<span class="faicon fa-remove" title="Delete schedule" data-confirm="You are about to delete the selected schedule"></span>
+										<span class="faicon fa-remove" title="Delete schedule"></span>
 									</td>
 								</tr>
 							</xsl:if>

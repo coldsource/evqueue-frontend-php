@@ -62,9 +62,9 @@
 			
 			<td class="tdActions">
 				<xsl:if test="@status='EXECUTING'">
-					<img src="images/stop.png" data-confirm="Are you sure you want to stop the execution of this workflow ?" alt="Stop execution of this workflow" title="Stop execution of this workflow" onclick="
+					<img src="images/stop.png" alt="Stop execution of this workflow" title="Stop execution of this workflow" onclick="
 						evqueueAPI({{
-							element: this,
+							confirm: 'Are you sure you want to stop the execution of this workflow?',
 							group: 'instance',
 							action: 'cancel',
 							attributes: {{ 'id':{@id} }},
@@ -73,9 +73,9 @@
 				</xsl:if>
 
 				<xsl:if test="@status='TERMINATED'">
-					<img data-confirm="Delete workflow instance {@id} ?" src="images/delete.gif" class="action" onclick="
+					<img src="images/delete.gif" class="action" onclick="
 						evqueueAPI({{
-							element: this,
+							confirm: 'Delete workflow instance {@id}?',
 							group: 'instance',
 							action: 'delete',
 							attributes: {{ 'id':'{@id}' }}
@@ -269,9 +269,9 @@
 			<xsl:apply-templates select="." mode="details" />
 			
 			<xsl:if test="@status='EXECUTING'">
-				<span class="faicon fa-bomb" data-confirm="Are you sure you want to kill this task ?" title="Kill Task" onclick="
+				<span class="faicon fa-bomb" title="Kill Task" onclick="
 					evqueueAPI({{
-						element: this,
+						confirm: 'Are you sure you want to kill this task?',
 						group: 'instance',
 						action: 'killtask',
 						attributes: {{ 'id':{ancestor::workflow[1]/@id}, 'pid':{@pid} }},

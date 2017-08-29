@@ -33,10 +33,10 @@
 						<td class="tdActions">
 							<a href="manage-user.php?user_login={@name}"><img src="images/edit.gif"  /></a>
 							&#160;
-							<img data-confirm="You are about to delete user '{@name}'" src="images/delete.gif"
+							<img src="images/delete.gif"
 								onclick="
 									evqueueAPI({
-										element: this,
+										confirm: 'You are about to delete user `{@name}`',
 										group: 'user',
 										action: 'delete',
 										attributes: {{ 'name':'{@name}' }}

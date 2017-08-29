@@ -26,10 +26,14 @@ function RefreshPage()
 			
 			Wait();
 			evqueueAPI({
-				element: this,
+				confirm: $(this).hasClass('conflict') ? 'You are about to overwrite changes to the repository' : '',
 				group: 'git',
 				action: 'save_workflow',
-				attributes: {name: $(this).data('name'), commit_log: log,force:$(this).data('force')}
+				attributes: {
+					name: $(this).data('name'),
+					commit_log: log,
+					force: $(this).hasClass('conflict') ? 'yes' : 'no'
+				}
 			}).done(function() {
 				Message('Committed workflow to git');
 				RefreshPage();
@@ -39,7 +43,7 @@ function RefreshPage()
 		$('.git.fa-download').click(function() {
 			Wait();
 			evqueueAPI({
-				element: this,
+				confirm: $(this).hasClass('conflict') ? 'You are about to overwrite changes to your local copy' : '',
 				group: 'git',
 				action: 'load_workflow',
 				attributes: {name: $(this).data('name')}
@@ -56,7 +60,7 @@ function RefreshPage()
 			
 			Wait();
 			evqueueAPI({
-				element: this,
+				confirm: 'You are about to remove a workflow from the git repository',
 				group: 'git',
 				action: 'remove_workflow',
 				attributes: {name: $(this).data('name'),commit_log:log}
@@ -73,7 +77,7 @@ function RefreshPage()
 		$('.fa-remove:not(.git)').click(function() {
 			Wait();
 			evqueueAPI({
-				element: this,
+				confirm: 'You are about to delete the selected workflow',
 				group: 'workflow',
 				action: 'delete',
 				attributes: { id: $(this).parents('tr').data('id') }

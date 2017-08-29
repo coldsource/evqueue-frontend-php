@@ -152,7 +152,7 @@ function RefreshPage()
 		
 		$('.fa-remove').click(function() {
 			evqueueAPI({
-				element: this,
+				confirm: 'You are about to delete the selected schedule',
 				group: 'workflow_schedule',
 				action: 'delete',
 				attributes: { 'id': $(this).parents('tr').data('id') }

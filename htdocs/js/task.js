@@ -32,10 +32,14 @@ function RefreshPage()
 			
 			Wait();
 			evqueueAPI({
-				element: this,
+				confirm: $(this).hasClass('conflict') ? 'You are about to overwrite changes to the repository' : '',
 				group: 'git',
 				action: 'save_task',
-				attributes: {name: $(this).data('name'), commit_log: log,force:$(this).data('force')}
+				attributes: {
+					name: $(this).data('name'),
+					commit_log: log,
+					force: $(this).hasClass('conflict') ? 'yes' : 'no'
+				}
 			}).done(function() {
 				Message('Committed task to git');
 				RefreshPage();
@@ -45,7 +49,7 @@ function RefreshPage()
 		$('.git.fa-download').click(function() {
 			Wait();
 			evqueueAPI({
-				element: this,
+				confirm: $(this).hasClass('conflict') ? 'You are about to overwrite changes to your local copy' : '',
 				group: 'git',
 				action: 'load_task',
 				attributes: {name: $(this).data('name')}
@@ -62,7 +66,7 @@ function RefreshPage()
 			
 			Wait();
 			evqueueAPI({
-				element: this,
+				confirm: 'You are about to remove a task from the git repository',
 				group: 'git',
 				action: 'remove_task',
 				attributes: {name: $(this).data('name'), commit_log: log}
@@ -74,7 +78,7 @@ function RefreshPage()
 		
 		$('.fa-remove:not(.git)').click(function() {
 			evqueueAPI({
-				element: this,
+				confirm: 'You are about to delete the selected task',
 				group: 'task',
 				action: 'delete',
 				attributes: { 'id':$(this).parents('tr').data('id') }

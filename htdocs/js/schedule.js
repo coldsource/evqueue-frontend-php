@@ -57,7 +57,12 @@ function RefreshPage()
 		}, evqueueEditFormHandler);
 		
 		$('td.tdActions .fa-remove').click(function() {
-			evqueueAPI({element:this,group:'retry_schedule',action:'delete',attributes:{ 'id':$(this).parents('tr').data('id') }}).done(function() {
+			evqueueAPI({
+				confirm: 'You are about to delete the selected retry schedule',
+				group: 'retry_schedule',
+				action: 'delete',
+				attributes: { 'id': $(this).parents('tr').data('id') }
+			}).done(function() {
 				Message('Schedule has been deleted');
 				RefreshPage();
 			});

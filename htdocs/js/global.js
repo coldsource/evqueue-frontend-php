@@ -53,13 +53,11 @@ $(document).ready( function() {
 });
 
 function evqueueAPI(options){
-	options = $.extend({attributes: [], parameters: []}, options);
+	options = $.extend({confirm: '', attributes: [], parameters: []}, options);
 	
-	if ($(options.element).attr('data-confirm')) {
-		if(!confirm($(options.element).data('confirm')))
-			return;
-	}
-	delete options.element;
+	if (options.confirm && !confirm(options.confirm))
+		return;
+	delete options.confirm;
 	
 	var promise = new jQuery.Deferred();
 	
