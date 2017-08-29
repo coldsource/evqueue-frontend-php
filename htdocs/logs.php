@@ -26,6 +26,6 @@ require_once 'lib/XSLEngine.php';
 $xsl = new XSLEngine();
 $xsl->AddFragment(['logs' => $xsl->Api('logs', 'list')]);
 $xsl->AddFragment(['config' => $xsl->ClusterApi('status', 'query', ['type' => 'configuration'])]);
-$xsl->DisplayXHTML('xsl/view-logs.xsl');
+$xsl->DisplayXHTML('xsl/logs.xsl');
 
 ?>

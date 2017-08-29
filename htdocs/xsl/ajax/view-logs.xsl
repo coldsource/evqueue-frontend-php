@@ -6,12 +6,6 @@
 	
 	<xsl:template match="/">
 		<div>
-				<div class="boxTitle">
-				<span class="title">
-					Last logs
-					<input type="checkbox" class="autorefresh" checked="checked" />&#160;Auto-refresh
-				</span>
-			</div>
 			<table>
 				<tr>
 					<th style="width:150px;">Timestamp</th>

@@ -22,13 +22,14 @@ a, a:visited {
 	font-family:FontAwesome;
 	cursor:pointer;
 }
+
 .action {
 	cursor: pointer;
 }
+
 .faicon, .fa-spinner {
 	margin: 0 5px;
 }
-
 
 .hidden, .dialog {
 	display:none;

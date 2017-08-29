@@ -9,6 +9,47 @@ $(document).ready( function() {
 	$('.tabs').tabs();
 	
 	$('.spinner').spinner();
+	
+	$('.evq-autorefresh').each(function() {
+		var el = $(this);
+		
+		var toggle = el.find('span.evq-autorefresh-toggle');
+		if(toggle)
+		{
+			if(el.data('interval')>0)
+			{
+				toggle.addClass('fa-spin');
+				toggle.attr('title','Auto-refresh is enabled');
+			}
+			
+			toggle.click(function() {
+				if(el.data('interval')==0)
+					autorefresh(el,toggle);
+				else
+				{
+					$(this).toggleClass('fa-spin');
+					
+					if($(this).hasClass('fa-spin'))
+					{
+						autorefresh(el,toggle);
+						$(this).attr('title','Auto-refresh is enabled');
+						Message('Auto refresh enabled');
+					}
+					else
+					{
+						$(this).attr('title','Auto-refresh is disabled');
+						clearTimeout(el.data('timeout'));
+						Message('Auto refresh stopped');
+					}
+				}
+			});
+		}
+		
+		Wait();
+		autorefresh(el,toggle).done(function() {
+			Ready();
+		});
+	});
 });
 
 function evqueueAPI(options, cbk = false){
@@ -64,7 +105,6 @@ function Message(msg)
 	$('#message').delay(2000).fadeOut();
 }
 
-
 var dialog_currpos = 0;
 var dialog_positions = ['left top', 'right top', 'left bottom', 'right bottom'];
 jQuery.fn.extend({
@@ -82,3 +122,21 @@ jQuery.fn.extend({
     });
   }
 });
+
+
+function autorefresh(el,toggle)
+{
+	var interval = el.data('interval')?el.data('interval'):0;
+	var url = el.data('url');
+	var pannel = el.find('div.evq-autorefresh-pannel').first();
+	
+	return $.ajax({url: url}).done(function(data) {
+		pannel.html(data);
+		
+		if(interval>0 && toggle.hasClass('fa-spin'))
+		{
+			var timeout = setTimeout(function() { autorefresh(el,toggle); } ,interval*1000);
+			el.data('timeout',timeout);
+		}
+	});
+}
