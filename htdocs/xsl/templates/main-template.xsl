@@ -34,6 +34,7 @@
 
 				<script type="text/javascript">
 					var site_base = '<xsl:value-of select="$SITE_BASE" />';
+					var connected_user = '<xsl:value-of select="$LOGIN" />';
 				</script>
 
 				<!-- Load base javascript -->
@@ -43,6 +44,7 @@
 				
 				<script type="text/javascript" src="{$SITE_BASE}js/forms.js" />
 				<script type="text/javascript" src="{$SITE_BASE}js/global.js" />
+				<script type="text/javascript" src="{$SITE_BASE}js/preferences.js" />
 
 				<!-- Load additional javascript -->
 				<xsl:if test="$javascript != '' and exsl:node-set($javascript)/src">
@@ -57,6 +59,7 @@
 				<xsl:if test="$FULLSCREEN = 'no'">
 					<xsl:if test="$topmenu != ''">
 						<xsl:call-template name="topmenu" />
+						<xsl:call-template name="user-preferences-editor" />
 					</xsl:if>
 
 					<div class="content">
@@ -165,16 +168,42 @@
 				<div id="userInfo">
 					<span><xsl:value-of select="$LOGIN" /></span>
 					<xsl:text>&#160;</xsl:text>
-					<a href="{$SITE_BASE}user-preferences.php" title="My preferences">
-						<img src="{$SITE_BASE}images/edit.png" />
-					</a>
+					<span class="faicon fa-pencil" title="My preferences"></span>
 					<xsl:text>&#160;</xsl:text>
 					<a href="{$SITE_BASE}auth.php?action=logout" title="Log out">
-						<img src="{$SITE_BASE}images/logout.png" />
+						<span class="faicon fa-power-off"></span>
 					</a>
 				</div>
 			</xsl:when>
 		</xsl:choose>
+	</xsl:template>
+	
+	<xsl:template name="user-preferences-editor">
+		<div id="user-preferences-editor" class="dialog formdiv">
+			<h2>
+				My preferences
+				<span class="help faicon fa-question-circle" title="Preferred node is the default node used when launching new workflows"></span>
+			</h2>
+			<form>
+				<div>
+					<label>Change password</label>
+					<input type="password" name="password" />
+				</div>
+				<div>
+					<label>Confirm password</label>
+					<input type="password" name="password2" class="nosubmit" />
+				</div>
+				<div>
+					<label>Preferred node</label>
+					<select name="preferred_node">
+						<xsl:for-each select="/page/evqueue-nodes/node">
+							<option value="{@name}"><xsl:value-of select="@name" /></option>
+						</xsl:for-each>
+					</select>
+				</div>
+			</form>
+			<button class="submit">Save</button>
+		</div>
 	</xsl:template>
 
 </xsl:stylesheet>
