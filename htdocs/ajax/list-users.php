@@ -24,8 +24,7 @@ require_once 'lib/XSLEngine.php';
 
 
 $xsl = new XSLEngine();
-$xml = $xsl->Api("users", "list");
-$xsl->AddFragment(["users" => $xml]);
+$xsl->AddFragment(["users" => $xsl->Api("users", "list")]);
 
-$xsl->DisplayXHTML('xsl/list_users.xsl');
+$xsl->DisplayXHTML('../xsl/ajax/list-users.xsl');
 ?>

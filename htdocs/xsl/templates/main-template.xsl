@@ -146,7 +146,7 @@
 				<li><a href="{$SITE_BASE}workflow-schedules.php">Scheduled workflows</a></li>
 				<li><a href="{$SITE_BASE}schedule.php">Retry Schedules</a></li>
 				<li><a href="{$SITE_BASE}queue.php">Queues</a></li>
-				<li><a href="{$SITE_BASE}list-users.php">Users</a></li>
+				<li><a href="{$SITE_BASE}user.php">Users</a></li>
 				<li><a href="{$SITE_BASE}system_configuration.php">Running configuration</a></li>
 			</ul>
 			<ul class="submenu" id="submenu-notifications">

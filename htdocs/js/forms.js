@@ -172,7 +172,7 @@ function evqueuePrepareFormAPI(el, group, id)
 		return evqueueAPI({
 			group: group,
 			action: 'get',
-			attributes: {id:id}
+			attributes: group=='user'?{name:id}:{id:id}
 		}).done(function(xml) {
 			attributes = xml.documentElement.firstChild.attributes;
 			for(var i=0;i<attributes.length;i++)
@@ -231,7 +231,7 @@ function evqueueEditFormHandler(event)
 {
 	options = event.data;
 	
-	var id = $(this).parents('tr').data('id');
+	var id = $(event.currentTarget).parents('tr').data('id');
 	options.form_div.find('.submit').text(options.title);
 	options.form_div.find('.submit').off('click').on('click',function() {
 		var promise;

@@ -31,7 +31,6 @@
 						<td class="center"><xsl:value-of select="@dynamic" /></td>
 						<td class="tdActions">
 							<span class="faicon fa-edit" title="Edit queue"></span>
-							<xsl:text>&#160;</xsl:text>
 							<span class="faicon fa-remove" title="Delete queue"></span>
 						</td>
 					</tr>
