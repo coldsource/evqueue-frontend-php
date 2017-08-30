@@ -59,12 +59,17 @@ function evqueueAPI(options){
 	
 	if (options.confirm && !confirm(options.confirm))
 		return promise.reject();
-	delete options.confirm;
 	
 	$.ajax({
 		url: 'ajax/evqueue_api.php',
 		type: 'post',
-		data: options,
+		data: {
+			group: options.group,
+			action: options.action,
+			attributes: options.attributes,
+			parameters: options.parameters,
+			node: options.node,
+		},
 	}).done(function(xml){
 		error = $(xml).find('error');
 		if ($(error).length > 0) {
