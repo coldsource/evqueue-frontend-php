@@ -12,10 +12,31 @@
 	
 	<xsl:variable name="javascript">
 		<src>js/index.js</src>
-		<src>js/workflow-instance.js</src>
+<!-- 		<src>js/workflow-instance.js</src> -->
 	</xsl:variable>
 	
 	<xsl:template name="content">
+	
+	<div id="opentest">clickme</div>
+	
+	<div class="dialog workflow-dialog" id="workflow-dialog" data-interval="5">
+	</div>
+	
+	<div class="dialog" id="task-dialog">
+		<ul>
+		</ul>
+	</div>
+	
+	
+	
+		
+		
+		
+		
+		
+		
+		
+		
 		
 		<script type="text/javascript">
 			var get = {
@@ -46,7 +67,13 @@
 		</script>
 		
 		<div id="workflows" class="contentList">
-			<div id="EXECUTING-workflows" class="workflow-list" />		
+			<div class="evq-autorefresh" data-url="ajax/executing-workflows.php" data-interval="2">
+				<div class="boxTitle">
+					<span class="title">Executing workflows <span class="faicon fa-refresh action evq-autorefresh-toggle"></span></span>
+				</div>
+				
+				<div id="EXECUTING-workflows" class="workflow-list evq-autorefresh-pannel"></div>
+			</div>
 
 			<table style="width:100%;">
 				<tr>

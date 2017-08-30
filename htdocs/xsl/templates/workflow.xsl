@@ -4,6 +4,158 @@
 	<xsl:import href="xmlhighlight.xsl" />
 
 
+	<xsl:template match="workflow" mode="tree">
+		<div id="workflow-{@id}">
+			<div class="workflow" data-id="{@id}">
+				<div id="jobs_{@id}">
+					<xsl:apply-templates select="subjobs/job">
+						<xsl:with-param name="first" select="1" />
+					</xsl:apply-templates>
+				</div>
+				
+			</div>
+		</div>
+	</xsl:template>
+	
+	<xsl:template match="job">
+
+		<xsl:variable name="jobClass">
+			<xsl:if test="@status = 'SKIPPED' or ancestor::job[@status = 'SKIPPED']">skipped</xsl:if>
+		</xsl:variable>
+		
+		<div class="job {$jobClass}" data-type="job" data-evqid="{@evqid}">
+			<xsl:if test="@status = 'ABORTED'">
+				<span class="faicon fa-exclamation error" title="{@details}"></span>
+				<xsl:text>&#160;</xsl:text>
+				<xsl:value-of select="@details" />
+			</xsl:if>
+			
+			<div class="tasks">
+				<xsl:if test="count(subjobs/job) > 0">
+					<span class="foldSubjobs faicon fa-minus-square-o" onclick="
+						$(this).parent().nextAll('.job').toggle('fast');
+						$(this).toggleClass('fa-minus-square-o fa-plus-square-o');"></span>
+				</xsl:if>
+				<xsl:apply-templates select="tasks/task" />
+			</div>
+			
+			<xsl:apply-templates select="subjobs/job" />
+		</div>
+	</xsl:template>
+	
+	<xsl:template match="task">
+		
+		<xsl:variable name="taskClass">
+			<xsl:if test="@status = 'SKIPPED' or ancestor::job[@status = 'SKIPPED']">skipped</xsl:if>
+		</xsl:variable>
+		
+		<div class="task {$taskClass}" data-name="{@name}" data-type="task" data-evqid="{@evqid}">
+			
+			<span class="taskName">
+				<xsl:apply-templates select="." mode="status" />
+				<xsl:value-of select="@name" />
+			</span>
+			
+			<xsl:if test="@status='EXECUTING'">
+				<span class="faicon fa-bomb" title="Kill Task" onclick="
+					evqueueAPI({{
+						confirm: 'Are you sure you want to kill this task?',
+						group: 'instance',
+						action: 'killtask',
+						attributes: {{ 'id':{ancestor::workflow[1]/@id}, 'pid':{@pid} }},
+						node: '{/page/instance/@node}'
+					}});"></span>
+			</xsl:if>
+			
+			<xsl:if test="@progression != 0 and @progression != 100">
+				<div class="progressbar-wrapper">
+					<div class="progressbar" style="width: {@progression}%;"></div>
+					<span><xsl:value-of select="@progression" />%</span>
+				</div>
+			</xsl:if>
+		</div>
+	</xsl:template>
+	
+	<xsl:template match="subjobs" mode="details">
+		<xsl:for-each select="job">
+			<xsl:variable name="jobid" select="@evqid" />
+			<div id="workflow-{/page/instance/workflow/@id}-{$jobid}"></div>
+			
+			<xsl:for-each select="tasks/task">
+				<xsl:variable name="taskid" select="@evqid" />
+				<div id="workflow-{/page/instance/workflow/@id}-{$taskid}"></div>
+				
+				<xsl:for-each select="output">
+					<div id="{/page/instance/workflow/@id}-{$taskid}-stdout-{position()}"><xsl:value-of select="." /></div>
+				</xsl:for-each>
+				
+				<xsl:for-each select="stderr">
+					<div id="{/page/instance/workflow/@id}-{$taskid}-stderr-{position()}"><xsl:value-of select="." /></div>
+				</xsl:for-each>
+				
+				<xsl:for-each select="log">
+					<div id="{/page/instance/workflow/@id}-{$taskid}-log-{position()}"><xsl:value-of select="." /></div>
+				</xsl:for-each>
+				
+				<div id="{/page/instance/workflow/@id}-{$taskid}-executions">
+					<xsl:for-each select="output">
+						<div class="task_execution"><xsl:value-of select="@execution_time" /> (<xsl:value-of select="@retval" />)</div>
+					</xsl:for-each>
+				</div>
+			</xsl:for-each>
+			
+			<xsl:apply-templates select="subjobs" mode="details" />
+		</xsl:for-each>
+	</xsl:template>
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	<xsl:template match="workflow">
 		<tr>
 			<td class="workflowStatus">
@@ -169,232 +321,16 @@
 	</xsl:template>
 
 
-	<xsl:template match="workflow" mode="tree">
-		<div>
-			<xsl:apply-templates select="." mode="launchbox" />
-
-			<div class="workflow" id="workflow{@id}" data-id="{@id}" data-node-name="{@node_name | ../@node}">
-				
-				<!-- Display workflow parameters -->
-				<span class="faicon fa-list" title="Workflow Parameters" onclick="$(this).nextAll('div.workflowParameters').toggleClass('hidden');"></span>
-				
-				<!-- Relaunch workflow -->
-				<span class="relaunch faicon fa-rocket" data-wfiid="{@id}" data-node-name="{../@node_name}" alt="Re-launch workflow instance" title="Re-launch workflow instance" ></span>
-				
-				<!-- Display formatted XML -->
-				<span class="faicon fa-code" title="View workflow XML" onclick="$('#xmlcontent{@id}').dialog({{width:800}});"></span>
-				<div id="xmlcontent{@id}" style="display:none;">
-					<xsl:apply-templates select="." mode="xml_display" />
-				</div>
-				
-				<xsl:variable name="totalTime">
-					<xsl:apply-templates select="." mode="total-time" />
-				</xsl:variable>
-				
-				<xsl:variable name="execTime" select="php:function('sumExecTimes', .//task/output)" />
-				<xsl:variable name="retryTime" select="php:function('sumRetryTimes', .//task/output)" />
-				<xsl:variable name="queueTime" select="$totalTime - $execTime - $retryTime" />
-				
-				<span class="exectime" style="margin-left: 5px; background-color: rgba(0,255,0,0.1); padding: 2px 5px; /* TODO: move to stylesheet */">
-					<xsl:text>real time </xsl:text>
-					<xsl:value-of select="php:function('humanTime',$execTime)" />
-				</span>
-				<span class="queuetime" style="margin-left: 5px; background-color: rgba(0,0,255,0.1); padding: 2px 5px; /* TODO: move to stylesheet */">
-					<xsl:text>queued for </xsl:text>
-					<xsl:value-of select="php:function('humanTime',$queueTime)" />
-				</span>
-				<span class="retrytime" style="margin-left: 5px; background-color: rgba(255,0,0,0.1); padding: 2px 5px; /* TODO: move to stylesheet */">
-					<xsl:text>waited </xsl:text>
-					<xsl:value-of select="php:function('humanTime',$retryTime)" />
-					<xsl:text> for retrials</xsl:text>
-				</span>
-
-				<div class="workflowParameters hidden">
-					<xsl:if test="count(parameters/parameter) = 0">
-						<i>no parameters</i>
-					</xsl:if>
-					<xsl:apply-templates select="parameters" />
-				</div>
-
-				<div id="jobs_{@id}">
-					<xsl:apply-templates select="subjobs/job">
-						<xsl:with-param name="first" select="1" />
-					</xsl:apply-templates>
-				</div>
-				
-			</div>
-		</div>
-	</xsl:template>
+	
 
 
-	<xsl:template match="job">
-
-		<xsl:variable name="jobClass">
-			<xsl:if test="@status = 'SKIPPED' or ancestor::job[@status = 'SKIPPED']">skipped</xsl:if>
-		</xsl:variable>
-		
-		<div class="job {$jobClass}" data-type="job" data-name="{@name}" data-loop="{@loop}" data-condition="{@condition}">
-			<xsl:if test="@status = 'ABORTED'">
-				<span class="faicon fa-exclamation error" title="{@details}"></span>
-				<xsl:text>&#160;</xsl:text>
-				<xsl:value-of select="@details" />
-			</xsl:if>
-			
-			<div class="tasks">
-				<xsl:if test="count(subjobs/job) > 0">
-					<span class="foldSubjobs faicon fa-minus-square-o" onclick="
-						$(this).parent().nextAll('.job').toggle('fast');
-						$(this).toggleClass('fa-minus-square-o fa-plus-square-o');"></span>
-				</xsl:if>
-				<xsl:apply-templates select="tasks/task" />
-			</div>
-			
-			<xsl:apply-templates select="subjobs/job" />
-		</div>
-	</xsl:template>
+	
 
 
-	<xsl:template match="task">
-		
-		<xsl:variable name="taskClass">
-			<xsl:if test="@status = 'SKIPPED' or ancestor::job[@status = 'SKIPPED']">skipped</xsl:if>
-		</xsl:variable>
-		
-		<div class="task {$taskClass}" data-name="{@name}" data-type="task" data-queue="{@queue}" data-retry-schedule="{@retry_schedule}" data-loop="{@loop}" data-condition="{@condition}">
-			
-			<span class="taskName">
-				<xsl:apply-templates select="." mode="status" />
-				<xsl:value-of select="@name" />
-			</span>
-			<xsl:apply-templates select="." mode="details" />
-			
-			<xsl:if test="@status='EXECUTING'">
-				<span class="faicon fa-bomb" title="Kill Task" onclick="
-					evqueueAPI({{
-						confirm: 'Are you sure you want to kill this task?',
-						group: 'instance',
-						action: 'killtask',
-						attributes: {{ 'id':{ancestor::workflow[1]/@id}, 'pid':{@pid} }},
-						node: '{/page/instance/@node}'
-					}});"></span>
-			</xsl:if>
-			
-			<xsl:if test="@progression != 0 and @progression != 100">
-				<div class="progressbar-wrapper">
-					<div class="progressbar" style="width: {@progression}%;"></div>
-					<span><xsl:value-of select="@progression" />%</span>
-				</div>
-			</xsl:if>
-		</div>
-	</xsl:template>
 	
 	
-	<xsl:template match="task" mode="details">
-		<div class="taskDetails dialog">
-			<ul class="js-exec-outputs unstyled">
-				<xsl:for-each select="output">
-					<li>
-						<h2>
-							<xsl:apply-templates select="." mode="status" />
-							<xsl:value-of select="../@name" />
-						</h2>
-					</li>
-				</xsl:for-each>
-			</ul>
-			
-			<div class="tabs">
-				<ul>
-					<li><a href="#tab-taskGeneral">General</a></li>
-					<li><a href="#tab-taskStdout">Stdout</a></li>
-					<li><a href="#tab-taskStderr">Stderr</a></li>
-					<li><a href="#tab-taskLog">Log</a></li>
-					<xsl:if test="count(output) > 1">
-						<li><a href="#tab-taskPrevExecs">Previous Executions</a></li>
-					</xsl:if>
-				</ul>
-				<div id="tab-taskGeneral">
-					<xsl:if test="count(input) = 0">
-						<i>no input</i>
-					</xsl:if>
-					<ul class="inputs unstyled">
-						<xsl:for-each select="input">
-							<li>
-								<xsl:if test="@name">
-									<b><xsl:value-of select="@name" /></b>:
-								</xsl:if>
-								<xsl:value-of select="." />
-							</li>
-						</xsl:for-each>
-					</ul>
-					<ul class="error unstyled">
-						<xsl:if test="@status = 'ABORTED'">
-							<li>ABORTED</li>
-						</xsl:if>
-						<xsl:if test="@error">
-							<li>error from engine: <xsl:value-of select="@error" /></li>
-						</xsl:if>
-						<xsl:if test="@retval != '0'">
-							<li>return value <xsl:value-of select="@retval" /></li>
-						</xsl:if>
-					</ul>
-				</div>
-				<div id="tab-taskStdout">
-					<ul class="js-exec-outputs unstyled">
-						<xsl:for-each select="output">
-							<li>
-								<xsl:choose>
-									<xsl:when test="@method = 'text'">
-										<xsl:attribute name="style">white-space:pre-wrap;</xsl:attribute>
-										<xsl:value-of select="." />
-									</xsl:when>
-									<xsl:when test="@method = 'xml'">
-										<xsl:apply-templates select="." mode="xml_display" />
-									</xsl:when>
-								</xsl:choose>
-							</li>
-						</xsl:for-each>
-					</ul>
-				</div>
-				<div id="tab-taskStderr">
-					<ul class="js-exec-outputs unstyled">
-						<xsl:for-each select="stderr">
-							<li><xsl:value-of select="." /></li>
-						</xsl:for-each>
-					</ul>
-				</div>
-				<div id="tab-taskLog">
-					<ul class="js-exec-outputs unstyled">
-						<xsl:for-each select="log">
-							<li><xsl:value-of select="." /></li>
-						</xsl:for-each>
-					</ul>
-				</div>
-				<xsl:choose>
-					<xsl:when test="count(output) > 1">
-						<div id="tab-taskPrevExecs">
-							<ul class="js-execs unstyled">
-								<xsl:for-each select="output">
-									<li class="action">
-										<xsl:apply-templates select="." mode="status" />
-										<xsl:value-of select="@exit_time" />:
-										return code <xsl:value-of select="@retval" />
-									</li>
-								</xsl:for-each>
-							</ul>
-						</div>
-					</xsl:when>
-					<xsl:otherwise>
-						<!-- dummy html to have our JS work -->
-						<div id="tab-taskPrevExecs" class="hidden">
-							<ul class="js-execs">
-								<li class="action"></li>
-							</ul>
-						</div>
-					</xsl:otherwise>
-				</xsl:choose>
-			</div>
-		</div>
-	</xsl:template>
+	
+	
 	
 	
 	<xsl:template match="task" mode="status">
@@ -438,6 +374,7 @@
 	<xsl:template name="instances">
 		<xsl:param name="instances" />
 		<xsl:param name="status" />
+		<div>
 
 		<div id="{$status}-workflows" class="workflow-list">
 
@@ -512,6 +449,7 @@
 
 				</xsl:otherwise>
 			</xsl:choose>
+		</div>
 		</div>
 
 	</xsl:template>

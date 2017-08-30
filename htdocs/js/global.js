@@ -11,44 +11,7 @@ $(document).ready( function() {
 	$('.spinner').spinner();
 	
 	$('.evq-autorefresh').each(function() {
-		var el = $(this);
-		
-		var toggle = el.find('span.evq-autorefresh-toggle');
-		if(toggle)
-		{
-			if(el.data('interval')>0)
-			{
-				toggle.addClass('fa-spin');
-				toggle.attr('title','Auto-refresh is enabled');
-			}
-			
-			toggle.click(function() {
-				if(el.data('interval')==0)
-					autorefresh(el,toggle);
-				else
-				{
-					$(this).toggleClass('fa-spin');
-					
-					if($(this).hasClass('fa-spin'))
-					{
-						autorefresh(el,toggle);
-						$(this).attr('title','Auto-refresh is enabled');
-						Message('Auto refresh enabled');
-					}
-					else
-					{
-						$(this).attr('title','Auto-refresh is disabled');
-						clearTimeout(el.data('timeout'));
-						Message('Auto refresh stopped');
-					}
-				}
-			});
-		}
-		
-		Wait();
-		autorefresh(el,toggle).done(function() {
-			Ready();
-		});
+		set_autorefresh($(this));
 	});
 });
 
@@ -109,8 +72,11 @@ function Message(msg)
 var dialog_currpos = 0;
 var dialog_positions = ['left top', 'right top', 'left bottom', 'right bottom'];
 jQuery.fn.extend({
-  dialogTiled: function(options) {
-    return this.each(function() {
+	dialogTiled: function(options) {
+	if(!options)
+		options = {};
+	
+	return this.each(function() {
 			var pos = dialog_positions[dialog_currpos];
 			dialog_currpos = (dialog_currpos + 1) % 4;
 			
@@ -124,12 +90,53 @@ jQuery.fn.extend({
   }
 });
 
+function set_autorefresh(el)
+{
+	var toggle = el.find('span.evq-autorefresh-toggle');
+	if(toggle)
+	{
+		if(el.data('interval')>0)
+		{
+			toggle.addClass('fa-spin');
+			toggle.attr('title','Auto-refresh is enabled');
+		}
+		
+		toggle.click(function() {
+			if(el.data('interval')==0)
+				autorefresh(el,toggle);
+			else
+			{
+				$(this).toggleClass('fa-spin');
+				
+				if($(this).hasClass('fa-spin'))
+				{
+					autorefresh(el,toggle);
+					$(this).attr('title','Auto-refresh is enabled');
+					Message('Auto refresh enabled');
+				}
+				else
+				{
+					$(this).attr('title','Auto-refresh is disabled');
+					clearTimeout(el.data('timeout'));
+					Message('Auto refresh stopped');
+				}
+			}
+		});
+	}
+	
+	Wait();
+	autorefresh(el,toggle).done(function() {
+		Ready();
+	});
+}
+
 
 function autorefresh(el,toggle)
 {
 	var interval = el.data('interval')?el.data('interval'):0;
 	var url = el.data('url');
-	var pannels = el.find('div.evq-autorefresh-pannel');
+	//var pannels = el.find('div.evq-autorefresh-pannel');
+	var pannels = $('.evq-autorefresh-pannel');
 	
 	return $.ajax({url: url}).done(function(data) {
 		if(pannels.length==1)
@@ -139,11 +146,12 @@ function autorefresh(el,toggle)
 			for(var i=0;i<pannels.length;i++)
 			{
 				var pannel_id = $(pannels[i]).attr('id');
-				$(pannels[i]).html($(data).find('#'+pannel_id).html());
+				if($(data).find('#'+pannel_id).length==1)
+					$(pannels[i]).html($(data).find('#'+pannel_id).html());
 			}
 		}
 		
-		if(interval>0 && toggle.hasClass('fa-spin'))
+		if(interval>0 && (toggle.length==0 || toggle.hasClass('fa-spin')))
 		{
 			var timeout = setTimeout(function() { autorefresh(el,toggle); } ,interval*1000);
 			el.data('timeout',timeout);

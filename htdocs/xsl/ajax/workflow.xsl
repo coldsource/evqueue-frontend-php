@@ -3,7 +3,13 @@
 	<xsl:import href="../templates/workflow.xsl" />
 	
 	<xsl:template match="/">
-		<xsl:apply-templates select="/page/instance/workflow" mode="tree" />
+		<div>
+			<!-- Display workflow -->
+			<xsl:apply-templates select="/page/instance/workflow" mode="tree" />
+			
+			<!-- Display tasks details -->
+			<xsl:apply-templates select="/page/instance/workflow/subjobs" mode="details" />
+		</div>
 	</xsl:template>
 
 </xsl:stylesheet>

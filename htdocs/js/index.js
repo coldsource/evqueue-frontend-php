@@ -1,6 +1,46 @@
+$(document).delegate('.showWorkflowDetails','click',function() {
+	var wfid = $(this).data('id');
+	var dialog = $('#workflow-dialog').clone();
+	dialog.attr('data-url',"ajax/workflow.php?id="+wfid+"&node=tkummerdev");
+	dialog.attr('id','workflow-'+wfid);
+	dialog.addClass('evq-autorefresh');
+	dialog.append('<div class="evq-autorefresh-pannel" id="workflow-'+wfid+'"></div>');
+	dialog.append('<div class="evq-autorefresh-pannel" id="workflow-'+wfid+'-parameters"></div>');
+	dialog.dialog();
+	set_autorefresh(dialog);
+	
+	dialog.delegate('.task','click',function() {
+		TaskDialog(wfid,$(this).data('evqid'),1);
+	});
+});
+
+function TaskDialog(wfid,evqid,idx)
+{
+	var dialog = $('#task-dialog').clone();
+	dialog.find('ul').append('<li><a href="#'+wfid+'-'+evqid+'-stdout-'+idx+'">stdout</a></li>')
+	dialog.find('ul').append('<li><a href="#'+wfid+'-'+evqid+'-stderr-'+idx+'">stderr</a></li>')
+	dialog.find('ul').append('<li><a href="#'+wfid+'-'+evqid+'-log-'+idx+'">log</a></li>')
+	if(idx==1)
+		dialog.find('ul').append('<li><a href="#'+wfid+'-'+evqid+'-executions">Previous executions</a></li>')
+	
+	dialog.append('<div class="evq-autorefresh-pannel" id="'+wfid+'-'+evqid+'-stdout-'+idx+'"</div>')
+	dialog.append('<div class="evq-autorefresh-pannel" id="'+wfid+'-'+evqid+'-stderr-'+idx+'"</div>')
+	dialog.append('<div class="evq-autorefresh-pannel" id="'+wfid+'-'+evqid+'-log-'+idx+'"</div>')
+	if(idx==1)
+		dialog.append('<div class="evq-autorefresh-pannel" id="'+wfid+'-'+evqid+'-executions"</div>')
+	dialog.tabs();
+	dialog.dialogTiled();
+	
+	dialog.delegate('.task_execution','click',function() {
+		TaskDialog(wfid,evqid,$(this).index()+1);
+	});
+}
 
 
-$(document).ready(function() {
+
+
+
+/*$(document).ready(function() {
 	refreshWorkflows("terminated");
 	refreshWorkflows("executing");
 
@@ -177,4 +217,4 @@ $(document).delegate('#actionTools img', 'click', function () {
 	var divToToggle = $('div#'+$(this).data('div-id'));
 	$('div.actionToolsDivs').not(divToToggle).hide('fast');
 	divToToggle.toggle('fast')
-});
+});*/
