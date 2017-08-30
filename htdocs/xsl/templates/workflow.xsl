@@ -83,7 +83,39 @@
 			
 			<xsl:for-each select="tasks/task">
 				<xsl:variable name="taskid" select="@evqid" />
-				<div id="workflow-{/page/instance/workflow/@id}-{$taskid}"></div>
+				<div id="{/page/instance/workflow/@id}-{$taskid}-general">
+					<fieldset class="tabbed">
+						<legend>Inputs</legend>
+						<xsl:for-each select="input">
+							<div>
+								<div><xsl:value-of select="@name" /></div>
+								<div><xsl:value-of select="." /></div>
+							</div>
+						</xsl:for-each>
+					</fieldset>
+					
+					<br />
+					
+					<fieldset class="tabbed">
+						<legend>Execution</legend>
+						<div>
+							<div>Status</div>
+							<div><xsl:value-of select="@status" /></div>
+						</div>
+						<div>
+							<div>Return value</div>
+							<div><xsl:value-of select="@retval" /></div>
+						</div>
+						<div>
+							<div>Started at</div>
+							<div><xsl:value-of select="@execution_time" /></div>
+						</div>
+						<div>
+							<div>Number of executions</div>
+							<div><xsl:value-of select="count(output)" /></div>
+						</div>
+					</fieldset>
+				</div>
 				
 				<xsl:for-each select="output">
 					<div id="{/page/instance/workflow/@id}-{$taskid}-stdout-{position()}"><xsl:value-of select="." /></div>
@@ -99,7 +131,7 @@
 				
 				<div id="{/page/instance/workflow/@id}-{$taskid}-executions">
 					<xsl:for-each select="output">
-						<div class="task_execution"><xsl:value-of select="@execution_time" /> (<xsl:value-of select="@retval" />)</div>
+						<div class="task_execution"><xsl:value-of select="@execution_time" /> (ret <xsl:value-of select="@retval" />)</div>
 					</xsl:for-each>
 				</div>
 			</xsl:for-each>
@@ -156,93 +188,7 @@
 	
 	
 	
-	<xsl:template match="workflow">
-		<tr>
-			<td class="workflowStatus">
-				<xsl:variable name="current-node">
-					<xsl:copy-of select="." />
-				</xsl:variable>
-				<xsl:choose>
-					<xsl:when test="@running_tasks - @queued_tasks > 0">
-						<span class="fa fa-spinner fa-pulse fa-fw" title="Task(s) running"></span>
-					</xsl:when>
-					<xsl:when test="@queued_tasks > 0">
-						<img src="images/waitpoint.gif" alt="Queued" title="Task(s) queued" />
-					</xsl:when>
-					<xsl:when test="@retrying_tasks > 0">
-						<span class="fa-icon fa-clock-o" title="A task ended badly and will retry"></span>
-					</xsl:when>
-					<xsl:when test="@errors > 0">
-						<span class="faicon fa-exclamation error" title="Errors"></span>
-					</xsl:when>
-					<xsl:when test="count(@end_time) > 0">
-						<span class="faicon fa-check success" title="Workflow terminated"></span>
-					</xsl:when>
-					<xsl:otherwise>
-						<b>?</b>
-					</xsl:otherwise>
-				</xsl:choose>
-			</td>
-
-			<td>
-				<span class="action showWorkflowDetails" data-id="{@id}" data-node-name="{@node_name | ../@node}">
-					<span class="faicon fa-plus-square-o"></span>
-					<xsl:text> </xsl:text>
-					<xsl:value-of select="@id" />
-					–
-					<xsl:value-of select="@name" />
-				</span>
-				<xsl:text>&#160;</xsl:text>
-				<xsl:variable name="seconds">
-					<xsl:apply-templates select="." mode="total-time" />
-				</xsl:variable>
-
-				(<xsl:value-of select="php:function('humanTime',$seconds)" />)
-			</td>
-			<td class="tdHost">
-				<xsl:value-of select="@node_name | ../@node" />
-			</td>
-			<td class="tdHost">
-				<xsl:choose>
-					<xsl:when test="@host != ''"><xsl:value-of select="@host" /></xsl:when>
-					<xsl:otherwise>localhost</xsl:otherwise>
-				</xsl:choose>
-			</td>
-			<td class="tdStarted">
-				<xsl:value-of select="php:function('timeSpan',string(@start_time),string(@end_time))" />
-			</td>
-			
-			<td class="tdActions">
-				<xsl:if test="@status='EXECUTING'">
-					<img src="images/stop.png" alt="Stop execution of this workflow" title="Stop execution of this workflow" onclick="
-						evqueueAPI({{
-							confirm: 'Are you sure you want to stop the execution of this workflow?',
-							group: 'instance',
-							action: 'cancel',
-							attributes: {{ 'id':{@id} }},
-							node: '{../@node}'
-						}});"/>
-				</xsl:if>
-
-				<xsl:if test="@status='TERMINATED'">
-					<img src="images/delete.gif" class="action" onclick="
-						evqueueAPI({{
-							confirm: 'Delete workflow instance {@id}?',
-							group: 'instance',
-							action: 'delete',
-							attributes: {{ 'id':'{@id}' }}
-						}}).done( function () {{
-							location.reload();
-						}});" />
-				</xsl:if>
-			</td>
-		</tr>
-		<tr id="tr{@id}" class="hidden">
-			<td colspan="7" class="details">
-				<img src="images/ajax-loader.gif" />
-			</td>
-		</tr>
-	</xsl:template>
+	
 
 
 	<xsl:template match="instance|workflow" mode="total-time">
@@ -371,88 +317,7 @@
 		</xsl:choose>
 	</xsl:template>
 
-	<xsl:template name="instances">
-		<xsl:param name="instances" />
-		<xsl:param name="status" />
-		<div>
-
-		<div id="{$status}-workflows" class="workflow-list">
-
-			<xsl:for-each select="error[@id='evqueue-not-running']">
-				<div id="evqueue-not-running">
-					Evqueue is not running on node '<xsl:value-of select="@node" />'!!!<br/>
-					<!--If you expect workflows to be launched, you should start the evqueue process urgently!-->
-				</div>
-			</xsl:for-each>
-
-			<xsl:choose>
-				<xsl:when test="count(exsl:node-set($instances))=0">
-					<div style="text-align: center">
-						<div class="boxTitle workflowTitle titleNoResults">
-							<span class="workflowPages">No <xsl:value-of select="$status" /> workflow.</span>
-						</div>
-					</div>
-				</xsl:when>
-				<xsl:otherwise>
-					<div class="boxTitle workflowTitle">
-						<xsl:if test="$status = 'TERMINATED'">
-							<div class="statusFilter" title="Click to see workflows in error only">
-								<input type="checkbox" onclick="window.location.href = 'index.php'+($(this).is(':checked') ? '?filter=errors' : '');">
-									<xsl:if test="/page/get/@filter = 'errors'">
-										<xsl:attribute name="checked">checked</xsl:attribute>
-									</xsl:if>
-								</input>
-								<img src="images/exclamation.png" />
-							</div>
-						</xsl:if>
-						<span class="workflowPages" style="line-height:20px;">
-							<xsl:if test="$status = 'TERMINATED'">
-								<span class="prevPage action" data-status="{$status}">&lt;</span>
-							</xsl:if>
-							<xsl:if test="$status = 'EXECUTING'">
-								<xsl:value-of select="count(/page/instances/workflow)" />
-							</xsl:if>
-							<xsl:text> </xsl:text>
-							<xsl:value-of select="$status" />
-							Workflows
-							<xsl:if test="$status = 'EXECUTING' and count(exsl:node-set($instances)) != count(/page/instances/workflow)">
-								(<xsl:value-of select="count(exsl:node-set($instances))" /> displayed)
-							</xsl:if>
-							<xsl:if test="$status = 'TERMINATED'">
-								<xsl:value-of select="($PAGE*$LIMIT)+1-$LIMIT" />-<xsl:value-of select="($PAGE*$LIMIT)" />&#160;<span style="font-size: 80%">(<xsl:value-of select="/page/instances/@rows" /> total)</span>
-							</xsl:if>
-							<xsl:text> </xsl:text>
-							<xsl:if test="$status = 'TERMINATED'">
-								<span class="nextPage action" data-status="{$status}">&gt;</span>
-							</xsl:if>
-						</span>
-						<img src="images/refresh.png" class="refreshWorkflows action" title="Refresh workflow list" data-status="{$status}" style="margin-left: 5px;" />
-						<xsl:if test="$status = 'EXECUTING'">
-							<img src="images/alarm_clock.png" onclick="retryAllTasks();" class="pointer" data-confirm='Do you really want to retry all tasks? This can lead to tasks stopping in error sooner than expected, since their retry "counter" gets decremented.' title="Retry all tasks" style="margin-left: 5px;"/>
-						</xsl:if>
-						<div style="float:right;"><input type="checkbox" class="autorefresh" checked="checked" />&#160;Auto-refresh</div>
-					</div>
-					<table class="tb_workflows highlight_row">
-						<tr>
-							<th class="thState">State</th>
-							<th>ID &#8211; Name</th>
-							<th>Node</th>
-							<th class="thStarted">Host</th>
-							<th class="thStarted">Time</th>
-							<th class="thActions">Actions</th>
-						</tr>
-						<xsl:apply-templates select="exsl:node-set($instances)[@status = $status]">
-							<xsl:sort select="@end_time" order="descending" />
-							<xsl:sort select="@start_time" order="descending" />
-						</xsl:apply-templates>
-					</table>
-
-				</xsl:otherwise>
-			</xsl:choose>
-		</div>
-		</div>
-
-	</xsl:template>
+	
 
 
 	<xsl:template match="parameters">
@@ -541,55 +406,6 @@
 				</xsl:choose>
 			</xsl:otherwise>
 		</xsl:choose>
-	</xsl:template>
-
-
-	<xsl:template match="groups" mode="select_workflow">
-		<xsl:param name="name" select="'wf_name'" />
-		<xsl:param name="id" select="''" />
-		<xsl:param name="selected_value" select="''" />
-		<xsl:param name="value" select="'id'" />
-		<xsl:param name="min_parameters" select="'0'" />
-		<xsl:param name="display-bound-workflows" select="'yes'" />
-
-		<select name="{$name}" id="{$id}" >
-			<option></option>
-			<xsl:for-each select="group">
-				<xsl:if test="/page/*[local-name()='workflows' or local-name()='available-workflows']/workflow[@group=current()][count(workflow/parameters/parameter) &gt;= $min_parameters]">
-					<optgroup>
-						<xsl:attribute name="label">
-							<xsl:choose>
-								<xsl:when test=". = ''">
-									No Group
-								</xsl:when>
-								<xsl:otherwise>
-									<xsl:value-of select="." />
-								</xsl:otherwise>
-							</xsl:choose>
-						</xsl:attribute>
-						<xsl:for-each select="/page/*[local-name()='workflows' or local-name()='available-workflows']/workflow[@group=current()][count(workflow/parameters/parameter) &gt;= $min_parameters]">
-							<xsl:if test="@bound-to-schedule=0 or $display-bound-workflows = 'yes'">
-								<option value="{@id}">
-									<xsl:if test="$value = 'id'">
-										<xsl:if test="@id = $selected_value">
-											<xsl:attribute name="selected">selected</xsl:attribute>
-										</xsl:if>
-										<xsl:attribute name="value"><xsl:value-of select="@id" /></xsl:attribute>
-									</xsl:if>
-									<xsl:if test="$value = 'name'">
-										<xsl:if test="@name = $selected_value">
-											<xsl:attribute name="selected">selected</xsl:attribute>
-										</xsl:if>
-										<xsl:attribute name="value"><xsl:value-of select="@name" /></xsl:attribute>
-									</xsl:if>
-									<xsl:value-of select="@name" />
-								</option>
-							</xsl:if>
-						</xsl:for-each>
-					</optgroup>
-				</xsl:if>
-			</xsl:for-each>
-		</select>
 	</xsl:template>
 
 </xsl:stylesheet>

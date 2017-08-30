@@ -17,59 +17,23 @@
 	
 	<xsl:template name="content">
 	
-	<div id="opentest">clickme</div>
-	
-	<div class="dialog workflow-dialog" id="workflow-dialog" data-interval="5">
-	</div>
-	
-	<div class="dialog" id="task-dialog">
-		<ul>
-		</ul>
-	</div>
-	
-	
-	
+		<div class="dialog" id="workflow-dialog">
+			<ul>
+			</ul>
+		</div>
 		
+		<div class="dialog" id="task-dialog">
+			<ul>
+			</ul>
+		</div>
 		
+		<div id="workflow-dialogs"></div>
 		
-		
-		
-		
-		
-		
-		
-		<script type="text/javascript">
-			var get = {
-			<xsl:for-each select="/page/get/@*">
-				'<xsl:value-of select="local-name()" />': '<xsl:value-of select="." />',
-			</xsl:for-each>
-			};
-		</script>
-		
-		<script type="text/javascript">
-			var workflows = [];
-			<xsl:for-each select="/page/available-workflows/workflow">
-				<xsl:if test="count(parameters/parameter) &gt;= 1">
-					workflows['<xsl:value-of select="@name" />'] = [];
-					<xsl:for-each select="parameters/parameter">
-						workflows['<xsl:value-of select="../../@name" />'][<xsl:value-of select="position() - 1" />] = '<xsl:value-of select="@name" />';
-					</xsl:for-each>
-				</xsl:if>
-			</xsl:for-each>
-			<xsl:choose>
-				<xsl:when test="count(/page/@*) > 0"> <!-- =if there are parameters in the URL -->
-					var REFRESH = false;
-				</xsl:when>
-				<xsl:otherwise>
-					var REFRESH = true;
-				</xsl:otherwise>
-			</xsl:choose>
-		</script>
-		
-		<div id="workflows" class="contentList">
-			<div class="evq-autorefresh" data-url="ajax/executing-workflows.php" data-interval="2">
+		<div>
+			<div class="evq-autorefresh" data-url="ajax/list-instances.php?status=executing" data-interval="2">
 				<div class="boxTitle">
 					<span class="title">Executing workflows <span class="faicon fa-refresh action evq-autorefresh-toggle"></span></span>
+					<div id="EXECUTING-workflows-pages" class="evq-autorefresh-pannel"></div>
 				</div>
 				
 				<div id="EXECUTING-workflows" class="workflow-list evq-autorefresh-pannel"></div>
@@ -90,8 +54,10 @@
 					</td>
 				</tr>
 			</table>
+			
 			<br />
-			<div id="searchWithinWorkflowParamsInput" class="nodisplay">
+			
+			<div id="searchWithinWorkflowParamsInput" class="hidden">
 				<div>
 					<label class="formLabel" for="#PARAMETER_NAME#" >#PARAMETER_LABEL#</label>
 					<input type="text" class="parameter" name="#PARAMETER_NAME#" value="" />
@@ -103,7 +69,7 @@
 					<tr>
 						<td colspan="2"><a onclick="$('.filter').toggle();" href="javascript:void(0)">Filters</a> : <xsl:call-template name="explain_search" /></td>
 					</tr>
-					<tr class="filter nodisplay">
+					<tr class="filter hidden">
 						<td style="width:300px;">Node</td>
 						<td>
 							<select name="node">
@@ -117,23 +83,19 @@
 							</select>
 						</td>
 					</tr>
-					<tr class="filter nodisplay">
+					<tr class="filter hidden">
 						<td style="width:300px;">Workflow</td>
 						<td>
-							<xsl:apply-templates select="/page/groups" mode="select_workflow">
-								<xsl:with-param name="id" select="'searchByWorkflowSelect'" />
-								<xsl:with-param name="value" select="'name'" />
-								<xsl:with-param name="selected_value" select="/page/get/@wf_name" />
-							</xsl:apply-templates>
+							<select name="wf_name" class="evq-autofill select2" data-type="workflows" data-valuetype="name" style="width:300px;"></select>
 						</td>
 					</tr>
-					<tr class="filter nodisplay">
+					<tr class="filter hidden">
 						<td style="width:300px;">Workflow parameters</td>
 						<td>
 							<div id="searchWithinWorkflowParams"><xsl:comment /></div>
 						</td>
 					</tr>
-					<tr class="filter nodisplay">
+					<tr class="filter hidden">
 						<td>Launched between</td>
 						<td>
 							Date&#160;:&#160;<input id="dt_inf" name="dt_inf" value="{/page/get/@dt_inf}" />
@@ -143,7 +105,7 @@
 							Hour&#160;:&#160;<input id="hr_sup" name="hr_sup" value="{/page/get/@hr_sup}" />
 						</td>
 					</tr>
-					<tr class="filter nodisplay">
+					<tr class="filter hidden">
 						<td colspan="2" class="center">
 							<input type="submit" value="Filter workflows" />
 							<xsl:text>&#160;</xsl:text>
@@ -152,7 +114,16 @@
 					</tr>
 				</table>
 			</form>
-			<div id="TERMINATED-workflows" class="workflow-list" />		
+		</div>
+		
+		<br />
+			
+		<div class="evq-autorefresh" data-url="ajax/list-instances.php?status=terminated" data-interval="2">
+			<div class="boxTitle">
+				<span class="title">Terminated workflows <span class="faicon fa-refresh action evq-autorefresh-toggle"></span></span>
+			</div>
+			
+			<div id="TERMINATED-workflows" class="workflow-list evq-autorefresh-pannel"></div>
 		</div>
 	</xsl:template>
 	

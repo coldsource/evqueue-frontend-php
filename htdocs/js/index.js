@@ -1,38 +1,65 @@
 $(document).delegate('.showWorkflowDetails','click',function() {
 	var wfid = $(this).data('id');
+	var node = $(this).data('node-name');
+	var status = $(this).data('status');
+	
+	var container = $('<div>');
+	container.attr('data-url',"ajax/workflow.php?id="+wfid+"&node="+node);
+	container.attr('data-interval',status=='TERMINATED'?0:5);
+	container.addClass('evq-autorefresh');
+	$('#workflow-dialogs').append(container);
+	
 	var dialog = $('#workflow-dialog').clone();
-	dialog.attr('data-url',"ajax/workflow.php?id="+wfid+"&node=tkummerdev");
-	dialog.attr('id','workflow-'+wfid);
-	dialog.addClass('evq-autorefresh');
+	dialog.find('ul').append('<li><a href="#workflow-'+wfid+'">Workflow</a></li>')
+	dialog.find('ul').append('<li><a href="#workflow-'+wfid+'-parameters">Parameters</a></li>')
+	
+	
 	dialog.append('<div class="evq-autorefresh-pannel" id="workflow-'+wfid+'"></div>');
 	dialog.append('<div class="evq-autorefresh-pannel" id="workflow-'+wfid+'-parameters"></div>');
-	dialog.dialog();
-	set_autorefresh(dialog);
+	dialog.tabs();
+	dialog.dialog({
+		width:'auto',
+		height:'auto',
+		appendTo:container,
+		title:'Instance '+wfid,
+		close:function() { container.evqautorefresh('disable'); container.remove(); }
+	});
 	
-	dialog.delegate('.task','click',function() {
-		TaskDialog(wfid,$(this).data('evqid'),1);
+	container.evqautorefresh();
+	
+	dialog.delegate('.taskName','click',function() {
+		TaskDialog(container,wfid,$(this).parent().data('evqid'),$(this).parent().data('name'),1);
 	});
 });
 
-function TaskDialog(wfid,evqid,idx)
+function TaskDialog(container,wfid,evqid,name,idx)
 {
 	var dialog = $('#task-dialog').clone();
+	dialog.find('ul').append('<li><a href="#'+wfid+'-'+evqid+'-general">General</a></li>')
 	dialog.find('ul').append('<li><a href="#'+wfid+'-'+evqid+'-stdout-'+idx+'">stdout</a></li>')
 	dialog.find('ul').append('<li><a href="#'+wfid+'-'+evqid+'-stderr-'+idx+'">stderr</a></li>')
 	dialog.find('ul').append('<li><a href="#'+wfid+'-'+evqid+'-log-'+idx+'">log</a></li>')
 	if(idx==1)
 		dialog.find('ul').append('<li><a href="#'+wfid+'-'+evqid+'-executions">Previous executions</a></li>')
 	
+	dialog.append('<div class="evq-autorefresh-pannel" id="'+wfid+'-'+evqid+'-general"></div>')
 	dialog.append('<div class="evq-autorefresh-pannel" id="'+wfid+'-'+evqid+'-stdout-'+idx+'"</div>')
 	dialog.append('<div class="evq-autorefresh-pannel" id="'+wfid+'-'+evqid+'-stderr-'+idx+'"</div>')
 	dialog.append('<div class="evq-autorefresh-pannel" id="'+wfid+'-'+evqid+'-log-'+idx+'"</div>')
 	if(idx==1)
 		dialog.append('<div class="evq-autorefresh-pannel" id="'+wfid+'-'+evqid+'-executions"</div>')
 	dialog.tabs();
-	dialog.dialogTiled();
+	dialog.dialog({
+		width:600,
+		title:'Task '+name,
+		appendTo:container,
+		close:function() { $(this).dialog('destroy'); }
+	});
+	
+	container.evqautorefresh('refresh');
 	
 	dialog.delegate('.task_execution','click',function() {
-		TaskDialog(wfid,evqid,$(this).index()+1);
+		TaskDialog(container,wfid,evqid,$(this).index()+1);
 	});
 }
 
@@ -92,73 +119,6 @@ $(document).delegate('#searchform', 'submit', function() {
 	var searchParams = JSON.stringify(params.serializeArray());
 	$('#searchform input[name=searchParams]').val(searchParams);
 	params.remove();
-});
-
-
-// AUTOREFRESH
-var interval = 2000;
-setTimeout(autoRefresh,interval);
-
-function autoRefresh() {
-	autoRefreshStatuses(['executing','terminated'], function () {
-		var wfs = $('div#EXECUTING-workflows div.workflow');
-		autoRefreshOpenWFs(wfs, function () {
-			setTimeout(autoRefresh,interval);
-		});
-	});
-}
-
-function autoRefreshStatuses (statuses,callback) {
-	if (statuses.length === 0) {
-		if (callback) callback();
-		return;
-	}
-
-	var status = statuses.shift();
-	var chkbx = $('div#'+status.toUpperCase()+'-workflows input.autorefresh');
-	var doRefresh =
-		chkbx.length === 0 ||  // workflows for this status are not displayed (there aren't any)
-		chkbx.is(':checked');
-
-	if (!doRefresh) {
-		autoRefreshStatuses(statuses,callback);
-	} else {
-		refreshWorkflows(status, function () {
-			autoRefreshStatuses(statuses,callback);
-		});
-	}
-}
-
-function autoRefreshOpenWFs (wfs,callback) {
-	return;
-	
-	if (wfs.length === 0) {
-		if (callback) callback();
-		return;
-	}
-
-	var wf = wfs.eq(0);
-	refreshWorkflowHTML(wf.data('id'), wf.data('node-name'), wf.parents('td.details:eq(0)'), function () {
-		autoRefreshOpenWFs(wfs.slice(1),callback);
-	});
-}
-
-$(document).delegate( '.showWorkflowDetails', 'click', function() {
-	$(this).children('span.faicon').toggleClass('fa-plus-square-o fa-minus-square-o');
-	
-	var nextTr = $(this).parents('tr').next('tr');
-	var nextTrTd = nextTr.children('td.details');
-
-	if (nextTrTd.children('div.workflow').length > 0) {  // workflow details already loaded
-		nextTr.toggle('fast');
-		return;
-	}
-	
-	// Stop autorefreshing this workflows list, we would lose the open details
-	$(this).parents('div.workflow-list').find('input.autorefresh').attr('checked', false);
-	
-	refreshWorkflowHTML($(this).data('id'),$(this).data('node-name'),nextTrTd);
-	nextTr.toggle('fast');
 });
 
 $(document).delegate( 'img.exclamationdetails', 'click', function() {

@@ -215,6 +215,21 @@ div#wfs-editor fieldset {
 	float:right;
 }
 
+/* Global styles for tabbed presentation */
+fieldset.tabbed {
+	border-radius:5px;
+}
+
+.tabbed div div:nth-child(1) {
+	min-width:22em;
+	display:inline-block;
+}
+
+.tabbed div div:nth-child(2) {
+	font-weight:bold;
+	display:inline-block;
+}
+
 /* Global styles for tables */
 table {
 	border-collapse: collapse;

@@ -10,9 +10,7 @@ $(document).ready( function() {
 	
 	$('.spinner').spinner();
 	
-	$('.evq-autorefresh').each(function() {
-		set_autorefresh($(this));
-	});
+	$('.evq-autorefresh').evqautorefresh();
 });
 
 function evqueueAPI(options){
@@ -90,53 +88,64 @@ jQuery.fn.extend({
   }
 });
 
-function set_autorefresh(el)
-{
-	var toggle = el.find('span.evq-autorefresh-toggle');
-	if(toggle)
-	{
-		if(el.data('interval')>0)
-		{
-			toggle.addClass('fa-spin');
-			toggle.attr('title','Auto-refresh is enabled');
-		}
-		
-		toggle.click(function() {
-			if(el.data('interval')==0)
-				autorefresh(el,toggle);
-			else
+jQuery.fn.extend({
+	evqautorefresh: function(action=false) {
+		this.each(function() {
+			var el = $(this);
+			
+			if(action===false)
 			{
-				$(this).toggleClass('fa-spin');
+				var toggle = el.find('span.evq-autorefresh-toggle');
+				if(toggle)
+				{
+					if(el.data('interval')>0)
+					{
+						toggle.addClass('fa-spin');
+						toggle.attr('title','Auto-refresh is enabled');
+					}
+					
+					toggle.click(function() {
+						if(el.data('interval')==0)
+							autorefresh(el,toggle);
+						else
+						{
+							$(this).toggleClass('fa-spin');
+							
+							if($(this).hasClass('fa-spin'))
+							{
+								autorefresh(el,toggle);
+								$(this).attr('title','Auto-refresh is enabled');
+								Message('Auto refresh enabled');
+							}
+							else
+							{
+								$(this).attr('title','Auto-refresh is disabled');
+								clearTimeout(el.data('timeout'));
+								Message('Auto refresh stopped');
+							}
+						}
+					});
+				}
 				
-				if($(this).hasClass('fa-spin'))
-				{
-					autorefresh(el,toggle);
-					$(this).attr('title','Auto-refresh is enabled');
-					Message('Auto refresh enabled');
-				}
-				else
-				{
-					$(this).attr('title','Auto-refresh is disabled');
-					clearTimeout(el.data('timeout'));
-					Message('Auto refresh stopped');
-				}
+				Wait();
+				autorefresh(el,toggle).done(function() {
+					Ready();
+				});
 			}
+			else if(action=='disable')
+				clearTimeout(el.data('timeout'));
+			else if(action=='refresh')
+				autorefresh(el,false);
 		});
 	}
-	
-	Wait();
-	autorefresh(el,toggle).done(function() {
-		Ready();
-	});
-}
+});
 
 
 function autorefresh(el,toggle)
 {
 	var interval = el.data('interval')?el.data('interval'):0;
 	var url = el.data('url');
-	//var pannels = el.find('div.evq-autorefresh-pannel');
-	var pannels = $('.evq-autorefresh-pannel');
+	var pannels = el.find('div.evq-autorefresh-pannel');
 	
 	return $.ajax({url: url}).done(function(data) {
 		if(pannels.length==1)
@@ -146,12 +155,11 @@ function autorefresh(el,toggle)
 			for(var i=0;i<pannels.length;i++)
 			{
 				var pannel_id = $(pannels[i]).attr('id');
-				if($(data).find('#'+pannel_id).length==1)
-					$(pannels[i]).html($(data).find('#'+pannel_id).html());
+				$(pannels[i]).html($(data).find('#'+pannel_id).html());
 			}
 		}
 		
-		if(interval>0 && (toggle.length==0 || toggle.hasClass('fa-spin')))
+		if(interval>0 && toggle!==false && (toggle.length==0 || toggle.hasClass('fa-spin')))
 		{
 			var timeout = setTimeout(function() { autorefresh(el,toggle); } ,interval*1000);
 			el.data('timeout',timeout);

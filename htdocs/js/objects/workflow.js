@@ -120,8 +120,11 @@ Workflow.prototype.AddParameter = function(name)
 		parameters_node = parameters_nodes[0];
 	else
 	{
-		parameters_node = this.job.ownerDocument.createElement('parameters');
-		this.xmldoc.documentElement.appendChild(parameters_node);
+		parameters_node = this.xmldoc.createElement('parameters');
+		if(this.xmldoc.documentElement.firstChild)
+			this.xmldoc.documentElement.insertBefore(parameters_node,this.xmldoc.documentElement.firstChild);
+		else
+			this.xmldoc.documentElement.appendChild(parameters_node);
 	}
 	
 	var parameter = this.xmldoc.createElement('parameter');
