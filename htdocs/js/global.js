@@ -68,7 +68,8 @@ function evqueueAPI(options){
 	}).done(function(xml){
 		error = $(xml).find('error');
 		if ($(error).length > 0) {
-			alert(error.html());
+			if(!options.ignore_errors)
+				alert(error.html());
 			promise.reject();
 			return;
 		}
