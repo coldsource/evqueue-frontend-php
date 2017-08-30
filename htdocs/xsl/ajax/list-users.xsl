@@ -24,6 +24,9 @@
 							<xsl:value-of select="@profile" />
 						</td>
 						<td class="tdActions">
+							<xsl:if test="@profile='USER'">
+								<span class="faicon fa-id-card-o" title="Edit user rights"></span>
+							</xsl:if>
 							<span class="faicon fa-edit" title="Edit user"></span>
 							<span class="faicon fa-remove" title="Delete user"></span>
 						</td>
