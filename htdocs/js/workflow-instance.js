@@ -114,28 +114,52 @@ $(document).delegate('.taskName', 'click', function () {
 
 $(document).delegate('.js-execs li', 'click', function () {
 	
-	var d = $(this).data('dialog-id')
+	var d = $(this).data('dialog-id');
 	if (d) {
 		$('#'+d).dialog('open');
 		return;
 	}
 	
-	var dialog = $(this).parents('.taskDetails').clone().attr('id','').dialogTiled({width: 660,height: 500});
+	var parentDlg = $(this).parents('.taskDetails');
+	var dialog = parentDlg.clone()
+		.data('parent-dialog-id',parentDlg.attr('id'))
+		.attr('id','')
+		.dialogTiled({width: 660, height: 500, autoOpen: false});
+	
+	// remember this execution line's associated dialog id
 	$(this).data('dialog-id', dialog.attr('id'));
 	
-	dialog.find('.tabs').tabs();
-	
-	var outputData = dialog.children('.outputData');
-	var pos = $(this).index();
-	
-	// if this not the first dialog we open for this task, remove the 'previous executions' tab
-	if (!$(this).is(':last-child')) {
+	// First dialog we open for this task
+	if ($(this).is(':last-child')) {
+		dialog.find('.js-execs li:last-child').data('dialog-id', dialog.attr('id'));  // find its last exec line and remember the dialog id
+		dialog.data('parent-dialog-id',dialog.attr('id'))  // I'm my own parent
+	}
+	// if this is not, remove the 'previous executions' tab
+	else {
 		dialog.find('a[href="#tab-taskPrevExecs"], #tab-taskPrevExecs').remove();
 	}
 	
-	dialog.find('#tab-taskStdout .output').hide().eq(pos).show();
-	dialog.find('#tab-taskStderr .stderr').hide().eq(pos).show();
-	dialog.find('#tab-taskLog    .log'   ).hide().eq(pos).show();
+	dialog.find('.tabs').tabs();
 	
+	// In every 'js-exec-outputs' list of executions data, show only the right one
+	var pos = $(this).index();
+	dialog.data('exec-pos', pos);
+	
+	dialog.dialog('open');
+	
+	dialog.find('.js-exec-outputs li').hide();
+	dialog.find('.js-exec-outputs li:nth-child('+(pos+1)+')').show();
+	
+	// go to stdout tab
 	dialog.find('a[href="#tab-taskStdout"]').click();
+});
+
+
+// Highlight the execution line in the main dialog
+$(document).delegate('.taskDetails', 'focus click', function () {
+	var parentID = $(this).data('parent-dialog-id');
+	var execPos = $(this).data('exec-pos');
+	$('#'+parentID).find('.js-execs li')
+		.css({'font-weight': ''})
+		.eq(execPos).css({'font-weight': 'bold'});
 });

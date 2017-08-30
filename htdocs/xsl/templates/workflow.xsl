@@ -12,19 +12,19 @@
 				</xsl:variable>
 				<xsl:choose>
 					<xsl:when test="@running_tasks - @queued_tasks > 0">
-						<img src="images/ajax-loader.gif" alt="Running" title="Task(s) running" />
+						<span class="fa fa-spinner fa-pulse fa-fw" title="Task(s) running"></span>
 					</xsl:when>
 					<xsl:when test="@queued_tasks > 0">
 						<img src="images/waitpoint.gif" alt="Queued" title="Task(s) queued" />
 					</xsl:when>
 					<xsl:when test="@retrying_tasks > 0">
-						<img src="images/alarm_clock.png" alt="Retrying" title="A task ended badly and will retry" />
+						<span class="fa-icon fa-clock-o" title="A task ended badly and will retry"></span>
 					</xsl:when>
 					<xsl:when test="@errors > 0">
-						<span class="faicon fa-exclamation" title="Errors"></span>
+						<span class="faicon fa-exclamation error" title="Errors"></span>
 					</xsl:when>
 					<xsl:when test="count(@end_time) > 0">
-						<img src="images/ok.png" alt="Terminated" title="Workflow terminated" />
+						<span class="faicon fa-check success" title="Workflow terminated"></span>
 					</xsl:when>
 					<xsl:otherwise>
 						<b>?</b>
@@ -176,13 +176,13 @@
 			<div class="workflow" id="workflow{@id}" data-id="{@id}" data-node-name="{@node_name | ../@node}">
 				
 				<!-- Display workflow parameters -->
-				<span class="faicon spaced fa-list" src="images/listli.png" title="Workflow Parameters" onclick="$(this).nextAll('div.workflowParameters').toggleClass('hidden');"></span>
+				<span class="faicon fa-list" title="Workflow Parameters" onclick="$(this).nextAll('div.workflowParameters').toggleClass('hidden');"></span>
 				
 				<!-- Relaunch workflow -->
-				<span class="relaunch faicon spaced fa-rocket" data-wfiid="{@id}" data-node-name="{../@node_name}" alt="Re-launch workflow instance" title="Re-launch workflow instance" ></span>
+				<span class="relaunch faicon fa-rocket" data-wfiid="{@id}" data-node-name="{../@node_name}" alt="Re-launch workflow instance" title="Re-launch workflow instance" ></span>
 				
 				<!-- Display formatted XML -->
-				<span class="faicon spaced fa-code" src="images/bigger.png" title="View workflow XML" onclick="$('#xmlcontent{@id}').dialog({{width:800}});"></span>
+				<span class="faicon fa-code" title="View workflow XML" onclick="$('#xmlcontent{@id}').dialog({{width:800}});"></span>
 				<div id="xmlcontent{@id}" style="display:none;">
 					<xsl:apply-templates select="." mode="xml_display" />
 				</div>
@@ -235,7 +235,7 @@
 		
 		<div class="job {$jobClass}" data-type="job" data-name="{@name}" data-loop="{@loop}" data-condition="{@condition}">
 			<xsl:if test="@status = 'ABORTED'">
-				<span class="faicon fa-exclamation" title="{@details}"></span>
+				<span class="faicon fa-exclamation error" title="{@details}"></span>
 				<xsl:text>&#160;</xsl:text>
 				<xsl:value-of select="@details" />
 			</xsl:if>
@@ -291,10 +291,16 @@
 	
 	<xsl:template match="task" mode="details">
 		<div class="taskDetails dialog">
-			<h2>
-				<xsl:apply-templates select="." mode="status" />
-				<xsl:value-of select="@name" />
-			</h2>
+			<ul class="js-exec-outputs unstyled">
+				<xsl:for-each select="output">
+					<li>
+						<h2>
+							<xsl:apply-templates select="." mode="status" />
+							<xsl:value-of select="../@name" />
+						</h2>
+					</li>
+				</xsl:for-each>
+			</ul>
 			
 			<div class="tabs">
 				<ul>
@@ -333,9 +339,9 @@
 					</ul>
 				</div>
 				<div id="tab-taskStdout">
-					<ul class="unstyled">
+					<ul class="js-exec-outputs unstyled">
 						<xsl:for-each select="output">
-							<li class="output">
+							<li>
 								<xsl:choose>
 									<xsl:when test="@method = 'text'">
 										<xsl:attribute name="style">white-space:pre-wrap;</xsl:attribute>
@@ -350,16 +356,16 @@
 					</ul>
 				</div>
 				<div id="tab-taskStderr">
-					<ul class="unstyled">
+					<ul class="js-exec-outputs unstyled">
 						<xsl:for-each select="stderr">
-							<li class="stderr"><xsl:value-of select="." /></li>
+							<li><xsl:value-of select="." /></li>
 						</xsl:for-each>
 					</ul>
 				</div>
 				<div id="tab-taskLog">
-					<ul class="unstyled">
+					<ul class="js-exec-outputs unstyled">
 						<xsl:for-each select="log">
-							<li class="log"><xsl:value-of select="." /></li>
+							<li><xsl:value-of select="." /></li>
 						</xsl:for-each>
 					</ul>
 				</div>
@@ -368,11 +374,7 @@
 						<ul class="js-execs unstyled">
 							<xsl:for-each select="output">
 								<li class="action">
-									<xsl:if test="position() = last()"><xsl:attribute name="style">font-weight: bold;</xsl:attribute></xsl:if>
-									<xsl:choose>
-										<xsl:when test="@retval = '0'"><span class="faicon fa-check"></span></xsl:when>
-										<xsl:otherwise><span class="faicon fa-exclamation"></span></xsl:otherwise>
-									</xsl:choose>
+									<xsl:apply-templates select="." mode="status" />
 									<xsl:value-of select="@exit_time" />:
 									return code <xsl:value-of select="@retval" />
 								</li>
@@ -389,7 +391,7 @@
 		<span class="taskState">
 			<xsl:choose>
 				<xsl:when test="@status='ABORTED'">
-					<span class="faicon fa-exclamation-circle" title="{@status} - {@error}"></span>
+					<span class="faicon fa-exclamation-circle error" title="{@status} - {@error}"></span>
 				</xsl:when>
 				<xsl:when test="@status='QUEUED'">
 					<span class="faicon fa-hand-stop-o" title="QUEUED"></span>
@@ -398,13 +400,13 @@
 					<span class="fa fa-spinner fa-pulse fa-fw"></span>
 				</xsl:when>
 				<xsl:when test="@status='TERMINATED' and @retval != 0">
-					<span class="faicon fa-exclamation" title="Return value: {@retval}"></span>
+					<span class="faicon fa-exclamation error" title="Return value: {@retval}"></span>
 				</xsl:when>
 				<xsl:when test="@status='TERMINATED' and @retval = 0 and count(./output[@retval != '0']) > 0">
 					<span class="faicon fa-check errorThenSuccess"></span>
 				</xsl:when>
 				<xsl:when test="@status='TERMINATED' and @retval = 0">
-					<span class="faicon fa-check"></span>
+					<span class="faicon fa-check success"></span>
 				</xsl:when>
 			</xsl:choose>
 			
@@ -415,7 +417,13 @@
 			
 		</span>
 	</xsl:template>
-
+	
+	<xsl:template match="output" mode="status">
+		<xsl:choose>
+			<xsl:when test="@retval = '0'"><span class="faicon fa-check success"></span></xsl:when>
+			<xsl:otherwise><span class="faicon fa-exclamation error"></span></xsl:otherwise>
+		</xsl:choose>
+	</xsl:template>
 
 	<xsl:template name="instances">
 		<xsl:param name="instances" />

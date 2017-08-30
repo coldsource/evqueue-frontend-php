@@ -22,6 +22,9 @@ a, a:visited {
 	font-family:FontAwesome;
 	cursor:pointer;
 }
+.faicon.success { color: #27ae60 }
+.faicon.error { color: #c0392b; }
+.faicon.errorThenSuccess { color: #e67e22; }
 
 .action {
 	cursor: pointer;
