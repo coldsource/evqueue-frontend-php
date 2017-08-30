@@ -369,19 +369,29 @@
 						</xsl:for-each>
 					</ul>
 				</div>
-				<xsl:if test="count(output) > 1">
-					<div id="tab-taskPrevExecs">
-						<ul class="js-execs unstyled">
-							<xsl:for-each select="output">
-								<li class="action">
-									<xsl:apply-templates select="." mode="status" />
-									<xsl:value-of select="@exit_time" />:
-									return code <xsl:value-of select="@retval" />
-								</li>
-							</xsl:for-each>
-						</ul>
-					</div>
-				</xsl:if>
+				<xsl:choose>
+					<xsl:when test="count(output) > 1">
+						<div id="tab-taskPrevExecs">
+							<ul class="js-execs unstyled">
+								<xsl:for-each select="output">
+									<li class="action">
+										<xsl:apply-templates select="." mode="status" />
+										<xsl:value-of select="@exit_time" />:
+										return code <xsl:value-of select="@retval" />
+									</li>
+								</xsl:for-each>
+							</ul>
+						</div>
+					</xsl:when>
+					<xsl:otherwise>
+						<!-- dummy html to have our JS work -->
+						<div id="tab-taskPrevExecs" class="hidden">
+							<ul class="js-execs">
+								<li class="action"></li>
+							</ul>
+						</div>
+					</xsl:otherwise>
+				</xsl:choose>
 			</div>
 		</div>
 	</xsl:template>
