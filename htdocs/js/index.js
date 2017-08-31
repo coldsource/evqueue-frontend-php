@@ -4,17 +4,19 @@ $(document).delegate('.showWorkflowDetails','click',function() {
 	var status = $(this).data('status');
 	
 	var container = $('<div>');
-	container.attr('data-url',"ajax/workflow.php?id="+wfid+"&node="+node);
+	container.attr('data-url',"ajax/instance.php?id="+wfid+"&node="+node);
 	container.attr('data-interval',status=='TERMINATED'?0:5);
 	container.addClass('evq-autorefresh');
 	$('#workflow-dialogs').append(container);
 	
 	var dialog = $('#workflow-dialog').clone();
-	dialog.find('ul').append('<li><a href="#workflow-'+wfid+'">Workflow</a></li>')
+	dialog.find('ul').append('<li><a href="#workflow-'+wfid+'">Tree</a></li>')
+	dialog.find('ul').append('<li><a href="#workflow-'+wfid+'-xml">XML</a></li>')
 	dialog.find('ul').append('<li><a href="#workflow-'+wfid+'-parameters">Parameters</a></li>')
 	
 	
 	dialog.append('<div class="evq-autorefresh-pannel" id="workflow-'+wfid+'"></div>');
+	dialog.append('<div class="evq-autorefresh-pannel" id="workflow-'+wfid+'-xml"></div>');
 	dialog.append('<div class="evq-autorefresh-pannel" id="workflow-'+wfid+'-parameters"></div>');
 	dialog.tabs();
 	dialog.dialog({

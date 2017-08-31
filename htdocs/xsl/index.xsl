@@ -29,33 +29,19 @@
 		
 		<div id="workflow-dialogs"></div>
 		
-		<div>
-			<div class="evq-autorefresh" data-url="ajax/list-instances.php?status=executing" data-interval="2">
-				<div class="boxTitle">
-					<span class="title">Executing workflows <span class="faicon fa-refresh action evq-autorefresh-toggle"></span></span>
-					<div id="EXECUTING-workflows-pages" class="evq-autorefresh-pannel"></div>
-				</div>
-				
-				<div id="EXECUTING-workflows" class="workflow-list evq-autorefresh-pannel"></div>
+		
+		<div class="evq-autorefresh" data-url="ajax/list-instances.php?status=executing" data-interval="2">
+			<div class="boxTitle">
+				<span class="title">Executing workflows <span class="faicon fa-refresh action evq-autorefresh-toggle"></span></span>
+				<div id="EXECUTING-workflows-pages" class="evq-autorefresh-pannel"></div>
 			</div>
-
-			<table style="width:100%;">
-				<tr>
-					<td style="width:300px;">Launch a new workflow</td>
-					<td>
-						<xsl:apply-templates select="/page/groups" mode="select_workflow">
-							<xsl:with-param name="id" select="'launchWF'" />
-							<xsl:with-param name="value" select="'name'" />
-						</xsl:apply-templates>
-						
-						<xsl:for-each select="/page/available-workflows/workflow">
-								<xsl:apply-templates select="." mode="launch" />
-						</xsl:for-each>
-					</td>
-				</tr>
-			</table>
 			
-			<br />
+			<div id="EXECUTING-workflows" class="workflow-list evq-autorefresh-pannel"></div>
+		</div>
+
+		<br />
+		
+		<div>
 			
 			<div id="searchWithinWorkflowParamsInput" class="hidden">
 				<div>

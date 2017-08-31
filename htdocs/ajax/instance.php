@@ -33,7 +33,7 @@ $dom = new DOMDocument();
 $dom->loadXML($xml);
 $dom->documentElement->setAttribute("node", $_GET['node']);
 $xsl->AddFragment(["instance" => $dom]);
-echo $xsl->DisplayXHTML('../xsl/ajax/workflow.xsl');
+echo $xsl->DisplayXHTML('../xsl/ajax/instance.xsl');
 
 
 ?>
