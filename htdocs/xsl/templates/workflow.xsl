@@ -24,18 +24,24 @@
 		</xsl:variable>
 		
 		<div class="job {$jobClass}" data-type="job" data-evqid="{@evqid}">
-			<xsl:if test="@status = 'ABORTED'">
-				<span class="faicon fa-exclamation error" title="{@details}"></span>
-				<xsl:text>&#160;</xsl:text>
-				<xsl:value-of select="@details" />
-			</xsl:if>
-			
 			<div class="tasks">
 				<xsl:if test="count(subjobs/job) > 0">
 					<span class="foldSubjobs faicon fa-minus-square-o" onclick="
 						$(this).parent().nextAll('.job').toggle('fast');
 						$(this).toggleClass('fa-minus-square-o fa-plus-square-o');"></span>
-				</xsl:if>
+					</xsl:if>
+				<xsl:choose>
+					<xsl:when test="@status = 'SKIPPED'">
+						<div class="jobStatus skipped">
+							<span class="faicon fa-remove" title="{@details} ({@condition})"></span> job skipped
+						</div>
+					</xsl:when>
+					<xsl:when test="@status = 'ABORTED'">
+						<div class="jobStatus error">
+							<span class="faicon fa-exclamation-circle" title="{@details}"></span> job aborted
+						</div>
+					</xsl:when>
+				</xsl:choose>
 				<xsl:apply-templates select="tasks/task" />
 			</div>
 			
@@ -304,7 +310,7 @@
 			
 			<!-- extra "alarm clock" icon if the task will be retried -->
 			<xsl:if test="@status='TERMINATED' and @retry_at != ''">
-				<span class="faicon fa-clock" title="{@retry_at}"></span>
+				<span class="fa-icon fa-clock" title="{@retry_at}"></span>
 			</xsl:if>
 			
 		</span>
