@@ -83,7 +83,14 @@
 				</span>
 				<xsl:text>&#160;</xsl:text>
 				<xsl:variable name="seconds">
-					<xsl:apply-templates select="." mode="total-time" />
+					<xsl:choose>
+						<xsl:when test="count(@end_time) > 0">
+							<xsl:value-of select="php:function('timeDiff',string(@start_time),string(@end_time))" />
+						</xsl:when>
+						<xsl:otherwise>
+							<xsl:value-of select="php:function('timeDiff',string(@start_time))" />
+						</xsl:otherwise>
+					</xsl:choose>
 				</xsl:variable>
 
 				(<xsl:value-of select="php:function('humanTime',$seconds)" />)
@@ -118,5 +125,5 @@
 			</td>
 		</tr>
 	</xsl:template>
-
+	
 </xsl:stylesheet>
