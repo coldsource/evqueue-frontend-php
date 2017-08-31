@@ -12,7 +12,7 @@
 	
 	<xsl:variable name="javascript">
 		<src>js/index.js</src>
-<!-- 		<src>js/workflow-instance.js</src> -->
+		<src>js/instance.js</src>
 	</xsl:variable>
 	
 	<xsl:template name="content">
@@ -29,10 +29,15 @@
 		
 		<div id="workflow-dialogs"></div>
 		
+		<xsl:call-template name="workflow-launch" />
 		
-		<div class="evq-autorefresh" data-url="ajax/list-instances.php?status=executing" data-interval="2">
+		
+		<div id="executing-workflows-pannel" class="evq-autorefresh" data-url="ajax/list-instances.php?status=executing" data-interval="2">
 			<div class="boxTitle">
-				<span class="title">Executing workflows <span class="faicon fa-refresh action evq-autorefresh-toggle"></span></span>
+				<span class="title">Executing workflows</span>
+				<span class="faicon fa-refresh action evq-autorefresh-toggle"></span>
+				<span class="faicon fa-rocket action" title="Launch a new workflow"></span>
+				<span class="faicon fa-clock-o action" title="Retry all pending tasks"></span>
 				<div id="EXECUTING-workflows-pages" class="evq-autorefresh-pannel"></div>
 			</div>
 			
@@ -41,8 +46,82 @@
 
 		<br />
 		
-		<div>
+		<xsl:call-template name="filter" />
+		
+		<br />
 			
+		<div class="evq-autorefresh" data-url="ajax/list-instances.php?status=terminated" data-interval="2">
+			<div class="boxTitle">
+				<span class="title">Terminated workflows <span class="faicon fa-refresh action evq-autorefresh-toggle"></span></span>
+			</div>
+			
+			<div id="TERMINATED-workflows" class="workflow-list evq-autorefresh-pannel"></div>
+		</div>
+	</xsl:template>
+	
+	<xsl:template name="workflow-launch">
+		<div id="workflow-launch" class="dialog tabs">
+			<ul>
+				<li><a href="#workflow-launch-tab-workflow">Workflow</a></li>
+				<li><a href="#workflow-launch-tab-remote">Remote</a></li>
+				<li><a href="#workflow-launch-tab-node">Node</a></li>
+			</ul>
+			<div id="workflow-launch-tab-workflow">
+				<h2>
+					Select workflow
+					<span class="help faicon fa-question-circle" title="Select the workflow to launch.&#10;&#10;If the workflow needs parameters, you will be prompted for them."></span>
+				</h2>
+				<div class="formdiv" id="which_workflow">
+					<form>
+						<div>
+							<label>Workflow</label>
+							<select name="workflow_id" class="evq-autofill select2" data-type="workflows" data-valuetype="id"></select>
+						</div>
+					</form>
+				</div>
+				<br /><button class="submit">Launch new instance</button>
+			</div>
+			<div id="workflow-launch-tab-remote">
+				<h2>
+					Remote execution
+					<span class="help faicon fa-question-circle" title="The workflow or task can be launched through SSH on a distant machine. Enter the user and host used for SSH connection."></span>
+				</h2>
+				
+				<div class="formdiv">
+					<form>
+						<div>
+							<label>User</label>
+							<input name="user" />
+						</div>
+						<div>
+							<label>Host</label>
+							<input name="host" />
+						</div>
+					</form>
+				</div>
+				<br /><button class="submit">Launch new instance</button>
+			</div>
+			<div id="workflow-launch-tab-node">
+				<h2>
+					Cluster node
+					<span class="help faicon fa-question-circle" title="If you are using evQueue in a clustered environement, specify here the node on which the workflow will be launched."></span>
+				</h2>
+				
+				<div class="formdiv">
+					<form>
+						<div>
+							<label>Node</label>
+							<select name="node" class="evq-autofill" data-type="node"></select>
+						</div>
+					</form>
+					<br /><button class="submit">Launch new instance</button>
+				</div>
+			</div>
+		</div>
+	</xsl:template>
+	
+	<xsl:template name="filter">
+		<div>
 			<div id="searchWithinWorkflowParamsInput" class="hidden">
 				<div>
 					<label class="formLabel" for="#PARAMETER_NAME#" >#PARAMETER_LABEL#</label>
@@ -101,16 +180,6 @@
 				</table>
 			</form>
 		</div>
-		
-		<br />
-			
-		<div class="evq-autorefresh" data-url="ajax/list-instances.php?status=terminated" data-interval="2">
-			<div class="boxTitle">
-				<span class="title">Terminated workflows <span class="faicon fa-refresh action evq-autorefresh-toggle"></span></span>
-			</div>
-			
-			<div id="TERMINATED-workflows" class="workflow-list evq-autorefresh-pannel"></div>
-		</div>
 	</xsl:template>
 	
 	<xsl:template name="explain_search">
@@ -148,5 +217,5 @@
 			</xsl:if>
 		</xsl:for-each>
 	</xsl:template>
-
+	
 </xsl:stylesheet>

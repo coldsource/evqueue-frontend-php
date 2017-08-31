@@ -1,73 +1,68 @@
-$(document).delegate('.showWorkflowDetails','click',function() {
-	var wfid = $(this).data('id');
-	var node = $(this).data('node-name');
-	var status = $(this).data('status');
-	
-	var container = $('<div>');
-	container.attr('data-url',"ajax/instance.php?id="+wfid+"&node="+node);
-	container.attr('data-interval',status=='TERMINATED'?0:5);
-	container.addClass('evq-autorefresh');
-	$('#workflow-dialogs').append(container);
-	
-	var dialog = $('#workflow-dialog').clone();
-	dialog.find('ul').append('<li><a href="#workflow-'+wfid+'">Tree</a></li>')
-	dialog.find('ul').append('<li><a href="#workflow-'+wfid+'-xml">XML</a></li>')
-	dialog.find('ul').append('<li><a href="#workflow-'+wfid+'-parameters">Parameters</a></li>')
-	
-	
-	dialog.append('<div class="evq-autorefresh-pannel" id="workflow-'+wfid+'"></div>');
-	dialog.append('<div class="evq-autorefresh-pannel" id="workflow-'+wfid+'-xml"></div>');
-	dialog.append('<div class="evq-autorefresh-pannel" id="workflow-'+wfid+'-parameters"></div>');
-	dialog.tabs();
-	dialog.dialog({
-		width:'auto',
-		height:'auto',
-		appendTo:container,
-		title:'Instance '+wfid,
-		close:function() { container.evqautorefresh('disable'); container.remove(); }
+$(document).ready(function() {
+	$('#executing-workflows-pannel .fa-rocket').click(function() {
+		$('#workflow-launch').dialog({width:'auto',height:'auto'});
 	});
 	
-	container.evqautorefresh();
+	$('#executing-workflows-pannel .fa-clock-o').click(function() {
+		evqueueAPI({
+			confirm: 'The retry counter of each task in error will be decremented. Continue ?',
+			group: 'control',
+			action: 'retry',
+			attributes: {}
+		}).done(function(xml) {
+			Message("Retrying all tasks");
+		});
+	});
 	
-	dialog.delegate('.taskName','click',function() {
-		TaskDialog(container,wfid,$(this).parent().data('evqid'),$(this).parent().data('name'),1);
+	$('#workflow-launch select[name=workflow_id').change(function(event,schedule_xml) {
+		$('#which_workflow form .parameter').remove();
+		
+		if($(this).val()=='')
+			return;
+		
+		evqueueAPI({
+			group: 'workflow',
+			action: 'get',
+			attributes: {id: $(this).val()}
+		}).done(function(xml) {
+			$(xml).find('parameter').each(function() {
+				$('#which_workflow form').append('<div class="parameter"><label>'+$(this).attr('name')+'</label><input name="parameter_'+$(this).attr('name')+'"></input></div>');
+			});
+			
+			$(schedule_xml).find('parameter').each(function() {
+				$('#which_workflow form input[name=parameter_'+$(this).attr('name')+']').val($(this).attr('value'));
+			});
+		});
+	});
+	
+	$('#workflow-launch .submit').click(function() {
+		var workflow_id = $('#workflow-launch select[name=workflow_id').val();
+		var workflow_parameters = {};
+		$('#which_workflow form .parameter input').each(function() {
+			console.log($(this).val());
+			workflow_parameters[$(this).attr('name').substr(10)] = $(this).val();
+		});
+		
+		evqueueAPI({
+			group: 'workflow',
+			action: 'get',
+			attributes: {id: workflow_id}
+		}).done(function(xml) {
+			var workflow_name = xml.documentElement.firstChild.getAttribute('name');
+			
+			evqueueAPI({
+				group: 'instance',
+				action: 'launch',
+				attributes: {name:workflow_name},
+				parameters: workflow_parameters
+			}).done(function(xml) {
+				var instance_id = xml.documentElement.getAttribute('workflow-instance-id');
+				$('#workflow-launch').dialog('close');
+				Message('Launched instance '+instance_id);
+			});
+		});
 	});
 });
-
-function TaskDialog(container,wfid,evqid,name,idx)
-{
-	var dialog = $('#task-dialog').clone();
-	dialog.find('ul').append('<li><a href="#'+wfid+'-'+evqid+'-general">General</a></li>')
-	dialog.find('ul').append('<li><a href="#'+wfid+'-'+evqid+'-stdout-'+idx+'">stdout</a></li>')
-	dialog.find('ul').append('<li><a href="#'+wfid+'-'+evqid+'-stderr-'+idx+'">stderr</a></li>')
-	dialog.find('ul').append('<li><a href="#'+wfid+'-'+evqid+'-log-'+idx+'">log</a></li>')
-	if(idx==1)
-		dialog.find('ul').append('<li><a href="#'+wfid+'-'+evqid+'-executions">Previous executions</a></li>')
-	
-	dialog.append('<div class="evq-autorefresh-pannel" id="'+wfid+'-'+evqid+'-general"></div>')
-	dialog.append('<div class="evq-autorefresh-pannel" id="'+wfid+'-'+evqid+'-stdout-'+idx+'"</div>')
-	dialog.append('<div class="evq-autorefresh-pannel" id="'+wfid+'-'+evqid+'-stderr-'+idx+'"</div>')
-	dialog.append('<div class="evq-autorefresh-pannel" id="'+wfid+'-'+evqid+'-log-'+idx+'"</div>')
-	if(idx==1)
-		dialog.append('<div class="evq-autorefresh-pannel" id="'+wfid+'-'+evqid+'-executions"</div>')
-	dialog.tabs();
-	dialog.dialog({
-		width:600,
-		title:'Task '+name,
-		appendTo:container,
-		close:function() { $(this).dialog('destroy'); }
-	});
-	
-	container.evqautorefresh('refresh');
-	
-	dialog.delegate('.task_execution','click',function() {
-		TaskDialog(container,wfid,evqid,$(this).index()+1);
-	});
-}
-
-
-
-
 
 /*$(document).ready(function() {
 	refreshWorkflows("terminated");
@@ -128,7 +123,7 @@ $(document).delegate( 'img.exclamationdetails', 'click', function() {
 });
 
 $(document).delegate( 'img.terminatedico', 'click', function() {
-	$(this).parent('span.taskState').nextAll('div.taskOutput').toggleClass('hidden');
+	$(this).parent('span.taskState').workflow-nextAll('div.taskOutput').toggleClass('hidden');
 });
 
 $(document).delegate( 'span.tasktitle', 'click', function() {

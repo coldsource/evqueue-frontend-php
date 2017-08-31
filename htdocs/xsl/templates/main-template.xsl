@@ -195,11 +195,7 @@
 				</div>
 				<div>
 					<label>Preferred node</label>
-					<select name="preferred_node">
-						<xsl:for-each select="/page/evqueue-nodes/node">
-							<option value="{@name}"><xsl:value-of select="@name" /></option>
-						</xsl:for-each>
-					</select>
+					<select name="node" class="evq-autofill" data-type="node"></select>
 				</div>
 			</form>
 			<button class="submit">Save</button>
