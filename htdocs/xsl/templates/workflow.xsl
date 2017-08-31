@@ -99,6 +99,9 @@
 				<xsl:when test="@status='EXECUTING'">
 					<span class="fa fa-spinner fa-pulse fa-fw"></span>
 				</xsl:when>
+				<xsl:when test="@status='TERMINATED' and @retry_at != ''">
+					<span class="faicon fa-clock-o" title="Will retry at : {@retry_at}"></span>
+				</xsl:when>
 				<xsl:when test="@status='TERMINATED' and @retval != 0">
 					<span class="faicon fa-exclamation error" title="Return value: {@retval}"></span>
 				</xsl:when>
@@ -109,12 +112,6 @@
 					<span class="faicon fa-check success"></span>
 				</xsl:when>
 			</xsl:choose>
-			
-			<!-- extra "alarm clock" icon if the task will be retried -->
-			<xsl:if test="@status='TERMINATED' and @retry_at != ''">
-				<span class="faicon fa-clock" title="{@retry_at}"></span>
-			</xsl:if>
-			
 		</span>
 	</xsl:template>
 	

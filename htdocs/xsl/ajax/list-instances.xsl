@@ -34,7 +34,7 @@
 					<xsl:otherwise>
 						<table class="tb_workflows highlight_row">
 							<tr>
-								<th style="width:50px;" class="center">State</th>
+								<th style="width:80px;" class="center">State</th>
 								<th>ID &#8211; Name</th>
 								<th>Node</th>
 								<th class="thStarted">Host</th>
@@ -58,26 +58,21 @@
 				<xsl:variable name="current-node">
 					<xsl:copy-of select="." />
 				</xsl:variable>
-				<xsl:choose>
-					<xsl:when test="@running_tasks - @queued_tasks > 0">
-						<span class="fa fa-spinner fa-pulse fa-fw" title="Task(s) running"></span>
-					</xsl:when>
-					<xsl:when test="@queued_tasks > 0">
-						<img src="images/waitpoint.gif" alt="Queued" title="Task(s) queued" />
-					</xsl:when>
-					<xsl:when test="@retrying_tasks > 0">
-						<span class="fa-icon fa-clock-o" title="A task ended badly and will retry"></span>
-					</xsl:when>
-					<xsl:when test="@errors > 0">
-						<span class="faicon fa-exclamation error" title="Errors"></span>
-					</xsl:when>
-					<xsl:when test="count(@end_time) > 0">
-						<span class="faicon fa-check success" title="Workflow terminated"></span>
-					</xsl:when>
-					<xsl:otherwise>
-						<b>?</b>
-					</xsl:otherwise>
-				</xsl:choose>
+				<xsl:if test="@running_tasks - @queued_tasks > 0">
+					<span class="fa fa-spinner fa-pulse fa-fw" title="Task(s) running"></span>
+				</xsl:if>
+				<xsl:if test="@queued_tasks > 0">
+					<span class="faicon fa-hand-stop-o" title="Task(s) queued"></span>
+				</xsl:if>
+				<xsl:if test="@retrying_tasks > 0">
+					<span class="faicon fa-clock-o" title="A task ended badly and will retry"></span>
+				</xsl:if>
+				<xsl:if test="@status = 'TERMINATED' and @errors > 0">
+					<span class="faicon fa-exclamation error" title="Errors"></span>
+				</xsl:if>
+				<xsl:if test="@status = 'TERMINATED' and @errors = 0">
+					<span class="faicon fa-check success" title="Workflow terminated"></span>
+				</xsl:if>
 			</td>
 
 			<td>
