@@ -60,7 +60,7 @@ $(document).ready( function() {
 	
 	$('#when_daily input[name=time]').on('autocompletechange',function() {
 		if($(this).val()!='')
-			$('#when_daily input[name=schedule]').val(";"+$(this).val().substr(3,2)+";"+$(this).val().substr(0,2)+";;;");
+			$('#when_daily input[name=schedule]').val("0;"+$(this).val().substr(3,2)+";"+$(this).val().substr(0,2)+";;;");
 	});
 	
 	$('#when_daily form input[name=schedule]').change(function() {
@@ -77,7 +77,7 @@ $(document).ready( function() {
 		var days = schedule[3].split(',');
 		var months = schedule[4].split(',');
 		var weekdays = schedule[5].split(',');
-		if(schedule[0]=='' && schedule[1]!='' && minutes.length==1 && schedule[2]!='' && hours.length==1 && schedule[3]=='' && schedule[4]=='' && schedule[5]=='')
+		if(schedule[0]=='0' && schedule[1]!='' && minutes.length==1 && schedule[2]!='' && hours.length==1 && schedule[3]=='' && schedule[4]=='' && schedule[5]=='')
 		{
 			if(!$('input[name=when][value=Daily]').prop('checked'))
 				$('input[name=when][value=Daily]').prop('checked',true).trigger('change');
