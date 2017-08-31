@@ -144,6 +144,12 @@
 							<div>Status</div>
 							<div><xsl:value-of select="@status" /></div>
 						</div>
+						<xsl:if test="@error">
+							<div>
+								<div>Error</div>
+								<div><xsl:value-of select="@error" /></div>
+							</div>
+						</xsl:if>
 						<div>
 							<div>Return value</div>
 							<div><xsl:value-of select="@retval" /></div>

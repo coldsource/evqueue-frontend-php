@@ -13,6 +13,15 @@ $(document).ready( function() {
 	$('.evq-autorefresh').evqautorefresh();
 });
 
+XMLDocument.prototype.Query = function(xpath, context)
+{
+	var results = this.evaluate(xpath,context,null,XPathResult.ANY_TYPE, null);
+	var ret = [];
+	while (result = results.iterateNext())
+		ret.push(result);
+	return ret;
+}
+
 function evqueueAPI(options){
 	options = $.extend({confirm: '', attributes: [], parameters: []}, options);
 	

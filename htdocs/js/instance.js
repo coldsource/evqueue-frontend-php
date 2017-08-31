@@ -64,3 +64,51 @@ function TaskDialog(container,wfid,evqid,name,idx)
 		TaskDialog(container,wfid,evqid,$(this).index()+1);
 	});
 }
+
+function CancelInstance(id,node,killtasks = false)
+{
+	evqueueAPI({
+		group: 'instance',
+		action: 'query',
+		attributes: { 'id':id }
+	}).done( function (xml) {
+		var subjobs = xml.Query('subjobs',xml.documentElement.firstChild);
+		
+		evqueueAPI({
+			group: 'instance',
+			action: 'cancel',
+			attributes: { 'id':id },
+			node: node
+		}).done(function() {
+			Message('Canceled instance '+id);
+			if(killtasks)
+				KillRunningTasks(subjobs[0],id,node);
+		});
+	});
+}
+
+function KillRunningTasks(subjobs,id,node)
+{
+	var xmldoc = subjobs.ownerDocument;
+	jobs = xmldoc.Query('job',subjobs);
+	for(var i=0;i<jobs.length;i++)
+	{
+		var tasks = xmldoc.Query("tasks/task[@status = 'EXECUTING']",jobs[i]);
+		for(var j=0;j<tasks.length;j++)
+		{
+			var task_name = tasks[j].getAttribute('name');
+			evqueueAPI({
+				group: 'instance',
+				action: 'killtask',
+				attributes: { 'id':id, 'pid':tasks[j].getAttribute('pid') },
+				node: node
+			}).done(function() {
+				Message('Killed task '+task_name);
+			});
+		
+			var job_subjobs = xmldoc.Query('subjobs',jobs[i]);
+			if(job_subjobs.length>0)
+				KillRunningTasks(job_subjobs[0],id,node);
+		}
+	}
+}

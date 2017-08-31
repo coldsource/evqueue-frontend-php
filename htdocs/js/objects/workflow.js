@@ -16,15 +16,6 @@ function Workflow(el,xml)
 	else
 		this.xmldoc = jQuery.parseXML(xml);
 	
-	XMLDocument.prototype.Query = function(xpath, context)
-	{
-		var results = this.evaluate(xpath,context,null,XPathResult.ANY_TYPE, null);
-		var ret = [];
-		while (result = results.iterateNext())
-			ret.push(result);
-		return ret;
-	}
-	
 	// Attribute IDs to each job
 	this.xmldoc.documentElement.setAttribute('id','0');
 	jobs = this.xmldoc.Query('//job',this.xmldoc);

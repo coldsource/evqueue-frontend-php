@@ -11,8 +11,8 @@
 	</xsl:variable>
 	
 	<xsl:variable name="javascript">
-		<src>js/index.js</src>
 		<src>js/instance.js</src>
+		<src>js/index.js</src>
 	</xsl:variable>
 	
 	<xsl:template name="content">

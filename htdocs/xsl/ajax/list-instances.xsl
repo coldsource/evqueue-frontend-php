@@ -53,7 +53,7 @@
 	</xsl:template>
 	
 	<xsl:template match="workflow">
-		<tr data-id="{@id}">
+		<tr data-id="{@id}" data-node="{../@node}">
 			<td class="center">
 				<xsl:variable name="current-node">
 					<xsl:copy-of select="." />
@@ -93,10 +93,10 @@
 
 				(<xsl:value-of select="php:function('humanTime',$seconds)" />)
 			</td>
-			<td class="tdHost">
+			<td class="center">
 				<xsl:value-of select="@node_name | ../@node" />
 			</td>
-			<td class="tdHost">
+			<td class="center">
 				<xsl:choose>
 					<xsl:when test="@host != ''"><xsl:value-of select="@host" /></xsl:when>
 					<xsl:otherwise>localhost</xsl:otherwise>
@@ -108,14 +108,8 @@
 			
 			<td class="tdActions">
 				<xsl:if test="@status='EXECUTING'">
-					<img src="images/stop.png" alt="Stop execution of this workflow" title="Stop execution of this workflow" onclick="
-						evqueueAPI({{
-							confirm: 'Are you sure you want to stop the execution of this workflow?',
-							group: 'instance',
-							action: 'cancel',
-							attributes: {{ 'id':{@id} }},
-							node: '{../@node}'
-						}});"/>
+					<span class="faicon fa-ban" title="Cancel this instance"></span>
+					<span class="faicon fa-bomb" title="Kill this instance"></span>
 				</xsl:if>
 
 				<xsl:if test="@status='TERMINATED'">

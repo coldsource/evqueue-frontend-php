@@ -27,6 +27,20 @@ $(document).ready(function() {
 		});
 	});
 	
+	$(document).delegate('#executing-workflows-pannel .fa-ban','click',function() {
+		if(!confirm("You are about to cancel this instance.\n\nRunning tasks will continue to run normally but no new task will be launched.\n\nRetry schedules will be disabled."))
+			return;
+		
+		CancelInstance($(this).parents('tr').data('id'),$(this).parents('tr').data('node'),false);
+	});
+	
+	$(document).delegate('#executing-workflows-pannel .fa-bomb','click',function() {
+		if(!confirm("You are about to kill this instance.\n\nRunning tasks will be killed with SIGKILL and workflow will end immediately.\n\nThis can lead to inconsistancies in running tasks."))
+			return;
+		
+		CancelInstance($(this).parents('tr').data('id'),$(this).parents('tr').data('node'),true);
+	});
+	
 	$('#workflow-launch select[name=workflow_id').change(function(event,schedule_xml) {
 		$('#which_workflow form .parameter').remove();
 		
