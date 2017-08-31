@@ -39,6 +39,13 @@
 							<span class="faicon fa-exclamation-circle" title="{@details}"></span> job aborted
 						</div>
 					</xsl:when>
+					<xsl:otherwise>
+						<xsl:if test="@details">
+							<div class="jobStatus">
+								<span class="faicon fa-question-circle-o" title="{@details}"></span>
+							</div>
+						</xsl:if>
+					</xsl:otherwise>
 				</xsl:choose>
 				<xsl:apply-templates select="tasks/task" />
 			</div>

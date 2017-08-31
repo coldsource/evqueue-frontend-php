@@ -79,6 +79,10 @@ span#message {
 	font-weight:bold;
 }
 
+span#message span+span:before {
+	content:", ";
+}
+
 ul.topmenu {
 	position:fixed;
 	top:0px;
