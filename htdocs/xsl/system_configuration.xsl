@@ -15,7 +15,7 @@
 				<span class="title">Configuration</span>
 			</div>
 			
-			<div class="makeMeTabz">
+			<div class="tabs">
 				<ul>
 					<xsl:for-each select="/page/global">
 						<li><a href="#{@node_name}"><xsl:value-of select="@node_name" /> (v<xsl:value-of select="@version" />)</a></li>
@@ -41,8 +41,6 @@
 				</xsl:for-each>
 			</div>
 		</div>
-		
-		<script type="text/javascript">$('div.makeMeTabz:visible').tabs().removeClass('makeMeTabz');</script>
 		
 		<!-- Highlight parameters that have different values on multiple nodes. -->
 		<script type="text/javascript">
