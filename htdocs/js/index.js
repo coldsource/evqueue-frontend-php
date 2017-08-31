@@ -14,6 +14,19 @@ $(document).ready(function() {
 		});
 	});
 	
+	$(document).delegate('#terminated-workflows-pannel .fa-remove','click',function() {
+		var instance_id = $(this).parents('tr').data('id');
+		evqueueAPI({
+			confirm: 'You are about to delete instance '+instance_id,
+			group: 'instance',
+			action: 'delete',
+			attributes: { 'id':instance_id }
+		}).done( function () {
+			$('#terminated-workflows-pannel').evqautorefresh('refresh');
+			Message('Instance '+instance_id+' removed');
+		});
+	});
+	
 	$('#workflow-launch select[name=workflow_id').change(function(event,schedule_xml) {
 		$('#which_workflow form .parameter').remove();
 		

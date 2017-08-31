@@ -53,7 +53,7 @@
 	</xsl:template>
 	
 	<xsl:template match="workflow">
-		<tr>
+		<tr data-id="{@id}">
 			<td class="center">
 				<xsl:variable name="current-node">
 					<xsl:copy-of select="." />
@@ -119,15 +119,7 @@
 				</xsl:if>
 
 				<xsl:if test="@status='TERMINATED'">
-					<img src="images/delete.gif" class="action" onclick="
-						evqueueAPI({{
-							confirm: 'Delete workflow instance {@id}?',
-							group: 'instance',
-							action: 'delete',
-							attributes: {{ 'id':'{@id}' }}
-						}}).done( function () {{
-							location.reload();
-						}});" />
+					<span class="faicon fa-remove" title="Delete this instance"></span>
 				</xsl:if>
 			</td>
 		</tr>

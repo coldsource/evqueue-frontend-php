@@ -50,7 +50,7 @@
 		
 		<br />
 			
-		<div class="evq-autorefresh" data-url="ajax/list-instances.php?status=terminated" data-interval="2">
+		<div id="terminated-workflows-pannel" class="evq-autorefresh" data-url="ajax/list-instances.php?status=terminated" data-interval="2">
 			<div class="boxTitle">
 				<span class="title">Terminated workflows <span class="faicon fa-refresh action evq-autorefresh-toggle"></span></span>
 			</div>
