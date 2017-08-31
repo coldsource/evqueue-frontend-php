@@ -60,7 +60,7 @@
 			<xsl:if test="@status = 'SKIPPED' or ancestor::job[@status = 'SKIPPED']">skipped</xsl:if>
 		</xsl:variable>
 		
-		<div class="task {$taskClass}" data-name="{@name}" data-type="task" data-evqid="{@evqid}">
+		<div class="task {$taskClass}" data-name="{@name}" data-type="task" data-evqid="{@evqid}" data-outputs="{count(output)}">
 			
 			<span class="taskName">
 				<xsl:apply-templates select="." mode="status" />
@@ -132,6 +132,9 @@
 				<div id="{/page/instance/workflow/@id}-{$taskid}-general">
 					<fieldset class="tabbed">
 						<legend>Inputs</legend>
+						<xsl:if test="count(input) = 0">
+							<div>This task has no inputs</div>
+						</xsl:if>
 						<xsl:for-each select="input">
 							<div>
 								<div><xsl:value-of select="@name" /></div>
@@ -163,6 +166,14 @@
 							<div><xsl:value-of select="@execution_time" /></div>
 						</div>
 						<div>
+							<div>Ended at</div>
+							<div><xsl:value-of select="output[position() = last()]/@exit_time" /></div>
+						</div>
+						<div>
+							<div>Execution time</div>
+							<div><xsl:value-of select="php:function('timeDiff',string(@execution_time),string(output[position() = last()]/@exit_time))" /> second(s)</div>
+						</div>
+						<div>
 							<div>Number of executions</div>
 							<div><xsl:value-of select="count(output)" /></div>
 						</div>
@@ -185,7 +196,7 @@
 					<xsl:for-each select="output">
 						<div class="task_execution">
 							<xsl:apply-templates select="." mode="status" />
-							<xsl:value-of select="@execution_time" /> (ret <xsl:value-of select="@retval" />)
+							<xsl:value-of select="php:function('timeSpan',string(@execution_time),string(@exit_time))" /> (ret <xsl:value-of select="@retval" />)
 						</div>
 					</xsl:for-each>
 				</div>
@@ -198,6 +209,8 @@
 	<xsl:template match="*" mode="display_output">
 		<xsl:choose>
 			<xsl:when test="count(@datastore-id) > 0">
+				<div><i>The output of this task is too big and has been stored in the datastore.</i></div>
+				<br />
 				<div><a href="ajax/datastore.php?id={@datastore-id}&amp;download"><span class="faicon fa-download"></span>Download from datastore</a></div>
 				<div><a target="_blank" href="ajax/datastore.php?id={@datastore-id}"><span class="faicon fa-eye"></span>View in browser</a></div>
 			</xsl:when>

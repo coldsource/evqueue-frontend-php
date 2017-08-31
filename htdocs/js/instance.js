@@ -30,26 +30,30 @@ $(document).delegate('.showWorkflowDetails','click',function() {
 	container.evqautorefresh();
 	
 	dialog.delegate('.taskName','click',function() {
-		TaskDialog(container,wfid,$(this).parent().data('evqid'),$(this).parent().data('name'),1);
+		TaskDialog(container,wfid,$(this).parent().data('evqid'),$(this).parent().data('name'),$(this).parent().data('outputs'),$(this).parent().data('outputs'));
 	});
 });
 
-function TaskDialog(container,wfid,evqid,name,idx)
+function TaskDialog(container,wfid,evqid,name,idx,noutputs)
 {
+	console.log(idx);
 	var dialog = $('#task-dialog').clone();
-	dialog.find('ul').append('<li><a href="#'+wfid+'-'+evqid+'-general">General</a></li>')
+	if(idx==noutputs)
+		dialog.find('ul').append('<li><a href="#'+wfid+'-'+evqid+'-general">General</a></li>')
 	dialog.find('ul').append('<li><a href="#'+wfid+'-'+evqid+'-stdout-'+idx+'">stdout</a></li>')
 	dialog.find('ul').append('<li><a href="#'+wfid+'-'+evqid+'-stderr-'+idx+'">stderr</a></li>')
 	dialog.find('ul').append('<li><a href="#'+wfid+'-'+evqid+'-log-'+idx+'">log</a></li>')
-	if(idx==1)
+	if(noutputs>1 && idx==noutputs)
 		dialog.find('ul').append('<li><a href="#'+wfid+'-'+evqid+'-executions">Previous executions</a></li>')
 	
-	dialog.append('<div class="evq-autorefresh-pannel" id="'+wfid+'-'+evqid+'-general"></div>')
+	if(idx==noutputs)
+		dialog.append('<div class="evq-autorefresh-pannel" id="'+wfid+'-'+evqid+'-general"></div>')
 	dialog.append('<div class="evq-autorefresh-pannel" id="'+wfid+'-'+evqid+'-stdout-'+idx+'"</div>')
 	dialog.append('<div class="evq-autorefresh-pannel" id="'+wfid+'-'+evqid+'-stderr-'+idx+'"</div>')
 	dialog.append('<div class="evq-autorefresh-pannel" id="'+wfid+'-'+evqid+'-log-'+idx+'"</div>')
-	if(idx==1)
+	if(noutputs>1 && idx==noutputs)
 		dialog.append('<div class="evq-autorefresh-pannel" id="'+wfid+'-'+evqid+'-executions"</div>')
+	
 	dialog.tabs();
 	dialog.dialog({
 		width:600,
@@ -61,7 +65,7 @@ function TaskDialog(container,wfid,evqid,name,idx)
 	container.evqautorefresh('refresh');
 	
 	dialog.delegate('.task_execution','click',function() {
-		TaskDialog(container,wfid,evqid,$(this).index()+1);
+		TaskDialog(container,wfid,evqid,name,$(this).index()+1,noutputs);
 	});
 }
 
