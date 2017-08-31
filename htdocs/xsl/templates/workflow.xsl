@@ -170,15 +170,15 @@
 				</div>
 				
 				<xsl:for-each select="output">
-					<div id="{/page/instance/workflow/@id}-{$taskid}-stdout-{position()}"><xsl:value-of select="." /></div>
+					<div id="{/page/instance/workflow/@id}-{$taskid}-stdout-{position()}"><xsl:apply-templates mode="display_output" select="." /></div>
 				</xsl:for-each>
 				
 				<xsl:for-each select="stderr">
-					<div id="{/page/instance/workflow/@id}-{$taskid}-stderr-{position()}"><xsl:value-of select="." /></div>
+					<div id="{/page/instance/workflow/@id}-{$taskid}-stderr-{position()}"><xsl:apply-templates mode="display_output" select="." /></div>
 				</xsl:for-each>
 				
 				<xsl:for-each select="log">
-					<div id="{/page/instance/workflow/@id}-{$taskid}-log-{position()}"><xsl:value-of select="." /></div>
+					<div id="{/page/instance/workflow/@id}-{$taskid}-log-{position()}"><xsl:apply-templates mode="display_output" select="." /></div>
 				</xsl:for-each>
 				
 				<div id="{/page/instance/workflow/@id}-{$taskid}-executions">
@@ -195,7 +195,17 @@
 		</xsl:for-each>
 	</xsl:template>
 	
-	
+	<xsl:template match="*" mode="display_output">
+		<xsl:choose>
+			<xsl:when test="count(@datastore-id) > 0">
+				<div><a href="ajax/datastore.php?id={@datastore-id}&amp;download"><span class="faicon fa-download"></span>Download from datastore</a></div>
+				<div><a target="_blank" href="ajax/datastore.php?id={@datastore-id}"><span class="faicon fa-eye"></span>View in browser</a></div>
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:value-of select="." />
+			</xsl:otherwise>
+		</xsl:choose>
+	</xsl:template>
 	
 	
 	
