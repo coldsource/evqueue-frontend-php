@@ -71,9 +71,12 @@ function Ready()
 
 function Message(msg)
 {
-	$('#message').html(msg);
+	/*$('#message').html(msg);
 	$('#message').show();
-	$('#message').delay(2000).fadeOut();
+	$('#message').delay(2000).fadeOut();*/
+	var msg_span = $('<span>',{text:msg});
+	$('#message').append(msg_span);
+	msg_span.delay(3000).fadeOut(function() { $(this).remove(); });
 }
 
 var dialog_currpos = 0;
