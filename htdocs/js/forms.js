@@ -120,6 +120,15 @@ $(document).ready( function() {
 			$.getJSON('ajax/get-nodes.php',function(data) {
 				for(var node in data)
 					el.append($('<option>',{value:node,text:node}));
+				
+				evqueueAPI({group:'user',action:'get',attributes:{name:connected_user}}).done(function(xml) {
+					preferences = jQuery.parseJSON(xml.documentElement.firstChild.getAttribute('preferences'));
+					if(preferences.preferred_node)
+					{
+						el.val(preferences.preferred_node);
+						el.change();
+					}
+				});
 			});
 		}
 		
