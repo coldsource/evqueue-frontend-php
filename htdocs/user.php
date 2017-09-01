@@ -25,7 +25,5 @@ require_once 'lib/XSLEngine.php';
 
 $xsl = new XSLEngine();
 
-$xsl->AddFragment(["workflows" => $xsl->Api("workflows", "list")]);
-
 $xsl->DisplayXHTML('xsl/user.xsl');
 ?>
