@@ -10,6 +10,8 @@ $(document).ready( function() {
 	
 	$('.spinner').spinner();
 	
+	$('.datepicker').datepicker({ dateFormat: "yy-mm-dd" });
+	
 	$('.evq-autorefresh').evqautorefresh();
 });
 

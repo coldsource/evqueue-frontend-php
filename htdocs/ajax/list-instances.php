@@ -50,41 +50,30 @@ if($_GET['status']=='executing')
 else if($_GET['status']=='terminated')
 {
 	$limit = 30;
-	$page = ((isset($_GET['p']) && $_GET['p'] > 0) ? $_GET['p']:1);
-	$offset = ($page-1) * $limit;
+	$offset = 0;
+	$page = 1;
+	if(isset($_GET['p']))
+	{
+		$page = $p;
+		$offset = ($_GET['p']-1)*$limit;
+		unset($_GET['p']);
+	}
 
 	$filters = [
 		"limit"  => $limit,
 		"offset" => $offset,
 	];
-
-	if(isset($_GET['wf_name'])){
-		$filters = array_merge($filters, [
-			"filter_node" => $_GET['node'],
-			"filter_workflow" => $_GET['wf_name'],
-			"filter_launched_from" => trim($_GET['dt_inf']." ".$_GET['hr_inf']),
-			"filter_launched_until" => trim($_GET['dt_sup']." ".$_GET['hr_sup']),
-			"filter_status" => "",
-		]);
+	
+	$parameters = [];
+	
+	foreach($_GET as $filter_name=>$filter_value)
+	{
+		if(substr($filter_name,0,10)=='parameter_')
+			$parameters[substr($filter_name,10)] = $filter_value;
+		else
+		$filters[$filter_name] = $filter_value;
 	}
-	elseif(isset($_GET['workflow_schedule_id']))
-		$filters['filter_schedule_id'] = $_GET['workflow_schedule_id'];
-	elseif(isset($_GET['filter']) && $_GET['filter'] == 'errors')
-		$filters['filter_error'] = 'yes';
-		
-	if(isset($_GET['filter_id']) && is_numeric($_GET['filter_id'])){
-		$filters['filter_id'] = $_GET['filter_id'];
-	}
-
-	if(isset($_GET['searchParams'])){
-		$getParams = json_decode($_GET['searchParams'], 1);
-		$parameters = [];
-		foreach($getParams as $value){
-			$parameters[$value['name']] = $value['value'];
-		}
-	}
-	else
-		$parameters = [];
+	
 
 	$xsl = new XSLEngine();
 	$xsl->SetParameter('LIMIT', $limit);

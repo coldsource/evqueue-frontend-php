@@ -1,3 +1,7 @@
+var search_filters = {
+	status:'terminated'
+};
+
 $(document).ready(function() {
 	$('#executing-workflows-pannel .fa-rocket').click(function() {
 		$('#workflow-launch').dialog({width:'auto',height:'auto'});
@@ -89,116 +93,133 @@ $(document).ready(function() {
 			});
 		});
 	});
-});
-
-/*$(document).ready(function() {
-	refreshWorkflows("terminated");
-	refreshWorkflows("executing");
-
-	$("#dt_inf, #dt_sup").datepicker({dateFormat : "yy-mm-dd", maxDate: new Date(), showAnim: 'slideDown'});
 	
-	if($('#searchform #searchByWorkflowSelect option:selected').val())
-		$('#searchByWorkflowSelect').change();
-
-	if($('#searchform input[name=searchParams]').val())
-	{
-		search_parameters = JSON.parse($('#searchform input[name=searchParams]').val());
-		for(var i=0;i<search_parameters.length;i++)
-			$('#searchform input[name='+search_parameters[i]['name']+']').val(search_parameters[i]['value']);
-	}
+	// Search form
+	$('#searchform select[name=node]').change(function() {
+		if($(this).val())
+			search_filters.filter_node = $(this).val();
+		else
+			delete search_filters.filter_node;
+		
+		UpdateFilters();
+	});
+	
+	$('#searchform select[name=wf_name]').change(function() {
+		$('#searchform .parameter').remove();
+		
+		if($(this).val()=='')
+			delete search_filters.filter_workflow;
+		else
+		{
+			var wfname = $(this).find("option:selected").text();
+			var wfid = $(this).val();
+			
+			search_filters.filter_workflow = wfname;
+			
+			evqueueAPI({
+				group: 'workflow',
+				action: 'get',
+				attributes: {id: $(this).val()}
+			}).done(function(xml) {
+				$(xml).find('parameter').each(function() {
+					$('<div class="parameter"><label>'+$(this).attr('name')+'</label><input name="parameter_'+$(this).attr('name')+'"></input></div>').insertAfter('#searchworkflow');
+				});
+			});
+		}
+		
+		UpdateFilters();
+	});
+	
+	$('#searchform').delegate('.parameter','change',function() {
+		UpdateFilters();
+	});
+	
+	$('#dt_inf,#hr_inf').on('change autocompletechange',function() {
+		if($('#dt_inf').val())
+		{
+			search_filters.filter_launched_from = $('#dt_inf').val()+' '+($('#hr_inf').val()!=''?($('#hr_inf').val()+':00'):'00:00:00');
+		}
+		else
+			delete search_filters.filter_launched_from;
+		
+		UpdateFilters();
+	});
+	
+	$('#dt_sup,#hr_sup').on('change autocompletechange',function() {
+		if($('#dt_inf').val())
+		{
+			search_filters.filter_launched_until = $('#dt_sup').val()+' '+($('#hr_sup').val()!=''?($('#hr_sup').val()+':00'):'23:59:59');
+		}
+		else
+			delete search_filters.filter_launched_until;
+		
+		UpdateFilters();
+	});
+	
+	$('#clearfilters').click(function() {
+		$('#searchform select[name=node]').val('').change();
+		$('#searchform select[name=wf_name]').val('').change();
+		$('#dt_inf').val('').change();
+		$('#hr_inf').val('').change();
+		$('#dt_sup').val('').change();
+		$('#hr_sup').val('').change();
+		UpdateFilters();
+		$('.filter').toggle();
+	});
 });
 
-$(document).delegate('#searchByWorkflowSelect', 'change', function() {
-	if ($(this).val() != '') {
-		$("#searchWithinWorkflowParams").html('');
-
-		var nbParams = 0;
-		if($(this).val() in workflows)
-			nbParams = workflows[$(this).val()].length;
-
-		if (nbParams > 0) {
-			var parameter_input = $('#searchWithinWorkflowParamsInput').html();
-			for(var i=0;i<nbParams;i++)
+function UpdateFilters()
+{
+	var url = "ajax/list-instances.php?";
+	url += jQuery.param(search_filters);
+	
+	var parameters = {};
+	$('#searchform input').each(function() {
+		if($(this).attr('name').substr(0,10)=='parameter_' && $(this).val()!='')
+			parameters[$(this).attr('name')] = $(this).val();
+	});
+	if(Object.keys(parameters).length)
+		url += "&" + jQuery.param(parameters);
+	
+	$('#terminated-workflows-pannel').data('url',url);
+	$('#terminated-workflows-pannel').evqautorefresh('refresh');
+	
+	var explain;
+	if(Object.keys(search_filters).length==1)
+	{
+		explain = 'Showing all terminated workflows';
+		$('#clearfilters').hide();
+	}
+	else
+	{
+		explain = 'Showing terminated '+(search_filters.filter_workflow?' <i>'+search_filters.filter_workflow+'</i> ':'')+'workflows';
+		if(search_filters.filter_launched_from && search_filters.filter_launched_until)
+			explain += ' between '+search_filters.filter_launched_from+' and '+search_filters.filter_launched_until;
+		else if(search_filters.filter_launched_from)
+			explain += ' since '+search_filters.filter_launched_from;
+		else if(search_filters.filter_launched_until)
+			explain += ' before '+search_filters.filter_launched_until;
+		
+		var i = 0;
+		if(Object.keys(parameters).length)
+		{
+			explain += ' having ';
+			for(var param in parameters)
 			{
-				var html = parameter_input;
-				console.log(html);
-				html = html.split('#PARAMETER_LABEL#').join(workflows[$(this).val()][i]);
-				html = html.split('#PARAMETER_NAME#').join(workflows[$(this).val()][i]);
-
-				$('#searchWithinWorkflowParams').append(html);
+				if(i>0)
+					explain += ', ';
+				explain+= param.substr(10)+'='+parameters[param];
+				i++;
 			}
 		}
-
-		$("#searchWithinWorkflowParams").removeClass('hidden');
+		
+		if(search_filters.filter_node)
+			explain += ' on node '+search_filters.filter_node;
+		
+		$('#clearfilters').show();
 	}
-	else {
-		$("#searchWithinWorkflowParams").addClass('hidden');
-	}
-});
-
-$(document).delegate('#searchform', 'submit', function() {
-	// gather params to search in one json-encoded string to be submitted as a GET param
-	$('#searchWithinWorkflowParams input.parameter').filter("[value='']").remove()
-	var params = $('#searchWithinWorkflowParams input.parameter');
-	var searchParams = JSON.stringify(params.serializeArray());
-	$('#searchform input[name=searchParams]').val(searchParams);
-	params.remove();
-});
-
-$(document).delegate( 'img.exclamationdetails', 'click', function() {
-	$(this).parent('span.taskState').nextAll('div.taskOutput').toggleClass('hidden');
-});
-
-$(document).delegate( 'img.terminatedico', 'click', function() {
-	$(this).parent('span.taskState').workflow-nextAll('div.taskOutput').toggleClass('hidden');
-});
-
-$(document).delegate( 'span.tasktitle', 'click', function() {
-	$(this).nextAll('div.taskOutput').toggleClass('hidden');
-});
-
-$(document).delegate( 'img.showmemore', 'click', function() {
-	toggleJob($(this));
-});
-
-function toggleJob(image) {
-	var src = (image.attr('src') === 'images/plus.png')
-		? 'images/minus.png'
-		: 'images/plus.png';
-		image.attr('src', src);
-
-	image.parents('div.job:eq(0)').children('div.job').toggleClass('hidden');
+	
+	$('#searchexplain').html(explain);
+	
+	Message('Filters updated');
 }
-
-$(document).delegate('select[name=selected_workflow]', 'change', function() {
-	var wf_name = $(this).attr('value');
-	if (wf_name == 'new') {
-		$('input[name=edit_workflow_name]').attr('value','');
-		$('input[name=edit_workflow_name]').attr('disabled',false);
-	} else {
-		$('input[name=edit_workflow_name]').attr('value',wf_name);
-		$('input[name=edit_workflow_name]').attr('disabled',true);
-	}
-
-	var xml = $('p[for='+$(this).attr('value')+']').html();
-	if ($(this).attr('value') != '') {
-		$('textarea[name=workflow_xml]').html(xml).show();
-		$(this).parents('form').find('input[type=submit]').attr('disabled',false);
-	}
-	else {
-		$('textarea[name=workflow_xml]').html('').hide();
-		$(this).parents('form').find('input[type=submit]').attr('disabled',true);
-	}
-});
-
-
-$(document).delegate( 'img.showskippeddetails', 'click', function() {
-	$(this).nextAll('div.skippedcause').toggleClass('hidden');
-});
-
-
-$(document).delegate('#actionTools img', 'click', function () {
-	var divToToggle = $('div#'+$(this).data('div-id'));
-	$('div.actionToolsDivs').not(divToToggle).hide('fast');
-	divToToggle.toggle('fast')
-});*/
