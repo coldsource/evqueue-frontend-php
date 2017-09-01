@@ -54,7 +54,7 @@ else if($_GET['status']=='terminated')
 	$page = 1;
 	if(isset($_GET['p']))
 	{
-		$page = $p;
+		$page = $_GET['p'];
 		$offset = ($_GET['p']-1)*$limit;
 		unset($_GET['p']);
 	}
@@ -62,6 +62,7 @@ else if($_GET['status']=='terminated')
 	$filters = [
 		"limit"  => $limit,
 		"offset" => $offset,
+		"filter_status" => "TERMINATED"
 	];
 	
 	$parameters = [];

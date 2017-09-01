@@ -1,6 +1,5 @@
-var search_filters = {
-	status:'terminated'
-};
+var search_filters = { status:'terminated' };
+var current_page = 1;
 
 $(document).ready(function() {
 	$('#executing-workflows-pannel .fa-rocket').click(function() {
@@ -188,9 +187,20 @@ $(document).ready(function() {
 		UpdateFilters();
 		$('#searchformcontainer .filter').hide();
 	});
+	
+	// Pages
+	$('#terminated-workflows-pannel').delegate('.fa-backward','click',function() {
+		current_page--;
+		UpdateFilterURL();
+	});
+	
+	$('#terminated-workflows-pannel').delegate('.fa-forward','click',function() {
+		current_page++;
+		UpdateFilterURL();
+	});
 });
 
-function UpdateFilters()
+function UpdateFilterURL()
 {
 	var url = "ajax/list-instances.php?";
 	url += jQuery.param(search_filters);
@@ -203,8 +213,15 @@ function UpdateFilters()
 	if(Object.keys(parameters).length)
 		url += "&" + jQuery.param(parameters);
 	
+	url += "&p="+current_page;
+	
 	$('#terminated-workflows-pannel').data('url',url);
 	$('#terminated-workflows-pannel').evqautorefresh('refresh');
+}
+
+function UpdateFilters()
+{
+	UpdateFilterURL();
 	
 	var explain;
 	if(Object.keys(search_filters).length==1)

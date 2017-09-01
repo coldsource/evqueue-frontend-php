@@ -5,30 +5,29 @@
 	<xsl:template match="/">
 		<div>
 			<div id="{$STATUS}-workflows-pages">
-				<xsl:if test="$STATUS = 'TERMINATED'">
-					<span class="prevPage action" data-status="{$STATUS}">&lt;</span>
+				<xsl:if test="$STATUS = 'TERMINATED' and $PAGE>1">
+					<span class="faicon fa-backward"></span>
 				</xsl:if>
 				<xsl:if test="$STATUS = 'EXECUTING'">
 					<xsl:value-of select="count(/page/instances/workflow)" />
 				</xsl:if>
 				<xsl:text> </xsl:text>
-				<xsl:value-of select="$STATUS" />
-				Workflows
 				<xsl:if test="$STATUS = 'EXECUTING' and count(/page/instances/workflow) != count(/page/instances/workflow)">
 					(<xsl:value-of select="count(/page/instances/workflow)" /> displayed)
 				</xsl:if>
 				<xsl:if test="$STATUS = 'TERMINATED'">
-					<xsl:value-of select="($PAGE*$LIMIT)+1-$LIMIT" />-<xsl:value-of select="($PAGE*$LIMIT)" />&#160;<span style="font-size: 80%">(<xsl:value-of select="/page/instances/@rows" /> total)</span>
+					<xsl:value-of select="($PAGE*$LIMIT)+1-$LIMIT" />-<xsl:value-of select="($PAGE*$LIMIT)" />&#160;/&#160;<xsl:value-of select="/page/instances/@rows" />
 				</xsl:if>
 				<xsl:text> </xsl:text>
-				<xsl:if test="$STATUS = 'TERMINATED'">
-					<span class="nextPage action" data-status="{$STATUS}">&gt;</span>
+				<xsl:if test="$STATUS = 'TERMINATED' and ($PAGE*$LIMIT) &lt; /page/instances/@rows">
+					<span class="faicon fa-forward"></span>
 				</xsl:if>
 			</div>
 			
 			<div id="{$STATUS}-workflows" class="workflow-list">
 				<xsl:choose>
 					<xsl:when test="count(/page/instances/workflow)=0">
+						<br />
 						<div class="center">No <xsl:value-of select="$STATUS" /> workflow.</div>
 					</xsl:when>
 					<xsl:otherwise>
