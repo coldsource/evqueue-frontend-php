@@ -2,10 +2,41 @@ var search_filters = { status:'terminated' };
 var current_page = 1;
 
 $(document).ready(function() {
+	// Launch button
 	$('#executing-workflows-pannel .fa-rocket').click(function() {
 		$('#workflow-launch').dialog({width:'auto',height:'auto'});
 	});
 	
+	// Relaunch button
+	$(document).delegate('.ui-dialog-title .fa-rocket','click',function() {
+		var instance_id = $(this).data('id');
+		var node = $(this).data('node');
+		
+		evqueueAPI({
+			group: 'instance',
+			action: 'query',
+			attributes: { id: instance_id }
+		}).done( function(xml) {
+			var workflow_node = xml.documentElement.firstChild;
+			var workflow_name = workflow_node.getAttribute('name');
+			var parameters = xml.Query("parameters/parameter",workflow_node);
+			
+			var workflow_id = $('#workflow-launch select[name=workflow_id] option').filter(function () { return $(this).html() == workflow_name; }).val();
+			
+			$('#workflow-launch input[name=user]').val(workflow_node.getAttribute('user'));
+			$('#workflow-launch input[name=host]').val(workflow_node.getAttribute('host'));
+			$('#workflow-launch select[name=node]').val(node);
+			
+			$('#workflow-launch select[name=workflow_id]').val(workflow_id).trigger('change.select2');
+			SetWorkflowParameters($('#workflow-launch select[name=workflow_id]')).done(function() {
+				for(var i=0;i<parameters.length;i++)
+					$('#workflow-launch input[name=parameter_'+parameters[i].getAttribute('name')+']').val(parameters[i].textContent);
+			});
+		});
+		$('#workflow-launch').dialog({width:'auto',height:'auto'});
+	});
+	
+	// Alarm clock
 	$('#executing-workflows-pannel .fa-clock-o').click(function() {
 		evqueueAPI({
 			confirm: 'The retry counter of each task in error will be decremented. Continue ?',
@@ -17,6 +48,7 @@ $(document).ready(function() {
 		});
 	});
 	
+	// Remove instance
 	$(document).delegate('#terminated-workflows-pannel .fa-remove','click',function() {
 		var instance_id = $(this).parents('tr').data('id');
 		evqueueAPI({
@@ -30,6 +62,7 @@ $(document).ready(function() {
 		});
 	});
 	
+	// Cancell instance
 	$(document).delegate('#executing-workflows-pannel .fa-ban','click',function() {
 		if(!confirm("You are about to cancel this instance.\n\nRunning tasks will continue to run normally but no new task will be launched.\n\nRetry schedules will be disabled."))
 			return;
@@ -37,6 +70,7 @@ $(document).ready(function() {
 		CancelInstance($(this).parents('tr').data('id'),$(this).parents('tr').data('node'),false);
 	});
 	
+	// Kill instance
 	$(document).delegate('#executing-workflows-pannel .fa-bomb','click',function() {
 		if(!confirm("You are about to kill this instance.\n\nRunning tasks will be killed with SIGKILL and workflow will end immediately.\n\nThis can lead to inconsistancies in running tasks."))
 			return;
@@ -44,32 +78,16 @@ $(document).ready(function() {
 		CancelInstance($(this).parents('tr').data('id'),$(this).parents('tr').data('node'),true);
 	});
 	
+	// Launch box : workflow change handler
 	$('#workflow-launch select[name=workflow_id').change(function(event,schedule_xml) {
-		$('#which_workflow form .parameter').remove();
-		
-		if($(this).val()=='')
-			return;
-		
-		evqueueAPI({
-			group: 'workflow',
-			action: 'get',
-			attributes: {id: $(this).val()}
-		}).done(function(xml) {
-			$(xml).find('parameter').each(function() {
-				$('#which_workflow form').append('<div class="parameter"><label>'+$(this).attr('name')+'</label><input name="parameter_'+$(this).attr('name')+'"></input></div>');
-			});
-			
-			$(schedule_xml).find('parameter').each(function() {
-				$('#which_workflow form input[name=parameter_'+$(this).attr('name')+']').val($(this).attr('value'));
-			});
-		});
+		SetWorkflowParameters($(this));
 	});
 	
+	// Launch a new instance
 	$('#workflow-launch .submit').click(function() {
 		var workflow_id = $('#workflow-launch select[name=workflow_id').val();
 		var workflow_parameters = {};
 		$('#which_workflow form .parameter input').each(function() {
-			console.log($(this).val());
 			workflow_parameters[$(this).attr('name').substr(10)] = $(this).val();
 		});
 		
@@ -79,11 +97,18 @@ $(document).ready(function() {
 			attributes: {id: workflow_id}
 		}).done(function(xml) {
 			var workflow_name = xml.documentElement.firstChild.getAttribute('name');
+			var attributes = {name:workflow_name};
+			if($('#workflow-launch input[name=host]').val())
+			{
+				attributes.host = $('#workflow-launch input[name=host]').val();
+				if($('#workflow-launch input[name=user]').val())
+					attributes.user = $('#workflow-launch input[name=user]').val();
+			}
 			
 			evqueueAPI({
 				group: 'instance',
 				action: 'launch',
-				attributes: {name:workflow_name},
+				attributes: attributes,
 				parameters: workflow_parameters
 			}).done(function(xml) {
 				var instance_id = xml.documentElement.getAttribute('workflow-instance-id');
@@ -175,7 +200,7 @@ $(document).ready(function() {
 	
 	$('#clearfilters').click(function() {
 		$('#searchform select[name=node]').val('');
-		$('#searchform select[name=wf_name]').val('').trigger('change.select2');;
+		$('#searchform select[name=wf_name]').val('').trigger('change.select2');
 		$('#dt_inf').val('');
 		$('#hr_inf').val('');
 		$('#dt_sup').val('');
@@ -199,6 +224,30 @@ $(document).ready(function() {
 		UpdateFilterURL();
 	});
 });
+
+function SetWorkflowParameters(el)
+{
+	$('#which_workflow form .parameter').remove();
+	
+	if(el.val()=='')
+		return;
+	
+	var promise = new jQuery.Deferred();
+	
+	evqueueAPI({
+		group: 'workflow',
+		action: 'get',
+		attributes: {id: el.val()}
+	}).done(function(xml) {
+		$(xml).find('parameter').each(function() {
+			$('#which_workflow form').append('<div class="parameter"><label>'+$(this).attr('name')+'</label><input name="parameter_'+$(this).attr('name')+'"></input></div>');
+		});
+		
+		promise.resolve();
+	});
+	
+	return promise;
+}
 
 function UpdateFilterURL()
 {

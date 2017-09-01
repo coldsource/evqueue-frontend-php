@@ -1,3 +1,13 @@
+$.widget("ui.dialog", $.extend({}, $.ui.dialog.prototype, {
+	_title: function(title) {
+		if (!this.options.title ) {
+			title.html("&#160;");
+		} else {
+			title.html(this.options.title);
+		}
+	}
+}));
+
 $(document).delegate('.showWorkflowDetails','click',function() {
 	var wfid = $(this).data('id');
 	var node = $(this).data('node-name');
@@ -10,6 +20,7 @@ $(document).delegate('.showWorkflowDetails','click',function() {
 	$('#workflow-dialogs').append(container);
 	
 	var dialog = $('#workflow-dialog').clone();
+	dialog.removeAttr('id');
 	dialog.find('ul').append('<li><a href="#workflow-'+wfid+'">Tree</a></li>')
 	dialog.find('ul').append('<li><a href="#workflow-'+wfid+'-xml">XML</a></li>')
 	dialog.find('ul').append('<li><a href="#workflow-'+wfid+'-parameters">Parameters</a></li>')
@@ -23,7 +34,7 @@ $(document).delegate('.showWorkflowDetails','click',function() {
 		width:'auto',
 		height:'auto',
 		appendTo:container,
-		title:'Instance '+wfid,
+		title:'Instance '+wfid+'<span class="faicon fa-rocket" style="font-weight:normal;" title="Launch new workflow base on this one" data-id="'+wfid+'" data-node="'+node+'"></span>',
 		close:function() { container.evqautorefresh('disable'); container.remove(); }
 	});
 	
