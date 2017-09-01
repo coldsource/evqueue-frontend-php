@@ -52,7 +52,9 @@
 			
 		<div id="terminated-workflows-pannel" class="evq-autorefresh" data-url="ajax/list-instances.php?status=terminated" data-interval="2">
 			<div class="boxTitle">
-				<span class="title">Terminated workflows <span class="faicon fa-refresh action evq-autorefresh-toggle"></span></span>
+				<span class="faicon fa-exclamation filter" title="Display only failed workflows"></span>
+				<span class="title">Terminated workflows</span>
+				<span class="faicon fa-refresh action evq-autorefresh-toggle"></span>
 			</div>
 			
 			<div id="TERMINATED-workflows" class="workflow-list evq-autorefresh-pannel"></div>
@@ -122,7 +124,7 @@
 	
 	<xsl:template name="filter">
 		<div id="searchformcontainer">
-			<a onclick="$('.filter').toggle();" href="javascript:void(0)">Filters</a> : <span id="searchexplain">Showing all terminated workflows</span><span id="clearfilters" class="hidden faicon fa-remove" title="Clear filters"></span>
+			<a onclick="$('#searchformcontainer .filter').toggle();" href="javascript:void(0)">Filters</a> : <span id="searchexplain">Showing all terminated workflows</span><span id="clearfilters" class="hidden faicon fa-remove" title="Clear filters"></span>
 		
 			<div class="formdiv filter hidden">
 				<form id="searchform">

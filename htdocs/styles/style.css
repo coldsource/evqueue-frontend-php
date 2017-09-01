@@ -308,6 +308,12 @@ div.boxTitle .action {
 	font-weight:normal;
 }
 
+div.boxTitle .filter {
+	float:left;
+	margin-top: 4px;
+	margin-left: 7px;
+}
+
 /* Login page */
 div#login {
 	text-align:center;

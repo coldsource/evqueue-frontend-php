@@ -146,25 +146,47 @@ $(document).ready(function() {
 	});
 	
 	$('#dt_sup,#hr_sup').on('change autocompletechange',function() {
-		if($('#dt_inf').val())
+		if($('#dt_sup').val())
 		{
 			search_filters.filter_launched_until = $('#dt_sup').val()+' '+($('#hr_sup').val()!=''?($('#hr_sup').val()+':00'):'23:59:59');
 		}
 		else
 			delete search_filters.filter_launched_until;
 		
+		
+		UpdateFilters();
+	});
+	
+	$('#terminated-workflows-pannel .fa-exclamation').click(function() {
+		$(this).toggleClass('error');
+		
+		if($(this).hasClass('error'))
+		{
+			$(this).attr('title','Display all workflows');
+			search_filters.filter_error = 1;
+		}
+		else
+		{
+			$(this).attr('title','Display only failed workflows');
+			delete search_filters.filter_error;
+		}
+		
 		UpdateFilters();
 	});
 	
 	$('#clearfilters').click(function() {
-		$('#searchform select[name=node]').val('').change();
-		$('#searchform select[name=wf_name]').val('').change();
-		$('#dt_inf').val('').change();
-		$('#hr_inf').val('').change();
-		$('#dt_sup').val('').change();
-		$('#hr_sup').val('').change();
+		$('#searchform select[name=node]').val('');
+		$('#searchform select[name=wf_name]').val('').trigger('change.select2');;
+		$('#dt_inf').val('');
+		$('#hr_inf').val('');
+		$('#dt_sup').val('');
+		$('#hr_sup').val('');
+		if($('#terminated-workflows-pannel .fa-exclamation').hasClass('error'))
+			$('#terminated-workflows-pannel .fa-exclamation').click();
+		
+		search_filters = { status:'terminated' };
 		UpdateFilters();
-		$('.filter').toggle();
+		$('#searchformcontainer .filter').hide();
 	});
 });
 
@@ -192,7 +214,12 @@ function UpdateFilters()
 	}
 	else
 	{
-		explain = 'Showing terminated '+(search_filters.filter_workflow?' <i>'+search_filters.filter_workflow+'</i> ':'')+'workflows';
+		if(search_filters.filter_error)
+			explain = 'Showing failed ';
+		else
+			explain = 'Showing terminated ';
+		
+		explain += (search_filters.filter_workflow?' <i>'+search_filters.filter_workflow+'</i> ':'')+'workflows';
 		if(search_filters.filter_launched_from && search_filters.filter_launched_until)
 			explain += ' between '+search_filters.filter_launched_from+' and '+search_filters.filter_launched_until;
 		else if(search_filters.filter_launched_from)
