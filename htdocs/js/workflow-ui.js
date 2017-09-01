@@ -106,7 +106,7 @@ $(document).ready(function() {
 	});
 
 	$('#import_xml_action').click(function() {
-		wf = new Workflow($('#import_xml_dlg textarea').val());
+		wf = new Workflow($('#workflow'),$('#import_xml_dlg textarea').val());
 		wf.Draw();
 		$('#import_xml_dlg').dialog('close');
 	});
