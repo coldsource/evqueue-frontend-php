@@ -42,7 +42,13 @@ if(isset($_POST['engine_host']) && isset($_POST['engine_port']))
 				throw $e;
 		}
 		
-		$f = @fopen("conf/queueing.php",'w',true);
+		if(is_file('/etc/evqueue/conf/queueing.php'))
+			$f = @fopen('/etc/evqueue/conf/queueing.php','w');
+		else if(is_file(__DIR__ . '/includes/conf/queueing.php'))
+			$f = @fopen(__DIR__ . '/includes/conf/queueing.php','w');
+		else
+			die("No configuration file found");
+		
 		if($f===false)
 			throw new Exception("Unable to open config file 'conf/queueing.php'");
 		

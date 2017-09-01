@@ -383,3 +383,31 @@ div#login div.form {
 #dt_inf, #dt_sup, #hr_inf, #hr_sup {
 	width: 6em;
 }
+
+/* Install page */
+  div.install_content {
+	width: 540px;
+	margin: auto;
+}
+
+  div.install_content div.error {
+	text-align: center;
+	font-weight: bold;
+	margin-bottom: 10px;
+}
+
+div.install_content div.submit {
+	text-align: center;
+}
+
+div.install_content div.installform {
+	border:1px solid grey;
+}
+
+div.install_content input[type=submit] {
+	min-width:unset;
+	display:inline-block;
+	margin-left:auto;
+	margin-right:auto;
+	margin-bottom:10px;
+}

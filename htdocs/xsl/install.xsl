@@ -18,7 +18,8 @@
 			
 				<div class="boxTitle">evQueue engine</div>
 				
-				<div class="formdiv">
+				<div class="installform formdiv">
+					<br />
 					<div>
 						<label class="formLabel" for="engine_host">Hostname :</label>
 						<input type="text" name="engine_host" value="{/page/post/@engine_host}" placeholder="localhost" />
@@ -30,8 +31,8 @@
 					</div>
 					
 					<br />
-					<div class="submit">
-						<input type="submit" value="Configure evQueue web board" />
+					<div class="center">
+						<input type="submit" style="min-width:unset;" value="Configure evQueue web board" />
 					</div>
 				</div>
 			</div>
