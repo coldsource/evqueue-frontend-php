@@ -1,7 +1,13 @@
 <?php
-require_once 'lib/evQueue.php';
-require_once 'utils/utils.php';
-require 'conf/queueing.php';
+require_once __DIR__ . '/../lib/evQueue.php';
+require_once __DIR__ . '/../utils/utils.php';
+
+if(is_file('/etc/evqueue/conf/queueing.php'))
+	require '/etc/evqueue/conf/queueing.php';
+else if(is_file(__DIR__ . '/../conf/queueing.php'))
+	require __DIR__ . '/../conf/queueing.php';
+else
+	die("No configuration file found");
 
 if(!isset($_REQUEST['node']) || $_REQUEST['node'] == ""){
 	$count = count($QUEUEING);

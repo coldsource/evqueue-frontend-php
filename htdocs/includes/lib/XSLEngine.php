@@ -133,8 +133,7 @@ class XSLEngine
 		$this->xmldoc->appendChild($this->root_node);
 
 		 // Add node(s) information
-		require 'conf/queueing.php';
-		$nodes = $this->xmldoc->createElement('evqueue-nodes');
+		 $nodes = $this->xmldoc->createElement('evqueue-nodes');
 		$this->root_node->appendChild($nodes);
 		if(isset($_SESSION['nodes']) && is_array($_SESSION['nodes'])){
 			foreach ($_SESSION['nodes'] as $node_name => $conf) {

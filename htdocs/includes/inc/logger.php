@@ -18,7 +18,7 @@
   * Authors: Nicolas Jean, Christophe Marti 
   */
 
-require_once 'lib/Logger.php';
+require_once __DIR__ . '/../lib/Logger.php';
 
 new Logger('queueing');
 Logger::SetFilter(LOG_WARNING);

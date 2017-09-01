@@ -1,6 +1,6 @@
 <?php
-require_once 'inc/auth_check.php';
-require_once 'inc/logger.php';
+require_once __DIR__ . '/includes/inc/auth_check.php';
+require_once __DIR__ . '/includes/inc/logger.php';
 
 $filename = tempnam('/tmp','evqueue-frontend-');
 

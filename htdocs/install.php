@@ -21,9 +21,9 @@
 session_start();
 session_destroy();
 
-require_once 'inc/logger.php';
-require_once 'lib/XSLEngine.php';
-require_once 'lib/evQueue.php';
+require_once __DIR__ . '/includes/inc/logger.php';
+require_once __DIR__ . '/includes/lib/XSLEngine.php';
+require_once __DIR__ . '/includes/lib/evQueue.php';
 
 $xsl = new XSLEngine();
 

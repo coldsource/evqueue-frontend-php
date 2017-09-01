@@ -18,10 +18,7 @@
   * Authors: Nicolas Jean, Christophe Marti
   */
 
-require_once 'inc/auth_check.php';
-require_once 'inc/logger.php';
-require_once 'lib/XSLEngine.php';
-
+require_once __DIR__ . '/../includes/inc/auth_check.php';
 
 if($_POST['mode'] == "xml"){
 	echo $_SESSION['edition'][$_POST['id']]['workflow'];

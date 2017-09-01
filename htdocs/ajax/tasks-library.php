@@ -18,10 +18,7 @@
   * Author: Thibault KUMMER
   */
 
-require_once 'inc/auth_check.php';
-require_once 'inc/logger.php';
-require_once 'lib/XSLEngine.php';
-
+require_once __DIR__ . '/../includes/inc/auth_check.php';
 
 $xsl = new XSLEngine();
 $xsl->AddFragment(['tasks' => $evqueue->Api('tasks', 'list')]);
