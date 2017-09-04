@@ -33,6 +33,7 @@ div#sticky_menu span#exit {
 div#workflow {
 	margin-left:auto;
 	margin-right:auto;
+	margin-top:30px;
 	border:1px solid;
 	font-size:10px;
 }
