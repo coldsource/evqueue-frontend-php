@@ -30,7 +30,7 @@ $(document).delegate('.showWorkflowDetails','click',function() {
 	dialog.append('<div class="evq-autorefresh-pannel" id="workflow-'+wfid+'-xml"></div>');
 	dialog.append('<div class="evq-autorefresh-pannel" id="workflow-'+wfid+'-parameters"></div>');
 	dialog.tabs();
-	dialog.dialog({
+	dialog.dialogTiled({
 		width:'auto',
 		height:'auto',
 		appendTo:container,
@@ -65,7 +65,7 @@ function TaskDialog(container,wfid,evqid,name,idx,noutputs)
 		dialog.append('<div class="evq-autorefresh-pannel" id="'+wfid+'-'+evqid+'-executions"</div>')
 	
 	dialog.tabs();
-	dialog.dialog({
+	dialog.dialogTiled({
 		width:600,
 		title:'Task '+name,
 		appendTo:container,

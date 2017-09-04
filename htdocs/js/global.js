@@ -82,7 +82,11 @@ function Message(msg)
 }
 
 var dialog_currpos = 0;
-var dialog_positions = ['left top', 'right top', 'left bottom', 'right bottom'];
+var dialog_positions = [];
+for (var b=0; b<2; b++)
+	for (var i=0; i<10; i++)
+		dialog_positions.push( ['left','center'][b] + '+' + (i*38) +'px top+' + (i*38) + 'px');
+
 jQuery.fn.extend({
 	dialogTiled: function(options) {
 	if(!options)
@@ -90,10 +94,10 @@ jQuery.fn.extend({
 	
 	return this.each(function() {
 			var pos = dialog_positions[dialog_currpos];
-			dialog_currpos = (dialog_currpos + 1) % 4;
+			dialog_currpos = (dialog_currpos + 1) % dialog_positions.length;
 			
 			options.position = {
-				my: pos,
+				my: 'left top',
 				at: pos,
 				of: window
 			};
