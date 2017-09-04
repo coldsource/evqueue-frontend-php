@@ -6,6 +6,15 @@
 
 	<xsl:template match="/">
 		<div>
+			<h1>Shell task</h1>
+			<div class="task" data-type="task" data-name="!/bin/ls">
+				<div class="task_icon">
+					<img class="cal-item-illust" src="images/icon_sh.png" alt="icon_shell"/>
+				</div>
+				<p>Dynamic shell task</p>
+			</div>
+			
+			
 			<xsl:for-each select="/page/tasks/task/@group[generate-id(.) = generate-id(key('groups', .))]">
 				<xsl:sort select="." />
 

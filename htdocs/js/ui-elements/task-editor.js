@@ -2,6 +2,7 @@ function TaskEditor()
 {
 	this.id = false;
 	this.task = false;
+	this.is_shell_task = false;
 	
 	var me = this;
 	
@@ -49,10 +50,29 @@ TaskEditor.prototype.Open = function(id)
 	this.id = id;
 	this.task = wf.GetTaskByID(this.id);
 	this.wfbackupdone = false;
+	this.is_shell_task = false;
 	
 	this.RefreshInputs();
 	
 	InitializeXPathHelper(this.task,'task');
+	
+	var path = '';
+	if(this.task.GetName().substr(0,1)=='!')
+	{
+		// Shell task
+		this.is_shell_task = true;
+		
+		var path = this.task.GetName().substr(1);
+		$('#task-editor input#path').val(path);
+		
+		$('#task-editor').tabs('option', 'disabled', []);
+		$('#task-editor').tabs('option', 'active', 0);
+	}
+	else
+	{
+		$('#task-editor').tabs('option', 'disabled', [0]);
+		$('#task-editor').tabs('option', 'active', 1);
+	}
 	
 	var condition = this.task.GetAttribute("condition");
 	$('#task-editor input#condition').val(condition);
@@ -99,6 +119,8 @@ TaskEditor.prototype.Open = function(id)
 		height:400,
 		title:"Edit task '"+this.task.GetName()+"'",
 		close:function() {
+			if(me.is_shell_task)
+				me.SaveAttribute('name',path,'!'+$('#task-editor input#path').val());
 			me.SaveAttribute('condition',condition,$('#task-editor input#condition').val());
 			me.SaveAttribute('loop',loop,$('#task-editor input#loop').val());
 			me.SaveAttribute('iteration-condition',iterationcondition,$('#task-editor input#iteration-condition').val());

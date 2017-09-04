@@ -6,12 +6,27 @@
 <xsl:template name="task-editor">
 	<div id='task-editor' class="tabs dialog" title="Edit task">
 		<ul>
+			<li><a href="#tab-path">Path</a></li>
 			<li><a href="#tab-inputs">Inputs</a></li>
 			<li><a href="#tab-conditionsloops">Conditions &amp; loops</a></li>
 			<li><a href="#tab-queueretry">Queue &amp; retry</a></li>
 			<li><a href="#tab-remote">Remote execution</a></li>
 			<li><a href="#tab-stdin">Stdin</a></li>
 		</ul>
+		<div id="tab-path">
+			<h2>
+				Task path
+				<span class="help faicon fa-question-circle" title="Dynamic shell task will be executed with text output mode and command line arguments.&#10;&#10;Enter the path of the binary to be executed. The path can contain arguments.&#10;&#10;You can still add dynamic inputs from evQueue. These inputs will be added to the command line arguments."></span>
+			</h2>
+			<div class="formdiv">
+				<form>
+					<div>
+						<label class="formLabel" for="condition">Path</label>
+						<input id="path" class="filenameInput" />
+					</div>
+				</form>
+			</div>
+		</div>
 		<div id="tab-inputs">
 			<h2>
 				Task inputs
