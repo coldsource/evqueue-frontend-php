@@ -318,4 +318,29 @@ Workflow.prototype.Draw = function()
 	$('.jobtask').click(function() {
 		task_editor.Open($(this).data('id'));
 	});
+	
+	$('.jobtask').contextmenu(function(e) {
+		var idx = $(e.target).index()-1;
+		var job_id = $(this).parent().data('id');
+		
+		$('#taskmenu').css({'top':e.pageY,'left':e.pageX, 'position':'absolute', 'border':'1px solid black', 'padding':'5px'});
+		$('#taskmenu').show();
+		
+		$(document).off('click').on('click',function(e) {
+			if($(e.target).attr('id')=='taskmenu' || $(e.target).parents('#taskmenu').length>0)
+			{
+				wf.Backup();
+				wf.GetJobByID(job_id).DeleteTask(idx);
+				wf.Draw();
+				
+				$('#taskmenu').hide();
+				return;
+			}
+			
+			$('#taskmenu').hide();
+		});
+		
+		
+		return false;
+	});
 }

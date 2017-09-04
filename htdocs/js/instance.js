@@ -47,7 +47,6 @@ $(document).delegate('.showWorkflowDetails','click',function() {
 
 function TaskDialog(container,wfid,evqid,name,idx,noutputs)
 {
-	console.log(idx);
 	var dialog = $('#task-dialog').clone();
 	if(idx==noutputs)
 		dialog.find('ul').append('<li><a href="#'+wfid+'-'+evqid+'-general">General</a></li>')

@@ -177,3 +177,8 @@ div.input_type_xpathvalue {
 div.input_type_text {
 	background-color:#ffffcc;
 }
+
+/* Task menu */
+#taskmenu {
+	background-color:white;
+}

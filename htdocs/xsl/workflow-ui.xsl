@@ -51,6 +51,10 @@
 			<button id='import_xml_action'>Import</button>
 		</div>
 		
+		<div id="taskmenu" class="hidden action">
+			<span class="faicon fa-times"></span>Delete task
+		</div>
+		
 		<xsl:call-template name="xpath-selector" />
 		<xsl:call-template name='task-editor' />
 		<xsl:call-template name='job-editor' />

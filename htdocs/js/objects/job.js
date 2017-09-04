@@ -142,6 +142,12 @@ Job.prototype.AddTask = function(task)
 	tasks_node.appendChild(task.task);
 }
 
+Job.prototype.DeleteTask = function(idx)
+{
+	var tasks = this.job.ownerDocument.Query('tasks/task',this.job);
+	tasks[idx].parentNode.removeChild(tasks[idx]);
+}
+
 Job.prototype.Draw = function()
 {
 	var tasks = this.GetTasks();
@@ -156,7 +162,7 @@ Job.prototype.Draw = function()
 	html += '</div>';
 	for(var i=0;i<tasks.length;i++)
 	{
-		html += '<div class="jobtask" data-type="jobtask" coucou="caca" data-id="'+tasks[i].GetID()+'">'+tasks[i].GetName();
+		html += '<div class="jobtask" data-type="jobtask" data-id="'+tasks[i].GetID()+'">'+tasks[i].GetName();
 		if(tasks[i].GetAttribute('condition') || tasks[i].GetAttribute('iteration-condition'))
 			html += '&nbsp;<span class="faicon fa-code-fork"></span>';
 		if(tasks[i].GetAttribute('loop'))

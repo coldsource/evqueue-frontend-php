@@ -1,4 +1,5 @@
 var search_filters = { status:'terminated' };
+var parameters = {};
 var current_page = 1;
 
 $(document).ready(function() {
@@ -254,7 +255,6 @@ function UpdateFilterURL()
 	var url = "ajax/list-instances.php?";
 	url += jQuery.param(search_filters);
 	
-	var parameters = {};
 	$('#searchform input').each(function() {
 		if($(this).attr('name').substr(0,10)=='parameter_' && $(this).val()!='')
 			parameters[$(this).attr('name')] = $(this).val();

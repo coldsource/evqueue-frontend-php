@@ -61,7 +61,7 @@ WorkflowEditor.prototype.SaveAttribute = function(name,old_val,new_val)
 
 WorkflowEditor.prototype.RefreshParameters = function()
 {
-	if(this.id==false)
+	if(this.id==false || !this.workflow)
 		return;
 	
 	var parameters = this.workflow.GetParameters();
