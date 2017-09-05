@@ -80,3 +80,81 @@
 	left: calc(-2em - 1px);
 	background-color: black;
 }
+
+/* Charts */
+#workflow-stats-graph {
+	display:none;
+	background-color:white;
+}
+
+body {
+	--chart-radius:100px;
+	--chart-width:20px;
+	--chart-label-space:10px;
+	--chart-label-width:200px;
+}
+
+div.chartwrapper {
+	padding:30px 120px 0px 120px;
+	border:1px solid black;
+	overflow:hidden;
+	display:inline-block;
+	font-size:12px;
+}
+
+div.chart {
+	width:calc(var(--chart-radius) * 2);
+	height:var(--chart-radius);
+	position:relative;
+}
+
+div.chartcenter {
+	border-radius:var(--chart-radius);
+	background-color:white;
+	width:calc(var(--chart-radius) * 2 - var(--chart-width) * 2);
+	height:calc(var(--chart-radius) * 2 - var(--chart-width) * 2);
+	position:absolute;
+	top:var(--chart-width);
+	left:var(--chart-width);
+	z-index:20;
+}
+
+div.slice {
+	border:0px;
+	width:calc(var(--chart-radius) * 2);
+	height:var(--chart-radius);
+	transform-origin: 50% 0;
+	border-bottom-left-radius:calc(var(--chart-radius) + 1px);
+	border-bottom-right-radius:calc(var(--chart-radius) + 0px);
+	position:absolute;
+	top:var(--chart-radius);
+	left:0;
+	
+	transform: rotate(0deg);
+	z-index:10;
+}
+
+div.labelwrapper {
+	width:var(--chart-label-space);
+	height:20px;
+	position:absolute;
+	top:var(--chart-radius);
+	left:calc(0px - var(--chart-label-space));
+	transform-origin: calc(var(--chart-radius) + var(--chart-label-space)) 0;
+	transform: rotate(0deg);
+}
+
+div.label.left {
+	text-align:right;
+	width:var(--chart-label-width);
+	margin-left:calc(0px - var(--chart-label-width));
+	transform-origin: var(--chart-label-width) 50%;
+	transform: rotate(0deg); 
+}
+
+div.label.right {
+	text-align:left;
+	width:var(--chart-label-width);
+	transform-origin: 0 50%;
+	transform: rotate(0deg); 
+}

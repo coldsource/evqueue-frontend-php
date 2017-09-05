@@ -53,10 +53,14 @@
 	
 	<xsl:template match="workflow">
 		<tr data-id="{@id}" data-node="{../@node}">
+			<xsl:if test="$STATUS = 'EXECUTING'">
+				<xsl:attribute name="data-running_tasks"><xsl:value-of select="@running_tasks" /></xsl:attribute>
+				<xsl:attribute name="data-retrying_tasks"><xsl:value-of select="@retrying_tasks" /></xsl:attribute>
+				<xsl:attribute name="data-queued_tasks"><xsl:value-of select="@queued_tasks" /></xsl:attribute>
+				<xsl:attribute name="data-error_tasks"><xsl:value-of select="@error_tasks" /></xsl:attribute>
+				<xsl:attribute name="data-waiting_conditions"><xsl:value-of select="@waiting_conditions" /></xsl:attribute>
+			</xsl:if>
 			<td class="center">
-				<xsl:variable name="current-node">
-					<xsl:copy-of select="." />
-				</xsl:variable>
 				<xsl:if test="@running_tasks - @queued_tasks > 0">
 					<span class="fa fa-spinner fa-pulse fa-fw" title="Task(s) running"></span>
 				</xsl:if>
@@ -79,6 +83,9 @@
 					<xsl:value-of select="@id" />
 					–
 					<xsl:value-of select="@name" />
+					<xsl:if test="$STATUS = 'EXECUTING'">
+						<span class="faicon fa-info"></span>
+					</xsl:if>
 				</span>
 				<xsl:text>&#160;</xsl:text>
 				<xsl:variable name="seconds">

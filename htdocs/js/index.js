@@ -49,6 +49,28 @@ $(document).ready(function() {
 		});
 	});
 	
+	// Graph
+	$('#executing-workflows-pannel').delegate('.fa-info','mouseover', function(e) {
+		DrawGraph($('#workflow-stats-graph div.chart'),[
+			{prct:$(this).parents('tr').data('running_tasks'),label:'Executing tasks',color:'#b6ffb2'},
+			{prct:$(this).parents('tr').data('retrying_tasks'),label:'Retrying tasks',color:'#ffb651'},
+			{prct:$(this).parents('tr').data('queued_tasks'),label:'Queued tasks',color:'#b5d4f2'},
+			{prct:$(this).parents('tr').data('error_tasks'),label:'Error tasks',color:'red'},
+			{prct:$(this).parents('tr').data('waiting_conditions'),label:'Waiting tasks',color:'#f2f4f7'}
+		]);
+		
+		console.log(e);
+		$('#workflow-stats-graph').css('position','fixed');
+		$('#workflow-stats-graph').css('top',e.pageY+10);
+		$('#workflow-stats-graph').css('left',e.pageX+10);
+		$('#workflow-stats-graph').show();
+	});
+	
+	$('#executing-workflows-pannel').delegate('td','mouseout', function() {
+		$('#workflow-stats-graph').hide();
+	});
+	
+	
 	// Remove instance
 	$(document).delegate('#terminated-workflows-pannel .fa-remove','click',function() {
 		var instance_id = $(this).parents('tr').data('id');

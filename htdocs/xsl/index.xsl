@@ -29,6 +29,14 @@
 		
 		<div id="workflow-dialogs"></div>
 		
+		<div id="workflow-stats-graph">
+			<div class="chartwrapper">
+				<div class="chart">
+					<div class="chartcenter"></div>
+				</div>
+			</div>
+		</div>
+		
 		<xsl:call-template name="workflow-launch" />
 		
 		

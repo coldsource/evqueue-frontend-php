@@ -126,3 +126,41 @@ function KillRunningTasks(subjobs,id,node)
 		}
 	}
 }
+
+function DrawGraph(el,desc)
+{
+	el.find('div.slice, div.labelwrapper').remove();
+	
+	var total = 0;
+	var total_last = 0;
+	var zindex = 10+desc.length;
+	
+	var max = 0;
+	for(var i=0;i<desc.length;i++)
+		max += desc[i].prct?desc[i].prct:0;
+	
+	console.log(desc);
+	for(var i=0;i<desc.length;i++)
+	{
+		if(desc[i].prct && desc[i].prct!=0)
+		{
+			total += desc[i].prct;
+			
+			var slice = $('<div class="slice"></div>');
+			slice.css('background-color',desc[i].color);
+			slice.css('transform','rotate('+(total/max*180)+'deg');
+			slice.css('z-index',zindex--);
+			el.append(slice)
+			
+			var labelwrapper = $('<div></div>',{class:"labelwrapper"});
+			labelwrapper.css('transform','rotate('+((total_last+(total-total_last)/2)/max*180)+'deg');
+			el.append(labelwrapper);
+			
+			var label = $('<div>',{class:(total_last+(total-total_last)/2)<(max/2)?"label left":"label right",text:desc[i].label});
+			label.css('transform','rotate(-'+((total_last+(total-total_last)/2)/max*180)+'deg');
+			labelwrapper.append(label);
+			
+			total_last = total;
+		}
+	}
+}
