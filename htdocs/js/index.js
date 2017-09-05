@@ -132,7 +132,8 @@ $(document).ready(function() {
 				group: 'instance',
 				action: 'launch',
 				attributes: attributes,
-				parameters: workflow_parameters
+				parameters: workflow_parameters,
+				node: $('#workflow-launch select[name=node]').val()
 			}).done(function(xml) {
 				var instance_id = xml.documentElement.getAttribute('workflow-instance-id');
 				$('#workflow-launch').dialog('close');
