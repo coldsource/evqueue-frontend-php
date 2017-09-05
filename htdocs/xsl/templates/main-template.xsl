@@ -140,6 +140,7 @@
 			<li><a href="{$SITE_BASE}index.php">Workflows instances</a></li>
 			<li><a href="{$SITE_BASE}system_state.php">Queues</a></li>
 			<li><a href="{$SITE_BASE}system_statistics.php">Statistics</a></li>
+			<li><a href="{$SITE_BASE}system_configuration.php">Running configuration</a></li>
 		</ul>
 		<xsl:if test="$PROFILE = 'ADMIN'">
 			<ul class="submenu" id="submenu-settings">
@@ -150,7 +151,6 @@
 				<li><a href="{$SITE_BASE}schedule.php">Retry Schedules</a></li>
 				<li><a href="{$SITE_BASE}queue.php">Queues</a></li>
 				<li><a href="{$SITE_BASE}user.php">Users</a></li>
-				<li><a href="{$SITE_BASE}system_configuration.php">Running configuration</a></li>
 			</ul>
 			<ul class="submenu" id="submenu-notifications">
 				<xsl:if test="$topmenu!='notifications'"><xsl:attribute name="style">display:none;</xsl:attribute></xsl:if>
