@@ -139,7 +139,7 @@
 			<xsl:if test="$topmenu!='system-state'"><xsl:attribute name="style">display:none;</xsl:attribute></xsl:if>
 			<li><a href="{$SITE_BASE}index.php">Workflows instances</a></li>
 			<li><a href="{$SITE_BASE}system_state.php">Queues</a></li>
-			<li><a href="{$SITE_BASE}system_statistics.php">Statistics</a></li>
+			<li><a href="{$SITE_BASE}system-statistics.php">Statistics</a></li>
 			<li><a href="{$SITE_BASE}system_configuration.php">Running configuration</a></li>
 		</ul>
 		<xsl:if test="$PROFILE = 'ADMIN'">

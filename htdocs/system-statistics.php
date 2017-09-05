@@ -22,26 +22,6 @@ require_once __DIR__ . '/includes/inc/auth_check.php';
 
 $xsl = new XSLEngine();
 
-foreach ($_SESSION['nodes'] as $node_name => $conf) {
-	try{
-		$evqueue_node = getevQueue($conf);
-		if (isset($_GET['action']) && $_GET['action'] == 'reset' && isset($_GET['node_name']) && $_GET['node_name'] == $node_name) {
-			$evqueue_node->Api('statistics', 'reset', ['type' => 'global']);
-		}
-
-		$xml = $evqueue_node->Api('statistics', 'query', ['type' => 'global']);
-		$dom = new DOMDocument();
-		$dom->loadXML($xml);
-		$dom->documentElement->setAttribute("node_name", $node_name);
-		$xsl->AddFragment(["global" => $dom]);
-	}
-	catch(Exception $e) {
-
-	}
-}
-
-
-
-$xsl->DisplayXHTML('xsl/system_statistics.xsl');
+$xsl->DisplayXHTML('xsl/system-statistics.xsl');
 
 ?>
