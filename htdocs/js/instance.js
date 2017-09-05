@@ -84,7 +84,8 @@ function CancelInstance(id,node,killtasks = false)
 	evqueueAPI({
 		group: 'instance',
 		action: 'query',
-		attributes: { 'id':id }
+		attributes: { 'id':id },
+		node: node
 	}).done( function (xml) {
 		var subjobs = xml.Query('subjobs',xml.documentElement.firstChild);
 		
