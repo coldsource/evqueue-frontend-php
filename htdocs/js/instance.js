@@ -156,7 +156,7 @@ function DrawGraph(el,desc)
 			labelwrapper.css('transform','rotate('+((total_last+(total-total_last)/2)/max*180)+'deg');
 			el.append(labelwrapper);
 			
-			var label = $('<div>',{class:(total_last+(total-total_last)/2)<(max/2)?"label left":"label right",text:desc[i].label});
+			var label = $('<div>',{class:(total_last+(total-total_last)/2)<(max/2)?"label left":"label right",text:desc[i].label+' ('+desc[i].prct+')'});
 			label.css('transform','rotate(-'+((total_last+(total-total_last)/2)/max*180)+'deg');
 			labelwrapper.append(label);
 			
