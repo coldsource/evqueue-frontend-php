@@ -18,6 +18,11 @@
   * Authors: Nicolas Jean, Christophe Marti 
   */
 
+if(!extension_loaded('xsl'))
+{
+	die("PHP extension 'XSL' is not installed");
+}
+
 require_once __DIR__ . '/../lib/Logger.php';
 
 new Logger('queueing');
