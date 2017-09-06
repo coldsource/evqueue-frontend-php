@@ -66,6 +66,10 @@ div.prctgradient {
 	margin:20px;
 }
 
+a.action {
+	color:#4996ce;
+}
+
 
 /* XML Formatter */
 span.xml_tagname {

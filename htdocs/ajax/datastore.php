@@ -20,34 +20,48 @@
 
 require_once __DIR__ . '/../includes/inc/auth_check.php';
 
-if(!isset($_GET['id']))
-	die();
-
-
-$xml = $cluster->Api('datastore', 'get',['id' => $_GET['id']]);
-$sxml = simplexml_load_string($xml);
-$gzip = (string)$sxml['gzip'];
-$data = (string)$sxml;
-
-if($gzip)
+if(isset($_GET['id']))
 {
-	if(isset($_GET['download']))
+	$xml = $cluster->Api('datastore', 'get',['id' => $_GET['id']]);
+	$sxml = simplexml_load_string($xml);
+	$gzip = (string)$sxml['gzip'];
+	$data = (string)$sxml;
+
+	if($gzip)
 	{
-		header('Content-type: application/gzip');
-		header("Content-Disposition: attachment; filename='datastore-{$_GET['id']}.gz'");
+		if(isset($_GET['download']))
+		{
+			header('Content-type: application/gzip');
+			header("Content-Disposition: attachment; filename='datastore-{$_GET['id']}.gz'");
+		}
+		else
+		{
+			header('Content-type: text/plain');
+			header('Content-Encoding: gzip');
+		}
 	}
 	else
 	{
 		header('Content-type: text/plain');
-		header('Content-Encoding: gzip');
+		if(isset($_GET['download']))
+			header("Content-Disposition: attachment; filename='datastore-{$_GET['id']}.txt'");
+	}
+
+	echo base64_decode($data);
+}
+else if(isset($_GET['tid']) && isset($_GET['type']))
+{
+	try
+	{
+		$xml = $cluster->Api('processmanager', 'tail',['tid' => $_GET['tid'], 'type' => $_GET['type']]);
+		$sxml = simplexml_load_string($xml);
+		
+		header('Content-type: text/plain');
+		echo $sxml;
+	}
+	catch(Exception $e)
+	{
+		echo "Unable to open log file";
 	}
 }
-else
-{
-	header('Content-type: text/plain');
-	if(isset($_GET['download']))
-		header("Content-Disposition: attachment; filename='datastore-{$_GET['id']}.txt'");
-}
-
-echo base64_decode($data);
 ?>

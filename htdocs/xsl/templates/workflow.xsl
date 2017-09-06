@@ -130,6 +130,23 @@
 			<xsl:for-each select="tasks/task">
 				<xsl:variable name="taskid" select="@evqid" />
 				<div id="{/page/instance/workflow/@id}-{$taskid}-general">
+					<xsl:if test="count(@tid) > 0">
+						<fieldset class="tabbed">
+							<legend>Live</legend>
+							<div>
+								This task is currently running.
+								<br />You can view it's live output :
+								<a target="_blank" class="action" href="ajax/datastore.php?tid={@tid}&amp;type=stdout">stdout</a>
+								<xsl:text>&#160;-&#160;</xsl:text>
+								<a target="_blank" class="action" href="ajax/datastore.php?tid={@tid}&amp;type=stderr">stderr</a>
+								<xsl:text>&#160;-&#160;</xsl:text>
+								<a target="_blank" class="action" href="ajax/datastore.php?tid={@tid}&amp;type=log">log</a>
+							</div>
+						</fieldset>
+					</xsl:if>
+					
+					<br />
+					
 					<fieldset class="tabbed">
 						<legend>Inputs</legend>
 						<xsl:if test="count(input) = 0">

@@ -87,9 +87,6 @@
 												<xsl:when test="count(/page/workflow-schedules-instance/workflow[@schedule_id = current()/@id]) = 0">
 
 												</xsl:when>
-												<xsl:otherwise>
-													<img src="images/ajax-loader.gif" />
-												</xsl:otherwise>
 											</xsl:choose>
 										</a>
 										<xsl:text>&#160;</xsl:text>

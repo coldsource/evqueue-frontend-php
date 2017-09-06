@@ -130,11 +130,6 @@
 				</xsl:if>
 			</td>
 		</tr>
-		<tr id="tr{@id}" class="hidden">
-			<td colspan="7" class="details">
-				<img src="images/ajax-loader.gif" />
-			</td>
-		</tr>
 	</xsl:template>
 	
 </xsl:stylesheet>
