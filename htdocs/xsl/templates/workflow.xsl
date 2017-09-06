@@ -193,12 +193,17 @@
 				</xsl:for-each>
 				
 				<div id="{/page/instance/workflow/@id}-{$taskid}-executions">
-					<xsl:for-each select="output">
-						<div class="task_execution">
-							<xsl:apply-templates select="." mode="status" />
-							<xsl:value-of select="php:function('timeSpan',string(@execution_time),string(@exit_time))" /> (ret <xsl:value-of select="@retval" />)
-						</div>
-					</xsl:for-each>
+					<div>
+						<xsl:for-each select="output">
+							<div class="task_execution">
+								<xsl:apply-templates select="." mode="status" />
+								<xsl:value-of select="php:function('timeSpan',string(@execution_time),string(@exit_time))" /> (ret <xsl:value-of select="@retval" />)
+							</div>
+						</xsl:for-each>
+					</div>
+					<p>
+						Next execution: <xsl:value-of select="php:function('timeSpan',string(@retry_at))" />
+					</p>
 				</div>
 			</xsl:for-each>
 			

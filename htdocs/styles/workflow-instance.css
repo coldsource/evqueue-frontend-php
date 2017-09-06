@@ -21,6 +21,10 @@
 	text-align: center;
 }
 
+.task_execution:not(:last-child) {
+	cursor: pointer;
+}
+
 
 
 /* minus-plus icon to fold/unfold subjobs */

@@ -74,7 +74,7 @@ function TaskDialog(container,wfid,evqid,name,idx,noutputs)
 	
 	container.evqautorefresh('refresh');
 	
-	dialog.delegate('.task_execution','click',function() {
+	dialog.delegate('.task_execution:not(:last-child)','click',function() {
 		TaskDialog(container,wfid,evqid,name,$(this).index()+1,noutputs);
 	});
 }
