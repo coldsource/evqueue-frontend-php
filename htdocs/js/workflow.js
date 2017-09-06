@@ -19,7 +19,21 @@ function RefreshPage()
 			document.location="export.php?workflow_id="+$(this).parents('tr').data('id');
 		});
 		
-		$('.git.fa-upload').click(function() {
+		$('.fa-cloud').click(function() {
+			Wait();
+			evqueueAPI({
+				group: 'git',
+				action: 'pull',
+				attributes: {}
+			}).done(function() {
+				Message('Git pulled');
+				RefreshPage();
+			}).always(function() {
+				Ready();
+			});
+		});
+		
+		$('.git.fa-cloud-upload').click(function() {
 			var log = prompt("Enter your commit log");
 			if(log==null)
 				return;
@@ -42,7 +56,7 @@ function RefreshPage()
 			});
 		});
 		
-		$('.git.fa-download').click(function() {
+		$('.git.fa-cloud-download').click(function() {
 			Wait();
 			evqueueAPI({
 				confirm: $(this).hasClass('conflict') ? 'You are about to overwrite changes to your local copy' : '',

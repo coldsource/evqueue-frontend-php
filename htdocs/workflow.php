@@ -83,9 +83,6 @@ if(isset($_FILES['workflow_zip_file']))
 	}
 }
 
-if($_SESSION['git_enabled'])
-	$xsl->Api("git", "pull");
-
 $xsl->DisplayXHTML('xsl/workflow.xsl');
 
 ?>

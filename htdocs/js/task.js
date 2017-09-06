@@ -18,6 +18,20 @@ function RefreshPage()
 			message:'Task created'
 		}, evqueueCreateFormHandler);
 		
+		$('.fa-cloud').click(function() {
+			Wait();
+			evqueueAPI({
+				group: 'git',
+				action: 'pull',
+				attributes: {}
+			}).done(function() {
+				Message('Git pulled');
+				RefreshPage();
+			}).always(function() {
+				Ready();
+			});
+		});
+		
 		$('.fa-edit').click({
 			form_div:$('#tpltask-editor'),
 			group:'task',
@@ -25,7 +39,7 @@ function RefreshPage()
 			message:'Task saved'
 		}, evqueueEditFormHandler);
 		
-		$('.git.fa-upload').click(function() {
+		$('.git.fa-cloud-upload').click(function() {
 			var log = prompt("Enter your commit log");
 			if(log==null)
 				return;
@@ -48,7 +62,7 @@ function RefreshPage()
 			});
 		});
 		
-		$('.git.fa-download').click(function() {
+		$('.git.fa-cloud-download').click(function() {
 			Wait();
 			evqueueAPI({
 				confirm: $(this).hasClass('conflict') ? 'You are about to overwrite changes to your local copy' : '',

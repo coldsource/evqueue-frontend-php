@@ -9,6 +9,9 @@
 			<div class="boxTitle">
 				<span class="title">Tasks list</span>
 				<span class="faicon fa-file-o action" title="Add new task"></span>
+				<xsl:if test="$USE_GIT = 1">
+					<span class="faicon fa-cloud action" title="Pull git repository"></span>
+				</xsl:if>
 			</div>
 			<table>
 				<tr>
@@ -94,18 +97,15 @@
 								
 								<td class="tdActions">
 									<xsl:if test="not($is-in-git) or $git-status='needpush' or $git-status='conflict'">
-										<span data-name="{@name}" class="faicon fa-upload git {$clsConflict}" title="Commit this task to Git"></span>
-										<xsl:text>&#160;</xsl:text>
+										<span data-name="{@name}" class="faicon fa-cloud-upload git {$clsConflict}" title="Commit this task to Git"></span>
 									</xsl:if>
 									<xsl:if test="$is-in-git and ($git-status='needpull' or $git-status='conflict')">
-										<span data-name="{@name}" class="faicon fa-download git {$clsConflict}" title="Load Git version"></span>
-										<xsl:text>&#160;</xsl:text>
+										<span data-name="{@name}" class="faicon fa-cloud-download git {$clsConflict}" title="Load Git version"></span>
 									</xsl:if>
 								</td>
 							</xsl:if>
 							<td class="tdActions">
 								<span class="faicon fa-edit" title="Edit task"></span>
-								<xsl:text>&#160;</xsl:text>
 								<span class="faicon fa-remove" title="Delete task"></span>
 							</td>
 						</tr>
@@ -124,7 +124,7 @@
 									<xsl:value-of select="@name" />
 								</td>
 								<td class="tdActions" style="min-width: 80px;">
-									<span data-name="{@name}" class="faicon fa-download git" title="Import from Git"></span>
+									<span data-name="{@name}" class="faicon fa-cloud-download git" title="Import from Git"></span>
 									<xsl:text>&#160;</xsl:text>
 									<span class="faicon fa-remove git" title="Delete from git repository" data-name="{@name}"></span>
 								</td>
