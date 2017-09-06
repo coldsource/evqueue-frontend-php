@@ -20,17 +20,24 @@
 						</span>
 					</div>
 					<table class="highlight_row">
-						<xsl:for-each select="statistics/@*">
-							<tr class="evenOdd">
-								<td>
-									<xsl:variable name="statistic_name" select="local-name(.)" />
-									<xsl:value-of select="document('../data/statistics.xml')/statistics/statistic[@id=$statistic_name]" />
-								</td>
-								<td class="txtcenter">
-									<xsl:value-of select="."/>
-								</td>
-							</tr>
-						</xsl:for-each>
+						<xsl:choose>
+							<xsl:when test="count(@err) > 0">
+								<tr><td colspan="2" class="center">Node is offline</td></tr>
+							</xsl:when>
+							<xsl:otherwise>
+								<xsl:for-each select="statistics/@*">
+									<tr class="evenOdd">
+										<td>
+											<xsl:variable name="statistic_name" select="local-name(.)" />
+											<xsl:value-of select="document('../data/statistics.xml')/statistics/statistic[@id=$statistic_name]" />
+										</td>
+										<td class="txtcenter">
+											<xsl:value-of select="."/>
+										</td>
+									</tr>
+								</xsl:for-each>
+							</xsl:otherwise>
+						</xsl:choose>
 					</table>
 				</div>	
 			</xsl:for-each>
