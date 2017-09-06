@@ -24,7 +24,7 @@ if(!isset($_GET['id']))
 	die();
 
 
-$xml = $evqueue->Api('datastore', 'get',['id' => $_GET['id']]);
+$xml = $cluster->Api('datastore', 'get',['id' => $_GET['id']]);
 $sxml = simplexml_load_string($xml);
 $gzip = (string)$sxml['gzip'];
 $data = (string)$sxml;
