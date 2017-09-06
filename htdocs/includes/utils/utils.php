@@ -1,42 +1,5 @@
 <?php
 
-function getevQueue($scheme){
-	if(isset($_SESSION['user_login']) && isset($_SESSION['user_pwd']))
-		$evqueue = new evQueue($scheme, $_SESSION['user_login'], $_SESSION['user_pwd'], true);
-	else
-		$evqueue = new evQueue($scheme);
-
-	return $evqueue;
-}
-
-function getAllGroup(){
-	global $xsl;
-	$groups = [];
-	$xml = $xsl->Api("workflows", "list");
-	$dom = new DOMDocument();
-	$dom->loadXML($xml);
-	$xpath = new DOMXPath($dom);
-	$groupsDOM = $xpath->evaluate('/response/workflow/@group');
-	foreach($groupsDOM as $groupDOM){
-		isset($groups[$groupDOM->nodeValue]) ? $groups[$groupDOM->nodeValue]++:$groups[$groupDOM->nodeValue]=1;
-	}
-	ksort($groups, SORT_STRING | SORT_FLAG_CASE );
-	return $groups;
-}
-
-function getAllGroupXml(){
-	$res = getAllGroup();
-	$xml = '<groups>';
-	foreach ($res as $key => $value) {
-		if($value != '')
-			$xml .= "<group>$key</group>";
-	}
-	$xml .= '</groups>';
-
-	return $xml;
-}
-
-
 function getAllTaskGroup(){
 	global $evqueue;
 	$groups = [];

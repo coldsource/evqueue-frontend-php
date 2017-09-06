@@ -22,21 +22,8 @@ require_once __DIR__ . '/../includes/inc/auth_check.php';
 
 $xsl = new XSLEngine();
 
-foreach ($_SESSION['nodes'] as $node_name => $conf) {
-	try{
-		$evqueue_node = getevQueue($conf);
-		$xml = $evqueue_node->Api('statistics', 'query', ['type' => 'global']);
-		$dom = new DOMDocument();
-		$dom->loadXML($xml);
-		$dom->documentElement->setAttribute("node_name", $node_name);
-		$xsl->AddFragment(["global" => $dom]);
-	}
-	catch(Exception $e) {
-
-	}
-}
-
-
+$xml = $xsl->Api('statistics', 'query', ['type' => 'global'], [], '*');
+$xsl->AddFragment(["global" => $xml]);
 
 $xsl->DisplayXHTML('../xsl/ajax/statistics.xsl');
 

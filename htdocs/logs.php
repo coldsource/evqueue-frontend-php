@@ -21,7 +21,7 @@
 require_once __DIR__ . '/includes/inc/auth_check.php';
 
 $xsl = new XSLEngine();
-$xsl->AddFragment(['config' => $xsl->ClusterApi('status', 'query', ['type' => 'configuration'])]);
+$xsl->AddFragment(['config' => $xsl->Api('status', 'query', ['type' => 'configuration'], [], '*')]);
 $xsl->DisplayXHTML('xsl/logs.xsl');
 
 ?>

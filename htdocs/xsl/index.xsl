@@ -42,9 +42,10 @@
 		
 		<div id="executing-workflows-pannel" class="evq-autorefresh" data-url="ajax/list-instances.php?status=executing" data-interval="2">
 			<div class="boxTitle">
+				<div class="evq-autorefresh-pannel" id="nodes-status"></div>
 				<span class="title">Executing workflows</span>
 				<xsl:text>&#160;</xsl:text>
-				(<div id="EXECUTING-workflows-pages" class="evq-autorefresh-pannel pages">?</div>)
+				<div id="EXECUTING-workflows-pages" class="evq-autorefresh-pannel pages">?</div>
 				<span class="faicon fa-refresh action evq-autorefresh-toggle"></span>
 				<span class="faicon fa-rocket action" title="Launch a new workflow"></span>
 				<span class="faicon fa-clock-o action" title="Retry all pending tasks"></span>

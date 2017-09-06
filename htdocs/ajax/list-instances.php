@@ -24,24 +24,16 @@ $xsl = new XSLEngine();
 
 if($_GET['status']=='executing')
 {
-	$_SESSION['nodes'] = [];
-	foreach ($QUEUEING as $scheme) {
-		try{
-			$evqueue_node = getevQueue($scheme);
-			$evqueue_node->Api('ping');
-			$node_name = $evqueue_node->GetParserRootAttributes()['NODE'];
-			$xml = $evqueue_node->Api('status', 'query', ['type' => "workflows"]);
-			$dom = new DOMDocument();
-			$dom->loadXML($xml);
-			$dom->documentElement->setAttribute("node", $node_name);
-			$xsl->AddFragment(["instances" => $dom]);
-			$_SESSION['nodes'][$node_name] = $scheme;
-		}
-		catch(Exception $e) {
-			$xsl->AddFragment('<error id="evqueue-not-running" node="'.$scheme.'">'.$e->getMessage().'</error>');
-		}
+	try {
+		$xml = $cluster->Api('status', 'query', ['type' => "workflows"], [], '*');
+		$dom = new DOMDocument();
+		$dom->loadXML($xml);
+		$xsl->AddFragment(["instances" => $dom]);
 	}
-	
+	catch (Exception $e) {
+		$xsl->AddError($e->getMessage());
+	}
+  
 	$xsl->SetParameter('STATUS','EXECUTING');
 }
 else if($_GET['status']=='terminated')
@@ -72,12 +64,10 @@ else if($_GET['status']=='terminated')
 		$filters[$filter_name] = $filter_value;
 	}
 	
-
-	$xsl = new XSLEngine();
 	$xsl->SetParameter('LIMIT', $limit);
 	$xsl->SetParameter('PAGE', $page);
 	$xsl->SetParameter('STATUS','TERMINATED');
-	$xsl->AddFragment(["instances" => $xsl->Api('instances', 'list', $filters, $parameters)]);
+	$xsl->AddFragment('<instances>'.$cluster->Api('instances', 'list', $filters, $parameters).'</instances>');
 }
 
 $xsl->DisplayXHTML('../xsl/ajax/list-instances.xsl');

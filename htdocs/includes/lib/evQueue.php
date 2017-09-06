@@ -268,10 +268,14 @@ class evQueue {
 		return $this->profile;
 	}
 
-	public function GetConfigurationEntry($name) {
+  public function GetConfigurationEntry($name) {
 		$xml = $this->Api('status','query',[ 'type' => 'configuration' ]);
-
-		$dom = new DOMDocument();
+    return self::ParseConfigurationEntry($xml,$name);
+  }
+  
+  public static function ParseConfigurationEntry($xml,$name)
+  {
+    $dom = new DOMDocument();
 		$dom->loadXML($xml);
 
 		$xpath = new DOMXpath($dom);
@@ -279,7 +283,7 @@ class evQueue {
 		if($nodes->length==0)
 			return false;
 		return $nodes->item(0)->getAttribute('value');
-	}
+  }
 
 	protected function ParserInit() {
 		$this->parser_level = 0;

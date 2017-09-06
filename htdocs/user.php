@@ -22,5 +22,8 @@ require_once __DIR__ . '/includes/inc/auth_check.php';
 
 $xsl = new XSLEngine();
 
+$xsl->AddFragment( ['workflows' => $xsl->Api('workflows','list')] );
+
 $xsl->DisplayXHTML('xsl/user.xsl');
+
 ?>

@@ -24,7 +24,7 @@ $xsl = new XSLEngine();
 
 $xsl->AddFragment(["schedules" => $xsl->Api('workflow_schedules', 'list', ['display_parameters' => 'yes'])]);
 $xsl->AddFragment(["workflows" => $xsl->Api("workflows", "list")]);
-$xsl->AddFragment(["status" => $xsl->ClusterApi("status", "query", ['type' => 'scheduler'])]);
+$xsl->AddFragment(["status" => $xsl->Api("status", "query", ['type' => 'scheduler'], [], '*')]);
 
 $xsl->DisplayXHTML('../xsl/ajax/list-workflow-schedules.xsl');
 ?>

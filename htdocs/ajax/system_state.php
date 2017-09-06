@@ -22,7 +22,7 @@ require_once __DIR__ . '/../includes/inc/auth_check.php';
 
 $xsl = new XSLEngine();
 
-$xsl->AddFragment(['statistics' => $xsl->ClusterApi('statistics', 'query', ['type' => 'queue'])] );
+$xsl->AddFragment([ 'statistics' => $xsl->Api('statistics', 'query', ['type' => 'queue'], [], '*') ]);
 
 $xsl->DisplayXHTML('../xsl/ajax/system_state.xsl');
 

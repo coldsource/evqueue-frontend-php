@@ -8,22 +8,20 @@
 	</xsl:variable>
 	
 	<xsl:template name="content">
-		<xsl:call-template name="displayErrors" />
-		
-		<div class="contentManage">
+		<div>
 			<div class="boxTitle statistics">
 				<span class="title">Configuration</span>
 			</div>
 			
 			<div class="tabs">
 				<ul>
-					<xsl:for-each select="/page/global">
-						<li><a href="#{@node_name}"><xsl:value-of select="@node_name" /> (v<xsl:value-of select="@version" />)</a></li>
+					<xsl:for-each select="/page/global/response">
+						<li><a href="#{@node}"><xsl:value-of select="@node" /></a></li>
 					</xsl:for-each>
 				</ul>
 				
-				<xsl:for-each select="/page/global">
-					<div id="{@node_name}" class="sysConfTab">
+				<xsl:for-each select="/page/global/response">
+					<div id="{@node}" class="sysConfTab">
 						<table class="statistics" style="width:100%;">
 							<xsl:for-each select="configuration/entry">
 								<tr class="evenOdd">
@@ -39,6 +37,7 @@
 						</table>
 					</div>
 				</xsl:for-each>
+				
 			</div>
 		</div>
 		
@@ -52,7 +51,6 @@
 				var values = params.next('.paramValue');
 				
 				if (values.length !== values.filter( function () { return $(this).text() === valueName; } ).length) {
-					console.log('different values for param',paramName);
 					values.css('font-weight', 'bold');
 				}
 			});

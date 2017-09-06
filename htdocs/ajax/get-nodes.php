@@ -21,5 +21,5 @@
 require_once __DIR__ . '/../includes/inc/auth_check.php';
 
 header('Content-type: text/json');
-echo json_encode($_SESSION['nodes']);
+echo json_encode(['nodes' => $_SESSION['nodes']]);
 ?>

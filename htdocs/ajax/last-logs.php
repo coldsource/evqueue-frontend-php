@@ -21,6 +21,6 @@
 require_once __DIR__ . '/../includes/inc/auth_check.php';
 
 $xsl = new XSLEngine();
-$xsl->AddFragment(['logs' => $evqueue->Api('logs', 'list')]);
+$xsl->AddFragment(['logs' => $xsl->Api('logs', 'list')]);
 $xsl->DisplayXHTML('../xsl/ajax/view-logs.xsl');
 ?>

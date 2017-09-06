@@ -118,10 +118,13 @@ $(document).ready( function() {
 		else if(el.data('type')=='node')
 		{
 			$.getJSON('ajax/get-nodes.php',function(data) {
-				for(var node in data)
-					el.append($('<option>',{value:node,text:node}));
+				nodes = data.nodes;
+				for(var i=0;i<nodes.length;i++)
+					el.append($('<option>',{value:nodes[i],text:nodes[i]}));
 				
 				evqueueAPI({group:'user',action:'get',attributes:{name:connected_user}}).done(function(xml) {
+					if(!xml.documentElement.firstChild.getAttribute('preferences'))
+						return;
 					preferences = jQuery.parseJSON(xml.documentElement.firstChild.getAttribute('preferences'));
 					if(preferences.preferred_node)
 					{

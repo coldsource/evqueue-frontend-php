@@ -18,27 +18,6 @@
   * Authors: Nicolas Jean, Christophe Marti
   */
 
-function sumExecTimes ($nodes) {
-	$total_time = 0;
-	foreach ($nodes as $node)
-		$total_time += strtotime($node->getAttribute('exit_time')) - strtotime($node->getAttribute('execution_time'));
-	return $total_time;
-}
-
-
-function sumRetryTimes ($nodes) {
-	$total_time = 0;
-	$prev_exit_time = null;
-	foreach ($nodes as $node) {
-		if (!$prev_exit_time)
-			$prev_exit_time = $node->getAttribute('execution_time');  // initialise prev_exec_time at the beginning, *and* when we move on to another task (previous node was output[@retval=0])
-
-		$total_time += strtotime($node->getAttribute('execution_time')) - strtotime($prev_exit_time);
-		$prev_exit_time = ($node->getAttribute('retval') == 0) ? null : $node->getAttribute('exit_time');  // reset prev_exit_time on retval=0 since we're moving to another task after that
-	}
-	return $total_time;
-}
-
 function timeDiff ($dt1,$dt2=null) {
   if (!$dt2)
     $dt2 = date('Y-m-d H:i:s');
@@ -55,6 +34,7 @@ function timeSpan ($dt1, $dt2=null) {
   foreach ($dts as &$dt) {
     $dt = preg_replace('/^'.date('Y-m-d').'/','',$dt);  // don't display today's date
     $dt = preg_replace('/^'.date('Y-m-d', strtotime('yesterday')).'/','yesterday',$dt);  // 'yesterday' instead of date
+    $dt = preg_replace('/^'.date('Y-m-d', strtotime('tomorrow')).'/','tomorrow',$dt);  // 'tomorrow' instead of date
     $dt = preg_replace('/:\d+$/','',$dt);  // don't display seconds
   }
   
@@ -136,10 +116,9 @@ class XSLEngine
 		 $nodes = $this->xmldoc->createElement('evqueue-nodes');
 		$this->root_node->appendChild($nodes);
 		if(isset($_SESSION['nodes']) && is_array($_SESSION['nodes'])){
-			foreach ($_SESSION['nodes'] as $node_name => $conf) {
+			foreach ($_SESSION['nodes'] as $node_name) {
 				$node = $this->xmldoc->createElement('node');
 				$node->setAttribute('name', $node_name);
-				$node->appendChild($this->xmldoc->createTextNode($conf));
 				$nodes->appendChild($node);
 			}
 		}
@@ -233,7 +212,7 @@ class XSLEngine
 	public function GetXHTML($xsl_filename)
 	{
 		$xsltproc = new \XSLTProcessor();
-		$xsltproc->registerPHPFunctions(['urlencode', 'sumExecTimes', 'sumRetryTimes', 'timeSpan', 'timeDiff', 'humanTime']);
+		$xsltproc->registerPHPFunctions(['urlencode', 'timeSpan', 'timeDiff', 'humanTime']);
 		// Set static parameters
 		foreach($this->parameters as $name=>$value)
 			$xsltproc->setParameter('',$name,$value);
@@ -283,51 +262,18 @@ class XSLEngine
 		$this->instruction = $instruction;
 	}
 
-	public function Api($name, $action = false, $attributes = [], $parameters = [], $evqueue_node = false)
+	public function Api($name, $action = false, $attributes = [], $parameters = [], $node_name = false)
 	{
-		global $evqueue;
-		if($evqueue_node === false)
-			$evqueue_node = $evqueue;
-
-		if($evqueue_node === false){
-			$this->AddError("This engine is not running");
-			return "<response status='KO' error='This engine is not running' />";
-		}
-
+		global $cluster;
 		try
 		{
-			return $evqueue_node->API($name, $action, $attributes, $parameters);
+			return $cluster->API($name, $action, $attributes, $parameters, $node_name);
 		}
 		catch(Exception $e)
 		{
 			$this->AddError($e->getMessage());
 			return "<response status='KO' error='".htmlspecialchars($e->getMessage())."' />";
 		}
-
-		return "<response />";
-	}
-
-	public function ClusterApi($name, $action = false, $attributes = [], $parameters = [])
-	{
-		$full_xml = '<cluster>';
-		foreach ($_SESSION['nodes'] as $node_name => $conf) {
-			try {
-				$evqueue_node = getevQueue($conf);
-				$xml = $evqueue_node->Api($name, $action, $attributes, $parameters);
-				$dom = new DOMDocument();
-				$dom->loadXML($xml);
-				$dom->documentElement->setAttribute("node", $node_name);
-				$xml = $dom->saveXML($dom->documentElement);
-
-				$full_xml .= $xml;
-			}
-			catch(Exception $e) {
-				$this->AddError($e->getMessage());
-			}
-		}
-		$full_xml .= '</cluster>';
-
-		return $full_xml;
 	}
 
 	public function HasError(){

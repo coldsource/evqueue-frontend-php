@@ -25,7 +25,7 @@ if (!isset($_GET['id']))
 
 $xsl = new XSLEngine();
 
-$xml = $evqueue->Api("instance", "query", ["id" => $_GET['id']]);
+$xml = $cluster->Api("instance", "query", ["id" => $_GET['id']], [], $_GET['node']);
 $dom = new DOMDocument();
 $dom->loadXML($xml);
 $dom->documentElement->setAttribute("node", $_GET['node']);

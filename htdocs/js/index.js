@@ -16,7 +16,8 @@ $(document).ready(function() {
 		evqueueAPI({
 			group: 'instance',
 			action: 'query',
-			attributes: { id: instance_id }
+			attributes: { id: instance_id },
+			node: node
 		}).done( function(xml) {
 			var workflow_node = xml.documentElement.firstChild;
 			var workflow_name = workflow_node.getAttribute('name');
@@ -43,7 +44,7 @@ $(document).ready(function() {
 			confirm: 'The retry counter of each task in error will be decremented. Continue ?',
 			group: 'control',
 			action: 'retry',
-			attributes: {}
+			node: '*'
 		}).done(function(xml) {
 			Message("Retrying all tasks");
 		});

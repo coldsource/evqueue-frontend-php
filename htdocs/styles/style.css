@@ -22,8 +22,8 @@ a, a:visited {
 	font-family:FontAwesome;
 	cursor:pointer;
 }
-.faicon.success { color: #27ae60 }
-.faicon.errorThenSuccess { color: #e67e22; }
+.success { color: #27ae60 }
+.errorThenSuccess { color: #e67e22; }
 .error { color: #c0392b; }
 .skipped { color: #95a5a6; }
 
@@ -60,6 +60,10 @@ div.prctgradient {
 	display: flex;
 	flex-wrap: wrap;
 	justify-content: space-around;
+}
+
+.flexContained {
+	margin:20px;
 }
 
 
@@ -295,6 +299,7 @@ ul.scheduleParameters li {
 }
 
 div.boxTitle {
+	position: relative;
 	background-color: #DEE0E3;
 	border-top-left-radius: 10px;
 	border-top-right-radius: 10px;

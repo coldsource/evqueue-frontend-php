@@ -4,17 +4,17 @@
 
 	<xsl:template match="/">
 		<div class="contentManage flexContainer">
-			<xsl:for-each select="/page/global">
+			<xsl:for-each select="/page/global/response">
 				<div class="flexContained">
 					<div class="boxTitle">
-						<span class="title">Statistics (node <xsl:value-of select="@node_name" />)</span>
+						<span class="title">Statistics (node <xsl:value-of select="@node" />)</span>
 						<span class="faicon fa-remove action" title="Reset statistics">
 							<xsl:attribute name="onclick">
 								evqueueAPI({
 									group: 'statistics',
 									action: 'reset',
 									attributes: {type:'global'},
-									node: '<xsl:value-of select="@node_name" />'
+									node: '<xsl:value-of select="@node" />'
 								});
 							</xsl:attribute>
 						</span>

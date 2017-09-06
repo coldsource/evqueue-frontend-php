@@ -43,51 +43,57 @@ if (isset($_GET['action']))
 
 
 $xsl = new XSLEngine();
-if (isset($_POST['login']) && isset($_POST['password'])) {
-	try
-	{
-		if($evqueue === false)
-		{
-			$xsl->AddError('There is no running node.');
-			throw new Exception;
-		}
-		
-		$pwd = sha1($_POST['password'], true);
-		$evqueue->SetUserLogin($_POST['login']);
-		$evqueue->SetUserPwd($pwd, true);
-		
-		$nodes = [];
 
-		$xml = $xsl->Api('ping');
-		foreach($QUEUEING as $scheme){
-			try{
-				$evqueue_node = new evQueue($scheme,$_POST['login'],$pwd,true);
-				$evqueue_node->Api('ping');
-				$node_name = $evqueue_node->GetParserRootAttributes()['NODE'];
-				if(isset($nodes[$node_name]) || $node_name == '')
-					throw new Exception('Node name can\'t be null and should be unique. Check your configuration.', evQueue::ERROR_ENGINE_NAME);
-				$nodes[$node_name] = $scheme;
-			}
-			catch(Exception $e){
-				if($e->getCode() == evQueue::ERROR_ENGINE_NAME || $e->getCode() == evQueue::ERROR_AUTH_FAILED)
-					throw $e;
-			}
-		}
+// Try anonymous login
+try{
+	$cluster->Api('ping');
+  
+  $_SESSION['user_login'] = "anonymous";
+	$_SESSION['user_pwd'] = "";
+	$_SESSION['user_profile'] = "ADMIN";
+  header('Location: index.php');
+  die();
+}
+catch(Exception $e){
+  if($e->getCode() != evQueue::ERROR_AUTH_REQUIRED){
+    $xsl->AddError($e->getMessage());
+    $xsl->DisplayXHTML('xsl/auth.xsl');
+    die();
+	}
+}
+
+
+if (isset($_POST['login']) && isset($_POST['password'])) {
+  
+	$pwd = sha1($_POST['password'], true);
+	$cluster->SetUserLoginPwd($_POST['login'], $pwd, true);
+	
+  try
+  {
+		$xsl->Api('ping');
 	}
 	catch(Exception $e)
 	{
 		$xsl->DisplayXHTML('xsl/auth.xsl');
 		die();
 	}
-
+  
+  try {
+    $node_names = $cluster->GetNodeNames();
+  }
+  catch (Exception $e) {
+    $xsl->AddError($e->getMessage());
+    $xsl->DisplayXHTML('xsl/auth.xsl');
+		die();
+  }
 
 	@session_start();
 	$_SESSION = [];
 	$_SESSION['user_login'] = $_POST['login'];
 	$_SESSION['user_pwd'] = $pwd;
-	$_SESSION['user_profile'] = $evqueue->GetProfile();
-	$_SESSION['nodes'] = $nodes;
-	$_SESSION['git_enabled'] = $evqueue->GetConfigurationEntry('git.repository')!=""?true:false;
+	$_SESSION['user_profile'] = $cluster->GetProfile();
+	$_SESSION['nodes'] = $node_names;
+	$_SESSION['git_enabled'] = $cluster->GetConfigurationEntry('git.repository')!=""?true:false;
 	session_write_close();
 	header('Location: index.php');
 	die();
@@ -95,6 +101,5 @@ if (isset($_POST['login']) && isset($_POST['password'])) {
 
 
 $xsl->DisplayXHTML('xsl/auth.xsl');
-
 
 ?>

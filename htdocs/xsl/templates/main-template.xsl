@@ -195,7 +195,7 @@
 				</div>
 				<div>
 					<label>Preferred node</label>
-					<select name="node" class="evq-autofill" data-type="node"></select>
+					<select name="preferred_node" class="evq-autofill" data-type="node"></select>
 				</div>
 			</form>
 			<button class="submit">Save</button>

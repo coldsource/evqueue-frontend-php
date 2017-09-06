@@ -4,29 +4,34 @@
 
 	<xsl:template match="/">
 		<div>
+			<div id="nodes-status">
+				<span class="success"><xsl:value-of select="count(/page/instances/response[count(@err) = 0])" /> nodes up</span>
+				<xsl:if test="count(/page/instances/response[count(@err) = 1]) >0">
+					<xsl:text> - </xsl:text>
+					<span class="error"><xsl:value-of select="count(/page/instances/response[count(@err) = 1])" /> nodes down</span>
+				</xsl:if>
+			</div>
+			
 			<div id="{$STATUS}-workflows-pages">
 				<xsl:if test="$STATUS = 'TERMINATED' and $PAGE>1">
 					<span class="faicon fa-backward"></span>
 				</xsl:if>
 				<xsl:if test="$STATUS = 'EXECUTING'">
-					<xsl:value-of select="count(/page/instances/workflow)" />
+					(<xsl:value-of select="count(/page/instances/response/workflow)" />)
 				</xsl:if>
-				<xsl:text> </xsl:text>
-				<xsl:if test="$STATUS = 'EXECUTING' and count(/page/instances/workflow) != count(/page/instances/workflow)">
-					(<xsl:value-of select="count(/page/instances/workflow)" /> displayed)
-				</xsl:if>
+				
 				<xsl:if test="$STATUS = 'TERMINATED'">
-					<xsl:value-of select="($PAGE*$LIMIT)+1-$LIMIT" />-<xsl:value-of select="($PAGE*$LIMIT)" />&#160;/&#160;<xsl:value-of select="/page/instances/@rows" />
+					<xsl:value-of select="($PAGE*$LIMIT)+1-$LIMIT" />-<xsl:value-of select="($PAGE*$LIMIT)" />&#160;/&#160;<xsl:value-of select="/page/instances/response/@rows" />
 				</xsl:if>
 				<xsl:text> </xsl:text>
-				<xsl:if test="$STATUS = 'TERMINATED' and ($PAGE*$LIMIT) &lt; /page/instances/@rows">
+				<xsl:if test="$STATUS = 'TERMINATED' and ($PAGE*$LIMIT) &lt; /page/instances/response/@rows">
 					<span class="faicon fa-forward"></span>
 				</xsl:if>
 			</div>
 			
 			<div id="{$STATUS}-workflows" class="workflow-list">
 				<xsl:choose>
-					<xsl:when test="count(/page/instances/workflow)=0">
+					<xsl:when test="count(/page/instances/response/workflow)=0">
 						<br />
 						<div class="center">No <xsl:value-of select="$STATUS" /> workflow.</div>
 					</xsl:when>
@@ -40,7 +45,7 @@
 								<th class="thStarted">Time</th>
 								<th class="thActions">Actions</th>
 							</tr>
-							<xsl:apply-templates select="/page/instances/workflow[@status = $STATUS]">
+							<xsl:apply-templates select="/page/instances/response/workflow[@status = $STATUS]">
 								<xsl:sort select="@end_time" order="descending" />
 								<xsl:sort select="@start_time" order="descending" />
 							</xsl:apply-templates>
