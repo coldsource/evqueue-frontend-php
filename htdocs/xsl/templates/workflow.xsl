@@ -216,9 +216,11 @@
 							</div>
 						</xsl:for-each>
 					</div>
-					<p>
-						Next execution: <xsl:value-of select="php:function('timeSpan',string(@retry_at))" />
-					</p>
+					<xsl:if test="count(@retry_at) = 1">
+						<p>
+							Next execution: <xsl:value-of select="php:function('timeSpan',string(@retry_at))" />
+						</p>
+					</xsl:if>
 				</div>
 			</xsl:for-each>
 			
