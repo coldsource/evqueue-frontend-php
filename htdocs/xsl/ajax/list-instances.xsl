@@ -57,7 +57,19 @@
 	</xsl:template>
 	
 	<xsl:template match="workflow">
-		<tr data-id="{@id}" data-node="{../@node}">
+		
+		<xsl:variable name="node">
+			<xsl:choose>
+				<xsl:when test="@status = 'EXECUTING'">
+					<xsl:value-of select="../@node" />
+				</xsl:when>
+				<xsl:otherwise>
+					<xsl:value-of select="@node_name" />
+				</xsl:otherwise>
+			</xsl:choose>
+		</xsl:variable>
+		
+		<tr data-id="{@id}" data-node="{$node}">
 			<xsl:if test="$STATUS = 'EXECUTING'">
 				<xsl:attribute name="data-running_tasks"><xsl:value-of select="@running_tasks" /></xsl:attribute>
 				<xsl:attribute name="data-retrying_tasks"><xsl:value-of select="@retrying_tasks" /></xsl:attribute>
@@ -84,7 +96,7 @@
 			</td>
 
 			<td>
-				<span class="action showWorkflowDetails" data-id="{@id}" data-node-name="{@node_name | ../@node}" data-status="{@status}">
+				<span class="action showWorkflowDetails" data-id="{@id}" data-node-name="{$node}" data-status="{@status}">
 					<xsl:value-of select="@id" />
 					–
 					<xsl:value-of select="@name" />
@@ -107,7 +119,7 @@
 				(<xsl:value-of select="php:function('humanTime',$seconds)" />)
 			</td>
 			<td class="center">
-				<xsl:value-of select="@node_name | ../@node" />
+				<xsl:value-of select="$node" />
 			</td>
 			<td class="center">
 				<xsl:choose>
