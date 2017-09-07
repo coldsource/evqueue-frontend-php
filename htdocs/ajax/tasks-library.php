@@ -21,6 +21,6 @@
 require_once __DIR__ . '/../includes/inc/auth_check.php';
 
 $xsl = new XSLEngine();
-$xsl->AddFragment(['tasks' => $evqueue->Api('tasks', 'list')]);
+$xsl->AddFragment(['tasks' => $xsl->Api('tasks', 'list')]);
 $xsl->DisplayXHTML('../xsl/ajax/tasks-library.xsl');
 ?>
