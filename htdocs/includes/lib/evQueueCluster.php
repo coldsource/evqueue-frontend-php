@@ -8,6 +8,7 @@ class evQueueCluster {
 	private $user_login = false;
 	private $user_pwd = false;
 	private $user_pwd_hashed = false;
+	private $last_request_status = false;
 	
 	private $profile = false;
 	
@@ -30,6 +31,7 @@ class evQueueCluster {
 		$full_xml = '';
 		
 		$nodes_requested = 0;
+		$this->last_request_status = [];
 		foreach ($this->node_schemes as $scheme) {
 			
 			try {
@@ -52,12 +54,15 @@ class evQueueCluster {
 				$name = $evqueue_node->GetParserRootAttributes()['NODE'];
 				
 				$nodes_requested++;
+				$this->last_request_status[$scheme] = $name;
 				
 				if($node_name !== '*')
 					break;
 			}
 			catch(Exception $e)
 			{
+				$this->last_request_status[$scheme] = false;
+				
 				if ($e->getCode() === evQueue::ERROR_ENGINE)
 				{
 					if ($node_name === '*') {
@@ -93,6 +98,11 @@ class evQueueCluster {
       $node_names[] = $node->nodeValue;
 		
 		return $node_names;
+	}
+	
+	public function GetLastRequestStatus()
+	{
+		return $this->last_request_status;
 	}
 	
 	public function GetProfile () {

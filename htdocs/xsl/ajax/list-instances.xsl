@@ -5,11 +5,13 @@
 	<xsl:template match="/">
 		<div>
 			<div id="nodes-status">
-				<span class="success"><xsl:value-of select="count(/page/instances/response[count(@err) = 0])" /> nodes up</span>
-				<xsl:if test="count(/page/instances/response[count(@err) = 1]) >0">
-					<xsl:text> - </xsl:text>
-					<span class="error"><xsl:value-of select="count(/page/instances/response[count(@err) = 1])" /> nodes down</span>
-				</xsl:if>
+				<a href="nodes.php">
+					<span class="success"><xsl:value-of select="count(/page/instances/response[count(@err) = 0])" /> nodes up</span>
+					<xsl:if test="count(/page/instances/response[count(@err) = 1]) >0">
+						<xsl:text> - </xsl:text>
+						<span class="error"><xsl:value-of select="count(/page/instances/response[count(@err) = 1])" /> nodes down</span>
+					</xsl:if>
+				</a>
 			</div>
 			
 			<div id="{$STATUS}-workflows-pages">
