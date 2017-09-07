@@ -51,7 +51,9 @@
 				<span class="faicon fa-clock-o action" title="Retry all pending tasks"></span>
 			</div>
 			
-			<div id="EXECUTING-workflows" class="workflow-list evq-autorefresh-pannel"></div>
+			<div id="EXECUTING-workflows" class="workflow-list evq-autorefresh-pannel">
+				<br /><div class="center">Loading...</div>
+			</div>
 		</div>
 
 		<br />
@@ -69,7 +71,9 @@
 				<span class="faicon fa-refresh action evq-autorefresh-toggle"></span>
 			</div>
 			
-			<div id="TERMINATED-workflows" class="workflow-list evq-autorefresh-pannel"></div>
+			<div id="TERMINATED-workflows" class="workflow-list evq-autorefresh-pannel">
+				<br /><div class="center">Loading...</div>
+			</div>
 		</div>
 	</xsl:template>
 	
