@@ -108,6 +108,7 @@ ul.topmenu {
 	height: 20px;
 	margin-bottom:50px;
 	padding-left:150px;
+	z-index:99;
 }
 
 ul.topmenu li {
@@ -145,6 +146,7 @@ ul.submenu {
 	padding: 3px 0px 3px 160px;
 	background-color: #EEEEEE;
 	height: 20px;
+	z-index:99;
 }
 
 ul.submenu li {
