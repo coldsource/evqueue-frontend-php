@@ -20,6 +20,14 @@
 		<div class="dialog" id="workflow-dialog">
 			<ul>
 			</ul>
+			<div id="workflow-debug" class="hidden">
+				Debug mode is used to clone an existing instance and restart it. Successful tasks will not be executed and their output will be kept.
+				<br /><br />Loops and conditions that have already been evaluated will not be evaluated again.
+				<br /><br />Error tasks will be restarted and their attributes will be reset.
+				<br /><br />Modifications on the original workflow will not be taken into account as what is run is a clone of the previous instance.
+				<br /><br />This mode is used for debugging tasks and workflows without launching each time your full treatment chain.
+				<br /><br /><span class="faicon fa-step-forward">&#160;Relaunch this instance in debug mode</span>
+			</div>
 		</div>
 		
 		<div class="dialog" id="task-dialog">

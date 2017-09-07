@@ -43,6 +43,8 @@ $(document).delegate('.showWorkflowDetails','click',function() {
 	dialog.find('ul').append('<li><a href="#workflow-'+wfid+'">Tree</a></li>')
 	dialog.find('ul').append('<li><a href="#workflow-'+wfid+'-xml">XML</a></li>')
 	dialog.find('ul').append('<li><a href="#workflow-'+wfid+'-parameters">Parameters</a></li>')
+	if(status=='TERMINATED')
+		dialog.find('ul').append('<li><a href="#workflow-debug">Debug</a></li>')
 	
 	
 	dialog.append('<div class="evq-autorefresh-pannel" id="workflow-'+wfid+'"></div>');
@@ -61,6 +63,18 @@ $(document).delegate('.showWorkflowDetails','click',function() {
 	
 	dialog.delegate('.taskName','click',function() {
 		TaskDialog(container,wfid,$(this).parent().data('evqid'),$(this).parent().data('name'),$(this).parent().data('outputs'),$(this).parent().data('outputs'));
+	});
+	
+	dialog.delegate('.fa-step-forward','click',function() {
+		evqueueAPI({
+				group: 'instance',
+				action: 'debugresume',
+				attributes: {id:wfid},
+				node: node
+			}).done(function(xml) {
+				var instance_id = xml.documentElement.getAttribute('workflow-instance-id');
+				Message('Debugging new instance '+instance_id);
+			});
 	});
 });
 
