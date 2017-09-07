@@ -72,7 +72,7 @@
 				</xsl:if>
 				
 				<div id="footer">
-					Licensed under GPLv3 (<a href="http://evqueue.net">evqueue.net</a>)
+					Licensed under GPLv3 (<a href="http://www.evqueue.net">evqueue.net</a>)
 				</div>
 			</body>
 		</html>
