@@ -22,9 +22,6 @@ require_once __DIR__ . '/includes/inc/auth_check.php';
 
 $xsl = new XSLEngine();
 
-if($_SESSION['git_enabled'])
-	$xsl->Api("git", "pull");
-
 $xsl->DisplayXHTML('xsl/task.xsl');
 
 ?>
