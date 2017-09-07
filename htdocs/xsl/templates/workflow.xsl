@@ -62,6 +62,11 @@
 		
 		<div class="task {$taskClass}" data-name="{@name}" data-type="task" data-evqid="{@evqid}" data-outputs="{count(output)}">
 			
+			<xsl:if test="@progression != 0 and @progression != 100">
+				<xsl:attribute name="title"><xsl:value-of select="@progression" />%</xsl:attribute>
+				<div class="progressbar" style="background: linear-gradient(to right, #27ae60 0%, #27ae60 {@progression}%, lightgray {@progression+1}%, lightgray 100%);"></div>
+			</xsl:if>
+			
 			<span class="taskName">
 				<xsl:apply-templates select="." mode="status" />
 				<xsl:value-of select="@name" />
@@ -76,13 +81,6 @@
 						attributes: {{ 'id':{ancestor::workflow[1]/@id}, 'pid':{@pid} }},
 						node: '{/page/instance/@node}'
 					}});"></span>
-			</xsl:if>
-			
-			<xsl:if test="@progression != 0 and @progression != 100">
-				<div class="progressbar-wrapper">
-					<div class="progressbar" style="width: {@progression}%;"></div>
-					<span><xsl:value-of select="@progression" />%</span>
-				</div>
 			</xsl:if>
 		</div>
 	</xsl:template>

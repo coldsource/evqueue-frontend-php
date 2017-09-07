@@ -26,6 +26,25 @@
 	text-align: center;
 }
 
+.task {
+	position: relative;  /* host the progressbar */
+	margin: 3px auto;
+}
+.task + .task {
+	margin-top: 10px;
+}
+.progressbar {
+	position: absolute;
+	width: 90%;
+	left: 5%;
+	bottom: -2px;
+	height: 2px;
+}
+
+.taskState {
+	margin-right: 5px;
+}
+
 .task_execution:not(:last-child) {
 	cursor: pointer;
 }
