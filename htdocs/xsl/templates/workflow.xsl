@@ -134,11 +134,11 @@
 							<div>
 								This task is currently running.
 								<br />You can view it's live output :
-								<a target="_blank" class="action" href="ajax/datastore.php?tid={@tid}&amp;type=stdout">stdout</a>
+								<a target="_blank" class="action" href="ajax/datastore.php?node={/page/instance/@node}&amp;tid={@tid}&amp;type=stdout">stdout</a>
 								<xsl:text>&#160;-&#160;</xsl:text>
-								<a target="_blank" class="action" href="ajax/datastore.php?tid={@tid}&amp;type=stderr">stderr</a>
+								<a target="_blank" class="action" href="ajax/datastore.php?node={/page/instance/@node}&amp;tid={@tid}&amp;type=stderr">stderr</a>
 								<xsl:text>&#160;-&#160;</xsl:text>
-								<a target="_blank" class="action" href="ajax/datastore.php?tid={@tid}&amp;type=log">log</a>
+								<a target="_blank" class="action" href="ajax/datastore.php?node={/page/instance/@node}&amp;tid={@tid}&amp;type=log">log</a>
 							</div>
 						</fieldset>
 					</xsl:if>

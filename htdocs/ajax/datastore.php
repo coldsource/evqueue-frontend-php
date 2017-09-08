@@ -49,11 +49,11 @@ if(isset($_GET['id']))
 
 	echo base64_decode($data);
 }
-else if(isset($_GET['tid']) && isset($_GET['type']))
+else if(isset($_GET['node']) && isset($_GET['tid']) && isset($_GET['type']))
 {
 	try
 	{
-		$xml = $cluster->Api('processmanager', 'tail',['tid' => $_GET['tid'], 'type' => $_GET['type']]);
+		$xml = $cluster->Api('processmanager', 'tail',['tid' => $_GET['tid'], 'type' => $_GET['type']], [], $_GET['node']);
 		$sxml = simplexml_load_string($xml);
 		
 		header('Content-type: text/plain');
