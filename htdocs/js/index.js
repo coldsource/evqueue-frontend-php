@@ -27,13 +27,18 @@ $(document).ready(function() {
 		$('#workflow-launch').dialog({width:'auto',height:'auto'});
 	});
 
-	// Read url parameters.
-	s = document.location.search.substr(1).split('&');
-	for(var kId = 0; kId < s.length; kId++){
-		var tmp = s[kId].split('=');
-		search_filters[tmp[0]] = tmp.length > 1 ? unescape(tmp[1]) : '';
+	// Read url parameters
+	if(document.location.search!='')
+	{
+		s = document.location.search.substr(1).split('&');
+		for(var kId = 0; kId < s.length; kId++){
+			var tmp = s[kId].split('=');
+			search_filters[tmp[0]] = tmp.length > 1 ? unescape(tmp[1]) : '';
+		}
+		
+		UpdateFilters();
 	}
-	UpdateFilters();
+	
 	$('.evq-autorefresh-filter').evqautorefresh();
 
 	// Relaunch button

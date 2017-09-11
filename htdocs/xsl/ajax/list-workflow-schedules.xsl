@@ -100,7 +100,7 @@
 										</xsl:call-template>
 									</td>
 									<td class="tdActions">
-										<a href="index.php?workflow_schedule_id={@id}"><span class="faicon fa-eye" title="View launched instances"></span></a>
+										<a href="index.php?filter_schedule_id={@id}"><span class="faicon fa-eye" title="View launched instances"></span></a>
 										<xsl:choose>
 											<xsl:when test="@active = 1"><span class="faicon fa-check" title="Disable this schedule"></span></xsl:when>
 											<xsl:otherwise test="@active = 1"><span class="faicon fa-lock" title="Enable this schedule"></span></xsl:otherwise>
