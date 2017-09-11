@@ -47,11 +47,13 @@ $xsl = new XSLEngine();
 // Try anonymous login
 try{
 	$cluster->Api('ping');
-  
+
   $_SESSION['user_login'] = "anonymous";
 	$_SESSION['user_pwd'] = "";
 	$_SESSION['user_profile'] = "ADMIN";
-  header('Location: index.php');
+
+  $query = parse_url($_SERVER['REQUEST_URI'],PHP_URL_QUERY);
+  header('Location: index.php'.(empty($query)?'':'?'.$query));
   die();
 }
 catch(Exception $e){
@@ -64,10 +66,10 @@ catch(Exception $e){
 
 
 if (isset($_POST['login']) && isset($_POST['password'])) {
-  
+
 	$pwd = sha1($_POST['password'], true);
 	$cluster->SetUserLoginPwd($_POST['login'], $pwd, true);
-	
+
   try
   {
 		$xsl->Api('ping');
@@ -77,7 +79,7 @@ if (isset($_POST['login']) && isset($_POST['password'])) {
 		$xsl->DisplayXHTML('xsl/auth.xsl');
 		die();
 	}
-  
+
   try {
     $node_names = $cluster->GetNodeNames();
   }
@@ -95,7 +97,8 @@ if (isset($_POST['login']) && isset($_POST['password'])) {
 	$_SESSION['nodes'] = $node_names;
 	$_SESSION['git_enabled'] = $cluster->GetConfigurationEntry('git.repository')!=""?true:false;
 	session_write_close();
-	header('Location: index.php');
+  $query = parse_url($_SERVER['REQUEST_URI'],PHP_URL_QUERY);
+  header('Location: index.php'.(empty($query)?'':'?'.$query));
 	die();
 }
 

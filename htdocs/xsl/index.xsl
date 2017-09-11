@@ -2,21 +2,21 @@
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:exsl="http://exslt.org/common" version="1.0">
 	<xsl:import href="templates/workflow.xsl" />
 	<xsl:import href="templates/main-template.xsl" />
-	
+
 	<xsl:variable name="topmenu" select="'system-state'" />
 	<xsl:variable name="title" select="'Board'" />
-	
+
 	<xsl:variable name="css">
 		<src>styles/workflow-instance.css</src>
 	</xsl:variable>
-	
+
 	<xsl:variable name="javascript">
 		<src>js/instance.js</src>
 		<src>js/index.js</src>
 	</xsl:variable>
-	
+
 	<xsl:template name="content">
-	
+
 		<div class="dialog" id="workflow-dialog">
 			<ul>
 			</ul>
@@ -29,14 +29,14 @@
 				<br /><br /><span class="faicon fa-step-forward">&#160;Relaunch this instance in debug mode</span>
 			</div>
 		</div>
-		
+
 		<div class="dialog" id="task-dialog">
 			<ul>
 			</ul>
 		</div>
-		
+
 		<div id="workflow-dialogs"></div>
-		
+
 		<div id="workflow-stats-graph">
 			<div class="chartwrapper">
 				<div class="chart">
@@ -44,10 +44,10 @@
 				</div>
 			</div>
 		</div>
-		
+
 		<xsl:call-template name="workflow-launch" />
-		
-		
+
+
 		<div id="executing-workflows-pannel" class="evq-autorefresh" data-url="ajax/list-instances.php?status=executing" data-interval="2">
 			<div class="boxTitle">
 				<div class="evq-autorefresh-pannel" id="nodes-status"></div>
@@ -58,19 +58,19 @@
 				<span class="faicon fa-rocket action" title="Launch a new workflow"></span>
 				<span class="faicon fa-clock-o action" title="Retry all pending tasks"></span>
 			</div>
-			
+
 			<div id="EXECUTING-workflows" class="workflow-list evq-autorefresh-pannel">
 				<br /><div class="center">Loading...</div>
 			</div>
 		</div>
 
 		<br />
-		
+
 		<xsl:call-template name="filter" />
-		
+
 		<br />
-			
-		<div id="terminated-workflows-pannel" class="evq-autorefresh" data-url="ajax/list-instances.php?status=terminated" data-interval="2">
+
+		<div id="terminated-workflows-pannel" class="evq-autorefresh-filter" data-url="ajax/list-instances.php?status=terminated" data-interval="2">
 			<div class="boxTitle">
 				<span class="faicon fa-exclamation filter" title="Display only failed workflows"></span>
 				<span class="title">Terminated workflows</span>
@@ -78,13 +78,13 @@
 				<div id="TERMINATED-workflows-pages" class="evq-autorefresh-pannel pages"></div>
 				<span class="faicon fa-refresh action evq-autorefresh-toggle"></span>
 			</div>
-			
+
 			<div id="TERMINATED-workflows" class="workflow-list evq-autorefresh-pannel">
 				<br /><div class="center">Loading...</div>
 			</div>
 		</div>
 	</xsl:template>
-	
+
 	<xsl:template name="workflow-launch">
 		<div id="workflow-launch" class="dialog tabs">
 			<ul>
@@ -112,7 +112,7 @@
 					Remote execution
 					<span class="help faicon fa-question-circle" title="The workflow or task can be launched through SSH on a distant machine. Enter the user and host used for SSH connection."></span>
 				</h2>
-				
+
 				<div class="formdiv">
 					<form>
 						<div>
@@ -132,7 +132,7 @@
 					Cluster node
 					<span class="help faicon fa-question-circle" title="If you are using evQueue in a clustered environement, specify here the node on which the workflow will be launched."></span>
 				</h2>
-				
+
 				<div class="formdiv">
 					<form>
 						<div>
@@ -145,11 +145,11 @@
 			</div>
 		</div>
 	</xsl:template>
-	
+
 	<xsl:template name="filter">
 		<div id="searchformcontainer">
 			<a onclick="$('#searchformcontainer .filter').toggle();" href="javascript:void(0)">Filters</a> : <span id="searchexplain">Showing all terminated workflows</span><span id="clearfilters" class="hidden faicon fa-remove" title="Clear filters"></span>
-		
+
 			<div class="formdiv filter hidden">
 				<form id="searchform">
 					<div>
@@ -177,5 +177,5 @@
 			</div>
 		</div>
 	</xsl:template>
-	
+
 </xsl:stylesheet>
