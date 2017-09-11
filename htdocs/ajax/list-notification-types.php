@@ -15,31 +15,13 @@
   * You should have received a copy of the GNU General Public License
   * along with evQueue. If not, see <http://www.gnu.org/licenses/>.
   * 
-  * Authors: Nicolas Jean, Christophe Marti 
+  * Author: Thibault KUMMER
   */
 
-require_once 'inc/auth_check.php';
-require_once 'inc/logger.php';
-require_once 'lib/XSLEngine.php';
-require_once 'lib/NotificationPlugin.php';
-
+require_once __DIR__ . '/../includes/inc/auth_check.php';
 
 $xsl = new XSLEngine();
-$xsl->SetParameter('SITE_BASE','../../');
-
-// INSTALL
-if (isset($_FILES['plugin_file'])) {
-	$plugin = new NotificationPlugin(false,false,'../../');
-	$errors = $plugin->Install($xsl,$_FILES['plugin_file']['tmp_name']);
-}
-
-// UNINSTALL
-if (isset($_POST['action']) && $_POST['action'] == 'delete') {
-	$plugin = new NotificationPlugin($_POST['plugin_id'],$_POST['plugin_name'], '../../');
-	$errors = $plugin->Delete($xsl);
-}
 
 $xsl->AddFragment(['response-notifications-types' => $xsl->Api('notification_types','list')]);
-
-$xsl->DisplayXHTML('plugins.xsl');
+$xsl->DisplayXHTML('../xsl/ajax/list-notification-types.xsl');
 ?>

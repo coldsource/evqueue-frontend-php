@@ -22,7 +22,6 @@ require_once __DIR__ . '/includes/inc/logger.php';
 require_once __DIR__ . '/includes/lib/XSLEngine.php';
 require_once __DIR__ . '/includes/inc/evqueue.php';
 
-
 if(count($QUEUEING) == 0)
 {
 	// Not yet configured
@@ -30,16 +29,23 @@ if(count($QUEUEING) == 0)
 	die();
 }
 
-if (isset($_GET['action']))
-	switch ($_GET['action']) {
-		case 'logout':
-			@session_start();
-			$sessionName = session_name();
-			$sessionCookie = session_get_cookie_params();
-			session_destroy();
-			setcookie($sessionName, false, $sessionCookie['lifetime'], $sessionCookie['path'], $sessionCookie['domain'], $sessionCookie['secure']);
-			break;
-	}
+if (isset($_GET['action']) && $_GET['action']=='logout')
+{
+		@session_start();
+		$sessionName = session_name();
+		$sessionCookie = session_get_cookie_params();
+		session_destroy();
+		setcookie($sessionName, false, $sessionCookie['lifetime'], $sessionCookie['path'], $sessionCookie['domain'], $sessionCookie['secure']);
+		header('Location: auth.php');
+		die();
+}
+
+// Redirect to index if already identified
+if(isset($_SESSION['user_login']))
+{
+	header('Location: index.php');
+	die();
+}
 
 
 $xsl = new XSLEngine();

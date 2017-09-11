@@ -164,6 +164,7 @@ div#userInfo {
 	right: 10px;
 	top: 0px;
 	padding: 5px;
+	z-index:100;
 }
 
 div.content {
@@ -190,10 +191,17 @@ div.formdiv label {
 	display: inline-block;
 	text-align: right;
 	margin-right:1em;
+	vertical-align:top;
 }
 
 div.formdiv input:not(.select2-search__field):not(.spinner):not(.datepicker):not(.timepicker) {
 	min-width:22em;
+}
+
+div.formdiv textarea {
+	min-width:23em;
+	min-height:7em;
+	resize:none;
 }
 
 div.formdiv input.spinner {
