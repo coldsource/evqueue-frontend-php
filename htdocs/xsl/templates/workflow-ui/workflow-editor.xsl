@@ -6,6 +6,7 @@
 		<ul>
 			<li><a href="#tab-workflowproperties">Properties</a></li>
 			<li><a href="#tab-workflowparameters">Parameters</a></li>
+			<li><a href="#tab-workflownotifications">Notifications</a></li>
 		</ul>
 		<div id="tab-workflowproperties">
 			<h2>
@@ -36,6 +37,32 @@
 			</h2>
 			<div class="parameters"></div>
 			<span id="add-parameter" class="faicon fa-plus" title="Add parameter"></span>
+		</div>
+		<div id="tab-workflownotifications">
+			<h2>
+				Notifications
+				<span class="help faicon fa-question-circle" title="Notifications are used to send reports on workflow end.&#10;&#10;You can install plugins that send emails, SMS..."></span>
+			</h2>
+			<table id="subscribednotifications">
+				<tr>
+					<th style="width:150px;">Type</th>
+					<th>Name</th>
+					<th style="width:30px;"></th>
+				</tr>
+				<xsl:for-each select="/page/notifications/notification">
+					<tr class="evenOdd" data-id="{@id}">
+						<td class="center" data-param="type_id" data-value="{type-id}">
+							<xsl:value-of select="/page/notification-types/notification_type[@id = current()/@type_id]/@name" />
+						</td>
+						<td data-param="name" data-value="{@name}">
+							<xsl:value-of select="@name" />
+						</td>
+						<td class="tdActions">
+							<input type="checkbox" />
+						</td>
+					</tr>
+				</xsl:for-each>
+			</table>
 		</div>
 	</div>
 </xsl:template>

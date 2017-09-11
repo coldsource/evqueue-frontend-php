@@ -43,9 +43,19 @@ $(document).ready(function() {
 			wf.SetAttribute('group',group);
 			wf.SetAttribute('comment',comment);
 			
-			Ready()
-			
-			wf.Draw();
+			evqueueAPI({
+				group: 'workflow',
+				action: 'list_notifications',
+				attributes: {'id': workflow_id}
+			}).done(function(xml) {
+				var notifications = xml.Query('/response/notification',xml.documentElement)
+				for(var i=0;i<notifications.length;i++)
+					$('#subscribednotifications tr[data-id='+notifications[i].getAttribute('id')+'] input').prop('checked',true);
+				
+				Ready()
+				
+				wf.Draw();
+			});
 		});
 	}
 	
@@ -158,14 +168,16 @@ function SaveWorkflow()
 				content: btoa(wf.GetXML(true))
 				}
 		}).done(function(xml) {
-			$('#message').html('Workflow has been created');
-			$('#message').show();
-			$('#message').delay(2000).fadeOut();
-			
-			workflow_id = xml.firstChild.getAttribute('workflow-id');
-			
-			if(want_exit)
-				window.location = "workflow.php";
+			SaveNotifications().always(function() {
+				$('#message').html('Workflow has been created');
+				$('#message').show();
+				$('#message').delay(2000).fadeOut();
+				
+				workflow_id = xml.firstChild.getAttribute('workflow-id');
+				
+				if(want_exit)
+					window.location = "workflow.php";
+			});
 		});
 	}
 	else
@@ -181,12 +193,38 @@ function SaveWorkflow()
 				content: btoa(wf.GetXML(true))
 			}
 		}).done(function(xml) {
-			$('#message').html('Workflow has been saved');
-			$('#message').show();
-			$('#message').delay(2000).fadeOut();
-			
-			if(want_exit)
-				window.location = "workflow.php";
+			SaveNotifications().always(function() {
+				$('#message').html('Workflow has been saved');
+				$('#message').show();
+				$('#message').delay(2000).fadeOut();
+				
+				if(want_exit)
+					window.location = "workflow.php";
+			});
 		});
 	}
+}
+
+function SaveNotifications()
+{
+	var promise = new jQuery.Deferred();
+	
+	evqueueAPI({
+		group: 'workflow',
+		action: 'clear_notifications',
+		attributes: {id:workflow_id}
+	}).done(function() {
+		$('#subscribednotifications input:checked').each(function() {
+			var notification_id = $(this).parents('tr').data('id');
+			evqueueAPI({
+				group: 'workflow',
+				action: 'subscribe_notification',
+				attributes: {id:workflow_id,notification_id:notification_id}
+			}).done(function() {
+				promise.resolve();
+			});
+		});
+	});
+	
+	return promise;
 }

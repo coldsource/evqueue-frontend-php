@@ -81,7 +81,7 @@
 
 	<xsl:template name="displayErrors">
 		<xsl:if test="count(/page/errors/error) > 0">
-			<div id="errors">
+			<div class="error">
 				<xsl:for-each select="/page/errors/error">
 					<p>
 						<xsl:choose>
@@ -114,7 +114,7 @@
 	</xsl:template>
 
 	<xsl:template name="topmenu">
-		<div class="topmenu"><a href="{$SITE_BASE}index.php"><img src="images/evQueue-small.svg" title="evQueue" /></a></div>
+		<div class="topmenu"><a href="{$SITE_BASE}index.php"><img src="{$SITE_BASE}images/evQueue-small.svg" title="evQueue" /></a></div>
 		<ul class="topmenu">
 			<li class="logo"></li>
 			<li id="system-state">
@@ -154,8 +154,8 @@
 			</ul>
 			<ul class="submenu" id="submenu-notifications">
 				<xsl:if test="$topmenu!='notifications'"><xsl:attribute name="style">display:none;</xsl:attribute></xsl:if>
-				<li><a href="{$SITE_BASE}plugins/notifications/">Configure</a></li>
-				<li><a href="{$SITE_BASE}plugins/notifications/plugins.php">Manage plugins</a></li>
+				<li><a href="{$SITE_BASE}notification.php">Configure</a></li>
+				<li><a href="{$SITE_BASE}notification-types.php">Manage plugins</a></li>
 			</ul>
 			<ul class="submenu" id="submenu-logging">
 				<xsl:if test="$topmenu!='logging'"><xsl:attribute name="style">display:none;</xsl:attribute></xsl:if>
