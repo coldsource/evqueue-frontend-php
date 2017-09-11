@@ -255,7 +255,7 @@ class evQueue {
 		$xml = $this->exec($dom->saveXML());
 
 		if(!isset($this->parser_root_attributes['STATUS']) || $this->parser_root_attributes['STATUS']!='OK')
-			throw new Exception("evQueue : error returned from engine : {$this->parser_root_attributes['ERROR']}", evQueue::ERROR_RESPONSE_KO);
+			throw new Exception("evQueue error returned from engine : {$this->parser_root_attributes['ERROR']}", evQueue::ERROR_RESPONSE_KO);
 
 		return trim($xml);
 	}
