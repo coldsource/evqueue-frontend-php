@@ -191,10 +191,10 @@ div.formdiv label {
 	display: inline-block;
 	text-align: right;
 	margin-right:1em;
-	vertical-align:top;
+	vertical-align:middle;
 }
 
-div.formdiv input:not(.select2-search__field):not(.spinner):not(.datepicker):not(.timepicker) {
+div.formdiv input[type=text]:not(.select2-search__field):not(.spinner):not(.datepicker):not(.timepicker) {
 	min-width:22em;
 }
 
@@ -220,6 +220,13 @@ div.formdiv input[type='checkbox'] {
 	min-width:0em;
 	margin:0px;
 }
+
+div.formdiv input[type='radio'] {
+	min-width:0em;
+	margin:0px;
+	display:inline-block;
+}
+
 
 div.formdiv select {
 	width:25em;
@@ -426,7 +433,7 @@ div.install_content div.submit {
 }
 
 div.install_content div.installform {
-	border:1px solid grey;
+	border:1px solid #DEE0E3;
 }
 
 div.install_content input[type=submit] {
