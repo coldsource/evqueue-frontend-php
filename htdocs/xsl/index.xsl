@@ -95,13 +95,17 @@
 			<div id="workflow-launch-tab-workflow">
 				<h2>
 					Select workflow
-					<span class="help faicon fa-question-circle" title="Select the workflow to launch.&#10;&#10;If the workflow needs parameters, you will be prompted for them."></span>
+					<span class="help faicon fa-question-circle" title="Select the workflow to launch.&#10;&#10;If the workflow needs parameters, you will be prompted for them.&#10;&#10;If needed, you can add an optional comment that will not be used by the engine."></span>
 				</h2>
 				<div class="formdiv" id="which_workflow">
 					<form>
 						<div>
 							<label>Workflow</label>
 							<select name="workflow_id" class="evq-autofill select2" data-type="workflows" data-valuetype="id"></select>
+						</div>
+						<div>
+							<label>Comment</label>
+							<input type="text" name="comment" />
 						</div>
 					</form>
 				</div>

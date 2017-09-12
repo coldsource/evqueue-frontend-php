@@ -142,6 +142,7 @@ $(document).ready(function() {
 	// Launch a new instance
 	$('#workflow-launch .submit').click(function() {
 		var workflow_id = $('#workflow-launch select[name=workflow_id').val();
+		var workflow_comment = $('#workflow-launch input[name=comment').val();
 		var workflow_parameters = {};
 		$('#which_workflow form .parameter input').each(function() {
 			workflow_parameters[$(this).attr('name').substr(10)] = $(this).val();
@@ -153,7 +154,7 @@ $(document).ready(function() {
 			attributes: {id: workflow_id}
 		}).done(function(xml) {
 			var workflow_name = xml.documentElement.firstChild.getAttribute('name');
-			var attributes = {name:workflow_name};
+			var attributes = {name:workflow_name,comment:workflow_comment};
 			if($('#workflow-launch input[name=host]').val())
 			{
 				attributes.host = $('#workflow-launch input[name=host]').val();

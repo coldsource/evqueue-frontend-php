@@ -4,6 +4,10 @@
 
 	<xsl:template match="workflow" mode="tree">
 		<div id="workflow-{@id}">
+			<xsl:if test="@comment != ''">
+				<div><i>Comment : <xsl:value-of select="@comment" /></i></div>
+				<br />
+			</xsl:if>
 			<div class="workflow" data-id="{@id}">
 				<div id="jobs_{@id}">
 					<xsl:apply-templates select="subjobs/job">
