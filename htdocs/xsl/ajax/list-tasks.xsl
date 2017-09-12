@@ -15,12 +15,12 @@
 			</div>
 			<table>
 				<tr>
-					<th>Name</th>
+					<th style="width:200px;">Name</th>
 					<th>Binary</th>
-					<th>Parameters mode</th>
-					<th>Host</th>
+					<th style="width:150px;">Parameters mode</th>
+					<th style="width:150px;">Host</th>
 					<xsl:if test="$USE_GIT = 1">
-						<th>Git</th>
+						<th style="width:80px;">Git</th>
 					</xsl:if>
 					<th class="thActions">Actions</th>
 				</tr>

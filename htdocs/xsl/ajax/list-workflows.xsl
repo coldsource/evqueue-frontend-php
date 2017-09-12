@@ -15,10 +15,10 @@
 			</div>
 			<table>
 				<tr>
-					<th>Name</th>
+					<th style="width:200px;">Name</th>
 					<th>Comment</th>
 					<xsl:if test="$USE_GIT = 1">
-						<th>Git</th>
+						<th style="width:80px;">Git</th>
 					</xsl:if>
 					<th class="thActions">Actions</th>
 				</tr>
