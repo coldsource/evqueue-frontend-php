@@ -22,7 +22,7 @@
 						<td>
 							<xsl:value-of select="@name" />
 						</td>
-						<td class="txtcenter">
+						<td class="center">
 							<xsl:value-of select="@scheduler" />
 						</td>
 						<td class="center">
