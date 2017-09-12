@@ -8,16 +8,7 @@
 				<div class="flexContained">
 					<div class="boxTitle">
 						<span class="title">Statistics (node <xsl:value-of select="@node" />)</span>
-						<span class="faicon fa-remove action" title="Reset statistics">
-							<xsl:attribute name="onclick">
-								evqueueAPI({
-									group: 'statistics',
-									action: 'reset',
-									attributes: {type:'global'},
-									node: '<xsl:value-of select="@node" />'
-								});
-							</xsl:attribute>
-						</span>
+						<span class="faicon fa-remove action" title="Reset statistics" data-node="{@node}"></span>
 					</div>
 					<table class="highlight_row">
 						<xsl:choose>

@@ -5,6 +5,7 @@
 	<xsl:variable name="topmenu" select="'system-state'" />
 	
 	<xsl:variable name="javascript">
+		<src>js/system-statistics.js</src>
 	</xsl:variable>
 	
 	<xsl:template name="content">
