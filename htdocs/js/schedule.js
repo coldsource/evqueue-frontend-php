@@ -47,7 +47,7 @@ $(document).ready( function() {
 			return;
 		
 		schedule = new RetrySchedule(new XMLSerializer().serializeToString(data.documentElement.firstChild));
-		$('#schedule-editor input[name=content]').val(btoa(schedule.GetXML()));
+		$('#schedule-editor input[name=content]').val(b64EncodeUnicode(schedule.GetXML()));
 		$('#schedule-editor input[name=content]').trigger('change');
 	});
 });
@@ -105,20 +105,20 @@ function AddScheduleLevel(isfirst,retry_delay='',retry_times='')
 	html.find('.spinner').on('spinchange', function() {
 		var idx = $(this).parent().parent().index('div.level');
 		schedule.SetLevelAttribute(idx,$(this).attr('name'),$(this).val());
-		$('#schedule-editor input[name=content]').val(btoa(schedule.GetXML()));
+		$('#schedule-editor input[name=content]').val(b64EncodeUnicode(schedule.GetXML()));
 	});
 	
 	html.find('.fa-remove').click(function() {
 		var idx = $(this).parent().index('div.level');
 		schedule.DeleteLevel(idx);
-		$('#schedule-editor input[name=content]').val(btoa(schedule.GetXML()));
+		$('#schedule-editor input[name=content]').val(b64EncodeUnicode(schedule.GetXML()));
 		$(this).parent().remove();
 	});
 	
 	$('#schedule-editor form div').last().prev().after(html);
 	
 	if(retry_delay=='' && retry_times=='')
-		$('#schedule-editor input[name=content]').val(btoa(schedule.GetXML()));
+		$('#schedule-editor input[name=content]').val(b64EncodeUnicode(schedule.GetXML()));
 }
 
 function UpdateSchedule()

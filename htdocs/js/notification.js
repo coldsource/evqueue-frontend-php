@@ -34,7 +34,7 @@ function RefreshPage()
 					evqueueAPI({
 						group: 'notification',
 						action: 'create',
-						attributes: { name: conf.name, type_id: type_id, parameters: btoa(conf_json) }
+						attributes: { name: conf.name, type_id: type_id, parameters: b64EncodeUnicode(conf_json) }
 					}).done(function() {
 						Message('Notification created');
 						$('#notification-configuration').dialog('close');
@@ -59,7 +59,7 @@ function RefreshPage()
 					action: 'get',
 					attributes: { 'id':id }
 				}).done(function(xml) {
-					var conf = jQuery.parseJSON(atob(xml.documentElement.firstChild.getAttribute('parameters')));
+					var conf = jQuery.parseJSON(b64DecodeUnicode(xml.documentElement.firstChild.getAttribute('parameters')));
 					for(var i in conf)
 						$('#notification-configuration form *[name='+i+']').val(conf[i]);
 				});
@@ -74,7 +74,7 @@ function RefreshPage()
 					evqueueAPI({
 						group: 'notification',
 						action: 'edit',
-						attributes: { 'id':id, name: conf.name, parameters: btoa(conf_json) }
+						attributes: { 'id':id, name: conf.name, parameters: b64EncodeUnicode(conf_json) }
 					}).done(function() {
 						Message('Configuration saved');
 						$('#notification-configuration').dialog('close');

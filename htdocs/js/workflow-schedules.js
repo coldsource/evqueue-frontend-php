@@ -244,7 +244,7 @@ function WFSFormHandler()
 	task_node.setAttribute('queue','default');
 	tasks_node.appendChild(task_node);
 	
-	var workflow = btoa(new XMLSerializer().serializeToString(xmldoc));
+	var workflow = b64EncodeUnicode(new XMLSerializer().serializeToString(xmldoc));
 	
 	return evqueueAPI({
 		group: 'workflow',

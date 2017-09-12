@@ -165,7 +165,7 @@ function SaveWorkflow()
 				name: wf.GetAttribute('name'),
 				group: wf.GetAttribute('group'),
 				comment: wf.GetAttribute('comment'),
-				content: btoa(wf.GetXML(true))
+				content: b64EncodeUnicode(wf.GetXML(true))
 				}
 		}).done(function(xml) {
 			workflow_id = xml.firstChild.getAttribute('workflow-id');
@@ -190,7 +190,7 @@ function SaveWorkflow()
 				name: wf.GetAttribute('name'),
 				group: wf.GetAttribute('group'),
 				comment: wf.GetAttribute('comment'),
-				content: btoa(wf.GetXML(true))
+				content: b64EncodeUnicode(wf.GetXML(true))
 			}
 		}).done(function(xml) {
 			SaveNotifications().always(function() {

@@ -21,7 +21,7 @@ function RefreshPage()
 					action: 'get_conf',
 					attributes: { 'id':id }
 				}).done(function(xml) {
-					var conf = jQuery.parseJSON(atob(xml.documentElement.firstChild.getAttribute('content')));
+					var conf = jQuery.parseJSON(b64DecodeUnicode(xml.documentElement.firstChild.getAttribute('content')));
 					for(var i in conf)
 						$('#plugin-configuration form *[name='+i+']').val(conf[i]);
 				});
@@ -36,7 +36,7 @@ function RefreshPage()
 					evqueueAPI({
 						group: 'notification_type',
 						action: 'set_conf',
-						attributes: { 'id':id, content: btoa(conf_json) }
+						attributes: { 'id':id, content: b64EncodeUnicode(conf_json) }
 					}).done(function() {
 						Message('Configuration saved');
 						$('#plugin-configuration').dialog('close');
