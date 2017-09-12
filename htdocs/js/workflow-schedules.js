@@ -192,9 +192,9 @@ function RefreshPage()
 						tr_el.find('td:eq(4)').text(xml.documentElement.firstChild.getAttribute('start_time'));
 						var instance_id = xml.documentElement.firstChild.getAttribute('id');
 						if(xml.documentElement.firstChild.getAttribute('errors')==0)
-							tr_el.find('td:eq(4)').append('<a href="index.php?filter_id='+instance_id+'"><span class="faicon fa-check" title="Instance has been successfully executed"></span></a>');
+							tr_el.find('td:eq(4)').append('<a href="index.php?filter_id='+instance_id+'"><span class="faicon fa-check success" title="Instance has been successfully executed"></span></a>');
 						else
-							tr_el.find('td:eq(4)').append('<a href="index.php?filter_id='+instance_id+'"><span class="faicon fa-exclamation" title="Errors executing instance"></span></a>');
+							tr_el.find('td:eq(4)').append('<a href="index.php?filter_id='+instance_id+'"><span class="faicon fa-exclamation error" title="Errors executing instance"></span></a>');
 					}
 				});
 			}
