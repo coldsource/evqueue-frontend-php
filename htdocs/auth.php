@@ -90,7 +90,6 @@ if (isset($_POST['login']) && isset($_POST['password'])) {
     $node_names = $cluster->GetNodeNames();
   }
   catch (Exception $e) {
-    $xsl->AddError($e->getMessage());
     $xsl->DisplayXHTML('xsl/auth.xsl');
 		die();
   }
