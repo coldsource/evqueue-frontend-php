@@ -168,12 +168,12 @@ function SaveWorkflow()
 				content: btoa(wf.GetXML(true))
 				}
 		}).done(function(xml) {
+			workflow_id = xml.firstChild.getAttribute('workflow-id');
+			
 			SaveNotifications().always(function() {
 				$('#message').html('Workflow has been created');
 				$('#message').show();
 				$('#message').delay(2000).fadeOut();
-				
-				workflow_id = xml.firstChild.getAttribute('workflow-id');
 				
 				if(want_exit)
 					window.location = "workflow.php";
@@ -220,10 +220,10 @@ function SaveNotifications()
 				group: 'workflow',
 				action: 'subscribe_notification',
 				attributes: {id:workflow_id,notification_id:notification_id}
-			}).done(function() {
-				promise.resolve();
 			});
 		});
+		
+		promise.resolve();
 	});
 	
 	return promise;
