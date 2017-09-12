@@ -173,7 +173,6 @@ function DrawGraph(el,desc)
 	for(var i=0;i<desc.length;i++)
 		max += desc[i].prct?desc[i].prct:0;
 	
-	console.log(desc);
 	for(var i=0;i<desc.length;i++)
 	{
 		if(desc[i].prct && desc[i].prct!=0)

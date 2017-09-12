@@ -93,7 +93,6 @@ $(document).ready(function() {
 			{prct:$(this).parents('tr').data('waiting_conditions'),label:'Waiting tasks',color:'#f2f4f7'}
 		]);
 
-		console.log(e);
 		$('#workflow-stats-graph').css('position','fixed');
 		$('#workflow-stats-graph').css('top',e.pageY+10);
 		$('#workflow-stats-graph').css('left',e.pageX+10);

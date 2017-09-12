@@ -124,7 +124,6 @@ function AddScheduleLevel(isfirst,retry_delay='',retry_times='')
 function UpdateSchedule()
 {
 	var levels = schedule.GetLevels();
-	console.log(levels);
 	for(var i=0;i<levels.length;i++)
 		AddScheduleLevel(i==0,levels[i].retry_delay,levels[i].retry_times);
 }
