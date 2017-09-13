@@ -141,6 +141,9 @@ $(document).ready( function() {
 				for(var i=0;i<nodes.length;i++)
 					el.append($('<option>',{value:nodes[i],text:nodes[i]}));
 				
+				if(connected_user=='anonymous')
+					return;
+				
 				evqueueAPI({group:'user',action:'get',attributes:{name:connected_user}}).done(function(xml) {
 					if(!xml.documentElement.firstChild.getAttribute('preferences'))
 						return;
