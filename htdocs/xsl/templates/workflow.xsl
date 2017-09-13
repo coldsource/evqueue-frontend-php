@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:exsl="http://exslt.org/common" xmlns:php="http://php.net/xsl" version="1.0">
 	<xsl:import href="datetime.xsl" />
+	<xsl:import href="xmlhighlight.xsl" />
 
 	<xsl:template match="workflow" mode="tree">
 		<div id="workflow-{@id}">
@@ -239,6 +240,9 @@
 				<br />
 				<div><a href="ajax/datastore.php?id={@datastore-id}&amp;download"><span class="faicon fa-download"></span>Download from datastore</a></div>
 				<div><a target="_blank" href="ajax/datastore.php?id={@datastore-id}"><span class="faicon fa-eye"></span>View in browser</a></div>
+			</xsl:when>
+			<xsl:when test="@method = 'xml'">
+				<xsl:apply-templates select="*" mode="xml_display" />
 			</xsl:when>
 			<xsl:otherwise>
 				<xsl:value-of select="." />
