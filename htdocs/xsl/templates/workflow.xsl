@@ -245,7 +245,9 @@
 				<xsl:apply-templates select="*" mode="xml_display" />
 			</xsl:when>
 			<xsl:otherwise>
-				<xsl:value-of select="." />
+				<pre>
+					<xsl:value-of select="." />
+				</pre>
 			</xsl:otherwise>
 		</xsl:choose>
 	</xsl:template>
