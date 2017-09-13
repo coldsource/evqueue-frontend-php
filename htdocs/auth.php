@@ -54,9 +54,12 @@ $xsl = new XSLEngine();
 try{
 	$cluster->Api('ping');
 
-  $_SESSION['user_login'] = "anonymous";
+	$_SESSION['user_login'] = "anonymous";
 	$_SESSION['user_pwd'] = "";
 	$_SESSION['user_profile'] = "ADMIN";
+	
+	$node_names = $cluster->GetNodeNames();
+	$_SESSION['nodes'] = $node_names;
 
   $query = parse_url($_SERVER['REQUEST_URI'],PHP_URL_QUERY);
   header('Location: index.php'.(empty($query)?'':'?'.$query));
