@@ -18,6 +18,9 @@
   */
 
 $(document).ready( function() {
+	if(connected_user=='anonymous')
+		return;
+	
 	$('#userInfo span.fa-pencil').click(function() {
 		$('#user-preferences-editor').dialog({width:'auto',height:'auto'});
 	});
