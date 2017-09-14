@@ -198,6 +198,23 @@
 							<div><xsl:value-of select="count(output)" /></div>
 						</div>
 					</fieldset>
+					
+					<xsl:if test="count(@host) > 0">
+						<br />
+						<fieldset class="tabbed">
+							<legend>Remote</legend>
+							<xsl:if test="count(@user) > 0">
+								<div>
+									<div>User</div>
+									<div><xsl:value-of select="@user" /></div>
+								</div>
+							</xsl:if>
+							<div>
+								<div>Host</div>
+								<div><xsl:value-of select="@host" /></div>
+							</div>
+						</fieldset>
+					</xsl:if>
 				</div>
 				
 				<xsl:for-each select="output">
