@@ -18,6 +18,7 @@ div#sticky_menu {
 	border-bottom:1px solid;
 	padding:4px;
 	font-size:20px;
+	z-index:100;
 }
 
 div#sticky_menu span {
