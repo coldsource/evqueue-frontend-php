@@ -197,6 +197,10 @@
 							<div>Number of executions</div>
 							<div><xsl:value-of select="count(output)" /></div>
 						</div>
+						<div>
+							<div>Queue</div>
+							<div><xsl:value-of select="@queue" /></div>
+						</div>
 					</fieldset>
 					
 					<xsl:if test="count(@host) > 0">
