@@ -30,7 +30,7 @@
 		<div id="tab-inputs">
 			<h2>
 				Task inputs
-				<span class="help faicon fa-question-circle" title="The inputs are passed to the task that will be executed. Depending on your task configuration, inputs will be passed as command line arguments or environment variables. The default is command line arguments.&#10;&#10;Input values can be static (simple text), or dynamic by fetching output of parent tasks in the workflow."></span>
+				<span class="help faicon fa-question-circle" title="The inputs are passed to the task that will be executed. Depending on your task configuration, inputs will be passed as command line arguments or environment variables. The default is command line arguments.&#10;&#10;Input values can be static (simple text), or dynamic by fetching output of parent tasks in the workflow.&#10;&#10;Optionally, tasks can have loops or conditions."></span>
 			</h2>
 			<div class="inputs"></div>
 			<span id="add-input" class="faicon fa-plus" title="Add input"></span>
@@ -119,6 +119,34 @@
 			<div class="input_line" data-inputtype="stdin">
 				<div class="input">stdin</div>
 				<div class="value"></div>
+			</div>
+		</div>
+	</div>
+	
+	<div id='task-input-editor' class="dialog" title="Properties">
+		<h2>
+			Task properties
+			<span class="help faicon fa-question-circle" title="Input name is used when passing inputs as environement variables.&#10;&#10;Input condition can be used to optionally pass a flag to the task. The flag will be passed to the task if the condition evaluates to true, otherwise the input will be ignored.&#10;&#10;Loops are used to pass a list of inputs based on a preceding task output. This could be a list of files, databases..."></span>
+		</h2>
+		<div class="formdiv">
+			<form>
+				<div>
+					<label class="formLabel" for="input-name">Name</label>
+					<input id="input-name" />
+				</div>
+				<div>
+					<label class="formLabel" for="condition">Condition</label>
+					<input id="input-condition" />
+					&#160;<span class="faicon fa-magic"></span>
+				</div>
+				<div>
+					<label class="formLabel" for="loop">Loop</label>
+					<input id="input-loop" />
+					&#160;<span class="faicon fa-magic"></span>
+				</div>
+			</form>
+			<div>
+				<button class="submit">Save</button>
 			</div>
 		</div>
 	</div>

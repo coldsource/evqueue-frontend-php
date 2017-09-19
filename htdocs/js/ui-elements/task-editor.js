@@ -51,7 +51,7 @@ function TaskEditor()
 	
 	$('#add-input').click(this.AddInput);
 	
-	$('#tab-conditionsloops span.fa-magic').click(function() {
+	$('#tab-conditionsloops span.fa-magic, #task-input-editor span.fa-magic').click(function() {
 		var input = $(this).parent().find('input');
 		
 		OpenXPathHelper();
@@ -190,8 +190,14 @@ TaskEditor.prototype.RefreshInputs = function()
 			var div = $("<div class='input_line' data-inputtype='input' >");
 			
 			var input_div = $("<div class='input'>");
-			input_div.append("<span class='faicon fa-remove' title='Delete input'></span>&nbsp;");
+			input_div.append("<span class='faicon fa-remove' title='Delete input'></span>");
 			var input_name_span = $("<span>",{class:'input_name',text:inputs[i].name!=''?inputs[i].name:"Input "+(i+1)});
+			var props = task_editor.task.GetInputProperties(i);
+			if(props.condition)
+				input_name_span.append('<span class="faicon fa-code-fork">&nbsp;</span>');
+			if(props.loop)
+				input_name_span.append('<span class="faicon fa-repeat">&nbsp;</span>');
+			
 			if(inputs[i].name=="")
 				input_name_span.addClass('greyed');
 			input_div.append(input_name_span);
@@ -208,20 +214,20 @@ TaskEditor.prototype.RefreshInputs = function()
 	
 	$('#tab-inputs .input span.input_name').click(function() {
 		var el = $(this);
-		el.hide();
-		var input_el = $('<input />');
-		input_el.val(el.text());
-		input_el.css('width','130px');
-		el.after(input_el);
-		input_el.focus();
+		var input_idx = $(this).parent().parent().index();
 		
-		input_el.blur(function() {
+		var props = task_editor.task.GetInputProperties(input_idx);
+		$('#input-name').val(el.text());
+		$('#input-condition').val(props.condition);
+		$('#input-loop').val(props.loop);
+		
+		$('#task-input-editor').dialog({width:'auto',height:'auto'});
+		
+		$('#task-input-editor button.submit').off('click').on('click', function() {
 			wf.Backup();
-			
-			task_editor.task.RenameInput(input_el.parent().parent().index(),input_el.val());
-			input_el.remove();
-			el.show();
-			
+			task_editor.task.RenameInput(input_idx,$('#input-name').val());
+			task_editor.task.EditInputProperties(input_idx,$('#input-condition').val(),$('#input-loop').val());
+			$('#task-input-editor').dialog('close');
 			task_editor.RefreshInputs();
 		});
 	});

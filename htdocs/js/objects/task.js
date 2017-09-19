@@ -262,3 +262,35 @@ Task.prototype.EditInputPart = function(input_idx, part_idx, new_value)
 	else if(parts[part_idx].nodeType==Node.TEXT_NODE)
 		parts[part_idx].nodeValue=new_value;
 }
+
+Task.prototype.GetInputProperties = function(input_idx)
+{
+	var res = {condition:'',loop:''};
+	
+	var inputs = this.task.ownerDocument.Query('input',this.task);
+	var input = inputs[input_idx];
+	
+	if(input.hasAttribute('condition'))
+		res.condition = input.getAttribute('condition');
+	
+	if(input.hasAttribute('loop'))
+		res.loop = input.getAttribute('loop');
+	
+	return res;
+}
+
+Task.prototype.EditInputProperties = function(input_idx, condition, loop)
+{
+	var inputs = this.task.ownerDocument.Query('input',this.task);
+	var input = inputs[input_idx];
+	
+	if(condition)
+		input.setAttribute('condition', condition);
+	else
+		input.removeAttribute('condition');
+	
+	if(loop)
+		input.setAttribute('loop', loop);
+	else
+		input.removeAttribute('loop');
+}
