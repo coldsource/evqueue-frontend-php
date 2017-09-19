@@ -141,7 +141,7 @@ div.task p
 /* Task input selector */
 div #value-selector input {
 	margin-top:5px;
-	width:100%;
+	width:90%;
 }
 
 /* Task editor */
