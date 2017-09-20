@@ -95,9 +95,18 @@
 										</xsl:call-template>
 									</td>
 									<td class="center">
-										<xsl:call-template name="displayDateAndTime">
-											<xsl:with-param name="datetime_start" select="/page/status/response/status/workflow[@workflow_schedule_id = current()/@id]/@scheduled_at" />
-										</xsl:call-template>
+										<xsl:variable name="running_nodes" select="count(/page/status/response/status/workflow[@workflow_schedule_id = current()/@id and @scheduled_at = 'running'])" />
+										<xsl:if test="$running_nodes > 1">
+											running on <xsl:value-of select="$running_nodes" /> nodes
+										</xsl:if>
+										<xsl:if test="$running_nodes = 1">
+											running
+										</xsl:if>
+										<xsl:if test="$running_nodes = 0">
+											<xsl:call-template name="displayDateAndTime">
+												<xsl:with-param name="datetime_start" select="/page/status/response/status/workflow[@workflow_schedule_id = current()/@id]/@scheduled_at" />
+											</xsl:call-template>
+										</xsl:if>
 									</td>
 									<td class="tdActions">
 										<a href="index.php?filter_schedule_id={@id}"><span class="faicon fa-eye" title="View launched instances"></span></a>
