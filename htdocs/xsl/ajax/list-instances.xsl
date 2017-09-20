@@ -102,6 +102,9 @@
 					<xsl:value-of select="@id" />
 					–
 					<xsl:value-of select="@name" />
+					<xsl:if test="$STATUS = 'TERMINATED' and @comment != ''">
+						<span class="faicon fa-comment-o" title="Comment : {@comment}"></span>
+					</xsl:if>
 					<xsl:if test="$STATUS = 'EXECUTING'">
 						<span class="faicon fa-info"></span>
 					</xsl:if>
