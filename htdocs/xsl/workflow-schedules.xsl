@@ -156,14 +156,14 @@
 			<div id="tab-node">
 				<h2>
 					Cluster node
-					<span class="help faicon fa-question-circle" title="If you are using evQueue in a clustered environement, specify here the node on which the workflow will be launched."></span>
+					<span class="help faicon fa-question-circle" title="If you are using evQueue in a clustered environement, specify here the node on which the workflow will be launched.&#10;&#10;Two special nodes can be used. 'All' will launch the instance on all clustered nodes. 'Any' will launch the instance on a node elected amongst the online nodes, thus guaranteeing high availability."></span>
 				</h2>
 				
 				<div class="formdiv">
 					<form>
 						<div>
 							<label>Node</label>
-							<select name="node" class="evq-autofill" data-type="node"></select>
+							<select name="node" class="evq-autofill" data-type="node" data-special-nodes="on"></select>
 						</div>
 					</form>
 				</div>

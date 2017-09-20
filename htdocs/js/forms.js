@@ -136,6 +136,12 @@ $(document).ready( function() {
 		}
 		else if(el.data('type')=='node')
 		{
+			if(el.data('special-nodes')=='on')
+			{
+				el.append($('<option>',{value:'any',text:'any'}));
+				el.append($('<option>',{value:'all',text:'all'}));
+			}
+			
 			$.getJSON('ajax/get-nodes.php',function(data) {
 				nodes = data.nodes;
 				for(var i=0;i<nodes.length;i++)
