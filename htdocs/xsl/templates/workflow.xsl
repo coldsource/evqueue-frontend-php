@@ -155,7 +155,7 @@
 						<xsl:if test="count(input) = 0">
 							<div>This task has no inputs</div>
 						</xsl:if>
-						<xsl:for-each select="input">
+						<xsl:for-each select="input[@status != 'SKIPPED']">
 							<div>
 								<div><xsl:value-of select="@name" /></div>
 								<div><xsl:value-of select="." /></div>
