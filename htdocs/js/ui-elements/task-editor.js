@@ -129,6 +129,12 @@ TaskEditor.prototype.Open = function(id)
 		$("#task-editor select#retryretval").removeAttr('disabled');
 	}
 	
+	/**** Remote execution tab ****/
+	$("#task-editor input#user").val(this.task.GetAttribute('user'));
+	$("#task-editor input#host").val(this.task.GetAttribute('host'));
+	$("#task-editor input#queue_host").val(this.task.GetAttribute('queue_host'));
+	
+	/**** Stdin tab ****/
 	var stdin_mode = this.task.GetAttribute('stdinmode');
 	$("#task-editor select#stdinmode").val(stdin_mode);
 	
