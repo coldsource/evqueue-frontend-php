@@ -86,7 +86,7 @@ $(document).ready(function() {
 	// Graph
 	$('#executing-workflows-pannel').delegate('.fa-info','mouseover', function(e) {
 		DrawGraph($('#workflow-stats-graph div.chart'),[
-			{prct:$(this).parents('tr').data('running_tasks'),label:'Executing tasks',color:'#b6ffb2'},
+			{prct:$(this).parents('tr').data('running_tasks')-$(this).parents('tr').data('queued_tasks'),label:'Executing tasks',color:'#b6ffb2'},
 			{prct:$(this).parents('tr').data('retrying_tasks'),label:'Retrying tasks',color:'#ffb651'},
 			{prct:$(this).parents('tr').data('queued_tasks'),label:'Queued tasks',color:'#b5d4f2'},
 			{prct:$(this).parents('tr').data('error_tasks'),label:'Error tasks',color:'red'},
