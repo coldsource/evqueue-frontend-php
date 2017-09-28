@@ -62,6 +62,18 @@ function TaskEditor()
 			input.val(XPathHelperPath($('#xpath-selector')));
 		});
 	});
+	
+	$('#tab-remote span.fa-magic').click(function() {
+		var input = $(this).parent().find('input');
+		
+		OpenXPathHelper();
+		
+		$('#xpath-selector #add_xpath_node').off('click').on('click', function() {
+			$('#xpath-selector').dialog('close');
+			
+			input.val('{'+XPathHelperPath($('#xpath-selector'))+'}');
+		});
+	});
 }
 
 TaskEditor.prototype.Open = function(id)

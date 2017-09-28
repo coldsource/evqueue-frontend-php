@@ -92,14 +92,17 @@
 					<div>
 						<label class="formLabel" for="user">User</label>
 						<input id="user" />
+						&#160;<span class="faicon fa-magic"></span>
 					</div>
 					<div>
 						<label class="formLabel" for="host">Host</label>
 						<input id="host" />
+						&#160;<span class="faicon fa-magic"></span>
 					</div>
 					<div>
 						<label class="formLabel" for="queue_host">Queue host</label>
 						<input id="queue_host" />
+						&#160;<span class="faicon fa-magic"></span>
 					</div>
 				</form>
 			</div>
