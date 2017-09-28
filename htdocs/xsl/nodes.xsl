@@ -25,6 +25,10 @@
 					<td><xsl:value-of select="@name" /></td>
 				</tr>
 				<tr>
+					<td>Uptime</td>
+					<td><xsl:value-of select="/page/cluster-response/response[@node = current()/@name]/@uptime" /> seconds</td>
+				</tr>
+				<tr>
 					<td>Node version</td>
 					<td><xsl:value-of select="/page/cluster-response/response[@node = current()/@name]/@version" /></td>
 				</tr>
