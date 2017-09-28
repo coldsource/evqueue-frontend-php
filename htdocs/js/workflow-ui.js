@@ -207,23 +207,28 @@ function SaveWorkflow()
 
 function SaveNotifications()
 {
-	var promise = new jQuery.Deferred();
+	var promise = new jQuery.Deferred();  // global promise to return, which waits for all evqueueAPI calls
 	
 	evqueueAPI({
 		group: 'workflow',
 		action: 'clear_notifications',
 		attributes: {id:workflow_id}
 	}).done(function() {
+		
+		var deferreds = [];
 		$('#subscribednotifications input:checked').each(function() {
 			var notification_id = $(this).parents('tr').data('id');
-			evqueueAPI({
+			var d = evqueueAPI({
 				group: 'workflow',
 				action: 'subscribe_notification',
 				attributes: {id:workflow_id,notification_id:notification_id}
 			});
+			deferreds.push(d);
 		});
 		
-		promise.resolve();
+		$.when.apply($,deferreds).done( function () {
+			promise.resolve();
+		});
 	});
 	
 	return promise;
