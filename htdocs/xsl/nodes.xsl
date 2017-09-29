@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0" xmlns:php="http://php.net/xsl">
 	<xsl:import href="templates/main-template.xsl" />
 	<xsl:import href="templates/git.xsl" />
 
@@ -26,7 +26,7 @@
 				</tr>
 				<tr>
 					<td>Uptime</td>
-					<td><xsl:value-of select="/page/cluster-response/response[@node = current()/@name]/@uptime" /> seconds</td>
+					<td><xsl:value-of select="php:function('humanTime',string(/page/cluster-response/response[@node = current()/@name]/@uptime))" /> seconds</td>
 				</tr>
 				<tr>
 					<td>Node version</td>
