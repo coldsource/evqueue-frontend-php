@@ -2,7 +2,7 @@
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
 	<xsl:import href="templates/main-template.xsl" />
 	
-	<xsl:variable name="topmenu" select="'system-state'" />
+	<xsl:variable name="topmenu" select="'statistics'" />
 	
 	<xsl:variable name="javascript">
 		<src>js/system-statistics.js</src>

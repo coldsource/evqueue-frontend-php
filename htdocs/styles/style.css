@@ -449,6 +449,15 @@ div.install_content input[type=submit] {
 }
 
 /* Instances statistics */
+div.graph-period form {
+	display:inline-block;
+}
+
+div.graph-period input {
+	vertical-align:bottom;
+	padding:0px;
+}
+
 div.graph-container div.graph {
 	height:250px;
 }

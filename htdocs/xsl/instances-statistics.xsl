@@ -3,7 +3,7 @@
 	<xsl:import href="templates/main-template.xsl" />
 	<xsl:import href="templates/git.xsl" />
 
-	<xsl:variable name="topmenu" select="'settings'" />
+	<xsl:variable name="topmenu" select="'statistics'" />
 	
 	<xsl:variable name="javascript">
 		<src>js/morris/morris.min.js</src>
@@ -18,6 +18,20 @@
 	<xsl:key name="groups" match="/page/workflows/workflow/@group" use="." />
 
 	<xsl:template name="content">
+		<div class="graph-period">
+			Please choose graph period
+			<form>
+				<input type="radio" name="groupby" value="hour" />&#160;Hourly
+				<xsl:text> - </xsl:text>
+				<input type="radio" name="groupby" value="day" checked="checked" />&#160;Daily
+				<xsl:text> - </xsl:text>
+				<input type="radio" name="groupby" value="month" />&#160;Daily
+				<xsl:text> - </xsl:text>
+				<input type="radio" name="groupby" value="year" />&#160;Yearly
+				<xsl:text> - </xsl:text>
+			</form>
+		</div>
+		
 		<h2>General summary</h2>
 		<div class="graph-container" data-group=":all">
 			<div class="graph" id="graph"></div>
@@ -43,7 +57,7 @@
 					<xsl:for-each select="/page/workflows/workflow[@group = $groupName]">
 						<div class="graph-workflow">
 							<input type="checkbox" name="{@name}" />
-							<label><xsl:value-of select="@name" /></label>
+							<label for="{@name}"><xsl:value-of select="@name" /></label>
 						</div>
 					</xsl:for-each>
 				</div>

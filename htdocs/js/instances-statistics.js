@@ -6,24 +6,36 @@ $(document).ready(function() {
 	jQuery.getJSON('ajax/get-nodes.php',function(nodes_local) {
 		nodes = nodes_local;
 		
-		evqueueAPI({
-			group: 'instances',
-			action: 'list',
-			attributes: {'groupby': groupby, 'limit':10000}
-		}).done(function(xml) {
-			statistics_data_dom = xml;
-			
-			
-			$('.graph-container').each(function() {
-				refresh_graph($(this));
-			});
-		});
+		refresh_all_graphs();
 	});
 	
 	$('.graph-container').delegate('input','change',function() {
 		refresh_graph($(this).parents('.graph-container'));
 	});
+	
+	$('.graph-period input').change(function() {
+		groupby = $('.graph-period input:checked').val();
+		refresh_all_graphs();
+	});
 });
+
+function refresh_all_graphs()
+{
+	Wait();
+	evqueueAPI({
+		group: 'instances',
+		action: 'list',
+		attributes: {'groupby': groupby, 'limit':10000}
+	}).done(function(xml) {
+		statistics_data_dom = xml;
+		
+		Ready();
+		
+		$('.graph-container').each(function() {
+			refresh_graph($(this));
+		});
+	});
+}
 
 function refresh_graph(graph_container)
 {
