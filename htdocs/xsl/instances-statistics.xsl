@@ -52,7 +52,7 @@
 			</xsl:choose>
 			
 			<div class="graph-container" data-group="{$groupName}">
-				<div class="graph" id="graph-{$groupName}"></div>
+				<div class="graph" id="graph-{translate($groupName,' ','-')}"></div>
 				<div class="graph-workflows">
 					<xsl:for-each select="/page/workflows/workflow[@group = $groupName]">
 						<div class="graph-workflow">

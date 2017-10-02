@@ -136,7 +136,8 @@ function refresh_graph(graph_container)
 		
 	}
 	
-	var graph_id = group!=':all'?'graph-'+group:'graph';
+	var graph_id = group!=':all'?'graph-'+group.replace(/ /g,'-'):'graph';
+	console.log(graph_id);
 	$('#'+graph_id).empty();
 	new Morris.Line({
 		element: graph_id,
