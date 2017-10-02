@@ -447,3 +447,23 @@ div.install_content input[type=submit] {
 	margin-right:auto;
 	margin-bottom:10px;
 }
+
+/* Instances statistics */
+div.graph-container div.graph {
+	height:250px;
+}
+
+div.graph-container div.graph-workflows {
+	margin-top:1em;
+}
+
+div.graph-container div.graph-workflow {
+	display:inline-block;
+	margin-right:2em;
+	margin-bottom:0.5em;
+}
+
+div.graph-container div.graph-workflow input {
+	vertical-align:bottom;
+	margin:0px 5px 0px 0px;
+}
