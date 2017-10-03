@@ -177,6 +177,12 @@
 								<div><xsl:value-of select="@error" /></div>
 							</div>
 						</xsl:if>
+						<xsl:if test="@details">
+							<div>
+								<div>Infos</div>
+								<div><xsl:value-of select="@details" /></div>
+							</div>
+						</xsl:if>
 						<div>
 							<div>Return value</div>
 							<div><xsl:value-of select="@retval" /></div>
