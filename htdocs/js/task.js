@@ -158,7 +158,9 @@ function getTaskUsedIn ()
 				var taskName = this.getAttribute('name');
 				if (!(taskName in taskUsedIn))
 					taskUsedIn[taskName] = [];
-				taskUsedIn[taskName].push(workflow.name);
+				
+				if (taskUsedIn[taskName].indexOf(workflow.name) == -1)
+					taskUsedIn[taskName].push(workflow.name);
 			});
 		});
 		
