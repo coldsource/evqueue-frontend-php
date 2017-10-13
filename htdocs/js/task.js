@@ -128,3 +128,55 @@ function RefreshPage()
 		});
 	});
 }
+
+
+var taskUsedIn = null;
+function getTaskUsedIn ()
+{
+	var promise = new jQuery.Deferred();
+	
+	if (taskUsedIn !== null) {
+		promise.resolve();
+		return promise;
+	}
+	taskUsedIn = {};
+	
+	evqueueAPI({
+		group: 'workflows',
+		action: 'list',
+		attributes: {full: 'yes'}
+	}).done(function(xml) {
+		var workflows = xml.Query('/response/workflow',xml.documentElement);
+		$.each( workflows, function () {
+			var workflow = {
+				id: this.getAttribute('id'),
+				name: this.getAttribute('name')
+			};
+			var used_tasks = xml.Query('.//task',this);
+			$.each( used_tasks, function () {
+				var taskName = this.getAttribute('name');
+				if (!(taskName in taskUsedIn))
+					taskUsedIn[taskName] = [];
+				taskUsedIn[taskName].push(workflow.name);
+			});
+		});
+		for (taskName in taskUsedIn) {
+			var tr = $('tr').filter(function () { return this.getAttribute('data-name') == taskName; });
+			var ul = $('<ul class="js-workflowsUsingTask unstyled secondaryInfo hidden"><li>'+taskUsedIn[taskName].length+' workflow(s) using this task</li></ul>');
+			tr.find('td:first-child').append(ul);
+			$.each(taskUsedIn[taskName], function () {
+				ul.append( '<li>- workflow '+this.trim()+'</li>' );
+			});
+		}
+		promise.resolve();
+	});
+	
+	return promise;
+}
+
+$(document).delegate('tr.group .fa-link', 'click', function () {
+	var tr = $(this).parents('tr.group:eq(0)');
+	getTaskUsedIn().done( function () {
+		tr.nextUntil('.groupspace,.group','.evenOdd').find('.js-workflowsUsingTask').toggleClass('hidden');
+	});
+});
