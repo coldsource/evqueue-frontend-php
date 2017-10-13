@@ -41,6 +41,7 @@
 									No group
 								</xsl:otherwise>
 							</xsl:choose>
+							<span class="faicon fa-link" title="View usage information for workflows in this group"></span>
 						</td>
 					</tr>
 
@@ -64,7 +65,7 @@
 							</xsl:choose>
 						</xsl:variable>
 						
-						<tr class="evenOdd" data-id = "{@id}">
+						<tr class="evenOdd" data-id="{@id}" data-name="{@name}">
 							<td>
 								<span>
 									<xsl:value-of select="@name" />

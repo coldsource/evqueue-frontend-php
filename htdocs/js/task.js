@@ -141,6 +141,7 @@ function getTaskUsedIn ()
 	}
 	taskUsedIn = {};
 	
+	// Check which workflows use which tasks (and which tasks are unused)
 	evqueueAPI({
 		group: 'workflows',
 		action: 'list',
@@ -160,6 +161,8 @@ function getTaskUsedIn ()
 				taskUsedIn[taskName].push(workflow.name);
 			});
 		});
+		
+		// Append HTML in every task <tr>
 		for (taskName in taskUsedIn) {
 			var tr = $('tr').filter(function () { return this.getAttribute('data-name') == taskName; });
 			var ul = $('<ul class="js-workflowsUsingTask unstyled success hidden"><li>'+taskUsedIn[taskName].length+' workflow(s) using this task</li></ul>');
