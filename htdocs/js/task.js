@@ -169,7 +169,7 @@ function getTaskUsedIn ()
 			});
 		}
 		
-		$('tr.evenOdd:not(:has(.js-workflowsUsingTask))').find('td:first-child').append('<p class="error">No workflow uses this task.</p>');
+		$('tr.evenOdd:not(:has(.js-workflowsUsingTask))').find('td:first-child').append('<p class="js-workflowsUsingTask error hidden">No workflow uses this task.</p>');
 		
 		promise.resolve();
 	});
