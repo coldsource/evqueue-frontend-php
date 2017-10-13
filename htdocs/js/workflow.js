@@ -156,17 +156,17 @@ function getWorkflowUsedIn ()
 			if (!(schedule.workflow in workflowUsedIn))
 				workflowUsedIn[schedule.workflow] = [];
 			workflowUsedIn[schedule.workflow].push(schedule.id);
-			
-			// Append HTML in every workflow <tr>
-			for (workflowName in workflowUsedIn) {
-				var tr = $('tr').filter(function () { return this.getAttribute('data-name') == workflowName; });
-				tr.find('td:first-child').append($('<p class="js-schedulesUsingWorkflow unstyled success hidden">'+workflowUsedIn[workflowName].length+' schedule(s) using this workflow</p>'));
-			}
-			
-			$('tr.evenOdd:not(:has(.js-schedulesUsingWorkflow))').find('td:first-child').append('<p class="js-schedulesUsingWorkflow warning hidden">No schedule using this workflow.</p>');
-			
-			promise.resolve();
 		});
+		
+		// Append HTML in every workflow <tr>
+		for (workflowName in workflowUsedIn) {
+			var tr = $('tr').filter(function () { return this.getAttribute('data-name') == workflowName; });
+			tr.find('td:first-child').append($('<p class="js-schedulesUsingWorkflow unstyled success hidden">'+workflowUsedIn[workflowName].length+' schedule(s) using this workflow</p>'));
+		}
+		
+		$('tr.evenOdd:not(:has(.js-schedulesUsingWorkflow))').find('td:first-child').append('<p class="js-schedulesUsingWorkflow warning hidden">No schedule using this workflow.</p>');
+		
+		promise.resolve();
 	});
 	
 	return promise;
