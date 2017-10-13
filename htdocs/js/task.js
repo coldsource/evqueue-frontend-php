@@ -165,7 +165,7 @@ function getTaskUsedIn ()
 			var ul = $('<ul class="js-workflowsUsingTask unstyled success hidden"><li>'+taskUsedIn[taskName].length+' workflow(s) using this task</li></ul>');
 			tr.find('td:first-child').append(ul);
 			$.each(taskUsedIn[taskName], function () {
-				ul.append( '<li>- workflow '+this.trim()+'</li>' );
+				ul.append( '<li>- '+this.trim()+'</li>' );
 			});
 		}
 		
