@@ -56,8 +56,6 @@ ul.unstyled {
 	padding-left: 0;
 }
 
-.secondaryInfo { color: #7f8c8d; }
-
 div.prctgradient {
 	background:linear-gradient(to right,#E5FCE6,#8BE082 50%,#F7B471 80%,#FF6666 100%);
 }

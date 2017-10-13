@@ -162,12 +162,15 @@ function getTaskUsedIn ()
 		});
 		for (taskName in taskUsedIn) {
 			var tr = $('tr').filter(function () { return this.getAttribute('data-name') == taskName; });
-			var ul = $('<ul class="js-workflowsUsingTask unstyled secondaryInfo hidden"><li>'+taskUsedIn[taskName].length+' workflow(s) using this task</li></ul>');
+			var ul = $('<ul class="js-workflowsUsingTask unstyled success hidden"><li>'+taskUsedIn[taskName].length+' workflow(s) using this task</li></ul>');
 			tr.find('td:first-child').append(ul);
 			$.each(taskUsedIn[taskName], function () {
 				ul.append( '<li>- workflow '+this.trim()+'</li>' );
 			});
 		}
+		
+		$('tr.evenOdd:not(:has(.js-workflowsUsingTask))').find('td:first-child').append('<p class="error">No workflow uses this task.</p>');
+		
 		promise.resolve();
 	});
 	
