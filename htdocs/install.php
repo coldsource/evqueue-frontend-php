@@ -25,7 +25,7 @@ if(is_file('/etc/evqueue/conf/queueing.php') || is_file(__DIR__ . '/includes/con
 {
 	if(is_file('/etc/evqueue/conf/queueing.php'))
 		require '/etc/evqueue/conf/queueing.php';
-	else is_file(__DIR__ . '/includes/conf/queueing.php')
+	else if(is_file(__DIR__ . '/includes/conf/queueing.php'))
 		require __DIR__ . '/includes/conf/queueing.php';
 	
 	if(isset($QUEUEING) && count($QUEUEING) > 0)
