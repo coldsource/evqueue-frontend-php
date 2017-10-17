@@ -22,7 +22,15 @@ session_start();
 session_destroy();
 
 if(is_file('/etc/evqueue/conf/queueing.php') || is_file(__DIR__ . '/includes/conf/queueing.php'))
-	die('Configuration file already exists, install is disabled');
+{
+	if(is_file('/etc/evqueue/conf/queueing.php'))
+		require '/etc/evqueue/conf/queueing.php';
+	else is_file(__DIR__ . '/includes/conf/queueing.php')
+		require __DIR__ . '/includes/conf/queueing.php';
+	
+	if(isset($QUEUEING) && count($QUEUEING) > 0)
+		die('Configuration file already exists, install is disabled');
+}
 
 require_once __DIR__ . '/includes/inc/logger.php';
 require_once __DIR__ . '/includes/lib/XSLEngine.php';
