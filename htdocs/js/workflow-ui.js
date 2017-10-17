@@ -48,7 +48,7 @@ $(document).ready(function() {
 				action: 'list_notifications',
 				attributes: {'id': workflow_id}
 			}).done(function(xml) {
-				var notifications = xml.Query('/response/notification',xml.documentElement)
+				var notifications = xml.Query('/response/notification',xml.documentElement);
 				for(var i=0;i<notifications.length;i++)
 					$('#subscribednotifications tr[data-id='+notifications[i].getAttribute('id')+'] input').prop('checked',true);
 				

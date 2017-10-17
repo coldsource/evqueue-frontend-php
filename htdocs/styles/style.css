@@ -27,7 +27,7 @@ tr:hover {
 	cursor:pointer;
 }
 .success { color: #27ae60 }
-.errorThenSuccess { color: #e67e22; }
+.errorThenSuccess, .warning { color: #e67e22; }
 .error { color: #c0392b; }
 .skipped { color: #95a5a6; }
 

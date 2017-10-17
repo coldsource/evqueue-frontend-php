@@ -128,3 +128,63 @@ function RefreshPage()
 		});
 	});
 }
+
+
+var taskUsedIn = null;
+function getTaskUsedIn ()
+{
+	var promise = new jQuery.Deferred();
+	
+	if (taskUsedIn !== null) {
+		promise.resolve();
+		return promise;
+	}
+	taskUsedIn = {};
+	
+	// Check which workflows use which tasks (and which tasks are unused)
+	evqueueAPI({
+		group: 'workflows',
+		action: 'list',
+		attributes: {full: 'yes'}
+	}).done(function(xml) {
+		var workflows = xml.Query('/response/workflow',xml.documentElement);
+		$.each( workflows, function () {
+			var workflow = {
+				id: this.getAttribute('id'),
+				name: this.getAttribute('name')
+			};
+			var used_tasks = xml.Query('.//task',this);
+			$.each( used_tasks, function () {
+				var taskName = this.getAttribute('name');
+				if (!(taskName in taskUsedIn))
+					taskUsedIn[taskName] = [];
+				
+				if (taskUsedIn[taskName].indexOf(workflow.name) == -1)
+					taskUsedIn[taskName].push(workflow.name);
+			});
+		});
+		
+		// Append HTML in every task <tr>
+		for (taskName in taskUsedIn) {
+			var tr = $('tr').filter(function () { return this.getAttribute('data-name') == taskName; });
+			var ul = $('<ul class="js-workflowsUsingTask unstyled success hidden"><li>'+taskUsedIn[taskName].length+' workflow(s) using this task</li></ul>');
+			tr.find('td:first-child').append(ul);
+			$.each(taskUsedIn[taskName], function () {
+				ul.append( '<li>- '+this.trim()+'</li>' );
+			});
+		}
+		
+		$('tr.evenOdd:not(:has(.js-workflowsUsingTask))').find('td:first-child').append('<p class="js-workflowsUsingTask error hidden">No workflow uses this task.</p>');
+		
+		promise.resolve();
+	});
+	
+	return promise;
+}
+
+$(document).delegate('tr.group .fa-link', 'click', function () {
+	var tr = $(this).parents('tr.group:eq(0)');
+	getTaskUsedIn().done( function () {
+		tr.nextUntil('.groupspace,.group','.evenOdd').find('.js-workflowsUsingTask').toggleClass('hidden');
+	});
+});
