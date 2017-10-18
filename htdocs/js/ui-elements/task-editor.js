@@ -351,6 +351,8 @@ TaskEditor.prototype.RefreshInputParts = function(input,value_div)
 			
 			if(part.task && part.node)
 				val = "task:"+part.task+", node:"+part.node;
+			else if(part.task)
+				val = "task:"+part.task;
 			else if(part.parameter)
 				val = "parameter:"+part.parameter;
 			else

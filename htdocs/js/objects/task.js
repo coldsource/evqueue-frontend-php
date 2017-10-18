@@ -105,7 +105,7 @@ Task.prototype.GetInputs = function()
 					value.task = matches[1];
 					value.node = matches[2];
 				}
-				else if((matches = value.val.match(/^evqGetCurrentJob\(\)\/evqGetContext\(\)\/(.*)$/))!=null)
+				else if((matches = value.val.match(/^evqGetCurrentJob\(\)\/evqGetContext\(\)(?:\/(.*))?$/))!=null)
 				{
 					value.task ='Current job context';
 					value.node = matches[1];
