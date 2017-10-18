@@ -158,7 +158,12 @@
 						<xsl:for-each select="input[count(@status)=0 or @status!='SKIPPED']">
 							<div>
 								<div><xsl:value-of select="@name" /></div>
-								<div><xsl:value-of select="." /></div>
+								<xsl:if test="count(@error) = 0">
+									<div><xsl:value-of select="." /></div>
+								</xsl:if>
+								<xsl:if test="count(@error) != 0">
+									<div class="error"><xsl:value-of select="@error" /></div>
+								</xsl:if>
 							</div>
 						</xsl:for-each>
 					</fieldset>
