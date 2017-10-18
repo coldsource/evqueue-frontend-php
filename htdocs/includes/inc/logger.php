@@ -28,6 +28,11 @@ if(!extension_loaded('zip'))
 	die("PHP extension 'Zip' is not installed");
 }
 
+if(!extension_loaded('xml'))
+{
+	die("PHP extension 'XML' is not installed");
+}
+
 require_once __DIR__ . '/../lib/Logger.php';
 
 new Logger('queueing');
