@@ -10,6 +10,6 @@ Vcs-Browser: https://github.com/coldsource/evqueue-frontend-php
 
 Package: evqueue-frontend-php
 Architecture: all
-Depends: apache2, libapache2-mod-php5, php5-curl, php5-mysql, php5-xsl, ${misc:Depends}
+Depends: apache2, libapache2-mod-php5, php5-mysql, php5-xsl, ${misc:Depends}
 Description: evQueue web board
  evQueue web interface: simply create and run workflows
