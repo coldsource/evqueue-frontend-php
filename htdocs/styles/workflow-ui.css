@@ -37,6 +37,7 @@ div#workflow {
 	margin-top:30px;
 	border:1px solid;
 	font-size:10px;
+	color: #2c3e50;
 }
 
 div.branch {
@@ -46,23 +47,30 @@ div.branch {
 }
 
 div.node {
-	border:1px solid;
+	border:1px solid #95a5a6;
+	border-radius: 4px;
 	display:inline-block;
 	width:200px;
 	height:100px;
 	position:relative;
 	margin:auto;
-	background-color:white;
+	background-color: #ecf0f1;
 	vertical-align:top;
 	font-size:12px;
 }
 
 div.node div.title {
-	background-color:#d0d0d0;
+	background-color: #bdc3c7;
+	padding: 5px 0;
+	color: #34495e;
 }
 
 div.node div.title span {
 	float:left;
+}
+
+div.jobtask {
+	margin: 5px 0;
 }
 
 div.nodesep {
@@ -81,13 +89,13 @@ div.presep div {
 	width:0px;
 	height:10px;
 	border:1px solid;
-	border-color:red;
+	border-color: #e74c3c;
 }
 
 div.sep {
 	border:1px solid;
 	height:0px;
-	border-color:red;
+	border-color: #e74c3c;
 }
 
 div.nosep {
@@ -109,7 +117,7 @@ div.postsep {
 	width:0px;
 	height:10px;
 	border:1px solid;
-	border-color:red;
+	border-color: #e74c3c;
 	margin:auto;
 }
 
