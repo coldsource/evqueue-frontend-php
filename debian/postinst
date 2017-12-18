@@ -1,4 +1,6 @@
-#!/bin/bash -e
+#!/bin/bash
+
+set -e
 
 if [ "$1" = "configure" ]; then
 
@@ -9,7 +11,7 @@ if [ "$1" = "configure" ]; then
 		a2enconf evqueue
 	fi
 	
-	if [ -x /usr/sbin/invoke-rc.d ]; then
+	if [ -x invoke-rc.d ]; then
 		invoke-rc.d apache2 restart
 	else
 		service apache2 restart

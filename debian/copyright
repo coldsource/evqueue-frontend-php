@@ -1,7 +1,55 @@
-Files: images/*
-Copyright: Victor Ivlichev (Free Silver Button Icons)
-License : Creative Commons - Attribution 3.0 United States - CC BY 3.0 US.
+Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: evQueue frontend PHP
+Upstream-Contact: Thibault Kummer <bob@coldsource.net>
+Source: https://github.com/coldsource/evqueue-frontend-php
 
 Files: *
-Copyright: 2016, Thibault KUMMER
-License: GPL-3+ see /usr/share/common-licenses
+Copyright: 2016, Thibault KUMMER, Nicolas JEAN, Christophe MARTI
+License: GPL-3+
+License-Grant:
+    This is free software; you may copy, modify, and/or distribute this work
+    under the terms of the GNU General Public License as published by the Free
+    Software Foundation; version 3 of that License or later.
+    No warranty expressed or implied.
+
+Files:
+    htdocs/js/morris/morris.js
+    htdocs/js/morris/morris.min.js
+    htdocs/styles/morris/*
+Copyright: Copyright 2014 Olly Smith All rights reserved.
+License: BSD-2-Clause
+
+Files:
+    htdocs/js/morris/raphael.js
+    htdocs/js/morris/raphael.min.js
+Copyright:
+    Copyright © 2008-2016 Dmitry Baranovskiy (http://raphaeljs.com)
+    Copyright © 2008-2016 Sencha Labs (http://sencha.com)
+License: MIT
+
+Files:
+    htdocs/js/jquery/*
+    htdocs/styles/jquery/*
+Copyright: Copyright jQuery Foundation and other contributors
+License: MIT
+
+Files: htdocs/styles/font-awesome.css
+Copyright: Copyright Font Awesome
+License: MIT
+
+Files: htdocs/styles/fonts/*
+Copyright: Copyright Font Awesome
+License: SIL-OFL-1.1
+
+License: GPL-3+
+    On Debian systems, the complete text of the GNU General Public License
+    version 3 can be found in ‘/usr/share/common-licenses/GPL-3’.
+
+License: MIT
+    https://opensource.org/licenses/mit-license.php
+
+License: SIL-OFL-1.1
+    http://scripts.sil.org/OFL
+
+License: BSD-2-Clause
+    https://opensource.org/licenses/BSD-2-Clause

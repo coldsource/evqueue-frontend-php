@@ -1,4 +1,6 @@
-#!/bin/bash -e
+#!/bin/bash
+
+set -e
 
 case "$1" in
 	failed-upgrade|abort-install|abort-upgrade|disappear|upgrade)
@@ -29,7 +31,7 @@ case "$1" in
 		exit 1
 esac
 
-if [ -x /usr/sbin/invoke-rc.d ]; then
+if [ -x invoke-rc.d ]; then
 	invoke-rc.d apache2 restart
 else
 	/etc/init.d/apache2 restart
