@@ -10,7 +10,7 @@ Vcs-Browser: https://github.com/coldsource/evqueue-frontend-php
 
 Package: evqueue-frontend-php
 Architecture: all
-Depends: apache2, libapache2-mod-php7.0, php7.0-mysql, php7.0-xsl, php7.0-xml, ${misc:Depends}
+Depends: apache2, libapache2-mod-php7.0, php7.0-mysql, php7.0-xsl, php7.0-xml, fonts-font-awesome, libjs-raphael, ${misc:Depends}
 Description: evQueue web management and configuration interface
  evQueue frontend is a web interface used to configure and manage
  the evqueue-core daemon. Written in PHP and Javascript, it allows
