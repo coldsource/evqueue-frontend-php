@@ -71,6 +71,7 @@ div.node div.title span {
 
 div.jobtask {
 	margin: 5px 0;
+	cursor: pointer;
 }
 
 div.nodesep {
