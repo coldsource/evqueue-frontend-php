@@ -167,6 +167,13 @@ Task.prototype.AddInput = function(name)
 	input.setAttribute('name',name);
 	this.task.appendChild(input);
 	
+	// push <stdin> to the end of the "inputs" list (allows for simple numbering of regular <input>s)
+	var stdin = this.task.ownerDocument.Query('stdin',this.task);
+	if (stdin.length > 0) {
+		this.task.removeChild(stdin[0]);
+		this.task.appendChild(stdin[0]);  // <stdin> now after all <input>s
+	}
+	
 	return true;
 }
 
