@@ -181,11 +181,14 @@ Job.prototype.Draw = function()
 	html += '</div>';
 	for(var i=0;i<tasks.length;i++)
 	{
-		html += '<div class="jobtask" data-type="jobtask" data-id="'+tasks[i].GetID()+'">'+tasks[i].GetName();
+		html += '<div class="jobtask" data-type="jobtask" data-id="'+tasks[i].GetID()+'">' + tasks[i].GetName();
 		if(tasks[i].GetAttribute('condition') || tasks[i].GetAttribute('iteration-condition'))
 			html += '&nbsp;<span class="faicon fa-code-fork"></span>';
 		if(tasks[i].GetAttribute('loop'))
 			html += '&nbsp;<span class="faicon fa-repeat"></span>';
+		var queue = tasks[i].GetAttribute('queue');
+		if(queue && queue != 'default')
+			html += '<span class="faicon fas fa-server" title="Queue: '+queue+'">&nbsp;</span>';
 		html += '</div>';
 	}
 	return html;

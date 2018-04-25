@@ -115,7 +115,7 @@ TaskEditor.prototype.Open = function(id)
 	$('#task-editor input#iteration-condition').val(iterationcondition);
 	
 	var queue = this.task.GetAttribute('queue');
-	$("#task-editor select#queue option[value='"+queue+"']").attr("selected", "selected");
+	$("#task-editor select#queue").val(queue);
 	
 	var retry_schedule = this.task.GetAttribute('retry_schedule');
 	$("#task-editor select#retryschedule").val(retry_schedule);
