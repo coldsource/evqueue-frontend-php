@@ -23,5 +23,6 @@ require_once __DIR__ . '/../includes/inc/auth_check.php';
 $xsl = new XSLEngine();
 
 $xsl->AddFragment(['queues' => $xsl->Api('queuepool', 'list')]);
+$xsl->AddFragment(['workflows' => $xsl->Api('workflows', 'list', ['full' => 'yes'])]);
 $xsl->DisplayXHTML('../xsl/ajax/list-queues.xsl');
 ?>

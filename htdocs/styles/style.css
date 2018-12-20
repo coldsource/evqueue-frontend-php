@@ -305,6 +305,25 @@ td.tdActions {
 	text-align:center;
 }
 
+
+/* Linked objects to display next to a 'parent' object, e.g. workflows using a given retry schedule */
+ul.linkedObjects {
+	font-size: 90%;
+	list-style: none;
+	display: flex;
+	flex-wrap: wrap;
+	margin: 0;
+	padding: 0;
+}
+
+ul.linkedObjects li {
+	margin: 0.3em;
+	border: 1px solid #bdc3c7;
+	border-radius: 3px;
+	padding: 0 0.2em;
+}
+
+
 /* Boxes */
 ul.scheduleParameters {
 	display:inline-block;

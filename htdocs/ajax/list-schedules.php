@@ -23,5 +23,6 @@ require_once __DIR__ . '/../includes/inc/auth_check.php';
 $xsl = new XSLEngine();
 
 $xsl->AddFragment(['schedules' => $xsl->Api('retry_schedules', 'list')]);
+$xsl->AddFragment(['workflows' => $xsl->Api('workflows', 'list', ['full' => 'yes'])]);
 $xsl->DisplayXHTML('../xsl/ajax/list-schedules.xsl');
 ?>
