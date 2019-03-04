@@ -11,6 +11,7 @@
 			<table>
 				<tr>
 					<th>Name</th>
+					<th>Workflows using the retry schedule</th>
 					<th class="thActions" style="width:60px;">Actions</th>
 				</tr>
 
@@ -18,6 +19,22 @@
 					<tr data-id="{@id}">
 						<td>
 							<xsl:value-of select="@name" />
+						</td>
+						<td>
+							<xsl:variable name="scheduleName" select="@name" />
+							<xsl:variable name="wfs" select="/page/workflows/workflow[count(.//*[@retry_schedule = current()/@name]) > 0]" />
+							
+							<xsl:if test="count($wfs) > 0">
+								<ul class="linkedObjects" >
+									<xsl:for-each select="$wfs">
+										<li title="Workflow '{@name}' uses retry schedule '{$scheduleName}'">
+											<a href="workflow-ui.php?workflow_id={@id}">
+												<xsl:value-of select="@name" />
+											</a>
+										</li>
+									</xsl:for-each>
+								</ul>
+							</xsl:if>
 						</td>
 						<td class="tdActions">
 							<span class="faicon fa-edit" title="Edit retry schedule"></span>

@@ -191,6 +191,11 @@ Job.prototype.Draw = function()
 			html += '<span class="faicon fa-server" title="Queue: '+queue+'"></span>';
 		if(tasks[i].GetAttribute('retry_schedule'))
 			html += '<span class="faicon fa-bug" title="Retry schedule: '+tasks[i].GetAttribute('retry_schedule')+'"></span>';
+		
+		// remote execution
+		if(tasks[i].GetAttribute('host') || tasks[i].GetAttribute('user'))
+			html += '<span class="fas faicon fa-terminal" style="color: white; background-color: #2c3e50; padding: 10px; padding: 1px 3px; border-radius: 3px;" title="remote execution: ' + tasks[i].GetAttribute('user') + '@' + tasks[i].GetAttribute('host') + '"></span>';
+		
 		html += '</div>';
 	}
 	return html;

@@ -11,6 +11,7 @@
 			<table>
 				<tr>
 					<th>Name</th>
+					<th>Workflows using the queue</th>
 					<th style="width:100px;">Scheduler</th>
 					<th style="width:50px;">Concurrency</th>
 					<th style="width:50px;">Dynamic</th>
@@ -21,6 +22,22 @@
 					<tr class="evenOdd" data-id="{@id}">
 						<td>
 							<xsl:value-of select="@name" />
+						</td>
+						<td>
+							<xsl:variable name="queueName" select="@name" />
+							<xsl:variable name="wfs" select="/page/workflows/workflow[count(.//*[@queue = current()/@name]) > 0]" />
+							
+							<xsl:if test="count($wfs) > 0">
+								<ul class="linkedObjects" >
+									<xsl:for-each select="$wfs">
+										<li title="Workflow '{@name}' uses queue '{$queueName}'">
+											<a href="workflow-ui.php?workflow_id={@id}">
+												<xsl:value-of select="@name" />
+											</a>
+										</li>
+									</xsl:for-each>
+								</ul>
+							</xsl:if>
 						</td>
 						<td class="center">
 							<xsl:value-of select="@scheduler" />
