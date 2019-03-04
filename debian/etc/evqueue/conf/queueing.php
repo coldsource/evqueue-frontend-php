@@ -18,7 +18,17 @@
   * Authors: Nicolas Jean, Christophe Marti 
   */
 
-$QUEUEING = [
-	'tcp://localhost:5000'
-];
+// Detect if running in docker
+if(is_file("/.dockerenv"))
+{
+	$QUEUEING = [
+		'tcp://evqueue-core:5000'
+	];
+}
+else
+{
+	$QUEUEING = [
+		'tcp://localhost:5000'
+	];
+}
 ?>
