@@ -32,7 +32,7 @@ if(isset($_GET['id']))
 		if(isset($_GET['download']))
 		{
 			header('Content-type: application/gzip');
-			header("Content-Disposition: attachment; filename='datastore-{$_GET['id']}.gz'");
+			header("Content-Disposition: attachment; filename=datastore-{$_GET['id']}.gz");
 		}
 		else
 		{
@@ -44,7 +44,7 @@ if(isset($_GET['id']))
 	{
 		header('Content-type: text/plain');
 		if(isset($_GET['download']))
-			header("Content-Disposition: attachment; filename='datastore-{$_GET['id']}.txt'");
+			header("Content-Disposition: attachment; filename=datastore-{$_GET['id']}.txt");
 	}
 
 	echo base64_decode($data);
