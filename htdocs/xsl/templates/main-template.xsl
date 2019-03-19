@@ -146,32 +146,32 @@
 		</ul>
 		<ul class="submenu" id="submenu-system-state">
 			<xsl:if test="$topmenu!='system-state'"><xsl:attribute name="style">display:none;</xsl:attribute></xsl:if>
-			<li><a href="{$SITE_BASE}index.php"><span class="faicon fa-cubes"></span>Workflows instances</a></li>
-			<li><a href="{$SITE_BASE}system_state.php"><span class="faicon fa-hand-stop-o"></span>Queues</a></li>
-			<li><a href="{$SITE_BASE}system_configuration.php"><span class="faicon fa-terminal"></span>Running configuration</a></li>
+			<li><a href="{$SITE_BASE}index.php"><span class="faicon fa-cubes"></span>&#160;Workflows instances</a></li>
+			<li><a href="{$SITE_BASE}system_state.php"><span class="faicon fa-hand-stop-o"></span>&#160;Queues</a></li>
+			<li><a href="{$SITE_BASE}system_configuration.php"><span class="faicon fa-terminal"></span>&#160;Running configuration</a></li>
 		</ul>
 		<xsl:if test="$PROFILE = 'ADMIN'">
 			<ul class="submenu" id="submenu-settings">
 				<xsl:if test="$topmenu!='settings'"><xsl:attribute name="style">display:none;</xsl:attribute></xsl:if>
-				<li><a href="{$SITE_BASE}workflow.php"><span class="faicon fa-cubes"></span>Workflows</a></li>
-				<li><a href="{$SITE_BASE}workflow-schedules.php"><span class="faicon fa-calendar"></span>Scheduled workflows</a></li>
-				<li><a href="{$SITE_BASE}schedule.php"><span class="faicon fa-clock-o"></span>Retry Schedules</a></li>
-				<li><a href="{$SITE_BASE}queue.php"><span class="faicon fa-hand-stop-o"></span>Queues</a></li>
-				<li><a href="{$SITE_BASE}user.php"><span class="faicon fa-user-o"></span>Users</a></li>
+				<li><a href="{$SITE_BASE}workflow.php"><span class="faicon fa-cubes"></span>&#160;Workflows</a></li>
+				<li><a href="{$SITE_BASE}workflow-schedules.php"><span class="faicon fa-calendar"></span>&#160;Scheduled workflows</a></li>
+				<li><a href="{$SITE_BASE}schedule.php"><span class="faicon fa-clock-o"></span>&#160;Retry Schedules</a></li>
+				<li><a href="{$SITE_BASE}queue.php"><span class="faicon fa-hand-stop-o"></span>&#160;Queues</a></li>
+				<li><a href="{$SITE_BASE}user.php"><span class="faicon fa-user-o"></span>&#160;Users</a></li>
 			</ul>
 			<ul class="submenu" id="submenu-notifications">
 				<xsl:if test="$topmenu!='notifications'"><xsl:attribute name="style">display:none;</xsl:attribute></xsl:if>
-				<li><a href="{$SITE_BASE}notification.php"><span class="faicon fa-rss"></span>Configure</a></li>
-				<li><a href="{$SITE_BASE}notification-types.php"><span class="faicon fa-plug"></span>Manage plugins</a></li>
+				<li><a href="{$SITE_BASE}notification.php"><span class="faicon fa-rss"></span>&#160;Configure</a></li>
+				<li><a href="{$SITE_BASE}notification-types.php"><span class="faicon fa-plug"></span>&#160;Manage plugins</a></li>
 			</ul>
 			<ul class="submenu" id="submenu-statistics">
 				<xsl:if test="$topmenu!='statistics'"><xsl:attribute name="style">display:none;</xsl:attribute></xsl:if>
-				<li><a href="{$SITE_BASE}instances-statistics.php"><span class="faicon fa-line-chart"></span>Instances</a></li>
-				<li><a href="{$SITE_BASE}system-statistics.php"><span class="faicon fa-percent"></span>Global</a></li>
+				<li><a href="{$SITE_BASE}instances-statistics.php"><span class="faicon fa-line-chart"></span>&#160;Instances</a></li>
+				<li><a href="{$SITE_BASE}system-statistics.php"><span class="faicon fa-percent"></span>&#160;Global</a></li>
 			</ul>
 			<ul class="submenu" id="submenu-logging">
 				<xsl:if test="$topmenu!='logging'"><xsl:attribute name="style">display:none;</xsl:attribute></xsl:if>
-				<li><a href="{$SITE_BASE}logs.php"><span class="faicon fa-file-text-o"></span>Engine logs</a></li>
+				<li><a href="{$SITE_BASE}logs.php"><span class="faicon fa-file-text-o"></span>&#160;Engine logs</a></li>
 			</ul>
 		</xsl:if>
 
