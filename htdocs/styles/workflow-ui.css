@@ -126,8 +126,6 @@ div.postsep {
 div.task_icon
 {
 	display:inline-block;
-	width:40px;
-	height:40px;
 	border:1px solid;
 	text-align:center;
 }
@@ -137,7 +135,7 @@ div.task
 	display:inline-block;
 	text-align:center;
 	margin:5px;
-	width:160px;
+	width:250px;
 	border:0px;
 }
 
@@ -161,7 +159,8 @@ div#task-editor div.input_line {
 
 div#task-editor div.input {
 	display:inline-block;
-	width:180px;
+	width:15em;
+	margin-right:1em;
 }
 
 div#task-editor div.value {

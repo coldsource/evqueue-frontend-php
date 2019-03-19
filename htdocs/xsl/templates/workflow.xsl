@@ -74,7 +74,7 @@
 			
 			<span class="taskName">
 				<xsl:apply-templates select="." mode="status" />
-				<xsl:value-of select="@name" />
+				<xsl:value-of select="@path" />
 			</span>
 			
 			<xsl:if test="@status='EXECUTING'">

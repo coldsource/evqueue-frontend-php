@@ -153,7 +153,6 @@
 		<xsl:if test="$PROFILE = 'ADMIN'">
 			<ul class="submenu" id="submenu-settings">
 				<xsl:if test="$topmenu!='settings'"><xsl:attribute name="style">display:none;</xsl:attribute></xsl:if>
-				<li><a href="{$SITE_BASE}task.php"><span class="faicon fa-tasks"></span>Tasks</a></li>
 				<li><a href="{$SITE_BASE}workflow.php"><span class="faicon fa-cubes"></span>Workflows</a></li>
 				<li><a href="{$SITE_BASE}workflow-schedules.php"><span class="faicon fa-calendar"></span>Scheduled workflows</a></li>
 				<li><a href="{$SITE_BASE}schedule.php"><span class="faicon fa-clock-o"></span>Retry Schedules</a></li>

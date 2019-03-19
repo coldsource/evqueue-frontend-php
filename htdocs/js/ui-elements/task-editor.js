@@ -21,7 +21,6 @@ function TaskEditor()
 {
 	this.id = false;
 	this.task = false;
-	this.is_shell_task = false;
 	
 	var me = this;
 	
@@ -81,29 +80,28 @@ TaskEditor.prototype.Open = function(id)
 	this.id = id;
 	this.task = wf.GetTaskByID(this.id);
 	this.wfbackupdone = false;
-	this.is_shell_task = false;
 	
 	this.RefreshInputs();
 	
 	InitializeXPathHelper(this.task,'task');
 	
-	var path = '';
-	if(this.task.GetName().substr(0,1)=='!')
-	{
-		// Shell task
-		this.is_shell_task = true;
+	var path = this.task.GetAttribute("path");
+	$('#task-editor input#path').val(path);
+	
+	var wd = this.task.GetAttribute("wd");
+	$('#task-editor input#condition').val(wd);
+	
+	var parametersmode = this.task.GetAttribute("parameters-mode");
+	$('#task-editor select#parametersmode').val(parametersmode);
+	
+	var outputmethod = this.task.GetAttribute("output-method");
+	$('#task-editor select#outputmethod').val(outputmethod);
+	
+	var mergestderr = this.task.GetAttribute("merge-stderr");
+	$('#task-editor input#mergestderr').val(mergestderr);
 		
-		var path = this.task.GetName().substr(1);
-		$('#task-editor input#path').val(path);
-		
-		$('#task-editor').tabs('option', 'disabled', []);
-		$('#task-editor').tabs('option', 'active', 0);
-	}
-	else
-	{
-		$('#task-editor').tabs('option', 'disabled', [0]);
-		$('#task-editor').tabs('option', 'active', 1);
-	}
+	$('#task-editor').tabs('option', 'disabled', []);
+	$('#task-editor').tabs('option', 'active', 0);
 	
 	var condition = this.task.GetAttribute("condition");
 	$('#task-editor input#condition').val(condition);
@@ -117,7 +115,7 @@ TaskEditor.prototype.Open = function(id)
 	var queue = this.task.GetAttribute('queue');
 	$("#task-editor select#queue").val(queue);
 	
-	var retry_schedule = this.task.GetAttribute('retry_schedule');
+	var retry_schedule = this.task.GetAttribute('retry-schedule');
 	$("#task-editor select#retryschedule").val(retry_schedule);
 	$("#task-editor select#retryschedule").change(function() {
 		if($(this).val()=='')
@@ -129,7 +127,7 @@ TaskEditor.prototype.Open = function(id)
 			$("#task-editor select#retryretval").removeAttr('disabled');
 	});
 	
-	var retry_retval = this.task.GetAttribute('retry_retval');
+	var retry_retval = this.task.GetAttribute('retry-retval');
 	if(retry_schedule=='')
 	{
 		$("#task-editor select#retryretval").val('');
@@ -142,9 +140,17 @@ TaskEditor.prototype.Open = function(id)
 	}
 	
 	/**** Remote execution tab ****/
-	$("#task-editor input#user").val(this.task.GetAttribute('user'));
-	$("#task-editor input#host").val(this.task.GetAttribute('host'));
-	$("#task-editor input#queue_host").val(this.task.GetAttribute('queue_host'));
+	var user = this.task.GetAttribute('user');
+	$("#task-editor input#user").val(user);
+	
+	var host = this.task.GetAttribute('host');
+	$("#task-editor input#host").val(host);
+	
+	var queue_host = this.task.GetAttribute('queue_host');
+	$("#task-editor input#queue_host").val(queue_host);
+	
+	var useagent = this.task.GetAttribute('useagent');
+	$("#task-editor input#useagent").val(useagent);
 	
 	/**** Stdin tab ****/
 	var stdin_mode = this.task.GetAttribute('stdinmode');
@@ -154,19 +160,23 @@ TaskEditor.prototype.Open = function(id)
 	$('#task-editor').dialog({
 		width:900,
 		height:400,
-		title:"Edit task '"+this.task.GetName()+"'",
+		title:"Edit task '"+this.task.GetPath()+"'",
 		close:function() {
-			if(me.is_shell_task)
-				me.SaveAttribute('name',path,'!'+$('#task-editor input#path').val());
+			me.SaveAttribute('path',path,$('#task-editor input#path').val());
+			me.SaveAttribute('wd',wd,$('#task-editor input#wd').val());
+			me.SaveAttribute('parameters-mode',parametersmode,$('#task-editor select#parametersmode').val());
+			me.SaveAttribute('output-method',outputmethod,$('#task-editor select#outputmethod').val());
+			me.SaveAttribute('merge-stderr',mergestderr,$('#task-editor input#mergestderr').val());
 			me.SaveAttribute('condition',condition,$('#task-editor input#condition').val());
 			me.SaveAttribute('loop',loop,$('#task-editor input#loop').val());
 			me.SaveAttribute('iteration-condition',iterationcondition,$('#task-editor input#iteration-condition').val());
 			me.SaveAttribute('queue',queue,$("#task-editor select#queue").val());
-			me.SaveAttribute('retry_schedule',retry_schedule,$("#task-editor select#retryschedule").val());
-			me.SaveAttribute('retry_retval',retry_retval,$("#task-editor select#retryretval").val());
-			me.SaveAttribute('user',queue,$("#task-editor input#user").val());
-			me.SaveAttribute('host',queue,$("#task-editor input#host").val());
-			me.SaveAttribute('queue_host',queue,$("#task-editor input#queue_host").val());
+			me.SaveAttribute('retry-schedule',retry_schedule,$("#task-editor select#retryschedule").val());
+			me.SaveAttribute('retry-retval',retry_retval,$("#task-editor select#retryretval").val());
+			me.SaveAttribute('user',user,$("#task-editor input#user").val());
+			me.SaveAttribute('host',host,$("#task-editor input#host").val());
+			me.SaveAttribute('queue_host',queue_host,$("#task-editor input#queue_host").val());
+			me.SaveAttribute('use-agent',useagent,$("#task-editor input#useagent").val());
 			me.SaveAttribute('stdinmode',stdin_mode,$("#task-editor select#stdinmode").val());
 			
 			wf.Draw();

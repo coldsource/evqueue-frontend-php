@@ -123,7 +123,11 @@ $(document).ready(function() {
 	});
 
 	$('#open-tasks-library').click(function() {
-		$('#tasks-library').dialog({width:600,height:400});
+		$('#tasks-library').dialog({
+			width:300,
+			height:600,
+			position: {my:"left top",at:"left top+10", of:"body"}
+		});
 	});
 
 	$('#export_xml').click(function() {

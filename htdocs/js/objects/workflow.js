@@ -46,6 +46,8 @@ function Workflow(el,xml)
 	jobs = this.xmldoc.Query('//task',this.xmldoc);
 	for(var i=0;i<jobs.length;i++)
 		jobs[i].setAttribute('id',++this.gnid);
+	
+	this.SetAttribute("name","");
 }
 
 Workflow.prototype.GetAttribute = function(name)
@@ -199,11 +201,13 @@ Workflow.prototype.CreateJob = function()
 	return new Job(new_job);
 }
 
-Workflow.prototype.CreateTask = function(name)
+Workflow.prototype.CreateTask = function(path,parametersmode,outputmethod)
 {
 	var new_task = this.xmldoc.createElement('task');
 	new_task.setAttribute('id',++this.gnid);
-	new_task.setAttribute('name',name);
+	new_task.setAttribute('path',path);
+	new_task.setAttribute('parameters-mode',parametersmode);
+	new_task.setAttribute('output-method',outputmethod);
 	new_task.setAttribute('queue','default');
 	return new Task(new_task);
 }
@@ -278,9 +282,11 @@ Workflow.prototype.Draw = function()
 			
 			if(type=='task')
 			{
-				var task_name = ui.draggable.data('name');
+				var task_path = ui.draggable.data('path');
+				var parameters_mode = ui.draggable.data('parametersmode')
+				var output_method = ui.draggable.data('outputmethod')
 				var new_job = wf.CreateJob();
-				new_job.AddTask(wf.CreateTask(task_name));
+				new_job.AddTask(wf.CreateTask(task_path,parameters_mode,output_method));
 				parent_job.AddSubjob(sibling_pos,new_job);
 			}
 			else if(type=='branch')
@@ -314,10 +320,12 @@ Workflow.prototype.Draw = function()
 			
 			if(type=='task')
 			{
-				var task_name = ui.draggable.data('name');
+				var task_path = ui.draggable.data('path');
+				var parameters_mode = ui.draggable.data('parametersmode')
+				var output_method = ui.draggable.data('outputmethod')
 				var current_job_id = $(this).data('id');
 				var current_job = wf.GetJobByID(current_job_id);
-				current_job.AddTask(wf.CreateTask(task_name));
+				current_job.AddTask(wf.CreateTask(task_path,parameters_mode,output_method));
 			}
 		
 			wf.Draw();

@@ -32,9 +32,9 @@ Task.prototype.GetID = function()
 	return this.task.getAttribute('id');
 }
 
-Task.prototype.GetName = function()
+Task.prototype.GetPath = function()
 {
-	return this.task.getAttribute('name');
+	return this.task.getAttribute('path');
 }
 
 Task.prototype.GetAttribute = function(name)

@@ -8,6 +8,7 @@
 		<ul>
 			<li><a href="#tab-path">Path</a></li>
 			<li><a href="#tab-inputs">Inputs</a></li>
+			<li><a href="#tab-output">Output</a></li>
 			<li><a href="#tab-conditionsloops">Conditions &amp; loops</a></li>
 			<li><a href="#tab-queueretry">Queue &amp; retry</a></li>
 			<li><a href="#tab-remote">Remote execution</a></li>
@@ -21,8 +22,12 @@
 			<div class="formdiv">
 				<form>
 					<div>
-						<label class="formLabel" for="condition">Path</label>
+						<label class="formLabel" for="path">Path</label>
 						<input id="path" class="filenameInput" />
+					</div>
+					<div>
+						<label class="formLabel" for="wd">Working directory</label>
+						<input id="wd" class="dirnameInput" />
 					</div>
 				</form>
 			</div>
@@ -30,10 +35,40 @@
 		<div id="tab-inputs">
 			<h2>
 				Task inputs
-				<span class="help faicon fa-question-circle" title="The inputs are passed to the task that will be executed. Depending on your task configuration, inputs will be passed as command line arguments or environment variables. The default is command line arguments.&#10;&#10;Input values can be static (simple text), or dynamic by fetching output of parent tasks in the workflow.&#10;&#10;Optionally, tasks can have loops or conditions."></span>
+				<span class="help faicon fa-question-circle" title="The inputs are passed to the task that will be executed.&#10;&#10;Parameters mode defines how parameters will be passed to the task. 'Command line' is the traditional way to send arguments to a binary (like in a shell prompt). 'Environment variables' will set named environment variables in the task's ENV. &#10;&#10;Input values can be static (simple text), or dynamic by fetching output of parent tasks in the workflow.&#10;&#10;Optionally, tasks can have loops or conditions."></span>
 			</h2>
+			<div class="formdiv">
+				<div>
+					<label class="formLabel" for="parametersmode">Parameters mode</label>
+					<select id="parametersmode">
+						<option value="CMDLINE">Command line</option>
+						<option value="ENV">Environment variables</option>
+					</select>
+				</div>
+			</div>
 			<div class="inputs"></div>
 			<span id="add-input" class="faicon fa-plus" title="Add input"></span>
+		</div>
+		<div id="tab-output">
+			<h2>
+				Output method
+				<span class="help faicon fa-question-circle" title="How task output should be considered. You will only be able to use loops and conditions on XML type of output.&#10;&#10;Merging stderr with stdout is the traditional 2>&amp;1 redirection."></span>
+			</h2>
+			<div class="formdiv">
+				<form>
+					<div>
+						<label class="formLabel" for="outputmethod">Output method</label>
+						<select id="outputmethod">
+							<option value="TEXT">Text</option>
+							<option value="XML">XML</option>
+						</select>
+					</div>
+					<div>
+						<label class="formLabel" for="mergestderr">Merge stderr with stdout</label>
+						<input type="checkbox" id="mergestderr" />
+					</div>
+				</form>
+			</div>
 		</div>
 		<div id="tab-conditionsloops">
 			<h2>
@@ -85,7 +120,7 @@
 		<div id="tab-remote">
 			<h2>
 				Remote execution
-				<span class="help faicon fa-question-circle" title="If the task should not be executed locally, enter the user and host used for remote SSH connection.&#10;&#10;If you are using dynamic a dynamic queue, the used will be used by default to create the dynamic queue name.&#10;&#10;It is possible to use dynamic queues with local execution with the queue host attribute. This can be useful for tasks operating on distant machines without SSH (SQL connections, rsync...) on which you want to limit concurrency for performance reasons.&#10;&#10;All these values can incorporate dynamic XPath parts surrounded with braces."></span>
+				<span class="help faicon fa-question-circle" title="If the task should not be executed locally, enter the user and host used for remote SSH connection.&#10;&#10;If you are using dynamic a dynamic queue, the used will be used by default to create the dynamic queue name.&#10;&#10;It is possible to use dynamic queues with local execution with the queue host attribute. This can be useful for tasks operating on distant machines without SSH (SQL connections, rsync...) on which you want to limit concurrency for performance reasons.&#10;&#10;All these values can incorporate dynamic XPath parts surrounded with braces.&#10;&#10;evQueue agent can be used to enable advanced functionalities such as dedicated log and real time task progression. If you intend to use the agent, you must first deploy it on all needed machines."></span>
 			</h2>
 			<div class="formdiv">
 				<form>
@@ -103,6 +138,10 @@
 						<label class="formLabel" for="queue_host">Queue host</label>
 						<input id="queue_host" />
 						&#160;<span class="faicon fa-magic"></span>
+					</div>
+					<div>
+						<label class="formLabel" for="useagent">Use evQueue agent</label>
+						<input type="checkbox" id="useagent" />
 					</div>
 				</form>
 			</div>

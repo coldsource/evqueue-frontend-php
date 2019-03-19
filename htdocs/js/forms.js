@@ -17,7 +17,9 @@
   * Author: Thibault Kummer
   */
 
-$(document).on('keyup click', '.filenameInput' , function(){
+function filedir_autocomplete(event)
+{
+	type = event.data;
 	val = $(this).val();
 	if (val.substr(val.length - 1) == "/" || val == "") {
 		$.ajax({
@@ -29,23 +31,34 @@ $(document).on('keyup click', '.filenameInput' , function(){
 			availableFiles = [];
 			
 			$(xml).find('response entry').each(function(){
-				availableFiles.push(val+$(this).attr('name'));
+				if(type=='file')
+					availableFiles.push(val+$(this).attr('name'));
+				else if(type=='dir' && $(this).attr('type')=='directory')
+					availableFiles.push(val+$(this).attr('name'));
 			});
 			
 			availableFiles.sort(function(a,b){
 				return a.toLowerCase() > b.toLowerCase() ? 1 : -1;
 			})
 			
-			$( ".filenameInput" ).autocomplete({
+			if(type=='file')
+				cl = ".filenameInput";
+			else if(type=='dir')
+				cl = ".dirnameInput";
+			
+			$( cl ).autocomplete({
 				source: availableFiles,
 				minLength:0
 			});
 			
 			
-			$( ".filenameInput" ).autocomplete("search");
+			$( cl ).autocomplete("search");
 		});
 	}
-})
+}
+ 
+$(document).on('keyup click', '.filenameInput', 'file', filedir_autocomplete);
+$(document).on('keyup click', '.dirnameInput', 'dir', filedir_autocomplete);
 
 $(document).ready( function() {
 	$('.evq-autocomplete').each(function() {

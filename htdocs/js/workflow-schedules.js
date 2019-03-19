@@ -240,7 +240,7 @@ function WFSFormHandler()
 	job_node.appendChild(tasks_node);
 	
 	var task_node = xmldoc.createElement('task');
-	task_node.setAttribute('name','!'+script);
+	task_node.setAttribute('path',script);
 	task_node.setAttribute('queue','default');
 	tasks_node.appendChild(task_node);
 	
