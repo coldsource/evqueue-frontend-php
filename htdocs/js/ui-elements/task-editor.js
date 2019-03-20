@@ -89,7 +89,7 @@ TaskEditor.prototype.Open = function(id)
 	$('#task-editor input#path').val(path);
 	
 	var wd = this.task.GetAttribute("wd");
-	$('#task-editor input#condition').val(wd);
+	$('#task-editor input#wd').val(wd);
 	
 	var parametersmode = this.task.GetAttribute("parameters-mode");
 	$('#task-editor select#parametersmode').val(parametersmode);
