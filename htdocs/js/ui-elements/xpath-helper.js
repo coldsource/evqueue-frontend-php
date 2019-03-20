@@ -65,7 +65,7 @@ function InitializeXPathHelper(task_or_job,mode)
 		
 		for(var j=0;j<tasks.length;j++)
 		{
-			el.append($('<option>', {value: "evqGetParentJob("+(i-1)+")/evqGetOutput('"+tasks[j].GetName()+"')",text:"Task: "+tasks[j].GetName()}));
+			el.append($('<option>', {value: "evqGetParentJob("+(i-1)+")/evqGetOutput('"+tasks[j].GetPath()+"')",text:"Task: "+tasks[j].GetPath()}));
 		}
 		
 		i++;
