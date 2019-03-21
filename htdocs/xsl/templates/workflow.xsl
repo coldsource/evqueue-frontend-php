@@ -74,7 +74,16 @@
 			
 			<span class="taskName">
 				<xsl:apply-templates select="." mode="status" />
-				<xsl:value-of select="@path" />
+				<xsl:variable name="command" select="php:function('preg_replace', '_^(\S*)\s.*$_', '$1', string(@path))" />
+				<xsl:variable name="parameters" select="php:function('preg_replace', '_^\S*\s(.*)$_', '$1', string(@path))" />
+				<xsl:variable name="filename" select="php:function('preg_replace', '_.*/_', '', $command)" />
+				<span title="{$command}">
+					<xsl:value-of select="$filename" />
+				</span>
+				<xsl:text> </xsl:text>
+				<small>
+					<xsl:value-of select="$parameters" />
+				</small>
 			</span>
 			
 			<xsl:if test="@status='EXECUTING'">

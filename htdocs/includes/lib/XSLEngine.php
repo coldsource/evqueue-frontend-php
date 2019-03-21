@@ -212,7 +212,7 @@ class XSLEngine
 	public function GetXHTML($xsl_filename)
 	{
 		$xsltproc = new \XSLTProcessor();
-		$xsltproc->registerPHPFunctions(['urlencode', 'timeSpan', 'timeDiff', 'humanTime']);
+		$xsltproc->registerPHPFunctions(['urlencode', 'timeSpan', 'timeDiff', 'humanTime', 'preg_replace']);
 		// Set static parameters
 		foreach($this->parameters as $name=>$value)
 			$xsltproc->setParameter('',$name,$value);

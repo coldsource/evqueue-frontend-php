@@ -71,6 +71,9 @@
 .taskName {
 	cursor: pointer;
 }
+.taskName small {
+	font-size: 80%;
+}
 
 
 
