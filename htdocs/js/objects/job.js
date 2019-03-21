@@ -181,7 +181,12 @@ Job.prototype.Draw = function()
 	html += '</div>';
 	for(var i=0;i<tasks.length;i++)
 	{
-		html += '<div class="jobtask" data-type="jobtask" data-id="'+tasks[i].GetID()+'">' + tasks[i].GetPath();
+		// remove task filesystem path and make command parameters smaller
+		var task_path = tasks[i].GetPath().split(/\s/);
+		task_path[0] = task_path[0].replace(/^(.*\/)([^/]*)$/, '<span title="'+task_path[0]+'">$2</span>');
+		task_path = task_path[0] + ' <small>'+task_path.slice(1).join(' ')+'</small>';
+		
+		html += '<div class="jobtask" data-type="jobtask" data-id="'+tasks[i].GetID()+'">' + task_path;
 		if(tasks[i].GetAttribute('condition') || tasks[i].GetAttribute('iteration-condition'))
 			html += '<span class="faicon fa-code-fork"></span>';
 		if(tasks[i].GetAttribute('loop'))
