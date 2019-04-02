@@ -144,14 +144,14 @@ function KillRunningTasks(subjobs,id,node)
 		var tasks = xmldoc.Query("tasks/task[@status = 'EXECUTING']",jobs[i]);
 		for(var j=0;j<tasks.length;j++)
 		{
-			var task_name = tasks[j].getAttribute('name');
+			var task_path = tasks[j].getAttribute('path');
 			evqueueAPI({
 				group: 'instance',
 				action: 'killtask',
 				attributes: { 'id':id, 'pid':tasks[j].getAttribute('pid') },
 				node: node
 			}).done(function() {
-				Message('Killed task '+task_name);
+				Message('Killed task '+task_path);
 			});
 		
 			var job_subjobs = xmldoc.Query('subjobs',jobs[i]);
