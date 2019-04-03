@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:exsl="http://exslt.org/common" xmlns:php="http://php.net/xsl" version="1.0">
+<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:exsl="http://exslt.org/common" xmlns:php="http://php.net/xsl" exclude-result-prefixes="exsl php" version="1.0">
 	<xsl:import href="datetime.xsl" />
 	<xsl:import href="xmlhighlight.xsl" />
 
@@ -74,16 +74,7 @@
 			
 			<span class="taskName">
 				<xsl:apply-templates select="." mode="status" />
-				<xsl:variable name="command" select="php:function('preg_replace', '_^(\S*)\s.*$_', '$1', string(@path))" />
-				<xsl:variable name="parameters" select="php:function('preg_replace', '_^\S*(\s.*|$)_', '$1', string(@path))" />
-				<xsl:variable name="filename" select="php:function('preg_replace', '_.*/_', '', $command)" />
-				<span title="{$command}">
-					<xsl:value-of select="$filename" />
-				</span>
-				<xsl:text> </xsl:text>
-				<small>
-					<xsl:value-of select="$parameters" />
-				</small>
+				<xsl:apply-templates select="." mode="small" />
 			</span>
 			
 			<xsl:if test="@status='EXECUTING'">
@@ -125,6 +116,16 @@
 				</xsl:when>
 			</xsl:choose>
 		</span>
+	</xsl:template>
+	
+	<xsl:template match="task" mode="small">
+		<span title="{php:function('taskPart', string(@path), 'COMMAND')}">
+			<xsl:value-of select="php:function('taskPart', string(@path), 'FILENAME')" />
+		</span>
+		<xsl:text> </xsl:text>
+		<small>
+			<xsl:value-of select="php:function('taskPart', string(@path), 'PARAMETERS')" />
+		</small>
 	</xsl:template>
 	
 	<xsl:template match="output" mode="status">

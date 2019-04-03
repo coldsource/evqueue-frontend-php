@@ -166,6 +166,7 @@
 			</ul>
 			<ul class="submenu" id="submenu-statistics">
 				<xsl:if test="$topmenu!='statistics'"><xsl:attribute name="style">display:none;</xsl:attribute></xsl:if>
+				<li><a href="{$SITE_BASE}workflows-statistics.php"><span class="faicon fa-cubes"></span>&#160;Workflows</a></li>
 				<li><a href="{$SITE_BASE}instances-statistics.php"><span class="faicon fa-line-chart"></span>&#160;Instances</a></li>
 				<li><a href="{$SITE_BASE}system-statistics.php"><span class="faicon fa-percent"></span>&#160;Global</a></li>
 			</ul>
