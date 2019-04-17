@@ -100,6 +100,20 @@ $(document).ready( function() {
 					data.push(('00'+i).slice(-2)+':'+('00'+j).slice(-2));
 				el.data('autocomplete',data);
 		}
+		else if(el.data('type')=='tags')
+		{
+			evqueueAPI({
+				group: 'tags',
+				action: 'list'
+			}).done(function(xml) {
+				data = new Set();
+				$(xml).find('tag').each(function() {
+					if($(this).attr('label')!='')
+						data.add($(this).attr('label'));
+				});
+				el.data('autocomplete',Array.from(data));
+			});
+		}
 		
 		el.on('focus',function() {
 			el.autocomplete({source: $(this).data('autocomplete'),minLength:0});
