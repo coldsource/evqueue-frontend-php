@@ -12,11 +12,11 @@
 
 	<xsl:variable name="javascript">
 		<src>js/instance.js</src>
+		<src>js/tags.js</src>
 		<src>js/index.js</src>
 	</xsl:variable>
 
 	<xsl:template name="content">
-
 		<div class="dialog" id="workflow-dialog">
 			<ul>
 			</ul>
@@ -42,6 +42,24 @@
 				<div class="chart">
 					<div class="chartcenter"></div>
 				</div>
+			</div>
+		</div>
+		
+		<div class="dialog" id="tags-dialog">
+			<ul>
+				<li><a href="#instance-tags">Instance tags</a></li>
+				<li><a href="#tags-management">Tags management</a></li>
+			</ul>
+			<div id="instance-tags" class="hidden">
+				<div>
+					<form>
+						Add tag&#160;:&#160;<input id="tag_label" type="text" size="16" class="evq-autocomplete" data-type="tags" />&#160;<span class="faicon fa-check"></span>
+					</form>
+				</div>
+				<br />
+				<div class="tags-list"></div>
+			</div>
+			<div id="tags-management" class="hidden">
 			</div>
 		</div>
 
@@ -168,6 +186,10 @@
 					<div id="searchworkflow">
 						<label>Workflow</label>
 						<select name="wf_name" class="evq-autofill select2" data-type="workflows" data-valuetype="id"></select>
+					</div>
+					<div id="searchtag">
+						<label>Tag</label>
+						<select name="tagged" class="evq-autofill" data-type="tags"></select>
 					</div>
 					<div>
 						<label>Launched between</label>

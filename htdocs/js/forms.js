@@ -189,7 +189,23 @@ $(document).ready( function() {
 				});
 			});
 		}
-		
+		else if(el.data('type')=='tags')
+		{
+			el.append($('<option>'));
+			var valuetype = el.data('valuetype');
+			var groups = [];
+			var workflows = new Object();
+			evqueueAPI({
+				group: 'tags',
+				action: 'list'
+			}).done(function(xml) {
+				$(xml).find('tag').each(function() {
+					el.append($('<option>',{value:$(this).attr('id'),text:$(this).attr('label')}));
+				});
+				
+				el.select2();
+			});
+		}
 	});
 	
 	$('.select2').select2();

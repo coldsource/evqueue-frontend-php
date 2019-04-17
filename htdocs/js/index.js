@@ -211,6 +211,17 @@ $(document).ready(function() {
 
 		UpdateFilters();
 	});
+	
+	$('#searchform select[name=tagged]').change(function() {
+		$('#searchform .parameter').remove();
+
+		if($(this).val()=='')
+			delete search_filters.filter_tag_id;
+		else
+			search_filters.filter_tag_id = $(this).val();
+
+		UpdateFilters();
+	});
 
 	$('#searchform').delegate('.parameter','change',function() {
 		UpdateFilters();
@@ -349,6 +360,8 @@ function UpdateFilters()
 			explain += ' since '+search_filters.filter_launched_from;
 		else if(search_filters.filter_launched_until)
 			explain += ' before '+search_filters.filter_launched_until;
+		else if(search_filters.filter_tag_id)
+			explain += ' tagged '+$('#searchform select[name=tagged] option[value='+search_filters.filter_tag_id+']').text();
 
 		var i = 0;
 		if(Object.keys(parameters).length)

@@ -122,6 +122,10 @@
 				</xsl:variable>
 
 				(<xsl:value-of select="php:function('humanTime',$seconds)" />)
+				
+				<xsl:for-each select="tags/tag">
+					<span class="faicon fa-tag tag">&#160;<xsl:value-of select="@label" /></span>
+				</xsl:for-each>
 			</td>
 			<td class="center">
 				<xsl:value-of select="$node" />

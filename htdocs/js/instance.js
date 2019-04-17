@@ -40,7 +40,7 @@ $(document).delegate('.showWorkflowDetails','click',function() {
 	
 	var dialog = $('#workflow-dialog').clone();
 	dialog.removeAttr('id');
-	dialog.find('ul').append('<li><a href="#workflow-'+wfid+'">Tree</a></li>')
+	dialog.find('ul').append('<li><a href="#workflow-'+wfid+'">Tree <span class="faicon fa-tag" title="Manage tags"></span></a></li>')
 	dialog.find('ul').append('<li><a href="#workflow-'+wfid+'-xml">XML</a></li>')
 	dialog.find('ul').append('<li><a href="#workflow-'+wfid+'-parameters">Parameters</a></li>')
 	if(status=='TERMINATED')
@@ -76,6 +76,14 @@ $(document).delegate('.showWorkflowDetails','click',function() {
 				Message('Debugging new instance '+instance_id);
 			});
 	});
+	
+	dialog.delegate('.fa-tag','click',function() {
+		TagsDialog(wfid);
+	});
+});
+
+$(document).delegate('#terminated-workflows-pannel .fa-tag','click',function() {
+	TagsDialog($(this).parents('tr').data('id'));
 });
 
 function TaskDialog(container,wfid,evqid,name,idx,noutputs)

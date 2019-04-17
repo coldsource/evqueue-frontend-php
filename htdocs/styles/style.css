@@ -74,6 +74,13 @@ a.action {
 	color:#4996ce;
 }
 
+span.tag {
+	border: 1px solid;
+	border-color: grey;
+	border-radius: 5px;
+	padding:2px;
+}
+
 
 /* XML Formatter */
 span.xml_tagname {
