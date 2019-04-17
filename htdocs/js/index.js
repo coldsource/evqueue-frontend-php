@@ -270,6 +270,7 @@ $(document).ready(function() {
 	$('#clearfilters').click(function() {
 		$('#searchform select[name=node]').val('');
 		$('#searchform select[name=wf_name]').val('').trigger('change.select2');
+		$('#searchform select[name=tagged]').val('').trigger('change.select2');
 		$('#dt_inf').val('');
 		$('#hr_inf').val('');
 		$('#dt_sup').val('');
