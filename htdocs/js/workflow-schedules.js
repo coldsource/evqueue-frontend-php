@@ -84,10 +84,7 @@ $(document).ready( function() {
 	
 	$('#when_daily form input[name=schedule]').change(function() {
 		if($(this).val()=='')
-		{
-			$(this).val(';;;;;');
 			return;
-		}
 		
 		var schedule = $(this).val().split(';');
 		var seconds = schedule[0].split(',');
@@ -208,7 +205,7 @@ function calculateSchedule() {
 		schedule.push( $('select[name='+this+'] option:checked').map(function(){return $(this).val()=='any'?'':$(this).val();}).toArray().join(',') );
 	});
 	
-	$('input[name=schedule]').val(schedule.join(';'));
+	$('#when_custom input[name=schedule]').val(schedule.join(';'));
 }
 
 function WFSFormHandler()
