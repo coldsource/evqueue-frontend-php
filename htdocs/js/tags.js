@@ -1,6 +1,7 @@
 function TagsDialog(instance_id)
 {
 	var dialog = $('#tags-dialog');
+	dialog.undelegate();
 	
 	RefreshInstanceTags(instance_id,$('#instance-tags .tags-list'));
 	RefreshTags($('#tags-management'));
