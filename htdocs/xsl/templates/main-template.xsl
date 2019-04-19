@@ -173,6 +173,7 @@
 			<ul class="submenu" id="submenu-logging">
 				<xsl:if test="$topmenu!='logging'"><xsl:attribute name="style">display:none;</xsl:attribute></xsl:if>
 				<li><a href="{$SITE_BASE}logs.php"><span class="faicon fa-file-text-o"></span>&#160;Engine logs</a></li>
+				<li><a href="{$SITE_BASE}logsapi.php"><span class="faicon fa-file-text-o"></span>&#160;API logs</a></li>
 			</ul>
 		</xsl:if>
 
