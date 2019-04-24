@@ -24,6 +24,7 @@ var current_page = 1;
 $(document).ready(function() {
 	// Launch button
 	$('#executing-workflows-pannel .fa-rocket').click(function() {
+		$('#workflow-launch input[name=comment]').val('Launched by user "'+connected_user+'"');
 		$('#workflow-launch').dialog({width:'auto',height:'auto'});
 	});
 
@@ -58,6 +59,7 @@ $(document).ready(function() {
 
 			var workflow_id = $('#workflow-launch select[name=workflow_id] option').filter(function () { return $(this).html() == workflow_name; }).val();
 
+			$('#workflow-launch input[name=comment]').val('Relaunched from instance '+instance_id+' by user "'+connected_user+'"');
 			$('#workflow-launch input[name=user]').val(workflow_node.getAttribute('user'));
 			$('#workflow-launch input[name=host]').val(workflow_node.getAttribute('host'));
 			$('#workflow-launch select[name=node]').val(node);
