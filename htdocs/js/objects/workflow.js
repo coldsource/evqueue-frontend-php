@@ -347,7 +347,11 @@ Workflow.prototype.Draw = function()
 	});
 	
 	$('.jobtask').contextmenu(function(e) {
-		var idx = $(e.target).index()-1;
+		var task = $(e.target);
+		if (!task.hasClass('jobtask'))
+			task = task.parent('.jobtask');
+		
+		var idx = task.index()-1;
 		var job_id = $(this).parent().data('id');
 		
 		$('#taskmenu').css({'top':e.pageY,'left':e.pageX, 'position':'absolute', 'border':'1px solid black', 'padding':'5px'});
