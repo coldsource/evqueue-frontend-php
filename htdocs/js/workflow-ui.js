@@ -63,6 +63,9 @@ $(document).ready(function() {
 	job_editor = new JobEditor();
 	workflow_editor = new WorkflowEditor();
 	
+	if (workflow_id == -1)
+		workflow_editor.Open();
+	
 	want_exit = false;
 	
 	tasks_library = new TasksLibrary();
