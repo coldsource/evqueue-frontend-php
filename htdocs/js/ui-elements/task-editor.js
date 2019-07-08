@@ -98,7 +98,7 @@ TaskEditor.prototype.Open = function(id)
 	$('#task-editor select#outputmethod').val(outputmethod);
 	
 	var mergestderr = this.task.GetAttribute("merge-stderr");
-	$('#task-editor input#mergestderr').val(mergestderr);
+	$('#task-editor input#mergestderr').prop('checked',mergestderr=='yes');
 		
 	$('#task-editor').tabs('option', 'disabled', []);
 	$('#task-editor').tabs('option', 'active', 0);
@@ -149,8 +149,8 @@ TaskEditor.prototype.Open = function(id)
 	var queue_host = this.task.GetAttribute('queue_host');
 	$("#task-editor input#queue_host").val(queue_host);
 	
-	var useagent = this.task.GetAttribute('useagent');
-	$("#task-editor input#useagent").val(useagent);
+	var useagent = this.task.GetAttribute('use-agent');
+	$("#task-editor input#useagent").prop('checked',useagent=='yes');
 	
 	/**** Stdin tab ****/
 	var stdin_mode = this.task.GetAttribute('stdinmode');
@@ -166,7 +166,7 @@ TaskEditor.prototype.Open = function(id)
 			me.SaveAttribute('wd',wd,$('#task-editor input#wd').val());
 			me.SaveAttribute('parameters-mode',parametersmode,$('#task-editor select#parametersmode').val());
 			me.SaveAttribute('output-method',outputmethod,$('#task-editor select#outputmethod').val());
-			me.SaveAttribute('merge-stderr',mergestderr,$('#task-editor input#mergestderr').val());
+			me.SaveAttribute('merge-stderr',mergestderr,$('#task-editor input#mergestderr').prop('checked')?'yes':'no');
 			me.SaveAttribute('condition',condition,$('#task-editor input#condition').val());
 			me.SaveAttribute('loop',loop,$('#task-editor input#loop').val());
 			me.SaveAttribute('iteration-condition',iterationcondition,$('#task-editor input#iteration-condition').val());
@@ -176,7 +176,7 @@ TaskEditor.prototype.Open = function(id)
 			me.SaveAttribute('user',user,$("#task-editor input#user").val());
 			me.SaveAttribute('host',host,$("#task-editor input#host").val());
 			me.SaveAttribute('queue_host',queue_host,$("#task-editor input#queue_host").val());
-			me.SaveAttribute('use-agent',useagent,$("#task-editor input#useagent").val());
+			me.SaveAttribute('use-agent',useagent,$("#task-editor input#useagent").prop('checked')?'yes':'no');
 			me.SaveAttribute('stdinmode',stdin_mode,$("#task-editor select#stdinmode").val());
 			
 			wf.Draw();
