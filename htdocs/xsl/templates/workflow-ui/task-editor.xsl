@@ -17,7 +17,7 @@
 		<div id="tab-path">
 			<h2>
 				Task path
-				<span class="help faicon fa-question-circle" title="Enter the path of the binary to be executed. The path can contain arguments.&#10;&#10;You can still add dynamic inputs from evQueue. These inputs will be added to the command line arguments or sent as environment variables depending on the task configuration."></span>
+				<span class="help faicon fa-question-circle" title="If you want to call an existing binary command, choose 'binary' type and enter its path. The path can contain arguments.&#10;&#10;You can still add dynamic inputs from evQueue. These inputs will be added to the command line arguments or sent as environment variables depending on the task configuration.&#10;&#10; If you choose 'script' type and 'static' script type, you can write here a small script that will be executed.&#10;&#10;If you select 'dynamic' script type, the content of the script will be taken from the output of an earlier task. For both cases, if you plan remote execution, you must enable the evQueue agent in the 'Remote execution' section."></span>
 			</h2>
 			<div class="formdiv">
 				<form>
@@ -223,6 +223,7 @@
 	</div>
 	
 	<div id="task-script-editor" class="dialog" title="Script editor">
+		<h2>Script editor <span class="help faicon fa-question-circle" title="Write here your script. Remember to have a shebang (#!) on the first line !"></span></h2>
 		<div class="formdiv">
 			<form>
 				<div>

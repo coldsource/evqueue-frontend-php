@@ -75,7 +75,7 @@ function TaskEditor()
 	});
 	
 	$('#tab-path span.fa-code').click(function() {
-		$('#task-script-editor').dialog({width: 800,height: 380});
+		$('#task-script-editor').dialog({width: 800,height: 420});
 	});
 
 	$('#tab-path select#type').change(function() {
