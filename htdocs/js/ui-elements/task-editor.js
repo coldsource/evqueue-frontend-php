@@ -50,7 +50,7 @@ function TaskEditor()
 	
 	$('#add-input').click(this.AddInput);
 	
-	$('#tab-conditionsloops span.fa-magic, #task-input-editor span.fa-magic').click(function() {
+	$('#tab-conditionsloops span.fa-magic, #task-input-editor span.fa-magic, #tab-path span.fa-magic').click(function() {
 		var input = $(this).parent().find('input');
 		
 		OpenXPathHelper();
@@ -83,13 +83,38 @@ function TaskEditor()
 		{
 			$('#task-editor input#path').parent().hide();
 			$('#task-editor input#name').parent().show();
-			$('#task-editor span.fa-code').parent().show();
+			$('#task-editor select#script_type').parent().show();
+			if(me.task.GetScriptType()=='DYNAMIC')
+			{
+				$('#task-editor input#script_xpath').parent().show();
+				$('#task-editor span.fa-code').parent().hide();
+			}
+			else
+			{
+				$('#task-editor input#script_xpath').parent().hide();
+				$('#task-editor span.fa-code').parent().show();
+			}
 		}
 		else
 		{
 			$('#task-editor input#path').parent().show();
 			$('#task-editor input#name').parent().hide();
+			$('#task-editor select#script_type').parent().hide();
 			$('#task-editor span.fa-code').parent().hide();
+			$('#task-editor input#script_xpath').parent().hide();
+		}
+	});
+	
+	$('#tab-path select#script_type').change(function() {
+		if($('#tab-path select#script_type').val()=='DYNAMIC')
+		{
+			$('#task-editor input#script_xpath').parent().show();
+			$('#task-editor span.fa-code').parent().hide();
+		}
+		else
+		{
+			$('#task-editor input#script_xpath').parent().hide();
+			$('#task-editor span.fa-code').parent().show();
 		}
 	});
 }
@@ -106,28 +131,35 @@ TaskEditor.prototype.Open = function(id)
 
 	var type = this.task.GetType();
 	$('#task-editor select#type').val(type);
+	$('#task-editor select#type').trigger('change');
 	
-	var script = this.task.GetAttribute("script");
-	$('#task-script-editor textarea#script').val(script);
+	var script = null;
+	if(this.task.GetScriptType()=='STATIC')
+	{
+		script = this.task.GetAttribute("script");
+		$('#task-script-editor textarea#script').val(script);
+	}
+	else
+		$('#task-script-editor textarea#script').val('');
+	
+	var script_xpath = null;
+	if(this.task.GetScriptType()=='DYNAMIC')
+	{
+		script_xpath = this.task.GetAttribute("script-xpath");
+		$('#task-editor input#script_xpath').val(script_xpath);
+	}
+	else
+		$('#task-editor input#script_xpath').val('');
+	
+	var script_type = this.task.GetScriptType();
+	$('#task-editor select#script_type').val(script_type);
+	$('#task-editor select#script_type').trigger('change');
 	
 	var path = this.task.GetAttribute("path");
 	$('#task-editor input#path').val(path);
 
 	var name = this.task.GetAttribute("name");
 	$('#task-editor input#name').val(name);
-
-	if(this.task.GetType()=='SCRIPT')
-	{
-		$('#task-editor input#path').parent().hide();
-		$('#task-editor input#name').parent().show();
-		$('#task-editor span.fa-code').parent().show();
-	}
-	else
-	{
-		$('#task-editor input#path').parent().show();
-		$('#task-editor input#name').parent().hide();
-		$('#task-editor span.fa-code').parent().hide();
-	}
 	
 	var wd = this.task.GetAttribute("wd");
 	$('#task-editor input#wd').val(wd);
@@ -206,7 +238,10 @@ TaskEditor.prototype.Open = function(id)
 			me.SaveAttribute('type',type,$('#task-editor select#type').val());
 			me.SaveAttribute('path',path,$('#task-editor input#path').val());
 			me.SaveAttribute('name',name,$('#task-editor input#name').val());
-			me.SaveAttribute('script',script,$('#task-script-editor textarea#script').val());
+			if($('#task-editor select#script_type').val()=='STATIC')
+				me.SaveAttribute('script',script,$('#task-script-editor textarea#script').val());
+			else if($('#task-editor select#script_type').val()=='DYNAMIC')
+				me.SaveAttribute('script-xpath',script,$('#task-editor input#script_xpath').val());
 			me.SaveAttribute('wd',wd,$('#task-editor input#wd').val());
 			me.SaveAttribute('parameters-mode',parametersmode,$('#task-editor select#parametersmode').val());
 			me.SaveAttribute('output-method',outputmethod,$('#task-editor select#outputmethod').val());

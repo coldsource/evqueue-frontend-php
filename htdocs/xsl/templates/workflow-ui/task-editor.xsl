@@ -41,10 +41,22 @@
 						<input id="wd" class="dirnameInput" />
 					</div>
 					<div>
+						<label class="formLabel" for="script_type">Script type</label>
+						<select id="script_type">
+							<option value="STATIC">static</option>
+							<option value="DYNAMIC">dynamic</option>
+						</select>
+					</div>
+					<div>
 						<label class="formLabel">
 							Script editor
 						</label>
 						<span class="faicon fa-code"></span>
+					</div>
+					<div>
+						<label class="formLabel" for="script_xpath">Script path</label>
+						<input id="script_xpath" />
+						&#160;<span class="faicon fa-magic"></span>
 					</div>
 				</form>
 			</div>

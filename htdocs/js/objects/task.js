@@ -60,16 +60,36 @@ Task.prototype.GetType = function()
 		return this.task.getAttribute('type');
 }
 
-Task.prototype.GetScript = function()
+Task.prototype.GetScriptType = function()
+{
+	var value = this.task.ownerDocument.Query('script/value',this.task);
+	if(value.length>0)
+		return 'DYNAMIC';
+	return 'STATIC';
+}
+
+Task.prototype.GetScript = function(type)
 {
 	var script = this.task.ownerDocument.Query('script',this.task);
 	if(script.length>0)
-		return script[0].textContent;
-	else
-		return '';
+	{
+		if(type=='STATIC')
+			return script[0].textContent;
+		else if(type=='DYNAMIC')
+		{
+			var value = this.task.ownerDocument.Query('value',script[0]);
+			if(value.length==0)
+				return '';
+			
+			if(value[0].hasAttribute('select'))
+				return value[0].getAttribute('select');
+			return '';
+		}
+	}
+	return '';
 }
 
-Task.prototype.SetScript = function(content)
+Task.prototype.SetScript = function(content,type)
 {
 	var script = this.task.ownerDocument.Query('script',this.task);
 	if(script.length==0)
@@ -86,7 +106,17 @@ Task.prototype.SetScript = function(content)
 		return;
 	}
 
-	script.textContent = content;
+	if(type=='STATIC')
+	{
+		script.textContent = content;
+	}
+	else if(type=='DYNAMIC')
+	{
+		script.textContent = '';
+		var value = this.task.ownerDocument.createElement('value');
+		script.appendChild(value);
+		value.setAttribute('select',content);
+	}
 }
 
 Task.prototype.GetAttribute = function(name)
@@ -94,7 +124,9 @@ Task.prototype.GetAttribute = function(name)
 	if(name=='stdinmode')
 		return this.GetStdinMode();
 	else if(name=='script')
-		return this.GetScript();
+		return this.GetScript('STATIC');
+	else if(name=='script-xpath')
+		return this.GetScript('DYNAMIC');
 	
 	if(this.task.hasAttribute(name))
 		return this.task.getAttribute(name);
@@ -106,7 +138,14 @@ Task.prototype.SetAttribute = function(name, value)
 	if(name=='stdinmode')
 		return  this.SetStdinMode(value);
 	else if(name=='script')
-		return this.SetScript(value);
+		return this.SetScript(value,'STATIC');
+	else if(name=='script-xpath')
+		return this.SetScript(value,'DYNAMIC');
+	
+	if(value)
+		this.task.setAttribute(name,value);
+	else
+		this.task.removeAttribute(name);
 	
 	if(name=='type')
 	{
@@ -118,11 +157,6 @@ Task.prototype.SetAttribute = function(name, value)
 		else if(value=='SCRIPT')
 			this.task.removeAttribute('path');
 	}
-	
-	if(value)
-		this.task.setAttribute(name,value);
-	else
-		this.task.removeAttribute(name);
 }
 
 Task.prototype.GetStdinMode = function()
