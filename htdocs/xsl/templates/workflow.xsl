@@ -119,13 +119,18 @@
 	</xsl:template>
 	
 	<xsl:template match="task" mode="small">
-		<span title="{php:function('taskPart', string(@path), 'COMMAND')}">
-			<xsl:value-of select="php:function('taskPart', string(@path), 'FILENAME')" />
-		</span>
-		<xsl:text> </xsl:text>
-		<small>
-			<xsl:value-of select="php:function('taskPart', string(@path), 'PARAMETERS')" />
-		</small>
+		<xsl:if test="count(@type)=0 or @type='BINARY'">
+			<span title="{php:function('taskPart', string(@path), 'COMMAND')}">
+				<xsl:value-of select="php:function('taskPart', string(@path), 'FILENAME')" />
+			</span>
+			<xsl:text> </xsl:text>
+			<small>
+				<xsl:value-of select="php:function('taskPart', string(@path), 'PARAMETERS')" />
+			</small>
+		</xsl:if>
+		<xsl:if test="@type='SCRIPT'">
+			<xsl:value-of select="@name" />
+		</xsl:if>
 	</xsl:template>
 	
 	<xsl:template match="output" mode="status">

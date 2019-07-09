@@ -17,17 +17,34 @@
 		<div id="tab-path">
 			<h2>
 				Task path
-				<span class="help faicon fa-question-circle" title="Dynamic shell task will be executed with text output mode and command line arguments.&#10;&#10;Enter the path of the binary to be executed. The path can contain arguments.&#10;&#10;You can still add dynamic inputs from evQueue. These inputs will be added to the command line arguments."></span>
+				<span class="help faicon fa-question-circle" title="Enter the path of the binary to be executed. The path can contain arguments.&#10;&#10;You can still add dynamic inputs from evQueue. These inputs will be added to the command line arguments or sent as environment variables depending on the task configuration."></span>
 			</h2>
 			<div class="formdiv">
 				<form>
+					<div>
+						<label class="formLabel" for="type">Type</label>
+						<select id="type">
+							<option value="BINARY">binary</option>
+							<option value="SCRIPT">script</option>
+						</select>
+					</div>
 					<div>
 						<label class="formLabel" for="path">Path</label>
 						<input id="path" class="filenameInput" />
 					</div>
 					<div>
+						<label class="formLabel" for="name">Name</label>
+						<input id="name" class="filenameInput" />
+					</div>
+					<div>
 						<label class="formLabel" for="wd">Working directory</label>
 						<input id="wd" class="dirnameInput" />
+					</div>
+					<div>
+						<label class="formLabel">
+							Script editor
+						</label>
+						<span class="faicon fa-code"></span>
 					</div>
 				</form>
 			</div>
@@ -190,6 +207,17 @@
 			<div>
 				<button class="submit">Save</button>
 			</div>
+		</div>
+	</div>
+	
+	<div id="task-script-editor" class="dialog" title="Script editor">
+		<div class="formdiv">
+			<form>
+				<div>
+					<textarea id="script">
+					</textarea>
+				</div>
+			</form>
 		</div>
 	</div>
 	

@@ -73,6 +73,25 @@ function TaskEditor()
 			input.val('{'+XPathHelperPath($('#xpath-selector'))+'}');
 		});
 	});
+	
+	$('#tab-path span.fa-code').click(function() {
+		$('#task-script-editor').dialog({width: 800,height: 380});
+	});
+
+	$('#tab-path select#type').change(function() {
+		if($('#type').val()=='SCRIPT')
+		{
+			$('#task-editor input#path').parent().hide();
+			$('#task-editor input#name').parent().show();
+			$('#task-editor span.fa-code').parent().show();
+		}
+		else
+		{
+			$('#task-editor input#path').parent().show();
+			$('#task-editor input#name').parent().hide();
+			$('#task-editor span.fa-code').parent().hide();
+		}
+	});
 }
 
 TaskEditor.prototype.Open = function(id)
@@ -84,9 +103,31 @@ TaskEditor.prototype.Open = function(id)
 	this.RefreshInputs();
 	
 	InitializeXPathHelper(this.task,'task');
+
+	var type = this.task.GetType();
+	$('#task-editor select#type').val(type);
+	
+	var script = this.task.GetAttribute("script");
+	$('#task-script-editor textarea#script').val(script);
 	
 	var path = this.task.GetAttribute("path");
 	$('#task-editor input#path').val(path);
+
+	var name = this.task.GetAttribute("name");
+	$('#task-editor input#name').val(name);
+
+	if(this.task.GetType()=='SCRIPT')
+	{
+		$('#task-editor input#path').parent().hide();
+		$('#task-editor input#name').parent().show();
+		$('#task-editor span.fa-code').parent().show();
+	}
+	else
+	{
+		$('#task-editor input#path').parent().show();
+		$('#task-editor input#name').parent().hide();
+		$('#task-editor span.fa-code').parent().hide();
+	}
 	
 	var wd = this.task.GetAttribute("wd");
 	$('#task-editor input#wd').val(wd);
@@ -162,7 +203,10 @@ TaskEditor.prototype.Open = function(id)
 		height:400,
 		title:"Edit task '"+this.task.GetPath()+"'",
 		close:function() {
+			me.SaveAttribute('type',type,$('#task-editor select#type').val());
 			me.SaveAttribute('path',path,$('#task-editor input#path').val());
+			me.SaveAttribute('name',name,$('#task-editor input#name').val());
+			me.SaveAttribute('script',script,$('#task-script-editor textarea#script').val());
 			me.SaveAttribute('wd',wd,$('#task-editor input#wd').val());
 			me.SaveAttribute('parameters-mode',parametersmode,$('#task-editor select#parametersmode').val());
 			me.SaveAttribute('output-method',outputmethod,$('#task-editor select#outputmethod').val());

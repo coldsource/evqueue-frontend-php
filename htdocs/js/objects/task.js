@@ -37,10 +37,64 @@ Task.prototype.GetPath = function()
 	return this.task.getAttribute('path');
 }
 
+Task.prototype.GetDisplayName = function()
+{
+	if(this.task.hasAttribute('path'))
+	{
+		// remove task filesystem path and make command parameters smaller
+		var task_path = this.task.getAttribute('path').split(/\s/);
+		task_path[0] = task_path[0].replace(/^(.*\/)([^/]*)$/, '<span title="'+task_path[0]+'">$2</span>');
+		return task_path[0] + ' <small>'+task_path.slice(1).join(' ')+'</small>';
+	}
+	else if(this.task.hasAttribute('name'))
+		return '<span title="'+this.task.getAttribute('name')+'">'+this.task.getAttribute('name')+'</span>';
+	
+	return '<span title="unknown">unknown</span>';;
+}
+
+Task.prototype.GetType = function()
+{
+	if(!this.task.hasAttribute('type'))
+		return 'BINARY';
+	else
+		return this.task.getAttribute('type');
+}
+
+Task.prototype.GetScript = function()
+{
+	var script = this.task.ownerDocument.Query('script',this.task);
+	if(script.length>0)
+		return script[0].textContent;
+	else
+		return '';
+}
+
+Task.prototype.SetScript = function(content)
+{
+	var script = this.task.ownerDocument.Query('script',this.task);
+	if(script.length==0)
+	{
+		script = this.task.ownerDocument.createElement('script');
+		this.task.appendChild(script);
+	}
+	else
+		script = script[0];
+
+	if(this.GetType()=='BINARY')
+	{
+		this.task.removeChild(script);
+		return;
+	}
+
+	script.textContent = content;
+}
+
 Task.prototype.GetAttribute = function(name)
 {
 	if(name=='stdinmode')
-		return  this.GetStdinMode();
+		return this.GetStdinMode();
+	else if(name=='script')
+		return this.GetScript();
 	
 	if(this.task.hasAttribute(name))
 		return this.task.getAttribute(name);
@@ -51,6 +105,19 @@ Task.prototype.SetAttribute = function(name, value)
 {
 	if(name=='stdinmode')
 		return  this.SetStdinMode(value);
+	else if(name=='script')
+		return this.SetScript(value);
+	
+	if(name=='type')
+	{
+		if(value=='BINARY')
+		{
+			this.task.removeAttribute('name');
+			this.SetScript('');
+		}
+		else if(value=='SCRIPT')
+			this.task.removeAttribute('path');
+	}
 	
 	if(value)
 		this.task.setAttribute(name,value);
