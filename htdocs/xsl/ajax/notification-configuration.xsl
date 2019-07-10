@@ -30,6 +30,13 @@
 						<label>Name</label>
 						<input type="text" name="name" />
 					</div>
+					<div>
+						<label>Subscribe all workflows</label>
+						<select name="subscribe_all">
+							<option value="yes">yes</option>
+							<option value="no">no</option>
+						</select>
+					</div>
 					<xsl:apply-templates select="/page/response/plugin/configuration/notification" />
 				</xsl:if>
 			</form>

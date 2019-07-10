@@ -34,7 +34,7 @@ function RefreshPage()
 					evqueueAPI({
 						group: 'notification',
 						action: 'create',
-						attributes: { name: conf.name, type_id: type_id, parameters: b64EncodeUnicode(conf_json) }
+						attributes: { name: conf.name, subscribe_all: conf.subscribe_all,type_id: type_id, parameters: b64EncodeUnicode(conf_json) }
 					}).done(function() {
 						Message('Notification created');
 						$('#notification-configuration').dialog('close');
@@ -74,7 +74,7 @@ function RefreshPage()
 					evqueueAPI({
 						group: 'notification',
 						action: 'edit',
-						attributes: { 'id':id, name: conf.name, parameters: b64EncodeUnicode(conf_json) }
+						attributes: { 'id':id, name: conf.name, subscribe_all: conf.subscribe_all, parameters: b64EncodeUnicode(conf_json) }
 					}).done(function() {
 						Message('Configuration saved');
 						$('#notification-configuration').dialog('close');

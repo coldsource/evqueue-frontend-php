@@ -177,7 +177,7 @@ function SaveWorkflow()
 		}).done(function(xml) {
 			workflow_id = xml.firstChild.getAttribute('workflow-id');
 			
-			SaveNotifications().always(function() {
+			SaveNotifications(true).always(function() {
 				$('#message').html('Workflow has been created');
 				$('#message').show();
 				$('#message').delay(2000).fadeOut();
@@ -200,7 +200,7 @@ function SaveWorkflow()
 				content: b64EncodeUnicode(wf.GetXML(true))
 			}
 		}).done(function(xml) {
-			SaveNotifications().always(function() {
+			SaveNotifications(false).always(function() {
 				$('#message').html('Workflow has been saved');
 				$('#message').show();
 				$('#message').delay(2000).fadeOut();
@@ -212,30 +212,74 @@ function SaveWorkflow()
 	}
 }
 
-function SaveNotifications()
+function SaveNotifications(create)
 {
 	var promise = new jQuery.Deferred();  // global promise to return, which waits for all evqueueAPI calls
 	
+	var subscribed_notifications = [];
+	$('#subscribednotifications input:checked').each(function() {
+		subscribed_notifications[$(this).parents('tr').data('id')] = false;
+	});
+	
 	evqueueAPI({
 		group: 'workflow',
-		action: 'clear_notifications',
-		attributes: {id:workflow_id}
-	}).done(function() {
+		action: 'list_notifications',
+		attributes: {'id': workflow_id}
+	}).done(function(xml) {
+		var notifications = xml.Query('/response/notification',xml.documentElement);
+		for(var i=0;i<notifications.length;i++)
+			subscribed_notifications[notifications[i].getAttribute('id')] = true;
 		
 		var deferreds = [];
 		$('#subscribednotifications input:checked').each(function() {
 			var notification_id = $(this).parents('tr').data('id');
-			var d = evqueueAPI({
-				group: 'workflow',
-				action: 'subscribe_notification',
-				attributes: {id:workflow_id,notification_id:notification_id}
-			});
-			deferreds.push(d);
+			if(!subscribed_notifications[notification_id])
+			{
+				var d = evqueueAPI({
+					group: 'workflow',
+					action: 'subscribe_notification',
+					attributes: {id:workflow_id,notification_id:notification_id}
+				});
+				deferreds.push(d);
+			}
 		});
 		
 		$.when.apply($,deferreds).done( function () {
-			promise.resolve();
+			if(create)
+			{
+				for(var notif_id in subscribed_notifications)
+					$('#subscribednotifications tr[data-id='+notif_id+'] input').prop('checked',true);
+					
+				Ready()
+				
+				wf.Draw();
+				
+				promise.resolve();
+			}
+			else
+			{
+				var deferreds = [];
+				
+				for(var notif_id in subscribed_notifications)
+				{
+					if(subscribed_notifications[notif_id] && !$('#subscribednotifications tr[data-id='+notif_id+'] input').prop('checked'))
+					{
+						var d = evqueueAPI({
+							group: 'workflow',
+							action: 'unsubscribe_notification',
+							attributes: {id:workflow_id,notification_id:notif_id}
+						});
+						deferreds.push(d);
+					}
+				}
+				
+				$.when.apply($,deferreds).done( function () {
+					promise.resolve();
+				});
+			}
 		});
+		
+		
 	});
 	
 	return promise;
