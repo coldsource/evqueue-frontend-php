@@ -34,7 +34,7 @@
 					</div>
 					<div>
 						<label class="formLabel" for="name">Name</label>
-						<input id="name" class="filenameInput" />
+						<input id="name" />
 					</div>
 					<div>
 						<label class="formLabel" for="wd">Working directory</label>
