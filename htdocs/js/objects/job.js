@@ -102,14 +102,17 @@ Job.prototype.AddSubjob = function(sibling_pos,new_job)
 	}
 }
 
+// @param parent_job is the new parent (drag'n'drop destination)
 Job.prototype.MoveTo = function(parent_job, sibling_pos, depth)
 {
+	var previous_parent = this.job.parentNode;
+	
 	if(this.job==parent_job.job)
 		parent_job = parent_job.GetParent();
 	
 	if(depth)
 	{
-		this.job.parentNode.removeChild(this.job);
+		previous_parent.removeChild(this.job);
 		parent_job.AddSubjob(sibling_pos, this);
 	}
 	else
@@ -119,19 +122,25 @@ Job.prototype.MoveTo = function(parent_job, sibling_pos, depth)
 		if(subjobs.length>0)
 		{
 			for(var i=0;i<subjobs.length;i++)
-				this.job.parentNode.insertBefore(subjobs[i].job,this.job);
+				previous_parent.insertBefore(subjobs[i].job,this.job);
 		}
 		
-		this.job.parentNode.removeChild(this.job);
+		previous_parent.removeChild(this.job);
 		
 		parent_job.AddSubjob(sibling_pos, this);
 	}
+	
+	// Check that we're not leaving any empty <subjobs> node
+	if (previous_parent.childNodes.length == 0)
+		previous_parent.parentNode.removeChild(previous_parent);
 }
 
 Job.prototype.Delete = function(depth)
 {
+	var parent = this.job.parentNode;
+	
 	if(depth)
-		this.job.parentNode.removeChild(this.job);
+		parent.removeChild(this.job);
 	else
 	{
 		var subjobs = this.GetSubjobs();
@@ -139,11 +148,15 @@ Job.prototype.Delete = function(depth)
 		if(subjobs.length>0)
 		{
 			for(var i=0;i<subjobs.length;i++)
-				this.job.parentNode.insertBefore(subjobs[i].job,this.job);
+				parent.insertBefore(subjobs[i].job,this.job);
 		}
 		
-		this.job.parentNode.removeChild(this.job);
+		parent.removeChild(this.job);
 	}
+	
+	// Check that we're not leaving an empty <subjobs> node (if we are, remove it too)
+	if (parent.childNodes.length == 0)
+		parent.parentNode.removeChild(parent);
 }
 
 Job.prototype.AddTask = function(task)
