@@ -442,7 +442,7 @@ div#login div.form {
 	color:#4996ce;
 }
 
-#dt_inf, #dt_sup, #hr_inf, #hr_sup {
+#dt_inf, #dt_sup, #dt_at, #hr_inf, #hr_sup, #hr_at {
 	width: 6em;
 }
 

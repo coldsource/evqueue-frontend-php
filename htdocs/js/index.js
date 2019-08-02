@@ -229,27 +229,67 @@ $(document).ready(function() {
 		UpdateFilters();
 	});
 
-	$('#dt_inf,#hr_inf').on('change autocompletechange',function() {
+	$('#dt_inf,#hr_inf').on('change autocompletechange',function(event,data) {
 		if($('#dt_inf').val())
 		{
-			search_filters.filter_launched_from = $('#dt_inf').val()+' '+($('#hr_inf').val()!=''?($('#hr_inf').val()+':00'):'00:00:00');
+			// "workflows around a given time" and "workflows launched before/after" are incompatible, empty the other fields
+			$('#dt_at,#hr_at').val('').trigger('change',{update_filters: false});
+			
+			// default to midnight if no time is given
+			if (!$('#hr_inf').val())
+				$('#hr_inf').val('00:00');
+			
+			search_filters.filter_launched_from = $('#dt_inf').val()+' '+$('#hr_inf').val();
 		}
 		else
 			delete search_filters.filter_launched_from;
-
-		UpdateFilters();
+		
+		if (!data || data.update_filters)
+			UpdateFilters();
 	});
 
-	$('#dt_sup,#hr_sup').on('change autocompletechange',function() {
+	$('#dt_sup,#hr_sup').on('change autocompletechange',function(event,data) {
 		if($('#dt_sup').val())
 		{
-			search_filters.filter_launched_until = $('#dt_sup').val()+' '+($('#hr_sup').val()!=''?($('#hr_sup').val()+':00'):'23:59:59');
+			// "workflows around a given time" and "workflows launched before/after" are incompatible, empty the other fields
+			$('#dt_at,#hr_at').val('').trigger('change',{update_filters: false});
+			
+			// default to just-before-midnight if no time is given
+			if (!$('#hr_sup').val())
+				$('#hr_sup').val('23:59:59');
+			
+			search_filters.filter_launched_until = $('#dt_sup').val()+' '+$('#hr_sup').val();
 		}
 		else
 			delete search_filters.filter_launched_until;
-
-
-		UpdateFilters();
+		
+		if (!data || data.update_filters)
+			UpdateFilters();
+	});
+	
+	$('#dt_at,#hr_at').on('change autocompletechange',function(event,data) {
+		if($('#dt_at').val())
+		{
+			// "workflows around a given time" and "workflows launched before/after"" are incompatible, empty the other fields
+			$('#dt_inf,#hr_inf,#dt_sup,#hr_sup').val('');
+			$('#dt_inf,#hr_inf,#dt_sup,#hr_sup').trigger('change',{update_filters: false});
+			
+			// default to midnight if no time is given
+			if (!$('#hr_at').val())
+				$('#hr_at').val('00:00');
+			
+			var datetime = $('#dt_at').val()+' '+($('#hr_at').val()!=''?($('#hr_at').val()+':00'):'00:00:00');
+			search_filters.filter_launched_until = datetime;
+			search_filters.filter_ended_from = datetime;
+		}
+		else {
+			delete search_filters.filter_launched_until;
+			delete search_filters.filter_ended_from;
+			
+		}
+		
+		if (!data || data.update_filters)
+			UpdateFilters();
 	});
 
 	$('#terminated-workflows-pannel .fa-exclamation').click(function() {
@@ -277,6 +317,8 @@ $(document).ready(function() {
 		$('#hr_inf').val('');
 		$('#dt_sup').val('');
 		$('#hr_sup').val('');
+		$('#dt_at').val('');
+		$('#hr_at').val('');
 		if($('#terminated-workflows-pannel .fa-exclamation').hasClass('error'))
 			$('#terminated-workflows-pannel .fa-exclamation').click();
 
@@ -365,6 +407,7 @@ function UpdateFilters()
 			explain += ' before '+search_filters.filter_launched_until;
 		else if(search_filters.filter_tag_id)
 			explain += ' tagged '+$('#searchform select[name=tagged] option[value='+search_filters.filter_tag_id+']').text();
+		// TODO dt_at
 
 		var i = 0;
 		if(Object.keys(parameters).length)

@@ -199,6 +199,11 @@
 						Date&#160;:&#160;<input id="dt_sup" name="dt_sup" class="datepicker" />
 						Hour&#160;:&#160;<input id="hr_sup" name="hr_sup" class="timepicker evq-autocomplete" data-type="time" />
 					</div>
+					<div>
+						<label>Workflows that were running at</label>
+						Date&#160;:&#160;<input id="dt_at" name="dt_at" class="datepicker" />
+						Hour&#160;:&#160;<input id="hr_at" name="hr_at" class="timepicker evq-autocomplete" data-type="time" />
+					</div>
 				</form>
 			</div>
 		</div>

@@ -61,7 +61,7 @@ else if($_GET['status']=='terminated')
 		if(substr($filter_name,0,10)=='parameter_')
 			$parameters[substr($filter_name,10)] = $filter_value;
 		else
-		$filters[$filter_name] = $filter_value;
+			$filters[$filter_name] = $filter_value;
 	}
 	
 	$xsl->SetParameter('LIMIT', $limit);
