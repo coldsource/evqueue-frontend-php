@@ -229,12 +229,14 @@ $(document).ready(function() {
 		UpdateFilters();
 	});
 
-	$('#dt_inf,#hr_inf').on('change autocompletechange',function(event,data) {
+	$('#dt_inf,#hr_inf,#dt_sup,#hr_sup').on('change autocompletechange',function(event,data) {
+		
+		// "workflows around a given time" and "workflows launched before/after" are incompatible, empty the other fields
+		if ($('#dt_inf').val() || $('#dt_sup').val())
+			$('#dt_at,#hr_at').val('').trigger('change',{update_filters: false});
+		
 		if($('#dt_inf').val())
 		{
-			// "workflows around a given time" and "workflows launched before/after" are incompatible, empty the other fields
-			$('#dt_at,#hr_at').val('').trigger('change',{update_filters: false});
-			
 			// default to midnight if no time is given
 			if (!$('#hr_inf').val())
 				$('#hr_inf').val('00:00');
@@ -244,16 +246,8 @@ $(document).ready(function() {
 		else
 			delete search_filters.filter_launched_from;
 		
-		if (!data || data.update_filters)
-			UpdateFilters();
-	});
-
-	$('#dt_sup,#hr_sup').on('change autocompletechange',function(event,data) {
 		if($('#dt_sup').val())
 		{
-			// "workflows around a given time" and "workflows launched before/after" are incompatible, empty the other fields
-			$('#dt_at,#hr_at').val('').trigger('change',{update_filters: false});
-			
 			// default to just-before-midnight if no time is given
 			if (!$('#hr_sup').val())
 				$('#hr_sup').val('23:59:59');
@@ -271,8 +265,7 @@ $(document).ready(function() {
 		if($('#dt_at').val())
 		{
 			// "workflows around a given time" and "workflows launched before/after"" are incompatible, empty the other fields
-			$('#dt_inf,#hr_inf,#dt_sup,#hr_sup').val('');
-			$('#dt_inf,#hr_inf,#dt_sup,#hr_sup').trigger('change',{update_filters: false});
+			$('#dt_inf,#hr_inf,#dt_sup,#hr_sup').val('').trigger('change',{update_filters: false});
 			
 			// default to midnight if no time is given
 			if (!$('#hr_at').val())
@@ -285,7 +278,6 @@ $(document).ready(function() {
 		else {
 			delete search_filters.filter_launched_until;
 			delete search_filters.filter_ended_from;
-			
 		}
 		
 		if (!data || data.update_filters)
@@ -399,7 +391,9 @@ function UpdateFilters()
 			explain = 'Showing terminated ';
 
 		explain += (search_filters.filter_workflow?' <i>'+search_filters.filter_workflow+'</i> ':'')+'workflows';
-		if(search_filters.filter_launched_from && search_filters.filter_launched_until)
+		if(search_filters.filter_launched_until && search_filters.filter_ended_from)
+			explain += ' that were running at '+search_filters.filter_launched_until;
+		else if(search_filters.filter_launched_from && search_filters.filter_launched_until)
 			explain += ' between '+search_filters.filter_launched_from+' and '+search_filters.filter_launched_until;
 		else if(search_filters.filter_launched_from)
 			explain += ' since '+search_filters.filter_launched_from;
@@ -407,7 +401,6 @@ function UpdateFilters()
 			explain += ' before '+search_filters.filter_launched_until;
 		else if(search_filters.filter_tag_id)
 			explain += ' tagged '+$('#searchform select[name=tagged] option[value='+search_filters.filter_tag_id+']').text();
-		// TODO dt_at
 
 		var i = 0;
 		if(Object.keys(parameters).length)
