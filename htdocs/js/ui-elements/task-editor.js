@@ -188,7 +188,7 @@ TaskEditor.prototype.Open = function(id)
 	var queue = this.task.GetAttribute('queue');
 	$("#task-editor select#queue").val(queue);
 	
-	var retry_schedule = this.task.GetAttribute('retry-schedule');
+	var retry_schedule = this.task.GetAttribute('retry_schedule');
 	$("#task-editor select#retryschedule").val(retry_schedule);
 	$("#task-editor select#retryschedule").change(function() {
 		if($(this).val()=='')
@@ -200,7 +200,7 @@ TaskEditor.prototype.Open = function(id)
 			$("#task-editor select#retryretval").removeAttr('disabled');
 	});
 	
-	var retry_retval = this.task.GetAttribute('retry-retval');
+	var retry_retval = this.task.GetAttribute('retry_retval');
 	if(retry_schedule=='')
 	{
 		$("#task-editor select#retryretval").val('');
@@ -250,8 +250,8 @@ TaskEditor.prototype.Open = function(id)
 			me.SaveAttribute('loop',loop,$('#task-editor input#loop').val());
 			me.SaveAttribute('iteration-condition',iterationcondition,$('#task-editor input#iteration-condition').val());
 			me.SaveAttribute('queue',queue,$("#task-editor select#queue").val());
-			me.SaveAttribute('retry-schedule',retry_schedule,$("#task-editor select#retryschedule").val());
-			me.SaveAttribute('retry-retval',retry_retval,$("#task-editor select#retryretval").val());
+			me.SaveAttribute('retry_schedule',retry_schedule,$("#task-editor select#retryschedule").val());
+			me.SaveAttribute('retry_retval',retry_retval,$("#task-editor select#retryretval").val());
 			me.SaveAttribute('user',user,$("#task-editor input#user").val());
 			me.SaveAttribute('host',host,$("#task-editor input#host").val());
 			me.SaveAttribute('queue_host',queue_host,$("#task-editor input#queue_host").val());
