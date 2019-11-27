@@ -51,7 +51,7 @@ div.node {
 	border-radius: 4px;
 	display:inline-block;
 	width:200px;
-	height:100px;
+	min-height:100px;
 	position:relative;
 	margin:auto;
 	background-color: #ecf0f1;
