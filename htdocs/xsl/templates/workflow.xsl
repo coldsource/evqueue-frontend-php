@@ -2,7 +2,8 @@
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:exsl="http://exslt.org/common" xmlns:php="http://php.net/xsl" exclude-result-prefixes="exsl php" version="1.0">
 	<xsl:import href="datetime.xsl" />
 	<xsl:import href="xmlhighlight.xsl" />
-
+	
+	
 	<xsl:template match="workflow" mode="tree">
 		<div id="workflow-{@id}">
 			<xsl:if test="@comment != ''">
@@ -20,8 +21,9 @@
 		</div>
 	</xsl:template>
 	
+	
 	<xsl:template match="job">
-
+		
 		<xsl:variable name="jobClass">
 			<xsl:if test="@status = 'SKIPPED' or ancestor::job[@status = 'SKIPPED']">skipped</xsl:if>
 		</xsl:variable>
@@ -52,20 +54,49 @@
 						</xsl:if>
 					</xsl:otherwise>
 				</xsl:choose>
-				<xsl:apply-templates select="tasks/task" />
+				<xsl:if test="count(tasks/task) > 10">
+				<small>(<xsl:value-of select="count(tasks/task)" /> tasks)</small>
+				</xsl:if>
+				
+				<xsl:choose>
+					<xsl:when test="count(tasks/task) > 5">
+						<xsl:apply-templates select="tasks/task" mode="grouped" />
+					</xsl:when>
+					<xsl:otherwise>
+						<xsl:apply-templates select="tasks/task" mode="no-grouping" />
+					</xsl:otherwise>
+				</xsl:choose>
 			</div>
 			
 			<xsl:apply-templates select="subjobs/job" />
 		</div>
 	</xsl:template>
 	
-	<xsl:template match="task">
+	
+	<xsl:template match="task" mode="grouped">
+		<xsl:choose>
+			<!-- regroup successfully terminated sibling tasks that have the same name -->
+			<xsl:when test="@status = 'TERMINATED' and @retval = 0 and @path = preceding-sibling::task[1][@status = 'TERMINATED' and @retval = 0]/@path" >
+				<xsl:apply-templates select="." mode="no-grouping">
+					<xsl:with-param name="cls" select="'minitask'" />
+				</xsl:apply-templates>
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:apply-templates select="." mode="no-grouping" />
+			</xsl:otherwise>
+		</xsl:choose>
+	</xsl:template>
+	
+	
+	<xsl:template match="task" mode="no-grouping">
+		<xsl:param name="cls" select="''" />
 		
 		<xsl:variable name="taskClass">
 			<xsl:if test="@status = 'SKIPPED' or ancestor::job[@status = 'SKIPPED']">skipped</xsl:if>
 		</xsl:variable>
+		<xsl:variable name="nb-similar-tasks" select="count(following-sibling::task[@status = 'TERMINATED' and @retval = 0 and @path = current()/@path])" />
 		
-		<div class="task {$taskClass}" data-name="{@name}" data-type="task" data-evqid="{@evqid}" data-outputs="{count(output)}">
+		<div class="task {$taskClass} {$cls}" data-name="{@name}" data-type="task" data-evqid="{@evqid}" data-outputs="{count(output)}">
 			
 			<xsl:if test="@progression != 0 and @progression != 100">
 				<xsl:attribute name="title"><xsl:value-of select="@progression" />%</xsl:attribute>
@@ -89,6 +120,7 @@
 			</xsl:if>
 		</div>
 	</xsl:template>
+	
 	
 	<xsl:template match="task" mode="status">
 		<span class="taskState">
@@ -118,6 +150,7 @@
 		</span>
 	</xsl:template>
 	
+	
 	<xsl:template match="task" mode="small">
 		<xsl:if test="count(@type)=0 or @type='BINARY'">
 			<span title="{php:function('taskPart', string(@path), 'COMMAND')}">
@@ -133,12 +166,14 @@
 		</xsl:if>
 	</xsl:template>
 	
+	
 	<xsl:template match="output" mode="status">
 		<xsl:choose>
 			<xsl:when test="@retval = '0'"><span class="faicon fa-check success"></span></xsl:when>
 			<xsl:otherwise><span class="faicon fa-exclamation error"></span></xsl:otherwise>
 		</xsl:choose>
 	</xsl:template>
+	
 	
 	<xsl:template match="subjobs" mode="details">
 		<xsl:for-each select="job">
@@ -280,6 +315,7 @@
 		</xsl:for-each>
 	</xsl:template>
 	
+	
 	<xsl:template match="*" mode="display_output">
 		<xsl:choose>
 			<xsl:when test="count(@datastore-id) > 0">
@@ -298,7 +334,5 @@
 			</xsl:otherwise>
 		</xsl:choose>
 	</xsl:template>
-	
-	
 	
 </xsl:stylesheet>

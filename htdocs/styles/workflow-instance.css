@@ -30,9 +30,18 @@
 	position: relative;  /* host the progressbar */
 	margin: 3px auto;
 }
-.task + .task {
+.task + .task:not(.minitask) {
 	margin-top: 10px;
 }
+.minitask {
+	height: 14px;
+	width: 20px;
+	margin: 1px;
+	overflow: hidden;
+	display: inline-block;
+	opacity: 0.4;
+}
+
 .progressbar {
 	position: absolute;
 	width: 90%;
