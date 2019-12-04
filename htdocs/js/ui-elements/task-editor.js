@@ -298,6 +298,7 @@ TaskEditor.prototype.RefreshInputs = function()
 			
 			var input_div = $("<div class='input'>");
 			input_div.append("<span class='faicon fa-remove' title='Delete input'></span>");
+			input_div.append("<span class='faicon fa-arrows' title='Move input'></span> ");
 			var input_name_span = $("<span>",{class:'input_name',text:inputs[i].name!=''?inputs[i].name:"Input "+(i+1)});
 			var props = task_editor.task.GetInputProperties(i);
 			if(props.condition)
@@ -318,6 +319,16 @@ TaskEditor.prototype.RefreshInputs = function()
 		else if(inputs[i].type=='stdin')
 			this.RefreshInputParts(inputs[i],$('#tab-stdin .value'));
 	}
+	
+	$('#tab-inputs .inputs').sortable({
+		handle: '.fa-arrows',
+		update: function (event,ui) {
+			var wanted_order = $.map($(this).children('.input_line'), function (el,i) {
+				return $(el).find('.input_name').text();
+			});
+			task_editor.task.ReorderInputs(wanted_order);
+		}
+	});
 	
 	$('#tab-inputs .input span.input_name').click(function() {
 		var el = $(this);
