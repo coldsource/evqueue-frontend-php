@@ -245,8 +245,31 @@ Task.prototype.GetInputs = function()
 	return ret;
 }
 
+Task.prototype.ReorderInputs = function (wanted_order)
+{
+	for (i in wanted_order)
+	{
+		var input = this.task.ownerDocument.Query('input[@name="'+wanted_order[i]+'"]',this.task)[0];
+		this.task.appendChild(input);
+	}
+	
+	this.stdin_at_end_of_inputs();
+}
+
+Task.prototype.stdin_at_end_of_inputs = function ()
+{
+	// push <stdin> to the end of the "inputs" list (allows for simple numbering of regular <input>s)
+	var stdin = this.task.ownerDocument.Query('stdin',this.task);
+	if (stdin.length > 0)
+	{
+		this.task.removeChild(stdin[0]);
+		this.task.appendChild(stdin[0]);  // <stdin> now after all <input>s
+	}
+}
+
 Task.prototype.AddInput = function(name)
 {
+	// verifications
 	if(name=='')
 	{
 		alert('Invalid name');
@@ -264,16 +287,12 @@ Task.prototype.AddInput = function(name)
 		}
 	}
 	
+	// input creation
 	var input = this.task.ownerDocument.createElement('input');
 	input.setAttribute('name',name);
 	this.task.appendChild(input);
 	
-	// push <stdin> to the end of the "inputs" list (allows for simple numbering of regular <input>s)
-	var stdin = this.task.ownerDocument.Query('stdin',this.task);
-	if (stdin.length > 0) {
-		this.task.removeChild(stdin[0]);
-		this.task.appendChild(stdin[0]);  // <stdin> now after all <input>s
-	}
+	this.stdin_at_end_of_inputs();
 	
 	return true;
 }
