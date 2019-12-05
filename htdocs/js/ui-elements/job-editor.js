@@ -94,7 +94,7 @@ JobEditor.prototype.SaveAttribute = function(name,old_val,new_val)
 	
 	if(!this.wfbackupdone)
 	{
-		wf.Backup();
+		wf.Backup("Edit job's "+name);
 		this.wfbackupdone = true;
 	}
 	

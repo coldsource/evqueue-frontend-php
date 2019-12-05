@@ -72,7 +72,7 @@ $(document).ready(function() {
 	
 	$('#trash').droppable({
 		drop: function(event, ui) {
-			wf.Backup();
+			wf.Backup('Delete job');
 			
 			var type = ui.draggable.data('type');
 			
