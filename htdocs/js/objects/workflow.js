@@ -60,29 +60,48 @@ Workflow.prototype.SetAttribute = function(name,value)
 	this.attributes[name] = value;
 }
 
-Workflow.prototype.Backup = function()
+Workflow.prototype.Backup = function(next_action)
 {
 	this.redo_stack = [];
-	this.undo_stack.push(this.GetXML());
+	this.undo_stack.push({
+		xml: this.GetXML(),
+		next_action: next_action ? next_action : 'some action'
+	});
 }
 
 Workflow.prototype.Undo = function()
 {
-	if(this.undo_stack.length==0)
+	if(this.undo_stack.length==0) {
+		Message('nothing to undo');
 		return false;
+	}
 	
-	this.redo_stack.push(this.GetXML());
-	this.xmldoc = jQuery.parseXML(this.undo_stack.pop());
+	var action = this.undo_stack.pop();
+	Message('UNDO: '+action.next_action);
+	
+	this.redo_stack.push({
+		xml: this.GetXML(),
+		next_action: action.next_action
+	});
+	this.xmldoc = jQuery.parseXML(action.xml);
 	return true;
 }
 
 Workflow.prototype.Redo = function()
 {
-	if(this.redo_stack.length==0)
+	if(this.redo_stack.length==0){
+		Message('nothing to redo');
 		return false;
+	}
 	
-	this.undo_stack.push(this.GetXML());
-	this.xmldoc = jQuery.parseXML(this.redo_stack.pop());
+	var action = this.redo_stack.pop();
+	Message('REDO: '+action.next_action);
+	
+	this.undo_stack.push({
+		xml: this.GetXML(),
+		next_action: action.next_action
+	});
+	this.xmldoc = jQuery.parseXML(action.xml);
 }
 
 Workflow.prototype.GetXML = function(remove_id = false)
@@ -273,7 +292,6 @@ Workflow.prototype.Draw = function()
 	
 	$('.droppable').droppable({
 		drop: function(event, ui) {
-			wf.Backup();
 			
 			var type = ui.draggable.data('type');
 			var parent_id = $(this).data('parent-id');
@@ -282,6 +300,8 @@ Workflow.prototype.Draw = function()
 			
 			if(type=='task')
 			{
+				wf.Backup('Add task');
+				
 				var task_path = ui.draggable.data('path');
 				var parameters_mode = ui.draggable.data('parametersmode')
 				var output_method = ui.draggable.data('outputmethod')
@@ -291,12 +311,16 @@ Workflow.prototype.Draw = function()
 			}
 			else if(type=='branch')
 			{
+				wf.Backup('Move branch');
+				
 				var current_job_id = ui.draggable.find('.node:first').data('id');
 				var current_job = wf.GetJobByID(current_job_id);
 				current_job.MoveTo(parent_job,sibling_pos,true);
 			}
 			else if(type=='node')
 			{
+				wf.Backup('Move job');
+				
 				var current_job_id = ui.draggable.data('id');
 				var current_job = wf.GetJobByID(current_job_id);
 				current_job.MoveTo(parent_job,sibling_pos,false);
@@ -314,12 +338,12 @@ Workflow.prototype.Draw = function()
 	
 	$('.node').droppable({
 		drop: function(event, ui) {
-			wf.Backup();
-			
 			var type = ui.draggable.data('type');
 			
 			if(type=='task')
 			{
+				wf.Backup('Add task');
+				
 				var task_path = ui.draggable.data('path');
 				var parameters_mode = ui.draggable.data('parametersmode')
 				var output_method = ui.draggable.data('outputmethod')
@@ -360,7 +384,7 @@ Workflow.prototype.Draw = function()
 		$(document).off('click').on('click',function(e) {
 			if($(e.target).attr('id')=='taskmenu' || $(e.target).parents('#taskmenu').length>0)
 			{
-				wf.Backup();
+				wf.Backup('Delete task');
 				wf.GetJobByID(job_id).DeleteTask(idx);
 				wf.Draw();
 				

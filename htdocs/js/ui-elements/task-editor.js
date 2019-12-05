@@ -323,6 +323,7 @@ TaskEditor.prototype.RefreshInputs = function()
 	$('#tab-inputs .inputs').sortable({
 		handle: '.fa-arrows',
 		update: function (event,ui) {
+			wf.Backup('reorder inputs of '+task_editor.task.GetPath());
 			var wanted_order = $.map($(this).children('.input_line'), function (el,i) {
 				return $(el).find('.input_name').text();
 			});
@@ -342,7 +343,8 @@ TaskEditor.prototype.RefreshInputs = function()
 		$('#task-input-editor').dialog({width:'auto',height:'auto'});
 		
 		$('#task-input-editor button.submit').off('click').on('click', function() {
-			wf.Backup();
+			wf.Backup('Edit input of '+task_editor.task.GetPath());
+			
 			task_editor.task.RenameInput(input_idx,$('#input-name').val());
 			task_editor.task.EditInputProperties(input_idx,$('#input-condition').val(),$('#input-loop').val());
 			$('#task-input-editor').dialog('close');
@@ -353,7 +355,7 @@ TaskEditor.prototype.RefreshInputs = function()
 	$('#tab-inputs .input span.fa-remove').click(this.DeleteInput);
 	
 	$('#tab-inputs .value span.fa-remove,#tab-stdin .value span.fa-remove').click(function() {
-		wf.Backup();
+		wf.Backup('Remove input part');
 		
 		var idx;
 		if($(this).parent().parent().parent().data('inputtype')=='input')
@@ -377,7 +379,7 @@ TaskEditor.prototype.RefreshInputs = function()
 		OpenValueSelector($(this).data('type'),$(this).data('val'));
 		
 		$('#value-selector .add_value').off('click').on('click',function() {
-			wf.Backup();
+			wf.Backup('Edit input part');
 	
 			$('#value-selector').dialog('close');
 			
@@ -410,7 +412,7 @@ TaskEditor.prototype.RefreshInputs = function()
 		OpenValueSelector();
 		
 		$('#value-selector .add_value').off('click').on('click',function() {
-			wf.Backup();
+			wf.Backup('Add input part');
 	
 			$('#value-selector').dialog('close');
 			
@@ -472,7 +474,7 @@ TaskEditor.prototype.AddInput = function()
 	if(name==null)
 		return;
 	
-	wf.Backup();
+	wf.Backup('Add input');
 	
 	if(task_editor.task.AddInput(name))
 		task_editor.RefreshInputs();
@@ -480,7 +482,7 @@ TaskEditor.prototype.AddInput = function()
 
 TaskEditor.prototype.DeleteInput = function()
 {
-	wf.Backup();
+	wf.Backup('Delete input');
 	
 	if(task_editor.task.DeleteInput($(this).parent().parent().index()))
 		task_editor.RefreshInputs();
