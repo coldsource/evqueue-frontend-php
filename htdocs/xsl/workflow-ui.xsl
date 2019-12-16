@@ -35,7 +35,6 @@
 			<span id="undo" class="faicon fa-rotate-left" title="Undo"></span>
 			<span id="redo" class="faicon fa-rotate-right" title="Redo"></span>
 			<span id="open-tasks-library" class="faicon fa-tasks" title="Tasks library"></span>
-			<span id="open-custom-filters" class="faicon fa-filter" title="Custom filters"></span>
 			<span id="export_xml" class="faicon fa-arrow-down" title="Export XML"></span>
 			<span id="import_xml" class="faicon fa-arrow-up" title="Import XML"></span>
 			<span id="trash" class="faicon fa-trash" title="Drag'n drop elements to the trash to remove them"></span>
