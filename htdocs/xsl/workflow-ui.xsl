@@ -46,8 +46,6 @@
 		
 		<div id="tasks-library" class="dialog" title="Tasks library"></div>
 		
-		<div id="custom-filters" class="dialog" title="Custom filters"></div>
-		
 		<div id='import_xml_dlg' class="dialog">
 			<textarea rows='30' cols='80' name='xml'></textarea>
 			<button id='import_xml_action'>Import</button>
