@@ -128,7 +128,7 @@ function CancelInstance(id,node,killtasks = false)
 		attributes: { 'id':id },
 		node: node
 	}).done( function (xml) {
-		var subjobs = xml.Query('subjobs',xml.documentElement.firstChild);
+		var subjobs = xml.Query('//subjobs',xml.documentElement.firstChild);
 		
 		evqueueAPI({
 			group: 'instance',
@@ -137,8 +137,10 @@ function CancelInstance(id,node,killtasks = false)
 			node: node
 		}).done(function() {
 			Message('Canceled instance '+id);
-			if(killtasks)
-				KillRunningTasks(subjobs[0],id,node);
+			if(killtasks) {
+				for (i in subjobs)
+					KillRunningTasks(subjobs[i],id,node);
+			}
 		});
 	});
 }
