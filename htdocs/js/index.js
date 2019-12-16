@@ -23,7 +23,7 @@ var current_page = 1;
 
 $(document).ready(function() {
 	// Launch button
-	$('#executing-workflows-pannel .fa-rocket').click(function() {
+	$('#executing-workflows .fa-rocket').click(function() {
 		$('#workflow-launch input[name=comment]').val('Launched by user "'+connected_user+'"');
 		$('#workflow-launch').dialog({width:'auto',height:'auto'});
 	});
@@ -74,7 +74,7 @@ $(document).ready(function() {
 	});
 
 	// Alarm clock
-	$('#executing-workflows-pannel .fa-clock-o').click(function() {
+	$('#executing-workflows .fa-clock-o').click(function() {
 		evqueueAPI({
 			confirm: 'The retry counter of each task in error will be decremented. Continue ?',
 			group: 'control',
@@ -86,7 +86,7 @@ $(document).ready(function() {
 	});
 
 	// Graph
-	$('#executing-workflows-pannel').delegate('.fa-info','mouseover', function(e) {
+	$('#executing-workflows').delegate('.fa-info','mouseover', function(e) {
 		DrawGraph($('#workflow-stats-graph div.chart'),[
 			{prct:$(this).parents('tr').data('running_tasks')-$(this).parents('tr').data('queued_tasks'),label:'Executing tasks',color:'#b6ffb2'},
 			{prct:$(this).parents('tr').data('retrying_tasks'),label:'Retrying tasks',color:'#ffb651'},
@@ -101,7 +101,7 @@ $(document).ready(function() {
 		$('#workflow-stats-graph').show();
 	});
 
-	$('#executing-workflows-pannel').delegate('td','mouseout', function() {
+	$('#executing-workflows').delegate('td','mouseout', function() {
 		$('#workflow-stats-graph').hide();
 	});
 
@@ -121,7 +121,7 @@ $(document).ready(function() {
 	});
 
 	// Cancell instance
-	$(document).delegate('#executing-workflows-pannel .fa-ban','click',function() {
+	$(document).delegate('#executing-workflows .fa-ban','click',function() {
 		if(!confirm("You are about to cancel this instance.\n\nRunning tasks will continue to run normally but no new task will be launched.\n\nRetry schedules will be disabled."))
 			return;
 
@@ -129,7 +129,7 @@ $(document).ready(function() {
 	});
 
 	// Kill instance
-	$(document).delegate('#executing-workflows-pannel .fa-bomb','click',function() {
+	$(document).delegate('#executing-workflows .fa-bomb','click',function() {
 		if(!confirm("You are about to kill this instance.\n\nRunning tasks will be killed with SIGKILL and workflow will end immediately.\n\nThis can lead to inconsistancies in running tasks."))
 			return;
 
