@@ -35,6 +35,7 @@
 			<span id="undo" class="faicon fa-rotate-left" title="Undo"></span>
 			<span id="redo" class="faicon fa-rotate-right" title="Redo"></span>
 			<span id="open-tasks-library" class="faicon fa-tasks" title="Tasks library"></span>
+			<span id="open-custom-filters" class="faicon fa-filter" title="Custom filters"></span>
 			<span id="export_xml" class="faicon fa-arrow-down" title="Export XML"></span>
 			<span id="import_xml" class="faicon fa-arrow-up" title="Import XML"></span>
 			<span id="trash" class="faicon fa-trash" title="Drag'n drop elements to the trash to remove them"></span>
@@ -45,6 +46,8 @@
 		<div id="workflow"></div>
 		
 		<div id="tasks-library" class="dialog" title="Tasks library"></div>
+		
+		<div id="custom-filters" class="dialog" title="Custom filters"></div>
 		
 		<div id='import_xml_dlg' class="dialog">
 			<textarea rows='30' cols='80' name='xml'></textarea>

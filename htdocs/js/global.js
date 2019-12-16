@@ -178,6 +178,32 @@ jQuery.fn.extend({
 });
 
 
+class WorkflowIDs
+{
+	constructor ()
+	{
+		if (typeof WorkflowIDs.workflows !== 'undefined')
+			return;
+		
+		WorkflowIDs.workflows = {};
+		
+		evqueueAPI({
+			group: 'workflows',
+			action: 'list',
+		}).done(function (xml) {
+			$(xml).find('workflow').each( function () {
+				WorkflowIDs.workflows[this.getAttribute('name')] = this.getAttribute('id');
+			});
+		});
+	}
+	
+	static Get (workflow_name) {
+		return WorkflowIDs.workflows[workflow_name];
+	}
+}
+var wfids = new WorkflowIDs();
+
+
 function autorefresh(el,toggle)
 {
 	var interval = el.data('interval')?el.data('interval'):0;
