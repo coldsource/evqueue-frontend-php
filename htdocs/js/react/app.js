@@ -713,6 +713,8 @@ class evQueueWS {
 	constructor(context, callback) {
 		this.ws = new WebSocket("ws://srvdev:5001/", "events");
 
+		this.time_delta = 0;
+
 		this.state = 'CONNECTING';
 
 		this.ws.onopen = function (event) {
@@ -726,9 +728,10 @@ class evQueueWS {
 
 		var self = this;
 		this.ws.onmessage = function (event) {
+			var parser = new DOMParser();
+			var xmldoc = parser.parseFromString(event.data, "text/xml");
+
 			if (self.state == 'CONNECTING') {
-				var parser = new DOMParser();
-				var xmldoc = parser.parseFromString(event.data, "text/xml");
 				var challenge = xmldoc.documentElement.getAttribute("challenge");
 
 				var passwd_hash = CryptoJS.SHA1("admin");
@@ -737,6 +740,9 @@ class evQueueWS {
 				self.ws.send("<auth response='" + response + "' user='admin' />");
 				self.state = 'AUTHENTICATED';
 			} else if (self.state == 'AUTHENTICATED') {
+				var time = xmldoc.documentElement.getAttribute("time");
+				self.time_delta = Date.now() - Date.parse(time);
+
 				var api_cmd = btoa("<status action='query' type='workflows' />");
 				self.ws.send("<event action='subscribe' type='INSTANCE_TERMINATED' api_cmd='" + api_cmd + "' />");
 				self.ws.send("<event action='subscribe' type='INSTANCE_STARTED' api_cmd='" + api_cmd + "' />");
@@ -755,6 +761,10 @@ class evQueueWS {
 				self.callback(self.context, ret);
 			}
 		};
+	}
+
+	GetTimeDelta() {
+		return this.time_delta;
 	}
 }
 /*
@@ -895,7 +905,7 @@ class RunningInstances extends React.Component {
 		super(props);
 
 		this.state = {
-			now: Date.now(),
+			now: 0,
 			workflows: {
 				node: 'unknown',
 				response: []
@@ -905,10 +915,18 @@ class RunningInstances extends React.Component {
 		this.timerID = false;
 	}
 
+	now() {
+		return Date.now();
+		/*if(!this.evqueue)
+  	return Date.now();
+  return Date.now()-this.evqueue.GetTimeDelta();*/
+	}
+
 	componentDidMount() {
 		this.evqueue = new evQueueWS(this, this.evQueueEvent);
 
-		this.timerID = setInterval(() => this.setState({ now: Date.now() }), 1000);
+		this.setState({ now: this.now() });
+		this.timerID = setInterval(() => this.setState({ now: this.now() }), 1000);
 	}
 
 	componentWillUnmount() {
@@ -920,6 +938,7 @@ class RunningInstances extends React.Component {
 	}
 
 	humanTime(seconds) {
+		if (seconds < 0) seconds = 0;
 		seconds = Math.floor(seconds);
 		return (seconds / 86400 >= 1 ? Math.floor(seconds / 86400) + ' days, ' : '') + (seconds / 3600 >= 1 ? Math.floor(seconds / 3600) % 24 + 'h ' : '') + (seconds / 60 >= 1 ? Math.floor(seconds / 60) % 60 + 'm ' : '') + seconds % 60 + 's';
 	}
@@ -1072,7 +1091,7 @@ class RunningInstances extends React.Component {
 	}
 
 	render() {
-		this.state.now = Date.now();
+		this.state.now = this.now();
 
 		return React.createElement(
 			'div',

@@ -4,6 +4,8 @@ class evQueueWS
 	{
 		this.ws = new WebSocket("ws://srvdev:5001/", "events");
 		
+		this.time_delta = 0;
+		
 		this.state = 'CONNECTING';
 		
 		this.ws.onopen = function (event) {
@@ -18,10 +20,11 @@ class evQueueWS
 		
 		var self = this;
 		this.ws.onmessage = function (event) {
+			var parser = new DOMParser();
+			var xmldoc = parser.parseFromString(event.data, "text/xml");
+			
 			if(self.state == 'CONNECTING')
 			{
-				var parser = new DOMParser();
-				var xmldoc = parser.parseFromString(event.data, "text/xml");
 				var challenge = xmldoc.documentElement.getAttribute("challenge");
 			
 				var passwd_hash = CryptoJS.SHA1("admin");
@@ -32,6 +35,9 @@ class evQueueWS
 			}
 			else if(self.state == 'AUTHENTICATED')
 			{
+				var time = xmldoc.documentElement.getAttribute("time");
+				self.time_delta = Date.now()-Date.parse(time);
+				
 				var api_cmd = btoa("<status action='query' type='workflows' />");
 				self.ws.send("<event action='subscribe' type='INSTANCE_TERMINATED' api_cmd='"+api_cmd+"' />");
 				self.ws.send("<event action='subscribe' type='INSTANCE_STARTED' api_cmd='"+api_cmd+"' />");
@@ -54,5 +60,9 @@ class evQueueWS
 				self.callback(self.context,ret);
 			}
 		}
+	}
+	
+	GetTimeDelta() {
+		return this.time_delta;
 	}
 }

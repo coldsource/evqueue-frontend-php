@@ -5,7 +5,7 @@ class RunningInstances extends React.Component {
 		super(props);
 		
 		this.state = {
-			now: Date.now(),
+			now: 0,
 			workflows: {
 				node: 'unknown',
 				response: [],
@@ -15,10 +15,19 @@ class RunningInstances extends React.Component {
 		this.timerID = false;
 	}
 	
+	now()
+	{
+		return Date.now();
+		/*if(!this.evqueue)
+			return Date.now();
+		return Date.now()-this.evqueue.GetTimeDelta();*/
+	}
+	
 	componentDidMount() {
 		this.evqueue = new evQueueWS(this,this.evQueueEvent); 
 		
-		this.timerID = setInterval(() => this.setState({now: Date.now()}),1000);
+		this.setState({now: this.now()});
+		this.timerID = setInterval(() => this.setState({now: this.now()}),1000);
 	}
 	
 	componentWillUnmount() {
@@ -30,6 +39,8 @@ class RunningInstances extends React.Component {
 	}
 	
 	humanTime(seconds) {
+		if(seconds<0)
+			seconds = 0;
 		seconds = Math.floor(seconds);
 		return (seconds/86400 >= 1 ? Math.floor(seconds/86400)+' days, ' : '') +
                 (seconds/3600 >= 1 ? (Math.floor(seconds/3600)%24)+'h ' : '') +
@@ -129,7 +140,7 @@ class RunningInstances extends React.Component {
 	}
 
 	render() {
-		this.state.now=Date.now();
+		this.state.now=this.now();
 		
 		return (
 			<div>
