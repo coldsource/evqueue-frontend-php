@@ -66,33 +66,19 @@
 		<xsl:call-template name="workflow-launch" />
 
 
-		<div id="executing-workflows">
-			<div class="center">Loading executing workflows...</div>
-		</div>
+		<div id="executing-workflows"></div>
 		
-		<script src="https://unpkg.com/react@16/umd/react.development.js" crossorigin="crossorigin"></script>
-		<script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js" crossorigin="crossorigin"></script>
-		<script src="js/react/app.js"></script>
-
 		<br />
 
 		<xsl:call-template name="filter" />
 
 		<br />
-
-		<div id="terminated-workflows-pannel" class="evq-autorefresh-filter" data-url="ajax/list-instances.php?status=terminated" data-interval="2">
-			<div class="boxTitle">
-				<span class="faicon fa-exclamation filter" title="Display only failed workflows"></span>
-				<span class="title">Terminated workflows</span>
-				<xsl:text>&#160;</xsl:text>
-				<div id="TERMINATED-workflows-pages" class="evq-autorefresh-pannel pages"></div>
-				<span class="faicon fa-refresh action evq-autorefresh-toggle"></span>
-			</div>
-
-			<div id="TERMINATED-workflows" class="workflow-list evq-autorefresh-pannel">
-				<br /><div class="center">Loading...</div>
-			</div>
-		</div>
+		
+		<div id="terminated-workflows"></div>
+		
+		<script src="https://unpkg.com/react@16/umd/react.development.js" crossorigin="crossorigin"></script>
+		<script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js" crossorigin="crossorigin"></script>
+		<script src="js/react/app.js"></script>
 	</xsl:template>
 
 	<xsl:template name="workflow-launch">

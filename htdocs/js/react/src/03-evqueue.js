@@ -1,8 +1,10 @@
 class evQueueWS
 {
-	constructor(context,callback)
+	constructor(context,subscriptions,callback)
 	{
 		this.ws = new WebSocket("ws://srvdev:5001/", "events");
+		
+		this.subscriptions = subscriptions;
 		
 		this.time_delta = 0;
 		
@@ -13,6 +15,7 @@ class evQueueWS
 		};
 		
 		this.ws.onclose = function(event) {
+			console.log("Disconnected from evQueue Websocket");
 		}
 		
 		this.context = context;
@@ -38,9 +41,13 @@ class evQueueWS
 				var time = xmldoc.documentElement.getAttribute("time");
 				self.time_delta = Date.now()-Date.parse(time);
 				
-				var api_cmd = btoa("<status action='query' type='workflows' />");
-				self.ws.send("<event action='subscribe' type='INSTANCE_TERMINATED' api_cmd='"+api_cmd+"' />");
-				self.ws.send("<event action='subscribe' type='INSTANCE_STARTED' api_cmd='"+api_cmd+"' />");
+				// Subscribe to wanted events
+				for(var i=0;i<self.subscriptions.length;i++)
+				{
+					var api_cmd_b64 = btoa(self.subscriptions[i].api);
+					self.ws.send("<event action='subscribe' type='"+self.subscriptions[i].event+"' api_cmd='"+api_cmd_b64+"' />");
+				}
+				
 				self.state = 'READY';
 			}
 			else if(self.state=='READY')
@@ -60,6 +67,10 @@ class evQueueWS
 				self.callback(self.context,ret);
 			}
 		}
+	}
+	
+	Close() {
+		this.ws.close();
 	}
 	
 	GetTimeDelta() {

@@ -107,7 +107,7 @@ $(document).ready(function() {
 
 
 	// Remove instance
-	$(document).delegate('#terminated-workflows-pannel .fa-remove','click',function() {
+	$(document).delegate('#terminated-workflows .fa-remove','click',function() {
 		var instance_id = $(this).parents('tr').data('id');
 		evqueueAPI({
 			confirm: 'You are about to delete instance '+instance_id,
@@ -115,7 +115,7 @@ $(document).ready(function() {
 			action: 'delete',
 			attributes: { 'id':instance_id }
 		}).done( function () {
-			$('#terminated-workflows-pannel').evqautorefresh('refresh');
+			$('#terminated-workflows').evqautorefresh('refresh');
 			Message('Instance '+instance_id+' removed');
 		});
 	});
@@ -284,7 +284,7 @@ $(document).ready(function() {
 			UpdateFilters();
 	});
 
-	$('#terminated-workflows-pannel .fa-exclamation').click(function() {
+	$('#terminated-workflows .fa-exclamation').click(function() {
 		$(this).toggleClass('error');
 
 		if($(this).hasClass('error'))
@@ -311,8 +311,8 @@ $(document).ready(function() {
 		$('#hr_sup').val('');
 		$('#dt_at').val('');
 		$('#hr_at').val('');
-		if($('#terminated-workflows-pannel .fa-exclamation').hasClass('error'))
-			$('#terminated-workflows-pannel .fa-exclamation').click();
+		if($('#terminated-workflows .fa-exclamation').hasClass('error'))
+			$('#terminated-workflows .fa-exclamation').click();
 
 		search_filters = { status:'terminated' };
 		UpdateFilters();
@@ -320,12 +320,12 @@ $(document).ready(function() {
 	});
 
 	// Pages
-	$('#terminated-workflows-pannel').delegate('.fa-backward','click',function() {
+	$('#terminated-workflows').delegate('.fa-backward','click',function() {
 		current_page--;
 		UpdateFilterURL();
 	});
 
-	$('#terminated-workflows-pannel').delegate('.fa-forward','click',function() {
+	$('#terminated-workflows').delegate('.fa-forward','click',function() {
 		current_page++;
 		UpdateFilterURL();
 	});
@@ -369,8 +369,8 @@ function UpdateFilterURL()
 
 	url += "&p="+current_page;
 
-	$('#terminated-workflows-pannel').data('url',url);
-	$('#terminated-workflows-pannel').evqautorefresh('refresh');
+	$('#terminated-workflows').data('url',url);
+	$('#terminated-workflows').evqautorefresh('refresh');
 }
 
 function UpdateFilters()

@@ -1,6 +1,6 @@
 'use strict';
 
-class RunningInstances extends React.Component {
+class ListInstances extends React.Component {
 	constructor(props) {
 		super(props);
 		
@@ -24,13 +24,15 @@ class RunningInstances extends React.Component {
 	}
 	
 	componentDidMount() {
-		this.evqueue = new evQueueWS(this,this.evQueueEvent); 
+		this.evqueue = new evQueueWS(this,this.subscriptions,this.evQueueEvent); 
 		
 		this.setState({now: this.now()});
 		this.timerID = setInterval(() => this.setState({now: this.now()}),1000);
 	}
 	
 	componentWillUnmount() {
+		this.evqueue.Close();
+		
 		clearInterval(this.timerID);
 	}
 	
@@ -71,54 +73,36 @@ class RunningInstances extends React.Component {
 		return dts[1] ? dts[0] + '→' + dts[1] : dts[0];
 	}
 	
-	WorkflowStatus(wf) {
-		if(wf.running_tasks - wf.queued_tasks > 0)
-			return <span className="fa fa-spinner fa-pulse fa-fw" title="Task(s) running"></span>;
-		
-		if(wf.queued_tasks > 0)
-			return <span className="faicon fa-hand-stop-o" title="Task(s) queued"></span>;
-		
-		if(wf.retrying_tasks > 0)
-			return <span className="faicon fa-clock-o" title="A task ended badly and will retry"></span>;
-		
-		if(wf.status = 'TERMINATED' && wf.errors > 0)
-			return <span class="faicon fa-exclamation error" title="Errors"></span>;
-		
-		if(wf.status = 'TERMINATED' && wf.errors == 0)
-			return <span class="faicon fa-check success" title="Workflow terminated"></span>;
-	}
-	
 	renderWorkflowsList() {
-		var node = this.state.workflows.node;
 		return this.state.workflows.response.map((wf) => {
 			return (
-					<tr key={wf.id} data-id={wf.id} data-node={node}>
+					<tr key={wf.id} data-id={wf.id} data-node={this.getNode(wf)}>
 						<td className="center">
 							{ this.WorkflowStatus(wf) }
 						</td>
 						<td>
-							<span className="action showWorkflowDetails" data-id="{@wf.id}" data-node-name="{node}" data-status="{wf.status}">
-								{wf.id} – {wf.name} <span className="faicon fa-info"></span> ({this.humanTime((this.state.now-Date.parse(wf.start_time))/1000)})
+							<span className="action showWorkflowDetails" data-id={wf.id} data-node-name={this.getNode(wf)} data-status="{wf.status}">
+								{wf.id} – {wf.name} <span className="faicon fa-info"></span> ({this.workflowDuration(wf)})
 							</span>
 							&#160;
 						</td>
-						<td className="center">{node}</td>
+						<td className="center">{this.getNode(wf)}</td>
 						<td className="center">{wf.host?wf.host:'localhost'}</td>
 						<td className="tdStarted">
-							{this.timeSpan(wf.start_time)}
+							{this.timeSpan(wf.start_time,wf.end_time)}
 						</td>
-						<td className="tdActions">
-							<span className="faicon fa-ban" title="Cancel this instance"></span>
-							<span className="faicon fa-bomb" title="Kill this instance"></span>
-						</td>
+						{ this.renderActions() }
 					</tr>
 			);
 		});
 	}
 	
 	renderWorkflows() {
+		if(this.state.workflows.node=='unknown')
+			return (<div className="center"><br />Loading...</div>);
+		
 		if(this.state.workflows.response.length==0)
-			return (<div className="center"><br />No EXECUTING workflow.</div>);
+			return (<div className="center"><br />No workflow.</div>);
 		
 		return (
 			<div className="workflow-list">
@@ -144,20 +128,10 @@ class RunningInstances extends React.Component {
 		
 		return (
 			<div>
-				<div className="boxTitle">
-					<div id="nodes-status"></div>
-					<span className="title">Executing workflows</span>&#160;({this.state.workflows.response.length})
-					<span className="faicon fa-refresh action evq-autorefresh-toggle"></span>
-					<span className="faicon fa-rocket action" title="Launch a new workflow"></span>
-					<span className="faicon fa-clock-o action" title="Retry all pending tasks"></span>
-				</div>
+				{ this.renderTitle() }
 				
 				{ this.renderWorkflows() }
-				
 			</div>
 		);
 	}
 }
-
-let domContainer = document.querySelector('#executing-workflows');
-ReactDOM.render(<RunningInstances />, domContainer);

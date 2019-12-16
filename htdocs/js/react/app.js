@@ -709,64 +709,6 @@ var CryptoJS = CryptoJS || function (Math, undefined) {
 
     return C;
 }(Math);
-class evQueueWS {
-	constructor(context, callback) {
-		this.ws = new WebSocket("ws://srvdev:5001/", "events");
-
-		this.time_delta = 0;
-
-		this.state = 'CONNECTING';
-
-		this.ws.onopen = function (event) {
-			console.log("Connected to evQueue Websocket");
-		};
-
-		this.ws.onclose = function (event) {};
-
-		this.context = context;
-		this.callback = callback;
-
-		var self = this;
-		this.ws.onmessage = function (event) {
-			var parser = new DOMParser();
-			var xmldoc = parser.parseFromString(event.data, "text/xml");
-
-			if (self.state == 'CONNECTING') {
-				var challenge = xmldoc.documentElement.getAttribute("challenge");
-
-				var passwd_hash = CryptoJS.SHA1("admin");
-				var response = CryptoJS.HmacSHA1(CryptoJS.enc.Hex.parse(challenge), passwd_hash).toString(CryptoJS.enc.Hex);
-
-				self.ws.send("<auth response='" + response + "' user='admin' />");
-				self.state = 'AUTHENTICATED';
-			} else if (self.state == 'AUTHENTICATED') {
-				var time = xmldoc.documentElement.getAttribute("time");
-				self.time_delta = Date.now() - Date.parse(time);
-
-				var api_cmd = btoa("<status action='query' type='workflows' />");
-				self.ws.send("<event action='subscribe' type='INSTANCE_TERMINATED' api_cmd='" + api_cmd + "' />");
-				self.ws.send("<event action='subscribe' type='INSTANCE_STARTED' api_cmd='" + api_cmd + "' />");
-				self.state = 'READY';
-			} else if (self.state == 'READY') {
-				var parser = new DOMParser();
-				var xmldoc = parser.parseFromString(event.data, "text/xml");
-				var nodes_ite = xmldoc.evaluate('/response/*', xmldoc.documentElement);
-				var node;
-				var ret = { node: xmldoc.documentElement.getAttribute('node'), response: [] };
-				while (node = nodes_ite.iterateNext()) {
-					var obj = {};
-					for (var i = 0; i < node.attributes.length; i++) obj[node.attributes[i].name] = node.attributes[i].value;
-					ret.response.push(obj);
-				}
-				self.callback(self.context, ret);
-			}
-		};
-	}
-
-	GetTimeDelta() {
-		return this.time_delta;
-	}
-}
 /*
 CryptoJS v3.1.2
 code.google.com/p/crypto-js
@@ -898,227 +840,6 @@ code.google.com/p/crypto-js/wiki/License
                         }
             });
 })();
-'use strict';
-
-class RunningInstances extends React.Component {
-	constructor(props) {
-		super(props);
-
-		this.state = {
-			now: 0,
-			workflows: {
-				node: 'unknown',
-				response: []
-			}
-		};
-
-		this.timerID = false;
-	}
-
-	now() {
-		return Date.now();
-		/*if(!this.evqueue)
-  	return Date.now();
-  return Date.now()-this.evqueue.GetTimeDelta();*/
-	}
-
-	componentDidMount() {
-		this.evqueue = new evQueueWS(this, this.evQueueEvent);
-
-		this.setState({ now: this.now() });
-		this.timerID = setInterval(() => this.setState({ now: this.now() }), 1000);
-	}
-
-	componentWillUnmount() {
-		clearInterval(this.timerID);
-	}
-
-	evQueueEvent(context, data) {
-		context.setState({ workflows: data });
-	}
-
-	humanTime(seconds) {
-		if (seconds < 0) seconds = 0;
-		seconds = Math.floor(seconds);
-		return (seconds / 86400 >= 1 ? Math.floor(seconds / 86400) + ' days, ' : '') + (seconds / 3600 >= 1 ? Math.floor(seconds / 3600) % 24 + 'h ' : '') + (seconds / 60 >= 1 ? Math.floor(seconds / 60) % 60 + 'm ' : '') + seconds % 60 + 's';
-	}
-
-	timeSpan(dt1, dt2 = '') {
-		var duration = (Date.parse(dt2) - Date.parse(dt1)) / 1000;
-
-		if (dt1.split(' ')[0] == dt2.split[0]) dt2.replace(/^\d{4}-\d{2}-\d{2}/, ''); // don't display same date twice
-
-		var dts = [dt1, dt2];
-		var today = new Date().toISOString().substr(0, 10);
-		var yesterday = new Date(Date.now() - 86400000).toISOString().substr(0, 10);
-		var tomorrow = new Date(Date.now() + 86400000).toISOString().substr(0, 10);
-		for (var i = 0; i < 2; i++) {
-			dts[i] = dts[i].replace(new RegExp('^' + today), ''); // don't display today's date
-			dts[i] = dts[i].replace(new RegExp('^' + yesterday), 'yesterday'); // 'yesterday' instead of date
-			dts[i] = dts[i].replace(new RegExp('^' + tomorrow), 'tomorrow'); // 'tomorrow' instead of date
-			dts[i] = dts[i].replace(/:\d+$/, ''); // don't display seconds
-		}
-
-		if (duration < 60) dts[1] = false;
-
-		return dts[1] ? dts[0] + '→' + dts[1] : dts[0];
-	}
-
-	WorkflowStatus(wf) {
-		if (wf.running_tasks - wf.queued_tasks > 0) return React.createElement('span', { className: 'fa fa-spinner fa-pulse fa-fw', title: 'Task(s) running' });
-
-		if (wf.queued_tasks > 0) return React.createElement('span', { className: 'faicon fa-hand-stop-o', title: 'Task(s) queued' });
-
-		if (wf.retrying_tasks > 0) return React.createElement('span', { className: 'faicon fa-clock-o', title: 'A task ended badly and will retry' });
-
-		if (wf.status = 'TERMINATED' && wf.errors > 0) return React.createElement('span', { 'class': 'faicon fa-exclamation error', title: 'Errors' });
-
-		if (wf.status = 'TERMINATED' && wf.errors == 0) return React.createElement('span', { 'class': 'faicon fa-check success', title: 'Workflow terminated' });
-	}
-
-	renderWorkflowsList() {
-		var node = this.state.workflows.node;
-		return this.state.workflows.response.map(wf => {
-			return React.createElement(
-				'tr',
-				{ key: wf.id, 'data-id': wf.id, 'data-node': node },
-				React.createElement(
-					'td',
-					{ className: 'center' },
-					this.WorkflowStatus(wf)
-				),
-				React.createElement(
-					'td',
-					null,
-					React.createElement(
-						'span',
-						{ className: 'action showWorkflowDetails', 'data-id': '{@wf.id}', 'data-node-name': '{node}', 'data-status': '{wf.status}' },
-						wf.id,
-						' \u2013 ',
-						wf.name,
-						' ',
-						React.createElement('span', { className: 'faicon fa-info' }),
-						' (',
-						this.humanTime((this.state.now - Date.parse(wf.start_time)) / 1000),
-						')'
-					),
-					'\xA0'
-				),
-				React.createElement(
-					'td',
-					{ className: 'center' },
-					node
-				),
-				React.createElement(
-					'td',
-					{ className: 'center' },
-					wf.host ? wf.host : 'localhost'
-				),
-				React.createElement(
-					'td',
-					{ className: 'tdStarted' },
-					this.timeSpan(wf.start_time)
-				),
-				React.createElement(
-					'td',
-					{ className: 'tdActions' },
-					React.createElement('span', { className: 'faicon fa-ban', title: 'Cancel this instance' }),
-					React.createElement('span', { className: 'faicon fa-bomb', title: 'Kill this instance' })
-				)
-			);
-		});
-	}
-
-	renderWorkflows() {
-		if (this.state.workflows.response.length == 0) return React.createElement(
-			'div',
-			{ className: 'center' },
-			React.createElement('br', null),
-			'No EXECUTING workflow.'
-		);
-
-		return React.createElement(
-			'div',
-			{ className: 'workflow-list' },
-			React.createElement(
-				'table',
-				null,
-				React.createElement(
-					'thead',
-					null,
-					React.createElement(
-						'tr',
-						null,
-						React.createElement(
-							'th',
-							{ style: { width: '80px' }, className: 'center' },
-							'State'
-						),
-						React.createElement(
-							'th',
-							null,
-							'ID \u2013 Name'
-						),
-						React.createElement(
-							'th',
-							null,
-							'Node'
-						),
-						React.createElement(
-							'th',
-							{ className: 'thStarted' },
-							'Host'
-						),
-						React.createElement(
-							'th',
-							{ className: 'thStarted' },
-							'Time'
-						),
-						React.createElement(
-							'th',
-							{ className: 'thActions' },
-							'Actions'
-						)
-					)
-				),
-				React.createElement(
-					'tbody',
-					null,
-					this.renderWorkflowsList()
-				)
-			)
-		);
-	}
-
-	render() {
-		this.state.now = this.now();
-
-		return React.createElement(
-			'div',
-			null,
-			React.createElement(
-				'div',
-				{ className: 'boxTitle' },
-				React.createElement('div', { id: 'nodes-status' }),
-				React.createElement(
-					'span',
-					{ className: 'title' },
-					'Executing workflows'
-				),
-				'\xA0(',
-				this.state.workflows.response.length,
-				')',
-				React.createElement('span', { className: 'faicon fa-refresh action evq-autorefresh-toggle' }),
-				React.createElement('span', { className: 'faicon fa-rocket action', title: 'Launch a new workflow' }),
-				React.createElement('span', { className: 'faicon fa-clock-o action', title: 'Retry all pending tasks' })
-			),
-			this.renderWorkflows()
-		);
-	}
-}
-
-let domContainer = document.querySelector('#executing-workflows');
-ReactDOM.render(React.createElement(RunningInstances, null), domContainer);
 /*
 CryptoJS v3.1.2
 code.google.com/p/crypto-js
@@ -1251,3 +972,380 @@ code.google.com/p/crypto-js/wiki/License
      */
     C.HmacSHA1 = Hasher._createHmacHelper(SHA1);
 })();
+class evQueueWS {
+	constructor(context, subscriptions, callback) {
+		this.ws = new WebSocket("ws://srvdev:5001/", "events");
+
+		this.subscriptions = subscriptions;
+
+		this.time_delta = 0;
+
+		this.state = 'CONNECTING';
+
+		this.ws.onopen = function (event) {
+			console.log("Connected to evQueue Websocket");
+		};
+
+		this.ws.onclose = function (event) {
+			console.log("Disconnected from evQueue Websocket");
+		};
+
+		this.context = context;
+		this.callback = callback;
+
+		var self = this;
+		this.ws.onmessage = function (event) {
+			var parser = new DOMParser();
+			var xmldoc = parser.parseFromString(event.data, "text/xml");
+
+			if (self.state == 'CONNECTING') {
+				var challenge = xmldoc.documentElement.getAttribute("challenge");
+
+				var passwd_hash = CryptoJS.SHA1("admin");
+				var response = CryptoJS.HmacSHA1(CryptoJS.enc.Hex.parse(challenge), passwd_hash).toString(CryptoJS.enc.Hex);
+
+				self.ws.send("<auth response='" + response + "' user='admin' />");
+				self.state = 'AUTHENTICATED';
+			} else if (self.state == 'AUTHENTICATED') {
+				var time = xmldoc.documentElement.getAttribute("time");
+				self.time_delta = Date.now() - Date.parse(time);
+
+				// Subscribe to wanted events
+				for (var i = 0; i < self.subscriptions.length; i++) {
+					var api_cmd_b64 = btoa(self.subscriptions[i].api);
+					self.ws.send("<event action='subscribe' type='" + self.subscriptions[i].event + "' api_cmd='" + api_cmd_b64 + "' />");
+				}
+
+				self.state = 'READY';
+			} else if (self.state == 'READY') {
+				var parser = new DOMParser();
+				var xmldoc = parser.parseFromString(event.data, "text/xml");
+				var nodes_ite = xmldoc.evaluate('/response/*', xmldoc.documentElement);
+				var node;
+				var ret = { node: xmldoc.documentElement.getAttribute('node'), response: [] };
+				while (node = nodes_ite.iterateNext()) {
+					var obj = {};
+					for (var i = 0; i < node.attributes.length; i++) obj[node.attributes[i].name] = node.attributes[i].value;
+					ret.response.push(obj);
+				}
+				self.callback(self.context, ret);
+			}
+		};
+	}
+
+	Close() {
+		this.ws.close();
+	}
+
+	GetTimeDelta() {
+		return this.time_delta;
+	}
+}
+'use strict';
+
+class ListInstances extends React.Component {
+	constructor(props) {
+		super(props);
+
+		this.state = {
+			now: 0,
+			workflows: {
+				node: 'unknown',
+				response: []
+			}
+		};
+
+		this.timerID = false;
+	}
+
+	now() {
+		return Date.now();
+		/*if(!this.evqueue)
+  	return Date.now();
+  return Date.now()-this.evqueue.GetTimeDelta();*/
+	}
+
+	componentDidMount() {
+		this.evqueue = new evQueueWS(this, this.subscriptions, this.evQueueEvent);
+
+		this.setState({ now: this.now() });
+		this.timerID = setInterval(() => this.setState({ now: this.now() }), 1000);
+	}
+
+	componentWillUnmount() {
+		this.evqueue.Close();
+
+		clearInterval(this.timerID);
+	}
+
+	evQueueEvent(context, data) {
+		context.setState({ workflows: data });
+	}
+
+	humanTime(seconds) {
+		if (seconds < 0) seconds = 0;
+		seconds = Math.floor(seconds);
+		return (seconds / 86400 >= 1 ? Math.floor(seconds / 86400) + ' days, ' : '') + (seconds / 3600 >= 1 ? Math.floor(seconds / 3600) % 24 + 'h ' : '') + (seconds / 60 >= 1 ? Math.floor(seconds / 60) % 60 + 'm ' : '') + seconds % 60 + 's';
+	}
+
+	timeSpan(dt1, dt2 = '') {
+		var duration = (Date.parse(dt2) - Date.parse(dt1)) / 1000;
+
+		if (dt1.split(' ')[0] == dt2.split[0]) dt2.replace(/^\d{4}-\d{2}-\d{2}/, ''); // don't display same date twice
+
+		var dts = [dt1, dt2];
+		var today = new Date().toISOString().substr(0, 10);
+		var yesterday = new Date(Date.now() - 86400000).toISOString().substr(0, 10);
+		var tomorrow = new Date(Date.now() + 86400000).toISOString().substr(0, 10);
+		for (var i = 0; i < 2; i++) {
+			dts[i] = dts[i].replace(new RegExp('^' + today), ''); // don't display today's date
+			dts[i] = dts[i].replace(new RegExp('^' + yesterday), 'yesterday'); // 'yesterday' instead of date
+			dts[i] = dts[i].replace(new RegExp('^' + tomorrow), 'tomorrow'); // 'tomorrow' instead of date
+			dts[i] = dts[i].replace(/:\d+$/, ''); // don't display seconds
+		}
+
+		if (duration < 60) dts[1] = false;
+
+		return dts[1] ? dts[0] + '→' + dts[1] : dts[0];
+	}
+
+	renderWorkflowsList() {
+		return this.state.workflows.response.map(wf => {
+			return React.createElement(
+				'tr',
+				{ key: wf.id, 'data-id': wf.id, 'data-node': this.getNode(wf) },
+				React.createElement(
+					'td',
+					{ className: 'center' },
+					this.WorkflowStatus(wf)
+				),
+				React.createElement(
+					'td',
+					null,
+					React.createElement(
+						'span',
+						{ className: 'action showWorkflowDetails', 'data-id': wf.id, 'data-node-name': this.getNode(wf), 'data-status': '{wf.status}' },
+						wf.id,
+						' \u2013 ',
+						wf.name,
+						' ',
+						React.createElement('span', { className: 'faicon fa-info' }),
+						' (',
+						this.workflowDuration(wf),
+						')'
+					),
+					'\xA0'
+				),
+				React.createElement(
+					'td',
+					{ className: 'center' },
+					this.getNode(wf)
+				),
+				React.createElement(
+					'td',
+					{ className: 'center' },
+					wf.host ? wf.host : 'localhost'
+				),
+				React.createElement(
+					'td',
+					{ className: 'tdStarted' },
+					this.timeSpan(wf.start_time, wf.end_time)
+				),
+				this.renderActions()
+			);
+		});
+	}
+
+	renderWorkflows() {
+		if (this.state.workflows.node == 'unknown') return React.createElement(
+			'div',
+			{ className: 'center' },
+			React.createElement('br', null),
+			'Loading...'
+		);
+
+		if (this.state.workflows.response.length == 0) return React.createElement(
+			'div',
+			{ className: 'center' },
+			React.createElement('br', null),
+			'No workflow.'
+		);
+
+		return React.createElement(
+			'div',
+			{ className: 'workflow-list' },
+			React.createElement(
+				'table',
+				null,
+				React.createElement(
+					'thead',
+					null,
+					React.createElement(
+						'tr',
+						null,
+						React.createElement(
+							'th',
+							{ style: { width: '80px' }, className: 'center' },
+							'State'
+						),
+						React.createElement(
+							'th',
+							null,
+							'ID \u2013 Name'
+						),
+						React.createElement(
+							'th',
+							null,
+							'Node'
+						),
+						React.createElement(
+							'th',
+							{ className: 'thStarted' },
+							'Host'
+						),
+						React.createElement(
+							'th',
+							{ className: 'thStarted' },
+							'Time'
+						),
+						React.createElement(
+							'th',
+							{ className: 'thActions' },
+							'Actions'
+						)
+					)
+				),
+				React.createElement(
+					'tbody',
+					null,
+					this.renderWorkflowsList()
+				)
+			)
+		);
+	}
+
+	render() {
+		this.state.now = this.now();
+
+		return React.createElement(
+			'div',
+			null,
+			this.renderTitle(),
+			this.renderWorkflows()
+		);
+	}
+}
+'use strict';
+
+class ExecutingInstances extends ListInstances {
+	constructor(props) {
+		super(props);
+
+		this.subscriptions = [{
+			api: "<status action='query' type='workflows' />",
+			event: "INSTANCE_STARTED"
+		}, {
+			api: "<status action='query' type='workflows' />",
+			event: "INSTANCE_TERMINATED"
+		}];
+	}
+
+	getNode(wf) {
+		return this.state.workflows.node;
+	}
+
+	workflowDuration(wf) {
+		return this.humanTime((this.state.now - Date.parse(wf.start_time)) / 1000);
+	}
+
+	renderActions() {
+		return React.createElement(
+			"td",
+			{ className: "tdActions" },
+			React.createElement("span", { className: "faicon fa-ban", title: "Cancel this instance" }),
+			React.createElement("span", { className: "faicon fa-bomb", title: "Kill this instance" })
+		);
+	}
+
+	WorkflowStatus(wf) {
+		if (wf.running_tasks - wf.queued_tasks > 0) return React.createElement("span", { className: "fa fa-spinner fa-pulse fa-fw", title: "Task(s) running" });
+
+		if (wf.queued_tasks > 0) return React.createElement("span", { className: "faicon fa-hand-stop-o", title: "Task(s) queued" });
+
+		if (wf.retrying_tasks > 0) return React.createElement("span", { className: "faicon fa-clock-o", title: "A task ended badly and will retry" });
+	}
+
+	renderTitle() {
+		return React.createElement(
+			"div",
+			{ className: "boxTitle" },
+			React.createElement("div", { id: "nodes-status" }),
+			React.createElement(
+				"span",
+				{ className: "title" },
+				"Executing workflows"
+			),
+			"\xA0(",
+			this.state.workflows.response.length,
+			")",
+			React.createElement("span", { className: "faicon fa-refresh action evq-autorefresh-toggle" }),
+			React.createElement("span", { className: "faicon fa-rocket action", title: "Launch a new workflow" }),
+			React.createElement("span", { className: "faicon fa-clock-o action", title: "Retry all pending tasks" })
+		);
+	}
+}
+
+ReactDOM.render(React.createElement(ExecutingInstances, null), document.querySelector('#executing-workflows'));
+'use strict';
+
+class TerminatedInstances extends ListInstances {
+	constructor(props) {
+		super(props);
+
+		this.subscriptions = [{
+			api: "<instances action='list' />",
+			event: "INSTANCE_TERMINATED"
+		}];
+	}
+
+	getNode(wf) {
+		return wf.node_name;
+	}
+
+	workflowDuration(wf) {
+		return this.humanTime((Date.parse(wf.end_time) - Date.parse(wf.start_time)) / 1000);
+	}
+
+	renderActions() {
+		return React.createElement(
+			"td",
+			{ className: "tdActions" },
+			React.createElement("span", { className: "faicon fa-remove", title: "Delete this instance" })
+		);
+	}
+
+	WorkflowStatus(wf) {
+		if (wf.status = 'TERMINATED' && wf.errors > 0) return React.createElement("span", { className: "faicon fa-exclamation error", title: "Errors" });
+
+		if (wf.status = 'TERMINATED' && wf.errors == 0) return React.createElement("span", { className: "faicon fa-check success", title: "Workflow terminated" });
+	}
+
+	renderTitle() {
+		return React.createElement(
+			"div",
+			{ className: "boxTitle" },
+			React.createElement("div", { id: "nodes-status" }),
+			React.createElement(
+				"span",
+				{ className: "title" },
+				"Terminated workflows"
+			),
+			"\xA0(",
+			this.state.workflows.response.length,
+			")",
+			React.createElement("span", { className: "faicon fa-refresh action evq-autorefresh-toggle" })
+		);
+	}
+}
+
+ReactDOM.render(React.createElement(TerminatedInstances, null), document.querySelector('#terminated-workflows'));
