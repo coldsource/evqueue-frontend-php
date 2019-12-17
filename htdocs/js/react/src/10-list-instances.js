@@ -24,16 +24,16 @@ class ListInstances extends React.Component {
 	}
 	
 	componentDidMount() {
-		this.evqueue = new evQueueWS(this,this.subscriptions,this.evQueueEvent); 
+		this.evqueue = new evQueueWS(this,this.evQueueEvent); 
+		var evqueue_ready = this.evqueue.Connect();
 		
 		this.setState({now: this.now()});
-		this.timerID = setInterval(() => this.setState({now: this.now()}),1000);
+		
+		return evqueue_ready;
 	}
 	
 	componentWillUnmount() {
 		this.evqueue.Close();
-		
-		clearInterval(this.timerID);
 	}
 	
 	evQueueEvent(context,data) {
@@ -76,13 +76,21 @@ class ListInstances extends React.Component {
 	renderWorkflowsList() {
 		return this.state.workflows.response.map((wf) => {
 			return (
-					<tr key={wf.id} data-id={wf.id} data-node={this.getNode(wf)}>
+					<tr key={wf.id}
+					    data-id={wf.id}
+					    data-node={this.getNode(wf)}
+					    data-running_tasks={wf.running_tasks}
+					    data-retrying_tasks={wf.retrying_tasks}
+					    data-queued_tasks={wf.queued_tasks}
+					    data-error_tasks={wf.error_tasks}
+					    data-waiting_conditions={wf.waiting_conditions}
+					    >
 						<td className="center">
 							{ this.WorkflowStatus(wf) }
 						</td>
 						<td>
 							<span className="action showWorkflowDetails" data-id={wf.id} data-node-name={this.getNode(wf)} data-status="{wf.status}">
-								{wf.id} – {wf.name} <span className="faicon fa-info"></span> ({this.workflowDuration(wf)})
+								{wf.id} – {wf.name} { this.workflowInfos(wf) } ({this.workflowDuration(wf)})
 							</span>
 							&#160;
 						</td>

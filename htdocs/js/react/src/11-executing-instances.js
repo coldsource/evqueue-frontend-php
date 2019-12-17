@@ -3,17 +3,21 @@
 class ExecutingInstances extends ListInstances {
 	constructor(props) {
 		super(props);
+	}
+	
+	componentDidMount() {
+		var self = this;
+		super.componentDidMount().then( () => {
+			self.evqueue.Subscribe('INSTANCE_STARTED','status','query',{type:'workflows'});
+			self.evqueue.Subscribe('INSTANCE_TERMINATED','status','query',{type:'workflows'});
+		});
 		
-		this.subscriptions = [
-			{
-				api: "<status action='query' type='workflows' />",
-				event:"INSTANCE_STARTED"
-			},
-			{
-				api: "<status action='query' type='workflows' />",
-				event:"INSTANCE_TERMINATED"
-			}
-		];
+		this.timerID = setInterval(() => this.setState({now: this.now()}),1000);
+	}
+	
+	componentWillUnmount() {
+		super.componentWillUnmount();
+		clearInterval(this.timerID);
 	}
 	
 	getNode(wf)
@@ -23,6 +27,10 @@ class ExecutingInstances extends ListInstances {
 	
 	workflowDuration(wf) {
 		return this.humanTime((this.state.now-Date.parse(wf.start_time))/1000);
+	}
+	
+	workflowInfos(wf) {
+		return ( <span className="faicon fa-info"></span> );
 	}
 	
 	renderActions() {
@@ -56,6 +64,8 @@ class ExecutingInstances extends ListInstances {
 			</div>
 		);
 	}
+	
+	Toto() { console.log("Toto"); }
 }
 
 ReactDOM.render(<ExecutingInstances />, document.querySelector('#executing-workflows'));

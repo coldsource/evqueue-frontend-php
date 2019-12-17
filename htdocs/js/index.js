@@ -322,12 +322,12 @@ $(document).ready(function() {
 	// Pages
 	$('#terminated-workflows').delegate('.fa-backward','click',function() {
 		current_page--;
-		UpdateFilterURL();
+		terminated_instances.updateFilters(search_filters,current_page);
 	});
 
 	$('#terminated-workflows').delegate('.fa-forward','click',function() {
 		current_page++;
-		UpdateFilterURL();
+		terminated_instances.updateFilters(search_filters,current_page);
 	});
 });
 
@@ -355,27 +355,9 @@ function SetWorkflowParameters(el)
 	return promise;
 }
 
-function UpdateFilterURL()
-{
-	var url = "ajax/list-instances.php?";
-	url += jQuery.param(search_filters);
-
-	$('#searchform input').each(function() {
-		if($(this).attr('name').substr(0,10)=='parameter_' && $(this).val()!='')
-			parameters[$(this).attr('name')] = $(this).val();
-	});
-	if(Object.keys(parameters).length)
-		url += "&" + jQuery.param(parameters);
-
-	url += "&p="+current_page;
-
-	$('#terminated-workflows').data('url',url);
-	$('#terminated-workflows').evqautorefresh('refresh');
-}
-
 function UpdateFilters()
 {
-	UpdateFilterURL();
+	terminated_instances.updateFilters(search_filters,current_page);
 
 	var explain;
 	if(Object.keys(search_filters).length==1)

@@ -973,64 +973,68 @@ code.google.com/p/crypto-js/wiki/License
     C.HmacSHA1 = Hasher._createHmacHelper(SHA1);
 })();
 class evQueueWS {
-	constructor(context, subscriptions, callback) {
-		this.ws = new WebSocket("ws://srvdev:5001/", "events");
-
-		this.subscriptions = subscriptions;
-
-		this.time_delta = 0;
-
-		this.state = 'CONNECTING';
-
-		this.ws.onopen = function (event) {
-			console.log("Connected to evQueue Websocket");
-		};
-
-		this.ws.onclose = function (event) {
-			console.log("Disconnected from evQueue Websocket");
-		};
-
+	constructor(context, callback) {
 		this.context = context;
 		this.callback = callback;
+	}
 
+	Connect(context, subscriptions, callback) {
 		var self = this;
-		this.ws.onmessage = function (event) {
-			var parser = new DOMParser();
-			var xmldoc = parser.parseFromString(event.data, "text/xml");
 
-			if (self.state == 'CONNECTING') {
-				var challenge = xmldoc.documentElement.getAttribute("challenge");
+		return new Promise(function (resolve, reject) {
 
-				var passwd_hash = CryptoJS.SHA1("admin");
-				var response = CryptoJS.HmacSHA1(CryptoJS.enc.Hex.parse(challenge), passwd_hash).toString(CryptoJS.enc.Hex);
+			self.ws = new WebSocket("ws://srvdev:5001/", "events");
 
-				self.ws.send("<auth response='" + response + "' user='admin' />");
-				self.state = 'AUTHENTICATED';
-			} else if (self.state == 'AUTHENTICATED') {
-				var time = xmldoc.documentElement.getAttribute("time");
-				self.time_delta = Date.now() - Date.parse(time);
+			self.time_delta = 0;
 
-				// Subscribe to wanted events
-				for (var i = 0; i < self.subscriptions.length; i++) {
-					var api_cmd_b64 = btoa(self.subscriptions[i].api);
-					self.ws.send("<event action='subscribe' type='" + self.subscriptions[i].event + "' api_cmd='" + api_cmd_b64 + "' />");
-				}
+			self.state = 'CONNECTING';
 
-				self.state = 'READY';
-			} else if (self.state == 'READY') {
+			self.ws.onopen = function (event) {
+				console.log("Connected to evQueue Websocket");
+			};
+
+			self.ws.onclose = function (event) {
+				console.log("Disconnected from evQueue Websocket");
+			};
+
+			self.ws.onmessage = function (event) {
 				var parser = new DOMParser();
 				var xmldoc = parser.parseFromString(event.data, "text/xml");
-				var nodes_ite = xmldoc.evaluate('/response/*', xmldoc.documentElement);
-				var node;
-				var ret = { node: xmldoc.documentElement.getAttribute('node'), response: [] };
-				while (node = nodes_ite.iterateNext()) {
-					var obj = {};
-					for (var i = 0; i < node.attributes.length; i++) obj[node.attributes[i].name] = node.attributes[i].value;
-					ret.response.push(obj);
+
+				if (self.state == 'CONNECTING') {
+					var challenge = xmldoc.documentElement.getAttribute("challenge");
+
+					var passwd_hash = CryptoJS.SHA1("admin");
+					var response = CryptoJS.HmacSHA1(CryptoJS.enc.Hex.parse(challenge), passwd_hash).toString(CryptoJS.enc.Hex);
+
+					self.ws.send("<auth response='" + response + "' user='admin' />");
+					self.state = 'AUTHENTICATED';
+				} else if (self.state == 'AUTHENTICATED') {
+					var time = xmldoc.documentElement.getAttribute("time");
+					self.time_delta = Date.now() - Date.parse(time);
+
+					self.state = 'READY';
+					resolve();
+				} else if (self.state == 'READY') {
+					var parser = new DOMParser();
+					var xmldoc = parser.parseFromString(event.data, "text/xml");
+
+					var ret = { response: [] };
+
+					var root = xmldoc.documentElement;
+					for (var i = 0; i < root.attributes.length; i++) ret[root.attributes[i].name] = root.attributes[i].value;
+
+					var nodes_ite = xmldoc.evaluate('/response/*', xmldoc.documentElement);
+					var node;
+					while (node = nodes_ite.iterateNext()) {
+						var obj = {};
+						for (var i = 0; i < node.attributes.length; i++) obj[node.attributes[i].name] = node.attributes[i].value;
+						ret.response.push(obj);
+					}
+					self.callback(self.context, ret);
 				}
-				self.callback(self.context, ret);
-			}
-		};
+			};
+		});
 	}
 
 	Close() {
@@ -1039,6 +1043,22 @@ class evQueueWS {
 
 	GetTimeDelta() {
 		return this.time_delta;
+	}
+
+	Subscribe(event, group, action, parameters) {
+		var xmldoc = new Document();
+		var api_node = xmldoc.createElement(group);
+		api_node.setAttribute('action', action);
+		xmldoc.appendChild(api_node);
+		for (var parameter in parameters) api_node.setAttribute(parameter, parameters[parameter]);
+		var api_cmd = new XMLSerializer().serializeToString(xmldoc);
+
+		var api_cmd_b64 = btoa(api_cmd);
+		this.ws.send("<event action='subscribe' type='" + event + "' api_cmd='" + api_cmd_b64 + "' />");
+	}
+
+	UnsubscribeAll(api_cmd, event) {
+		this.ws.send("<event action='unsubscribeall' />");
 	}
 }
 'use strict';
@@ -1066,16 +1086,16 @@ class ListInstances extends React.Component {
 	}
 
 	componentDidMount() {
-		this.evqueue = new evQueueWS(this, this.subscriptions, this.evQueueEvent);
+		this.evqueue = new evQueueWS(this, this.evQueueEvent);
+		var evqueue_ready = this.evqueue.Connect();
 
 		this.setState({ now: this.now() });
-		this.timerID = setInterval(() => this.setState({ now: this.now() }), 1000);
+
+		return evqueue_ready;
 	}
 
 	componentWillUnmount() {
 		this.evqueue.Close();
-
-		clearInterval(this.timerID);
 	}
 
 	evQueueEvent(context, data) {
@@ -1113,7 +1133,15 @@ class ListInstances extends React.Component {
 		return this.state.workflows.response.map(wf => {
 			return React.createElement(
 				'tr',
-				{ key: wf.id, 'data-id': wf.id, 'data-node': this.getNode(wf) },
+				{ key: wf.id,
+					'data-id': wf.id,
+					'data-node': this.getNode(wf),
+					'data-running_tasks': wf.running_tasks,
+					'data-retrying_tasks': wf.retrying_tasks,
+					'data-queued_tasks': wf.queued_tasks,
+					'data-error_tasks': wf.error_tasks,
+					'data-waiting_conditions': wf.waiting_conditions
+				},
 				React.createElement(
 					'td',
 					{ className: 'center' },
@@ -1129,7 +1157,7 @@ class ListInstances extends React.Component {
 						' \u2013 ',
 						wf.name,
 						' ',
-						React.createElement('span', { className: 'faicon fa-info' }),
+						this.workflowInfos(wf),
 						' (',
 						this.workflowDuration(wf),
 						')'
@@ -1240,14 +1268,21 @@ class ListInstances extends React.Component {
 class ExecutingInstances extends ListInstances {
 	constructor(props) {
 		super(props);
+	}
 
-		this.subscriptions = [{
-			api: "<status action='query' type='workflows' />",
-			event: "INSTANCE_STARTED"
-		}, {
-			api: "<status action='query' type='workflows' />",
-			event: "INSTANCE_TERMINATED"
-		}];
+	componentDidMount() {
+		var self = this;
+		super.componentDidMount().then(() => {
+			self.evqueue.Subscribe('INSTANCE_STARTED', 'status', 'query', { type: 'workflows' });
+			self.evqueue.Subscribe('INSTANCE_TERMINATED', 'status', 'query', { type: 'workflows' });
+		});
+
+		this.timerID = setInterval(() => this.setState({ now: this.now() }), 1000);
+	}
+
+	componentWillUnmount() {
+		super.componentWillUnmount();
+		clearInterval(this.timerID);
 	}
 
 	getNode(wf) {
@@ -1258,40 +1293,48 @@ class ExecutingInstances extends ListInstances {
 		return this.humanTime((this.state.now - Date.parse(wf.start_time)) / 1000);
 	}
 
+	workflowInfos(wf) {
+		return React.createElement('span', { className: 'faicon fa-info' });
+	}
+
 	renderActions() {
 		return React.createElement(
-			"td",
-			{ className: "tdActions" },
-			React.createElement("span", { className: "faicon fa-ban", title: "Cancel this instance" }),
-			React.createElement("span", { className: "faicon fa-bomb", title: "Kill this instance" })
+			'td',
+			{ className: 'tdActions' },
+			React.createElement('span', { className: 'faicon fa-ban', title: 'Cancel this instance' }),
+			React.createElement('span', { className: 'faicon fa-bomb', title: 'Kill this instance' })
 		);
 	}
 
 	WorkflowStatus(wf) {
-		if (wf.running_tasks - wf.queued_tasks > 0) return React.createElement("span", { className: "fa fa-spinner fa-pulse fa-fw", title: "Task(s) running" });
+		if (wf.running_tasks - wf.queued_tasks > 0) return React.createElement('span', { className: 'fa fa-spinner fa-pulse fa-fw', title: 'Task(s) running' });
 
-		if (wf.queued_tasks > 0) return React.createElement("span", { className: "faicon fa-hand-stop-o", title: "Task(s) queued" });
+		if (wf.queued_tasks > 0) return React.createElement('span', { className: 'faicon fa-hand-stop-o', title: 'Task(s) queued' });
 
-		if (wf.retrying_tasks > 0) return React.createElement("span", { className: "faicon fa-clock-o", title: "A task ended badly and will retry" });
+		if (wf.retrying_tasks > 0) return React.createElement('span', { className: 'faicon fa-clock-o', title: 'A task ended badly and will retry' });
 	}
 
 	renderTitle() {
 		return React.createElement(
-			"div",
-			{ className: "boxTitle" },
-			React.createElement("div", { id: "nodes-status" }),
+			'div',
+			{ className: 'boxTitle' },
+			React.createElement('div', { id: 'nodes-status' }),
 			React.createElement(
-				"span",
-				{ className: "title" },
-				"Executing workflows"
+				'span',
+				{ className: 'title' },
+				'Executing workflows'
 			),
-			"\xA0(",
+			'\xA0(',
 			this.state.workflows.response.length,
-			")",
-			React.createElement("span", { className: "faicon fa-refresh action evq-autorefresh-toggle" }),
-			React.createElement("span", { className: "faicon fa-rocket action", title: "Launch a new workflow" }),
-			React.createElement("span", { className: "faicon fa-clock-o action", title: "Retry all pending tasks" })
+			')',
+			React.createElement('span', { className: 'faicon fa-refresh action evq-autorefresh-toggle' }),
+			React.createElement('span', { className: 'faicon fa-rocket action', title: 'Launch a new workflow' }),
+			React.createElement('span', { className: 'faicon fa-clock-o action', title: 'Retry all pending tasks' })
 		);
+	}
+
+	Toto() {
+		console.log("Toto");
 	}
 }
 
@@ -1302,10 +1345,15 @@ class TerminatedInstances extends ListInstances {
 	constructor(props) {
 		super(props);
 
-		this.subscriptions = [{
-			api: "<instances action='list' />",
-			event: "INSTANCE_TERMINATED"
-		}];
+		this.current_page = 1;
+		this.items_per_page = 30;
+	}
+
+	componentDidMount() {
+		var self = this;
+		super.componentDidMount().then(() => {
+			self.evqueue.Subscribe('INSTANCE_TERMINATED', 'instances', 'list');
+		});
 	}
 
 	getNode(wf) {
@@ -1316,36 +1364,56 @@ class TerminatedInstances extends ListInstances {
 		return this.humanTime((Date.parse(wf.end_time) - Date.parse(wf.start_time)) / 1000);
 	}
 
+	workflowInfos(wf) {
+		return React.createElement('span', { className: 'faicon fa-comment-o', title: "Comment : " + wf.comment });
+	}
+
 	renderActions() {
 		return React.createElement(
-			"td",
-			{ className: "tdActions" },
-			React.createElement("span", { className: "faicon fa-remove", title: "Delete this instance" })
+			'td',
+			{ className: 'tdActions' },
+			React.createElement('span', { className: 'faicon fa-remove', title: 'Delete this instance' })
 		);
 	}
 
 	WorkflowStatus(wf) {
-		if (wf.status = 'TERMINATED' && wf.errors > 0) return React.createElement("span", { className: "faicon fa-exclamation error", title: "Errors" });
+		if (wf.status = 'TERMINATED' && wf.errors > 0) return React.createElement('span', { className: 'faicon fa-exclamation error', title: 'Errors' });
 
-		if (wf.status = 'TERMINATED' && wf.errors == 0) return React.createElement("span", { className: "faicon fa-check success", title: "Workflow terminated" });
+		if (wf.status = 'TERMINATED' && wf.errors == 0) return React.createElement('span', { className: 'faicon fa-check success', title: 'Workflow terminated' });
 	}
 
 	renderTitle() {
 		return React.createElement(
-			"div",
-			{ className: "boxTitle" },
-			React.createElement("div", { id: "nodes-status" }),
+			'div',
+			{ className: 'boxTitle' },
+			React.createElement('div', { id: 'nodes-status' }),
 			React.createElement(
-				"span",
-				{ className: "title" },
-				"Terminated workflows"
+				'span',
+				{ className: 'title' },
+				'Terminated workflows'
 			),
-			"\xA0(",
-			this.state.workflows.response.length,
-			")",
-			React.createElement("span", { className: "faicon fa-refresh action evq-autorefresh-toggle" })
+			'\xA0',
+			this.current_page > 1 ? React.createElement('span', { className: 'faicon fa-backward' }) : '',
+			'\xA0',
+			(this.current_page - 1) * this.items_per_page + 1,
+			' - ',
+			this.current_page * this.items_per_page,
+			' / ',
+			this.state.workflows.rows,
+			this.current_page * this.items_per_page < this.state.workflows.rows ? React.createElement('span', { className: 'faicon fa-forward' }) : '',
+			React.createElement('span', { className: 'faicon fa-refresh action evq-autorefresh-toggle' })
 		);
+	}
+
+	updateFilters(search_filters, current_page) {
+		this.current_page = current_page;
+
+		this.evqueue.UnsubscribeAll();
+
+		search_filters.limit = this.items_per_page;
+		search_filters.offset = (current_page - 1) * this.items_per_page;
+		this.evqueue.Subscribe('INSTANCE_TERMINATED', 'instances', 'list', search_filters);
 	}
 }
 
-ReactDOM.render(React.createElement(TerminatedInstances, null), document.querySelector('#terminated-workflows'));
+var terminated_instances = ReactDOM.render(React.createElement(TerminatedInstances, null), document.querySelector('#terminated-workflows'));
