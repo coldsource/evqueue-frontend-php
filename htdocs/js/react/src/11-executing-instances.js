@@ -12,7 +12,7 @@ class ExecutingInstances extends ListInstances {
 			self.evqueue.Subscribe('INSTANCE_TERMINATED','status','query',{type:'workflows'});
 		});
 		
-		this.timerID = setInterval(() => this.setState({now: this.now()}),1000);
+		this.timerID = setInterval(() => this.state.refresh?this.setState({now: this.now()}):this.state.now = this.now(),1000);
 	}
 	
 	componentWillUnmount() {
@@ -58,7 +58,7 @@ class ExecutingInstances extends ListInstances {
 			<div className="boxTitle">
 				<div id="nodes-status"></div>
 				<span className="title">Executing workflows</span>&#160;({this.state.workflows.response.length})
-				<span className="faicon fa-refresh action evq-autorefresh-toggle"></span>
+				<span className={"faicon fa-refresh action"+(this.state.refresh?' fa-spin':'')} onClick={this.toggleAutorefresh}></span>
 				<span className="faicon fa-rocket action" title="Launch a new workflow"></span>
 				<span className="faicon fa-clock-o action" title="Retry all pending tasks"></span>
 			</div>

@@ -4,8 +4,14 @@ class TerminatedInstances extends ListInstances {
 	constructor(props) {
 		super(props);
 		
+		// Off-state attributes
+		this.search_filters = {};
 		this.current_page = 1;
 		this.items_per_page = 30;
+		
+		// Bind actions
+		this.nextPage = this.nextPage.bind(this);
+		this.previousPage = this.previousPage.bind(this);
 	}
 	
 	componentDidMount() {
@@ -50,23 +56,33 @@ class TerminatedInstances extends ListInstances {
 				<div id="nodes-status"></div>
 				<span className="title">Terminated workflows</span>
 				&#160;
-				{ this.current_page>1?(<span className="faicon fa-backward"></span>):'' }
+				{ this.current_page>1?(<span className="faicon fa-backward" onClick={this.previousPage}></span>):'' }
 				&#160;
 				{ (this.current_page-1)*this.items_per_page + 1 } - { this.current_page*this.items_per_page } &#47; {this.state.workflows.rows}
-				{ this.current_page*this.items_per_page<this.state.workflows.rows?(<span className="faicon fa-forward"></span>):''}
-				<span className="faicon fa-refresh action evq-autorefresh-toggle"></span>
+				{ this.current_page*this.items_per_page<this.state.workflows.rows?(<span className="faicon fa-forward" onClick={this.nextPage}></span>):''}
+				<span className={"faicon fa-refresh action"+(this.state.refresh?' fa-spin':'')} onClick={this.toggleAutorefresh}></span>
 			</div>
 		);
 	}
 	
-	updateFilters(search_filters,current_page) {
-		this.current_page = current_page;
+	updateFilters(search_filters) {
+		this.search_filters = search_filters;
 		
 		this.evqueue.UnsubscribeAll();
 		
 		search_filters.limit = this.items_per_page;
-		search_filters.offset = (current_page-1)*this.items_per_page;
+		search_filters.offset = (this.current_page-1)*this.items_per_page;
 		this.evqueue.Subscribe('INSTANCE_TERMINATED','instances','list',search_filters);
+	}
+	
+	nextPage() {
+		this.current_page++;
+		this.updateFilters(this.search_filters,this.current_page);
+	}
+	
+	previousPage() {
+		this.current_page--;
+		this.updateFilters(this.search_filters,this.current_page);
 	}
 }
 

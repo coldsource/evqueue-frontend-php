@@ -19,7 +19,6 @@
 
 var search_filters = { status:'terminated' };
 var parameters = {};
-var current_page = 1;
 
 $(document).ready(function() {
 	// Launch button
@@ -318,17 +317,6 @@ $(document).ready(function() {
 		UpdateFilters();
 		$('#searchformcontainer .filter').hide();
 	});
-
-	// Pages
-	$('#terminated-workflows').delegate('.fa-backward','click',function() {
-		current_page--;
-		terminated_instances.updateFilters(search_filters,current_page);
-	});
-
-	$('#terminated-workflows').delegate('.fa-forward','click',function() {
-		current_page++;
-		terminated_instances.updateFilters(search_filters,current_page);
-	});
 });
 
 function SetWorkflowParameters(el)
@@ -357,7 +345,7 @@ function SetWorkflowParameters(el)
 
 function UpdateFilters()
 {
-	terminated_instances.updateFilters(search_filters,current_page);
+	terminated_instances.updateFilters(search_filters);
 
 	var explain;
 	if(Object.keys(search_filters).length==1)

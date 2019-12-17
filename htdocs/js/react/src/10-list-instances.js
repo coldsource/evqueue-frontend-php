@@ -5,6 +5,7 @@ class ListInstances extends React.Component {
 		super(props);
 		
 		this.state = {
+			refresh: true,
 			now: 0,
 			workflows: {
 				node: 'unknown',
@@ -13,6 +14,14 @@ class ListInstances extends React.Component {
 		};
 		
 		this.timerID = false;
+		
+		this.toggleAutorefresh = this.toggleAutorefresh.bind(this);
+	}
+	
+	toggleAutorefresh() {
+		this.setState({refresh:!this.state.refresh});
+		/*if(this.refresh)
+			this.forceUpdate();*/
 	}
 	
 	now()
@@ -37,7 +46,10 @@ class ListInstances extends React.Component {
 	}
 	
 	evQueueEvent(context,data) {
-		context.setState({workflows: data});
+		if(context.state.refresh)
+			context.setState({workflows: data});
+		else
+			context.state.workflows = data;
 	}
 	
 	humanTime(seconds) {

@@ -1068,6 +1068,7 @@ class ListInstances extends React.Component {
 		super(props);
 
 		this.state = {
+			refresh: true,
 			now: 0,
 			workflows: {
 				node: 'unknown',
@@ -1076,6 +1077,14 @@ class ListInstances extends React.Component {
 		};
 
 		this.timerID = false;
+
+		this.toggleAutorefresh = this.toggleAutorefresh.bind(this);
+	}
+
+	toggleAutorefresh() {
+		this.setState({ refresh: !this.state.refresh });
+		/*if(this.refresh)
+  	this.forceUpdate();*/
 	}
 
 	now() {
@@ -1099,7 +1108,7 @@ class ListInstances extends React.Component {
 	}
 
 	evQueueEvent(context, data) {
-		context.setState({ workflows: data });
+		if (context.state.refresh) context.setState({ workflows: data });else context.state.workflows = data;
 	}
 
 	humanTime(seconds) {
@@ -1277,7 +1286,7 @@ class ExecutingInstances extends ListInstances {
 			self.evqueue.Subscribe('INSTANCE_TERMINATED', 'status', 'query', { type: 'workflows' });
 		});
 
-		this.timerID = setInterval(() => this.setState({ now: this.now() }), 1000);
+		this.timerID = setInterval(() => this.state.refresh ? this.setState({ now: this.now() }) : this.state.now = this.now(), 1000);
 	}
 
 	componentWillUnmount() {
@@ -1327,7 +1336,7 @@ class ExecutingInstances extends ListInstances {
 			'\xA0(',
 			this.state.workflows.response.length,
 			')',
-			React.createElement('span', { className: 'faicon fa-refresh action evq-autorefresh-toggle' }),
+			React.createElement('span', { className: "faicon fa-refresh action" + (this.state.refresh ? ' fa-spin' : ''), onClick: this.toggleAutorefresh }),
 			React.createElement('span', { className: 'faicon fa-rocket action', title: 'Launch a new workflow' }),
 			React.createElement('span', { className: 'faicon fa-clock-o action', title: 'Retry all pending tasks' })
 		);
@@ -1345,8 +1354,14 @@ class TerminatedInstances extends ListInstances {
 	constructor(props) {
 		super(props);
 
+		// Off-state attributes
+		this.search_filters = {};
 		this.current_page = 1;
 		this.items_per_page = 30;
+
+		// Bind actions
+		this.nextPage = this.nextPage.bind(this);
+		this.previousPage = this.previousPage.bind(this);
 	}
 
 	componentDidMount() {
@@ -1393,26 +1408,36 @@ class TerminatedInstances extends ListInstances {
 				'Terminated workflows'
 			),
 			'\xA0',
-			this.current_page > 1 ? React.createElement('span', { className: 'faicon fa-backward' }) : '',
+			this.current_page > 1 ? React.createElement('span', { className: 'faicon fa-backward', onClick: this.previousPage }) : '',
 			'\xA0',
 			(this.current_page - 1) * this.items_per_page + 1,
 			' - ',
 			this.current_page * this.items_per_page,
 			' / ',
 			this.state.workflows.rows,
-			this.current_page * this.items_per_page < this.state.workflows.rows ? React.createElement('span', { className: 'faicon fa-forward' }) : '',
-			React.createElement('span', { className: 'faicon fa-refresh action evq-autorefresh-toggle' })
+			this.current_page * this.items_per_page < this.state.workflows.rows ? React.createElement('span', { className: 'faicon fa-forward', onClick: this.nextPage }) : '',
+			React.createElement('span', { className: "faicon fa-refresh action" + (this.state.refresh ? ' fa-spin' : ''), onClick: this.toggleAutorefresh })
 		);
 	}
 
-	updateFilters(search_filters, current_page) {
-		this.current_page = current_page;
+	updateFilters(search_filters) {
+		this.search_filters = search_filters;
 
 		this.evqueue.UnsubscribeAll();
 
 		search_filters.limit = this.items_per_page;
-		search_filters.offset = (current_page - 1) * this.items_per_page;
+		search_filters.offset = (this.current_page - 1) * this.items_per_page;
 		this.evqueue.Subscribe('INSTANCE_TERMINATED', 'instances', 'list', search_filters);
+	}
+
+	nextPage() {
+		this.current_page++;
+		this.updateFilters(this.search_filters, this.current_page);
+	}
+
+	previousPage() {
+		this.current_page--;
+		this.updateFilters(this.search_filters, this.current_page);
 	}
 }
 
