@@ -972,6 +972,25 @@ code.google.com/p/crypto-js/wiki/License
      */
     C.HmacSHA1 = Hasher._createHmacHelper(SHA1);
 })();
+/*
+ * This file is part of evQueue
+ *
+ * evQueue is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * evQueue is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with evQueue. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * Author: Thibault Kummer
+ */
+
 class evQueueWS {
 	constructor(context, callback) {
 		this.context = context;
@@ -1061,6 +1080,25 @@ class evQueueWS {
 		this.ws.send("<event action='unsubscribeall' />");
 	}
 }
+/*
+ * This file is part of evQueue
+ *
+ * evQueue is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * evQueue is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with evQueue. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * Author: Thibault Kummer
+ */
+
 'use strict';
 
 class ListInstances extends React.Component {
@@ -1083,15 +1121,10 @@ class ListInstances extends React.Component {
 
 	toggleAutorefresh() {
 		this.setState({ refresh: !this.state.refresh });
-		/*if(this.refresh)
-  	this.forceUpdate();*/
 	}
 
 	now() {
 		return Date.now();
-		/*if(!this.evqueue)
-  	return Date.now();
-  return Date.now()-this.evqueue.GetTimeDelta();*/
 	}
 
 	componentDidMount() {
@@ -1272,6 +1305,25 @@ class ListInstances extends React.Component {
 		);
 	}
 }
+/*
+ * This file is part of evQueue
+ *
+ * evQueue is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * evQueue is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with evQueue. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * Author: Thibault Kummer
+ */
+
 'use strict';
 
 class ExecutingInstances extends ListInstances {
@@ -1348,6 +1400,25 @@ class ExecutingInstances extends ListInstances {
 }
 
 ReactDOM.render(React.createElement(ExecutingInstances, null), document.querySelector('#executing-workflows'));
+/*
+ * This file is part of evQueue
+ *
+ * evQueue is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * evQueue is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with evQueue. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * Author: Thibault Kummer
+ */
+
 'use strict';
 
 class TerminatedInstances extends ListInstances {
