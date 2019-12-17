@@ -1023,10 +1023,11 @@ class evQueueWS {
 				if (self.state == 'CONNECTING') {
 					var challenge = xmldoc.documentElement.getAttribute("challenge");
 
-					var passwd_hash = CryptoJS.SHA1("admin");
+					var user = document.querySelector("body").dataset.user;
+					var passwd_hash = CryptoJS.enc.Hex.parse(document.querySelector("body").dataset.password);
 					var response = CryptoJS.HmacSHA1(CryptoJS.enc.Hex.parse(challenge), passwd_hash).toString(CryptoJS.enc.Hex);
 
-					self.ws.send("<auth response='" + response + "' user='admin' />");
+					self.ws.send("<auth response='" + response + "' user='" + user + "' />");
 					self.state = 'AUTHENTICATED';
 				} else if (self.state == 'AUTHENTICATED') {
 					var time = xmldoc.documentElement.getAttribute("time");

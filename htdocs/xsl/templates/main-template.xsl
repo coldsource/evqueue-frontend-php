@@ -55,7 +55,7 @@
 
 				<title><xsl:value-of select="$title" /></title>
 			</head>
-			<body>
+			<body data-user="{$USER}" data-password="{$PASSWORD}">
 				<xsl:if test="$FULLSCREEN = 'no'">
 					<xsl:if test="$topmenu != ''">
 						<xsl:call-template name="topmenu" />
