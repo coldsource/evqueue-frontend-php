@@ -1262,6 +1262,7 @@ class ListInstances extends evQueueComponent {
 
 		for (var node in this.state.workflows) {
 			ret = ret.concat(this.state.workflows[node].map(wf => {
+				wf.wf_status = wf.status; // .status seems to be reserved by react, in any case it is replaced by a boolean in the rendered HTML
 				return React.createElement(
 					'tr',
 					{ key: wf.id,
@@ -1283,7 +1284,7 @@ class ListInstances extends evQueueComponent {
 						null,
 						React.createElement(
 							'span',
-							{ className: 'action showWorkflowDetails', 'data-id': wf.id, 'data-node-name': wf.node_name, 'data-status': '{wf.status}' },
+							{ className: 'action showWorkflowDetails', 'data-id': wf.id, 'data-node-name': wf.node_name, 'data-status': wf.wf_status },
 							wf.id,
 							' \u2013 ',
 							wf.name,

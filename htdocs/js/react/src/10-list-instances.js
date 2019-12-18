@@ -84,6 +84,7 @@ class ListInstances extends evQueueComponent {
 		for(var node in this.state.workflows)
 		{
 			ret = ret.concat(this.state.workflows[node].map((wf) => {
+				wf.wf_status = wf.status;  // .status seems to be reserved by react, in any case it is replaced by a boolean in the rendered HTML
 				return (
 						<tr key={wf.id}
 							data-id={wf.id}
@@ -98,7 +99,7 @@ class ListInstances extends evQueueComponent {
 								{ this.WorkflowStatus(wf) }
 							</td>
 							<td>
-								<span className="action showWorkflowDetails" data-id={wf.id} data-node-name={wf.node_name} data-status="{wf.status}">
+								<span className="action showWorkflowDetails" data-id={wf.id} data-node-name={wf.node_name} data-status={wf.wf_status}>
 									{wf.id} – {wf.name} { this.workflowInfos(wf) } ({this.workflowDuration(wf)})
 								</span>
 								&#160;
