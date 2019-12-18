@@ -102,5 +102,5 @@ class TerminatedInstances extends ListInstances {
 	}
 }
 
-//if(document.querySelector('#terminated-workflows'))
-//	var terminated_instances = ReactDOM.render(<TerminatedInstances />, document.querySelector('#terminated-workflows'));
+if(document.querySelector('#terminated-workflows'))
+	var terminated_instances = ReactDOM.render(<TerminatedInstances />, document.querySelector('#terminated-workflows'));
