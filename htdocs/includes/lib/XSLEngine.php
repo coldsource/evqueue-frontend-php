@@ -144,6 +144,10 @@ class XSLEngine
 		$this->SetParameter('USE_GIT', isset($_SESSION['git_enabled'])?$_SESSION['git_enabled']:'');
 		$this->SetParameter('USER', isset($_SESSION['user_login']) ? $_SESSION['user_login'] : '');
 		$this->SetParameter('PASSWORD', isset($_SESSION['user_pwd']) ? bin2hex($_SESSION['user_pwd']) : '');
+		
+		global $QUEUEING_WS;
+		$this->SetParameter('NODES',implode(',',$QUEUEING_WS));
+		$this->SetParameter('NODES_NAMES',isset($_SESSION['nodes'])?implode(',',$_SESSION['nodes']) : '');
 
 		$this->display_xml = isset($_GET['display_xml']);
 	}

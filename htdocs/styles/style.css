@@ -108,6 +108,24 @@ span#message span+span:before {
 	content:", ";
 }
 
+ul.reacttabs {
+	margin:5px;
+	padding:5px;
+}
+
+ul.reacttabs li {
+	display: inline;
+	padding: 7px;
+	cursor: pointer;
+	border:1px solid grey;
+	border-radius: 3px;
+	margin:5px;
+}
+
+ul.reacttabs li.selected {
+	font-weight:bold;
+}
+
 ul.topmenu {
 	position:fixed;
 	top:0px;

@@ -19,51 +19,30 @@
 
 'use strict';
 
-class ListInstances extends React.Component {
+class ListInstances extends evQueueComponent {
 	constructor(props) {
 		super(props);
 		
-		this.state = {
-			refresh: true,
-			now: 0,
-			workflows: {
-				node: 'unknown',
-				response: [],
-			}
+		this.state.workflows = {
 		};
-		
-		this.timerID = false;
-		
-		this.toggleAutorefresh = this.toggleAutorefresh.bind(this);
-	}
-	
-	toggleAutorefresh() {
-		this.setState({refresh:!this.state.refresh});
-	}
-	
-	now()
-	{
-		return Date.now();
-	}
-	
-	componentDidMount() {
-		this.evqueue = new evQueueWS(this,this.evQueueEvent); 
-		var evqueue_ready = this.evqueue.Connect();
-		
-		this.setState({now: this.now()});
-		
-		return evqueue_ready;
-	}
-	
-	componentWillUnmount() {
-		this.evqueue.Close();
 	}
 	
 	evQueueEvent(context,data) {
-		if(context.state.refresh)
-			context.setState({workflows: data});
+		if(context.node=='*')
+		{
+			for(var i=0;i<data.response.length;i++)
+				data.response[i].node_name = data.node;
+			
+			var current_state = context.state.workflows;
+			current_state[data.node] = data.response;
+		}
 		else
-			context.state.workflows = data;
+			var current_state = { current: data.response };
+		
+		if(context.state.refresh)
+			context.setState({workflows: current_state});
+		else
+			context.state.workflows = current_state;
 	}
 	
 	humanTime(seconds) {
@@ -100,42 +79,53 @@ class ListInstances extends React.Component {
 	}
 	
 	renderWorkflowsList() {
-		return this.state.workflows.response.map((wf) => {
-			return (
-					<tr key={wf.id}
-					    data-id={wf.id}
-					    data-node={this.getNode(wf)}
-					    data-running_tasks={wf.running_tasks}
-					    data-retrying_tasks={wf.retrying_tasks}
-					    data-queued_tasks={wf.queued_tasks}
-					    data-error_tasks={wf.error_tasks}
-					    data-waiting_conditions={wf.waiting_conditions}
-					    >
-						<td className="center">
-							{ this.WorkflowStatus(wf) }
-						</td>
-						<td>
-							<span className="action showWorkflowDetails" data-id={wf.id} data-node-name={this.getNode(wf)} data-status="{wf.status}">
-								{wf.id} – {wf.name} { this.workflowInfos(wf) } ({this.workflowDuration(wf)})
-							</span>
-							&#160;
-						</td>
-						<td className="center">{this.getNode(wf)}</td>
-						<td className="center">{wf.host?wf.host:'localhost'}</td>
-						<td className="tdStarted">
-							{this.timeSpan(wf.start_time,wf.end_time)}
-						</td>
-						{ this.renderActions() }
-					</tr>
-			);
-		});
+		var ret = [];
+		
+		for(var node in this.state.workflows)
+		{
+			ret = ret.concat(this.state.workflows[node].map((wf) => {
+				return (
+						<tr key={wf.id}
+							data-id={wf.id}
+							data-node={wf.node_name}
+							data-running_tasks={wf.running_tasks}
+							data-retrying_tasks={wf.retrying_tasks}
+							data-queued_tasks={wf.queued_tasks}
+							data-error_tasks={wf.error_tasks}
+							data-waiting_conditions={wf.waiting_conditions}
+							>
+							<td className="center">
+								{ this.WorkflowStatus(wf) }
+							</td>
+							<td>
+								<span className="action showWorkflowDetails" data-id={wf.id} data-node-name={wf.node_name} data-status="{wf.status}">
+									{wf.id} – {wf.name} { this.workflowInfos(wf) } ({this.workflowDuration(wf)})
+								</span>
+								&#160;
+							</td>
+							<td className="center">{wf.node_name}</td>
+							<td className="center">{wf.host?wf.host:'localhost'}</td>
+							<td className="tdStarted">
+								{this.timeSpan(wf.start_time,wf.end_time)}
+							</td>
+							{ this.renderActions() }
+						</tr>
+				);
+			}));
+		}
+		
+		return ret;
 	}
 	
 	renderWorkflows() {
-		if(this.state.workflows.node=='unknown')
+		if(Object.keys(this.state.workflows).length==0)
 			return (<div className="center"><br />Loading...</div>);
 		
-		if(this.state.workflows.response.length==0)
+		var n = 0;
+		for(var node in this.state.workflows)
+			n += this.state.workflows[node].length;
+		
+		if(n==0)
 			return (<div className="center"><br />No workflow.</div>);
 		
 		return (
@@ -158,8 +148,6 @@ class ListInstances extends React.Component {
 	}
 
 	render() {
-		this.state.now=this.now();
-		
 		return (
 			<div>
 				{ this.renderTitle() }

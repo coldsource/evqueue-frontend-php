@@ -995,77 +995,131 @@ class evQueueWS {
 	constructor(context, callback) {
 		this.context = context;
 		this.callback = callback;
+
+		this.nodes = document.querySelector("body").dataset.nodes.split(',');
+		for (var i = 0; i < this.nodes.length; i++) this.nodes[i] = this.nodes[i].replace('tcp://', 'ws://');
+
+		this.nodes_names = document.querySelector("body").dataset.nodesnames.split(',');
+
+		this.failed_nodes = 0;
+		this.connected_nodes = 0;
+		this.current_node = 0;
+		this.ws = [];
+		this.state = [];
 	}
 
-	Connect(context, subscriptions, callback) {
+	GetNodes() {
+		return this.nodes_names;
+	}
+
+	ChangeNode(idx) {
+		this.Close();
+		return this.Connect(idx);
+	}
+
+	GetConnectedNodes() {
+		return this.connected_nodes;
+	}
+
+	Connect(idx = 0) {
+		this.current_node = idx;
+
 		var self = this;
-
 		return new Promise(function (resolve, reject) {
-
-			self.ws = new WebSocket("ws://srvdev:5001/", "events");
-
-			self.time_delta = 0;
-
-			self.state = 'CONNECTING';
-
-			self.ws.onopen = function (event) {
-				console.log("Connected to evQueue Websocket");
-			};
-
-			self.ws.onclose = function (event) {
-				console.log("Disconnected from evQueue Websocket");
-			};
-
-			self.ws.onmessage = function (event) {
-				var parser = new DOMParser();
-				var xmldoc = parser.parseFromString(event.data, "text/xml");
-
-				if (self.state == 'CONNECTING') {
-					var challenge = xmldoc.documentElement.getAttribute("challenge");
-
-					var user = document.querySelector("body").dataset.user;
-					var passwd_hash = CryptoJS.enc.Hex.parse(document.querySelector("body").dataset.password);
-					var response = CryptoJS.HmacSHA1(CryptoJS.enc.Hex.parse(challenge), passwd_hash).toString(CryptoJS.enc.Hex);
-
-					self.ws.send("<auth response='" + response + "' user='" + user + "' />");
-					self.state = 'AUTHENTICATED';
-				} else if (self.state == 'AUTHENTICATED') {
-					var time = xmldoc.documentElement.getAttribute("time");
-					self.time_delta = Date.now() - Date.parse(time);
-
-					self.state = 'READY';
-					resolve();
-				} else if (self.state == 'READY') {
-					var parser = new DOMParser();
-					var xmldoc = parser.parseFromString(event.data, "text/xml");
-
-					var ret = { response: [] };
-
-					var root = xmldoc.documentElement;
-					for (var i = 0; i < root.attributes.length; i++) ret[root.attributes[i].name] = root.attributes[i].value;
-
-					var nodes_ite = xmldoc.evaluate('/response/*', xmldoc.documentElement);
-					var node;
-					while (node = nodes_ite.iterateNext()) {
-						var obj = {};
-						for (var i = 0; i < node.attributes.length; i++) obj[node.attributes[i].name] = node.attributes[i].value;
-						ret.response.push(obj);
-					}
-					self.callback(self.context, ret);
-				}
-			};
+			if (idx == '*') {
+				for (var i = 0; i < self.nodes.length; i++) self.connect(i, resolve, reject);
+			} else self.connect(idx, resolve, reject);
 		});
 	}
 
+	connect(idx, resolve, reject) {
+		var self = this;
+
+		self.ws[idx] = new WebSocket(self.nodes[idx], "events");
+
+		self.time_delta = 0;
+
+		self.state[idx] = 'CONNECTING';
+
+		self.ws[idx].onopen = function (event) {
+			console.log("Connected to node " + self.nodes_names[idx]);
+		};
+
+		self.ws[idx].onclose = function (event) {
+			if (self.state[idx] == 'READY') self.connected_nodes--;
+
+			self.failed_nodes++;
+
+			self.state[idx] = 'DISCONNECTED';
+			console.log("Disconnected from node " + self.nodes_names[idx]);
+		};
+
+		self.ws[idx].onmessage = function (event) {
+			var parser = new DOMParser();
+			var xmldoc = parser.parseFromString(event.data, "text/xml");
+
+			if (self.state[idx] == 'CONNECTING') {
+				var challenge = xmldoc.documentElement.getAttribute("challenge");
+
+				var user = document.querySelector("body").dataset.user;
+				var passwd_hash = CryptoJS.enc.Hex.parse(document.querySelector("body").dataset.password);
+				var response = CryptoJS.HmacSHA1(CryptoJS.enc.Hex.parse(challenge), passwd_hash).toString(CryptoJS.enc.Hex);
+
+				self.ws[idx].send("<auth response='" + response + "' user='" + user + "' />");
+				self.state[idx] = 'AUTHENTICATED';
+			} else if (self.state[idx] == 'AUTHENTICATED') {
+				var time = xmldoc.documentElement.getAttribute("time");
+				self.time_delta = Date.now() - Date.parse(time);
+
+				self.state[idx] = 'READY';
+				self.connected_nodes++;
+				if (self.connected_nodes + self.failed_nodes == self.nodes.length && self.current_node == '*') resolve();else if (self.current_node != '*') resolve();
+			} else if (self.state[idx] == 'READY') {
+				var parser = new DOMParser();
+				var xmldoc = parser.parseFromString(event.data, "text/xml");
+
+				var ret = { response: [] };
+
+				var root = xmldoc.documentElement;
+				for (var i = 0; i < root.attributes.length; i++) ret[root.attributes[i].name] = root.attributes[i].value;
+
+				var nodes_ite = xmldoc.evaluate(self.output_xpath_filter, xmldoc.documentElement);
+				var node;
+				while (node = nodes_ite.iterateNext()) {
+					var obj = {};
+					for (var i = 0; i < node.attributes.length; i++) obj[node.attributes[i].name] = node.attributes[i].value;
+					ret.response.push(obj);
+				}
+				self.callback(self.context, ret);
+			}
+		};
+	}
+
 	Close() {
-		this.ws.close();
+		if (this.current_node == '*') {
+			for (var i = 0; i < this.nodes.length; i++) this.close(i);
+		} else this.close(this.current_node);
+	}
+
+	close(idx) {
+		this.ws[idx].close();
 	}
 
 	GetTimeDelta() {
 		return this.time_delta;
 	}
 
-	Subscribe(event, group, action, parameters) {
+	Subscribe(event, api, output_xpath_filter = "/response/*") {
+		if (this.current_node == '*') {
+			for (var i = 0; i < this.nodes.length; i++) this.subscribe(i, event, api.group, api.action, api.parameters, output_xpath_filter);
+		} else this.subscribe(this.current_node, event, api.group, api.action, api.parameters, output_xpath_filter);
+	}
+
+	subscribe(idx, event, group, action, parameters, output_xpath_filter = "/response/*") {
+		if (this.state[idx] != 'READY') return;
+
+		this.output_xpath_filter = output_xpath_filter;
+
 		var xmldoc = new Document();
 		var api_node = xmldoc.createElement(group);
 		api_node.setAttribute('action', action);
@@ -1074,11 +1128,19 @@ class evQueueWS {
 		var api_cmd = new XMLSerializer().serializeToString(xmldoc);
 
 		var api_cmd_b64 = btoa(api_cmd);
-		this.ws.send("<event action='subscribe' type='" + event + "' api_cmd='" + api_cmd_b64 + "' />");
+		this.ws[idx].send("<event action='subscribe' type='" + event + "' api_cmd='" + api_cmd_b64 + "' />");
 	}
 
 	UnsubscribeAll(api_cmd, event) {
-		this.ws.send("<event action='unsubscribeall' />");
+		if (this.current_node == '*') {
+			for (var i = 0; i < this.nodes.length; i++) this.unsubscribeAll(i);
+		} else this.unsubscribeAll(this.current_node);
+	}
+
+	unsubscribeAll(idx) {
+		if (this.state[idx] != 'READY') return;
+
+		this.ws[idx].send("<event action='unsubscribeall' />");
 	}
 }
 /*
@@ -1102,47 +1164,70 @@ class evQueueWS {
 
 'use strict';
 
-class ListInstances extends React.Component {
+class evQueueComponent extends React.Component {
 	constructor(props) {
 		super(props);
 
 		this.state = {
-			refresh: true,
-			now: 0,
-			workflows: {
-				node: 'unknown',
-				response: []
-			}
+			refresh: true
 		};
 
-		this.timerID = false;
-
 		this.toggleAutorefresh = this.toggleAutorefresh.bind(this);
+
+		this.node = 0;
 	}
 
 	toggleAutorefresh() {
 		this.setState({ refresh: !this.state.refresh });
 	}
 
-	now() {
-		return Date.now();
-	}
-
 	componentDidMount() {
 		this.evqueue = new evQueueWS(this, this.evQueueEvent);
-		var evqueue_ready = this.evqueue.Connect();
 
-		this.setState({ now: this.now() });
-
-		return evqueue_ready;
+		if (this.node == '*' || this.node == 'any') return this.evqueue.Connect('*');else return this.evqueue.Connect(this.node);
 	}
 
 	componentWillUnmount() {
 		this.evqueue.Close();
 	}
+}
+/*
+ * This file is part of evQueue
+ *
+ * evQueue is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * evQueue is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with evQueue. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * Author: Thibault Kummer
+ */
+
+'use strict';
+
+class ListInstances extends evQueueComponent {
+	constructor(props) {
+		super(props);
+
+		this.state.workflows = {};
+	}
 
 	evQueueEvent(context, data) {
-		if (context.state.refresh) context.setState({ workflows: data });else context.state.workflows = data;
+		if (context.node == '*') {
+			for (var i = 0; i < data.response.length; i++) data.response[i].node_name = data.node;
+
+			var current_state = context.state.workflows;
+			current_state[data.node] = data.response;
+		} else var current_state = { current: data.response };
+
+		if (context.state.refresh) context.setState({ workflows: current_state });else context.state.workflows = current_state;
 	}
 
 	humanTime(seconds) {
@@ -1173,69 +1258,78 @@ class ListInstances extends React.Component {
 	}
 
 	renderWorkflowsList() {
-		return this.state.workflows.response.map(wf => {
-			return React.createElement(
-				'tr',
-				{ key: wf.id,
-					'data-id': wf.id,
-					'data-node': this.getNode(wf),
-					'data-running_tasks': wf.running_tasks,
-					'data-retrying_tasks': wf.retrying_tasks,
-					'data-queued_tasks': wf.queued_tasks,
-					'data-error_tasks': wf.error_tasks,
-					'data-waiting_conditions': wf.waiting_conditions
-				},
-				React.createElement(
-					'td',
-					{ className: 'center' },
-					this.WorkflowStatus(wf)
-				),
-				React.createElement(
-					'td',
-					null,
+		var ret = [];
+
+		for (var node in this.state.workflows) {
+			ret = ret.concat(this.state.workflows[node].map(wf => {
+				return React.createElement(
+					'tr',
+					{ key: wf.id,
+						'data-id': wf.id,
+						'data-node': wf.node_name,
+						'data-running_tasks': wf.running_tasks,
+						'data-retrying_tasks': wf.retrying_tasks,
+						'data-queued_tasks': wf.queued_tasks,
+						'data-error_tasks': wf.error_tasks,
+						'data-waiting_conditions': wf.waiting_conditions
+					},
 					React.createElement(
-						'span',
-						{ className: 'action showWorkflowDetails', 'data-id': wf.id, 'data-node-name': this.getNode(wf), 'data-status': '{wf.status}' },
-						wf.id,
-						' \u2013 ',
-						wf.name,
-						' ',
-						this.workflowInfos(wf),
-						' (',
-						this.workflowDuration(wf),
-						')'
+						'td',
+						{ className: 'center' },
+						this.WorkflowStatus(wf)
 					),
-					'\xA0'
-				),
-				React.createElement(
-					'td',
-					{ className: 'center' },
-					this.getNode(wf)
-				),
-				React.createElement(
-					'td',
-					{ className: 'center' },
-					wf.host ? wf.host : 'localhost'
-				),
-				React.createElement(
-					'td',
-					{ className: 'tdStarted' },
-					this.timeSpan(wf.start_time, wf.end_time)
-				),
-				this.renderActions()
-			);
-		});
+					React.createElement(
+						'td',
+						null,
+						React.createElement(
+							'span',
+							{ className: 'action showWorkflowDetails', 'data-id': wf.id, 'data-node-name': wf.node_name, 'data-status': '{wf.status}' },
+							wf.id,
+							' \u2013 ',
+							wf.name,
+							' ',
+							this.workflowInfos(wf),
+							' (',
+							this.workflowDuration(wf),
+							')'
+						),
+						'\xA0'
+					),
+					React.createElement(
+						'td',
+						{ className: 'center' },
+						wf.node_name
+					),
+					React.createElement(
+						'td',
+						{ className: 'center' },
+						wf.host ? wf.host : 'localhost'
+					),
+					React.createElement(
+						'td',
+						{ className: 'tdStarted' },
+						this.timeSpan(wf.start_time, wf.end_time)
+					),
+					this.renderActions()
+				);
+			}));
+		}
+
+		return ret;
 	}
 
 	renderWorkflows() {
-		if (this.state.workflows.node == 'unknown') return React.createElement(
+		if (Object.keys(this.state.workflows).length == 0) return React.createElement(
 			'div',
 			{ className: 'center' },
 			React.createElement('br', null),
 			'Loading...'
 		);
 
-		if (this.state.workflows.response.length == 0) return React.createElement(
+		var n = 0;
+		for (var node in this.state.workflows) n += this.state.workflows[node].length;
+
+		if (n == 0) return React.createElement(
 			'div',
 			{ className: 'center' },
 			React.createElement('br', null),
@@ -1296,8 +1390,6 @@ class ListInstances extends React.Component {
 	}
 
 	render() {
-		this.state.now = this.now();
-
 		return React.createElement(
 			'div',
 			null,
@@ -1327,18 +1419,244 @@ class ListInstances extends React.Component {
 
 'use strict';
 
-class ExecutingInstances extends ListInstances {
+class ListQueues extends evQueueComponent {
 	constructor(props) {
 		super(props);
+
+		this.state.nodes = [];
+		this.state.queues = [];
+		this.state.idx = 0;
+
+		this.changeNode = this.changeNode.bind(this);
+		this.node = 0;
+	}
+
+	subscribe() {
+		var api = { group: 'statistics', action: 'query', parameters: { type: 'queue' } };
+		this.evqueue.Subscribe('QUEUE_ENQUEUE', api, '/response/statistics/*');
+		this.evqueue.Subscribe('QUEUE_DEQUEUE', api, '/response/statistics/*');
+		this.evqueue.Subscribe('QUEUE_EXECUTE', api, '/response/statistics/*');
+		this.evqueue.Subscribe('QUEUE_TERMINATE', api, '/response/statistics/*');
 	}
 
 	componentDidMount() {
 		var self = this;
 		super.componentDidMount().then(() => {
-			self.evqueue.Subscribe('INSTANCE_STARTED', 'status', 'query', { type: 'workflows' });
-			self.evqueue.Subscribe('INSTANCE_TERMINATED', 'status', 'query', { type: 'workflows' });
+			self.subscribe();
+			self.setState({ nodes: self.evqueue.GetNodes() });
+		});
+	}
+
+	changeNode(event) {
+		var self = this;
+		self.setState({ idx: event.target.dataset.idx });
+		this.evqueue.ChangeNode(event.target.dataset.idx).then(() => {
+			self.subscribe();
+		});
+	}
+
+	evQueueEvent(context, data) {
+		if (context.state.refresh) context.setState({ queues: data.response });else context.state.queues = data.response;
+	}
+
+	renderQueuesList() {
+		return this.state.queues.map(queue => {
+			var running_prct = queue.running_tasks / queue.concurrency * 100;
+			var queue_prct = queue.size > 20 ? 100 : queue.size / 20 * 100;
+			return React.createElement(
+				'tr',
+				{ key: queue.name, className: 'evenOdd' },
+				React.createElement(
+					'td',
+					null,
+					queue.name
+				),
+				React.createElement(
+					'td',
+					{ className: 'center' },
+					queue.scheduler
+				),
+				React.createElement(
+					'td',
+					{ className: 'center' },
+					queue.concurrency
+				),
+				React.createElement(
+					'td',
+					null,
+					React.createElement(
+						'div',
+						{ className: 'prctgradient' },
+						React.createElement(
+							'div',
+							{ style: { background: 'linear-gradient(to right,transparent ' + running_prct + '%,white ' + running_prct + '%)' } },
+							React.createElement(
+								'div',
+								{ style: { textAlign: 'right', width: running_prct + '%' } },
+								Math.round(running_prct),
+								'\xA0%'
+							)
+						)
+					),
+					queue.running_tasks,
+					' task',
+					queue.running_tasks ? 's' : '',
+					' running.'
+				),
+				React.createElement(
+					'td',
+					null,
+					React.createElement(
+						'div',
+						{ className: 'prctgradient' },
+						React.createElement(
+							'div',
+							{ style: { background: "linear-gradient(to right,transparent " + queue_prct + "%,white " + queue_prct + "%)" } },
+							React.createElement(
+								'div',
+								{ style: { textAlign: 'right', width: queue_prct + '%' } },
+								'\xA0'
+							)
+						)
+					),
+					queue.size,
+					' awaiting task',
+					queue.size > 1 ? 's' : '',
+					' in queue.'
+				)
+			);
+		});
+	}
+
+	renderNodesList() {
+		var ret = [];
+		for (var i = 0; i < this.state.nodes.length; i++) {
+			var node = this.state.nodes[i];
+			ret.push(React.createElement(
+				'li',
+				{ key: node, 'data-idx': i, className: this.state.idx == i ? 'selected' : '', onClick: this.changeNode },
+				node
+			));
+		}
+		return ret;
+	}
+
+	renderQueues() {
+		return React.createElement(
+			'div',
+			{ className: 'workflow-list' },
+			React.createElement(
+				'table',
+				null,
+				React.createElement(
+					'thead',
+					null,
+					React.createElement(
+						'tr',
+						null,
+						React.createElement(
+							'th',
+							null,
+							'Name'
+						),
+						React.createElement(
+							'th',
+							null,
+							'Scheduler'
+						),
+						React.createElement(
+							'th',
+							null,
+							'Concurrency'
+						),
+						React.createElement(
+							'th',
+							null,
+							'Running tasks'
+						),
+						React.createElement(
+							'th',
+							null,
+							'Queued tasks'
+						)
+					)
+				),
+				React.createElement(
+					'tbody',
+					null,
+					this.renderQueuesList()
+				)
+			)
+		);
+	}
+
+	render() {
+		return React.createElement(
+			'div',
+			null,
+			React.createElement(
+				'div',
+				{ className: 'boxTitle' },
+				React.createElement(
+					'span',
+					{ className: 'title' },
+					'Queues States'
+				),
+				React.createElement('span', { className: "faicon fa-refresh action" + (this.state.refresh ? ' fa-spin' : ''), onClick: this.toggleAutorefresh })
+			),
+			React.createElement(
+				'ul',
+				{ className: 'reacttabs' },
+				this.renderNodesList()
+			),
+			this.renderQueues()
+		);
+	}
+}
+
+if (document.querySelector('#queues')) ReactDOM.render(React.createElement(ListQueues, null), document.querySelector('#queues'));
+/*
+ * This file is part of evQueue
+ *
+ * evQueue is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * evQueue is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with evQueue. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * Author: Thibault Kummer
+ */
+
+'use strict';
+
+class ExecutingInstances extends ListInstances {
+	constructor(props) {
+		super(props);
+
+		this.state.now = 0;
+		this.state.ready = false;
+		this.timerID = false;
+		this.node = '*';
+	}
+
+	componentDidMount() {
+		var self = this;
+
+		super.componentDidMount().then(() => {
+			var api = { group: 'status', action: 'query', parameters: { type: 'workflows' } };
+			self.evqueue.Subscribe('INSTANCE_STARTED', api);
+			self.evqueue.Subscribe('INSTANCE_TERMINATED', api);
+			this.setState({ ready: true });
 		});
 
+		this.setState({ now: this.now() });
 		this.timerID = setInterval(() => this.state.refresh ? this.setState({ now: this.now() }) : this.state.now = this.now(), 1000);
 	}
 
@@ -1347,8 +1665,8 @@ class ExecutingInstances extends ListInstances {
 		clearInterval(this.timerID);
 	}
 
-	getNode(wf) {
-		return this.state.workflows.node;
+	now() {
+		return Date.now();
 	}
 
 	workflowDuration(wf) {
@@ -1376,31 +1694,73 @@ class ExecutingInstances extends ListInstances {
 		if (wf.retrying_tasks > 0) return React.createElement('span', { className: 'faicon fa-clock-o', title: 'A task ended badly and will retry' });
 	}
 
+	renderNodeStatus() {
+		if (!this.state.ready) return React.createElement('div', null);
+
+		var nodes_up = this.evqueue.GetConnectedNodes();
+		var nodes_down = this.evqueue.GetNodes().length - this.evqueue.GetConnectedNodes();
+		if (nodes_down == 0) return React.createElement(
+			'a',
+			{ href: 'nodes.php' },
+			React.createElement(
+				'span',
+				{ className: 'success' },
+				nodes_up,
+				' node',
+				nodes_up != 1 ? 's' : '',
+				' up'
+			)
+		);
+		return React.createElement(
+			'a',
+			{ href: 'nodes.php' },
+			React.createElement(
+				'span',
+				{ className: 'success' },
+				nodes_up,
+				' node',
+				nodes_up != 1 ? 's' : '',
+				' up - ',
+				React.createElement(
+					'span',
+					{ className: 'error' },
+					nodes_down,
+					' node',
+					nodes_down != 1 ? 's' : '',
+					' down'
+				)
+			)
+		);
+	}
+
 	renderTitle() {
+		var n = 0;
+		for (var node in this.state.workflows) n += this.state.workflows[node].length;
+
 		return React.createElement(
 			'div',
 			{ className: 'boxTitle' },
-			React.createElement('div', { id: 'nodes-status' }),
+			React.createElement(
+				'div',
+				{ id: 'nodes-status' },
+				this.renderNodeStatus()
+			),
 			React.createElement(
 				'span',
 				{ className: 'title' },
 				'Executing workflows'
 			),
 			'\xA0(',
-			this.state.workflows.response.length,
+			n,
 			')',
 			React.createElement('span', { className: "faicon fa-refresh action" + (this.state.refresh ? ' fa-spin' : ''), onClick: this.toggleAutorefresh }),
 			React.createElement('span', { className: 'faicon fa-rocket action', title: 'Launch a new workflow' }),
 			React.createElement('span', { className: 'faicon fa-clock-o action', title: 'Retry all pending tasks' })
 		);
 	}
-
-	Toto() {
-		console.log("Toto");
-	}
 }
 
-ReactDOM.render(React.createElement(ExecutingInstances, null), document.querySelector('#executing-workflows'));
+if (document.querySelector('#executing-workflows')) ReactDOM.render(React.createElement(ExecutingInstances, null), document.querySelector('#executing-workflows'));
 /*
  * This file is part of evQueue
  *
@@ -1434,17 +1794,15 @@ class TerminatedInstances extends ListInstances {
 		// Bind actions
 		this.nextPage = this.nextPage.bind(this);
 		this.previousPage = this.previousPage.bind(this);
+		this.node = 'any';
 	}
 
 	componentDidMount() {
 		var self = this;
 		super.componentDidMount().then(() => {
-			self.evqueue.Subscribe('INSTANCE_TERMINATED', 'instances', 'list');
+			var api = { group: 'instances', action: 'list' };
+			self.evqueue.Subscribe('INSTANCE_TERMINATED', api);
 		});
-	}
-
-	getNode(wf) {
-		return wf.node_name;
 	}
 
 	workflowDuration(wf) {
@@ -1513,4 +1871,5 @@ class TerminatedInstances extends ListInstances {
 	}
 }
 
-var terminated_instances = ReactDOM.render(React.createElement(TerminatedInstances, null), document.querySelector('#terminated-workflows'));
+//if(document.querySelector('#terminated-workflows'))
+//	var terminated_instances = ReactDOM.render(<TerminatedInstances />, document.querySelector('#terminated-workflows'));

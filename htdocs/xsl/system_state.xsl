@@ -8,24 +8,11 @@
 	</xsl:variable>
 	
 	<xsl:template name="content">
-		<div class="evq-autorefresh" data-url="ajax/system_state.php" data-interval="1">
-			<div class="boxTitle">
-				<span class="title">Queues States <span class="faicon fa-refresh action evq-autorefresh-toggle"></span></span>
-			</div>
-			
-			<div class="tabs">
-				<ul>
-					<xsl:for-each select="/page/evqueue-nodes/node">
-						<li><a href="#node-{@name}"><xsl:value-of select="@name" /></a></li>
-					</xsl:for-each>
-				</ul>
-			
-				<xsl:for-each select="/page/evqueue-nodes/node">
-					<div class="evq-autorefresh-pannel" id="node-{@name}"></div>
-				</xsl:for-each>
-				
-			</div>
-		</div>
+		<div id="queues"></div>
+		
+		<script src="https://unpkg.com/react@16/umd/react.development.js" crossorigin="crossorigin"></script>
+		<script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js" crossorigin="crossorigin"></script>
+		<script src="js/react/app.js"></script>
 	</xsl:template>
 
 </xsl:stylesheet>

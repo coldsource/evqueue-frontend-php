@@ -31,18 +31,15 @@ class TerminatedInstances extends ListInstances {
 		// Bind actions
 		this.nextPage = this.nextPage.bind(this);
 		this.previousPage = this.previousPage.bind(this);
+		this.node = 'any';
 	}
 	
 	componentDidMount() {
 		var self = this;
 		super.componentDidMount().then( () => {
-			self.evqueue.Subscribe('INSTANCE_TERMINATED','instances','list');
+			var api = { group:'instances',action:'list' };
+			self.evqueue.Subscribe('INSTANCE_TERMINATED',api);
 		});
-	}
-	
-	getNode(wf)
-	{
-		return wf.node_name;
 	}
 	
 	workflowDuration(wf) {
@@ -105,4 +102,5 @@ class TerminatedInstances extends ListInstances {
 	}
 }
 
-var terminated_instances = ReactDOM.render(<TerminatedInstances />, document.querySelector('#terminated-workflows'));
+//if(document.querySelector('#terminated-workflows'))
+//	var terminated_instances = ReactDOM.render(<TerminatedInstances />, document.querySelector('#terminated-workflows'));
