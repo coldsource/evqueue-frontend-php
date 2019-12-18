@@ -13,6 +13,7 @@
 	<xsl:variable name="javascript">
 		<src>js/instance.js</src>
 		<src>js/tags.js</src>
+		<src>js/custom-filters.js</src>
 		<src>js/index.js</src>
 	</xsl:variable>
 

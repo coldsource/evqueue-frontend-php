@@ -7,6 +7,7 @@
 			<li><a href="#tab-workflowproperties">Properties</a></li>
 			<li><a href="#tab-workflowparameters">Parameters</a></li>
 			<li><a href="#tab-workflownotifications">Notifications</a></li>
+			<li><a href="#tab-workflowcustomfilters">Custom Filters</a></li>
 		</ul>
 		<div id="tab-workflowproperties">
 			<h2>
@@ -62,6 +63,22 @@
 						</td>
 					</tr>
 				</xsl:for-each>
+			</table>
+		</div>
+		<div id="tab-workflowcustomfilters">
+			<h2>
+				Custom Filters
+				<span class="help faicon fa-question-circle" title="Custom Filters may be used to retrieve pieces of information from workflow instances, and search for instances with a given value"></span>
+			</h2>
+			<table>
+				<tbody class="customfilters">
+					<tr>
+						<th>Name</th>
+						<th>Description</th>
+						<th>XPath</th>
+						<th></th>
+					</tr>
+				</tbody>
 			</table>
 		</div>
 	</div>

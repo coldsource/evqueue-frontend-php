@@ -26,7 +26,7 @@ function Workflow(el,xml)
 	this.undo_stack = [];
 	this.redo_stack = [];
 	
-	// Initiallize global node  ID
+	// Initialise global node ID
 	this.gnid = 0;
 	
 	// Load XML
@@ -169,6 +169,25 @@ Workflow.prototype.AddParameter = function(name)
 Workflow.prototype.DeleteParameter = function(idx)
 {
 	var parameters = this.xmldoc.Query('/workflow/parameters/parameter',this.xmldoc);
+	parameters[idx].parentNode.removeChild(parameters[idx]);
+}
+
+Workflow.prototype.GetCustomFilters = function()
+{
+	var filters = this.xmldoc.Query('/workflow/custom-filters/custom-filter',this.xmldoc);
+	var ret = [];
+	for(var i=0;i<filters.length;i++)
+		ret.push({
+			name: filters[i].getAttribute('name'),
+			select: filters[i].getAttribute('select'),
+			description: filters[i].getAttribute('description'),
+		});
+	return ret;
+}
+
+Workflow.prototype.DeleteCustomFilter = function(idx)
+{
+	var parameters = this.xmldoc.Query('/workflow/custom-filters/custom-filter',this.xmldoc);
 	parameters[idx].parentNode.removeChild(parameters[idx]);
 }
 

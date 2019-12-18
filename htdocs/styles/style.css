@@ -74,6 +74,11 @@ a.action {
 	color:#4996ce;
 }
 
+#tags-management {
+	display: flex;
+	flex-wrap: wrap;
+}
+
 span.tag {
 	border: 1px solid;
 	border-color: grey;
@@ -83,19 +88,34 @@ span.tag {
 
 
 /* XML Formatter */
+div.parent_tag {
+	margin-left: 10px;
+}
+
 span.xml_tagname {
 	color: #800080;
 	font-weight: bold;
+	cursor: pointer;
 }
 
 span.xml_attributename {
 	color: #000000;
 	font-weight: bold;
+	cursor: pointer;
 }
 
 span.xml_attributevalue {
 	color: #0000ff;
+	cursor: pointer;
 }
+
+span.user_selected, span.matching_selection {
+	color: white;
+	padding: 0.1em 0.2em;
+}
+span.user_selected { background-color: #f39c12; }
+span.matching_selection { background-color: #f1c40f; }
+
 
 /* Menu */
 span#message {
@@ -131,7 +151,7 @@ ul.topmenu {
 	top:0px;
 	left:0px;
 	width:100%;
-	margin: 0px 0px 0px 0px;
+	margin: 0;
 	padding: 5px 0px 5px 0px;
 	background-color: #E0E0E0;
 	height: 20px;

@@ -27,7 +27,7 @@ function WorkflowEditor()
 		if(name==null)
 			return;
 		
-		me.workflow.Backup();
+		me.workflow.Backup('Add WF parameter');
 		
 		if(me.workflow.AddParameter(name))
 			me.RefreshParameters();
@@ -40,6 +40,7 @@ WorkflowEditor.prototype.Open = function(id)
 	this.wfbackupdone = false;
 	
 	this.RefreshParameters();
+	this.RefreshCustomFilters();
 	
 	var wfname = this.workflow.GetAttribute('name');
 	$('#workflow-editor input#wfname').val(wfname);
@@ -71,7 +72,7 @@ WorkflowEditor.prototype.SaveAttribute = function(name,old_val,new_val)
 	
 	if(!this.wfbackupdone)
 	{
-		wf.Backup();
+		wf.Backup('Edit WF '+name);
 		this.wfbackupdone = true;
 	}
 	
@@ -99,8 +100,37 @@ WorkflowEditor.prototype.RefreshParameters = function()
 	
 	var me = this;
 	$('#tab-workflowparameters span.fa-remove').click(function() {
-		me.workflow.Backup();
+		me.workflow.Backup('Delete WF parameter');
 		me.workflow.DeleteParameter($(this).parent().index());
 		me.RefreshParameters();
+	});
+}
+
+WorkflowEditor.prototype.RefreshCustomFilters = function()
+{
+	if(this.id==false || !this.workflow)
+		return;
+	
+	var filters = this.workflow.GetCustomFilters();
+	
+	var node = $('#tab-workflowcustomfilters .customfilters');
+	
+	node.find('tr:has(td)').remove();
+	
+	for(var i=0;i<filters.length;i++)
+	{
+		var filter_tr = $('<tr>');
+		node.append(filter_tr);
+		filter_tr.append($("<td>"+filters[i].name+"</td>"));
+		filter_tr.append($("<td>"+filters[i].description+"</td>"));
+		filter_tr.append($("<td>"+filters[i].select+"</td>"));
+		filter_tr.append($("<td><span class='faicon fa-remove' title='Delete Custom Filter'></span></td>"));
+	}
+	
+	var me = this;
+	$('#tab-workflowcustomfilters span.fa-remove').click(function() {
+		me.workflow.Backup('Delete WF Custom Filter');
+		me.workflow.DeleteCustomFilter($(this).parent().index()); // TODO
+		me.RefreshCustomFilters();
 	});
 }
