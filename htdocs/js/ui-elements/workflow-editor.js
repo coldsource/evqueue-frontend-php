@@ -124,13 +124,13 @@ WorkflowEditor.prototype.RefreshCustomFilters = function()
 		filter_tr.append($("<td>"+filters[i].name+"</td>"));
 		filter_tr.append($("<td>"+filters[i].description+"</td>"));
 		filter_tr.append($("<td>"+filters[i].select+"</td>"));
-		filter_tr.append($("<td><span class='faicon fa-remove' title='Delete Custom Filter'></span></td>"));
+		filter_tr.append($("<td><span class='faicon fa-remove' title='Delete Custom Filter' data-idx='"+i+"'></span></td>"));
 	}
 	
 	var me = this;
 	$('#tab-workflowcustomfilters span.fa-remove').click(function() {
 		me.workflow.Backup('Delete WF Custom Filter');
-		me.workflow.DeleteCustomFilter($(this).parent().index()); // TODO
+		me.workflow.DeleteCustomFilter($(this).data('idx'));
 		me.RefreshCustomFilters();
 	});
 }
