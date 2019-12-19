@@ -96,7 +96,7 @@
 		</xsl:variable>
 		<xsl:variable name="nb-similar-tasks" select="count(following-sibling::task[@status = 'TERMINATED' and @retval = 0 and @path = current()/@path])" />
 		
-		<div class="task {$taskClass} {$cls}" data-name="{@name}" data-type="task" data-evqid="{@evqid}" data-outputs="{count(output)}">
+		<div class="task {$taskClass} {$cls}" data-name="{@path}" data-type="task" data-evqid="{@evqid}" data-outputs="{count(output)}">
 			
 			<xsl:if test="@progression != 0 and @progression != 100">
 				<xsl:attribute name="title"><xsl:value-of select="@progression" />%</xsl:attribute>
@@ -325,7 +325,23 @@
 				<div><a target="_blank" href="ajax/datastore.php?id={@datastore-id}"><span class="faicon fa-eye"></span>View in browser</a></div>
 			</xsl:when>
 			<xsl:when test="@method = 'xml'">
-				<xsl:apply-templates select="*" mode="xml_display" />
+				<xsl:variable name="task-xpath">
+					<xsl:apply-templates select=".." mode="xpath_gen" />
+				</xsl:variable>
+				<a href="#add-custom-filter" onclick="$(this).next().toggle('fast');" style="color: #27ae60; font-weight: bold;">+ Add Custom Filter</a>
+				
+				<form class="add-custom-filter" style="margin: 0.5em; display: none;">
+					<input type="hidden" name="instance_id" value="{/page/instance/workflow/@id}" />
+					<input name="custom_filter_name" required="required" placeholder="Custom Filter Name" />
+					<span style="display: block; color: #7f8c8d;"><xsl:value-of select="$task-xpath" /></span>
+					<input style="width: 100%;" name="xpath_expr" placeholder="Click in the XML to autogenerate an XPath expression" />
+					<input style="width: 100%;" name="custom_filter_desc" placeholder="Description" />
+					<input type="submit" value="Save Custom Filter" />
+				</form>
+				
+				<div class="task-xml-output" data-task-xpath="{$task-xpath}">
+					<xsl:apply-templates select="*" mode="xml_display" />
+				</div>
 			</xsl:when>
 			<xsl:otherwise>
 				<pre>
@@ -333,6 +349,33 @@
 				</pre>
 			</xsl:otherwise>
 		</xsl:choose>
+	</xsl:template>
+	
+	
+	<xsl:template match="*" mode="xpath_gen">
+		<xsl:apply-templates select=".." mode="xpath_gen" /> <!-- generate trailing xpath from ancestors -->
+		<xsl:text>/</xsl:text>
+		<xsl:value-of select="name()" />
+	</xsl:template>
+	
+	<xsl:template match="workflow" mode="xpath_gen" priority="2">
+		<xsl:text>/workflow</xsl:text>
+	</xsl:template>
+	
+	<xsl:template match="task" mode="xpath_gen" priority="2">
+		<xsl:apply-templates select=".." mode="xpath_gen" />
+		<xsl:text>/task[@path="</xsl:text>
+		<xsl:value-of select="@path" />
+		<xsl:text>"]</xsl:text>
+	</xsl:template>
+	
+	<xsl:template match="input | parameter" mode="xpath_gen" priority="2">
+		<xsl:apply-templates select=".." mode="xpath_gen" />
+		<xsl:text>/</xsl:text>
+		<xsl:value-of select="name()" />
+		<xsl:text>[@name="</xsl:text>
+		<xsl:value-of select="name" />
+		<xsl:text>"]</xsl:text>
 	</xsl:template>
 	
 </xsl:stylesheet>
