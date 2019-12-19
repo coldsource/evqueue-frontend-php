@@ -48,29 +48,45 @@ function evqueueAPI(options){
 	
 	var promise = new jQuery.Deferred();
 	
-	if (options.confirm && !confirm(options.confirm))
-		return promise.reject();
+	var old_promise;
+	if(evqueueAPI.old_promise===undefined)
+		old_promise = new jQuery.Deferred().resolve();
+	else
+		old_promise = evqueueAPI.old_promise;
 	
-	$.ajax({
-		url: 'ajax/evqueue_api.php',
-		type: 'post',
-		data: {
-			group: options.group,
-			action: options.action,
-			attributes: options.attributes,
-			parameters: options.parameters,
-			node: options.node,
-		},
-	}).done(function(xml){
-		error = $(xml).children('error');
-		if ($(error).length > 0) {
-			if(!options.ignore_errors)
-				alert(error.html());
-			promise.reject();
-			return;
-		}
+	evqueueAPI.old_promise = promise;
+	
+	old_promise.always(function() {
+		var nodes =  $("body").data('nodesnames').split(',');
+		var idx = (options.node!==undefined?nodes.findIndex((v) => { return v==options.node; }):0);
+		if(idx==-1)
+			return promise.reject();
 		
-		promise.resolve(xml);
+		if (options.confirm && !confirm(options.confirm))
+			return promise.reject();
+		
+		var evq_ready;
+		if(evqueueAPI.evqueue===undefined)
+		{
+			evqueueAPI.evqueue = new evQueueWS();
+			evq_ready = evqueueAPI.evqueue.Connect(idx);
+		}
+		else
+			evq_ready = evqueueAPI.evqueue.ChangeNode(idx);
+		
+		evq_ready.then( () => {
+			evqueueAPI.evqueue.API(options).then( (xml) => {
+				error = $(xml).children('error');
+				if ($(error).length > 0) {
+					if(!options.ignore_errors)
+						alert(error.html());
+					promise.reject();
+					return;
+				}
+				
+				promise.resolve(xml);
+			});
+		});
 	});
 	
 	return promise;

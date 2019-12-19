@@ -42,17 +42,6 @@
 				<script type="text/javascript" src="{$SITE_BASE}js/jquery/jquery-ui.min.js" />
 				<script type="text/javascript" src="{$SITE_BASE}js/jquery/select2.full.min.js" />
 				
-				<script type="text/javascript" src="{$SITE_BASE}js/forms.js" />
-				<script type="text/javascript" src="{$SITE_BASE}js/global.js" />
-				<script type="text/javascript" src="{$SITE_BASE}js/preferences.js" />
-
-				<!-- Load additional javascript -->
-				<xsl:if test="$javascript != '' and exsl:node-set($javascript)/src">
-					<xsl:for-each select="exsl:node-set($javascript)/src">
-						<script type="text/javascript" src="{$SITE_BASE}{.}"><xsl:text><![CDATA[]]></xsl:text></script>
-					</xsl:for-each>
-				</xsl:if>
-
 				<title><xsl:value-of select="$title" /></title>
 			</head>
 			<body data-user="{$USER}" data-password="{$PASSWORD}" data-nodes="{$NODES}" data-nodesnames="{$NODES_NAMES}">
@@ -74,6 +63,21 @@
 				<div id="footer">
 					Licensed under GPLv3 (<a target="_blank" href="http://www.evqueue.net">evqueue.net</a>)
 				</div>
+				
+				<script src="https://unpkg.com/react@16/umd/react.development.js" crossorigin="crossorigin"></script>
+				<script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js" crossorigin="crossorigin"></script>
+				<script src="js/react/app.js"></script>
+				
+				<script type="text/javascript" src="{$SITE_BASE}js/forms.js" />
+				<script type="text/javascript" src="{$SITE_BASE}js/global.js" />
+				<script type="text/javascript" src="{$SITE_BASE}js/preferences.js" />
+
+				<!-- Load additional javascript -->
+				<xsl:if test="$javascript != '' and exsl:node-set($javascript)/src">
+					<xsl:for-each select="exsl:node-set($javascript)/src">
+						<script type="text/javascript" src="{$SITE_BASE}{.}"><xsl:text><![CDATA[]]></xsl:text></script>
+					</xsl:for-each>
+				</xsl:if>
 			</body>
 		</html>
 	</xsl:template>

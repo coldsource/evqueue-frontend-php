@@ -76,10 +76,6 @@
 		<br />
 		
 		<div id="terminated-workflows"></div>
-		
-		<script src="https://unpkg.com/react@16/umd/react.development.js" crossorigin="crossorigin"></script>
-		<script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js" crossorigin="crossorigin"></script>
-		<script src="js/react/app.js"></script>
 	</xsl:template>
 
 	<xsl:template name="workflow-launch">

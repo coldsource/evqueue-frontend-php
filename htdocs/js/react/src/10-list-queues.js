@@ -32,7 +32,7 @@ class ListQueues extends evQueueComponent {
 	}
 	
 	subscribe() {
-		var api = { group:'statistics',action:'query',parameters:{type:'queue'} };
+		var api = { group:'statistics',action:'query',attributes:{type:'queue'} };
 		this.evqueue.Subscribe('QUEUE_ENQUEUE',api,'/response/statistics/*');
 		this.evqueue.Subscribe('QUEUE_DEQUEUE',api,'/response/statistics/*');
 		this.evqueue.Subscribe('QUEUE_EXECUTE',api,'/response/statistics/*');

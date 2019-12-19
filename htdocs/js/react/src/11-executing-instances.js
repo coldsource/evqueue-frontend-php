@@ -33,7 +33,7 @@ class ExecutingInstances extends ListInstances {
 		var self = this;
 		
 		super.componentDidMount().then( () => {
-			var api = { group:'status', action:'query',parameters:{type:'workflows'} };
+			var api = { group:'status', action:'query',attributes:{type:'workflows'} };
 			self.evqueue.Subscribe('INSTANCE_STARTED',api);
 			self.evqueue.Subscribe('INSTANCE_TERMINATED',api);
 			this.setState({ready: true});

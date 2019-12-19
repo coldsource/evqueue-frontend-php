@@ -1006,6 +1006,7 @@ class evQueueWS {
 		this.current_node = 0;
 		this.ws = [];
 		this.state = [];
+		this.promise = [];
 	}
 
 	GetNodes() {
@@ -1013,6 +1014,8 @@ class evQueueWS {
 	}
 
 	ChangeNode(idx) {
+		if (idx == this.current_node) return Promise.resolve();
+
 		this.Close();
 		return this.Connect(idx);
 	}
@@ -1035,7 +1038,7 @@ class evQueueWS {
 	connect(idx, resolve, reject) {
 		var self = this;
 
-		self.ws[idx] = new WebSocket(self.nodes[idx], "events");
+		if (self.context === undefined) self.ws[idx] = new WebSocket(self.nodes[idx], "api");else self.ws[idx] = new WebSocket(self.nodes[idx], "events");
 
 		self.time_delta = 0;
 
@@ -1091,6 +1094,9 @@ class evQueueWS {
 					ret.response.push(obj);
 				}
 				self.callback(self.context, ret);
+			} else if (self.state[idx] == 'API_SENT') {
+				self.state[idx] = 'READY';
+				self.promise[idx].resolve(new DOMParser().parseFromString(event.data, "text/xml"));
 			}
 		};
 	}
@@ -1109,29 +1115,43 @@ class evQueueWS {
 		return this.time_delta;
 	}
 
-	Subscribe(event, api, output_xpath_filter = "/response/*") {
-		if (this.current_node == '*') {
-			for (var i = 0; i < this.nodes.length; i++) this.subscribe(i, event, api.group, api.action, api.parameters, output_xpath_filter);
-		} else this.subscribe(this.current_node, event, api.group, api.action, api.parameters, output_xpath_filter);
+	build_api_xml(api) {
+		var xmldoc = new Document();
+
+		var api_node = xmldoc.createElement(api.group);
+		api_node.setAttribute('action', api.action);
+		xmldoc.appendChild(api_node);
+
+		for (var attribute in api.attributes) api_node.setAttribute(attribute, api.attributes[attribute]);
+
+		for (var parameter in api.parameters) {
+			var parameter_node = xmldoc.createElement('parameter');
+			parameter_node.setAttribute('name', parameter);
+			parameter_node.setAttribute('value', api.parameters[parameter]);
+			api_node.appendChild(parameter_node);
+		}
+
+		return new XMLSerializer().serializeToString(xmldoc);
 	}
 
-	subscribe(idx, event, group, action, parameters, output_xpath_filter = "/response/*") {
+	Subscribe(event, api, output_xpath_filter = "/response/*") {
+		if (this.current_node == '*') {
+			for (var i = 0; i < this.nodes.length; i++) this.subscribe(i, event, api, output_xpath_filter);
+		} else this.subscribe(this.current_node, event, api, output_xpath_filter);
+	}
+
+	subscribe(idx, event, api, output_xpath_filter = "/response/*") {
 		if (this.state[idx] != 'READY') return;
 
 		this.output_xpath_filter = output_xpath_filter;
 
-		var xmldoc = new Document();
-		var api_node = xmldoc.createElement(group);
-		api_node.setAttribute('action', action);
-		xmldoc.appendChild(api_node);
-		for (var parameter in parameters) api_node.setAttribute(parameter, parameters[parameter]);
-		var api_cmd = new XMLSerializer().serializeToString(xmldoc);
+		var api_cmd = this.build_api_xml(api);
 
 		var api_cmd_b64 = btoa(api_cmd);
 		this.ws[idx].send("<event action='subscribe' type='" + event + "' api_cmd='" + api_cmd_b64 + "' />");
 	}
 
-	UnsubscribeAll(api_cmd, event) {
+	UnsubscribeAll() {
 		if (this.current_node == '*') {
 			for (var i = 0; i < this.nodes.length; i++) this.unsubscribeAll(i);
 		} else this.unsubscribeAll(this.current_node);
@@ -1141,6 +1161,19 @@ class evQueueWS {
 		if (this.state[idx] != 'READY') return;
 
 		this.ws[idx].send("<event action='unsubscribeall' />");
+	}
+
+	API(api) {
+		var idx = this.current_node;
+		if (this.state[idx] != 'READY') return;
+
+		var self = this;
+		return new Promise(function (resolve, reject) {
+			var api_cmd = self.build_api_xml(api);
+			self.ws[idx].send(api_cmd);
+			self.state[idx] = 'API_SENT';
+			self.promise[idx] = { resolve: resolve, reject: reject };
+		});
 	}
 }
 /*
@@ -1433,7 +1466,7 @@ class ListQueues extends evQueueComponent {
 	}
 
 	subscribe() {
-		var api = { group: 'statistics', action: 'query', parameters: { type: 'queue' } };
+		var api = { group: 'statistics', action: 'query', attributes: { type: 'queue' } };
 		this.evqueue.Subscribe('QUEUE_ENQUEUE', api, '/response/statistics/*');
 		this.evqueue.Subscribe('QUEUE_DEQUEUE', api, '/response/statistics/*');
 		this.evqueue.Subscribe('QUEUE_EXECUTE', api, '/response/statistics/*');
@@ -1651,7 +1684,7 @@ class ExecutingInstances extends ListInstances {
 		var self = this;
 
 		super.componentDidMount().then(() => {
-			var api = { group: 'status', action: 'query', parameters: { type: 'workflows' } };
+			var api = { group: 'status', action: 'query', attributes: { type: 'workflows' } };
 			self.evqueue.Subscribe('INSTANCE_STARTED', api);
 			self.evqueue.Subscribe('INSTANCE_TERMINATED', api);
 			this.setState({ ready: true });

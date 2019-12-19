@@ -169,24 +169,22 @@ $(document).ready( function() {
 				el.append($('<option>',{value:'all',text:'all'}));
 			}
 			
-			$.getJSON('ajax/get-nodes.php',function(data) {
-				nodes = data.nodes;
-				for(var i=0;i<nodes.length;i++)
-					el.append($('<option>',{value:nodes[i],text:nodes[i]}));
-				
-				if(connected_user=='anonymous')
+			nodes = $("body").data('nodesnames').split(',');
+			for(var i=0;i<nodes.length;i++)
+				el.append($('<option>',{value:nodes[i],text:nodes[i]}));
+			
+			if(connected_user=='anonymous')
+				return;
+			
+			evqueueAPI({group:'user',action:'get',attributes:{name:connected_user}}).done(function(xml) {
+				if(!xml.documentElement.firstChild.getAttribute('preferences'))
 					return;
-				
-				evqueueAPI({group:'user',action:'get',attributes:{name:connected_user}}).done(function(xml) {
-					if(!xml.documentElement.firstChild.getAttribute('preferences'))
-						return;
-					preferences = jQuery.parseJSON(xml.documentElement.firstChild.getAttribute('preferences'));
-					if(preferences.preferred_node)
-					{
-						el.val(preferences.preferred_node);
-						el.change();
-					}
-				});
+				preferences = jQuery.parseJSON(xml.documentElement.firstChild.getAttribute('preferences'));
+				if(preferences.preferred_node)
+				{
+					el.val(preferences.preferred_node);
+					el.change();
+				}
 			});
 		}
 		else if(el.data('type')=='tags')
