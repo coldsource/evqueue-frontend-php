@@ -3,11 +3,8 @@ var statistics_data_dom = false;
 var nodes = false;
 
 $(document).ready(function() {
-	jQuery.getJSON('ajax/get-nodes.php',function(nodes_local) {
-		nodes = nodes_local;
-		
-		refresh_all_graphs();
-	});
+	nodes = {nodes:$("body").data('nodesnames').split(',')};
+	refresh_all_graphs();
 	
 	$('.graph-container').delegate('input','change',function() {
 		refresh_graph($(this).parents('.graph-container'));
