@@ -22,12 +22,7 @@ function filedir_autocomplete(event)
 	type = event.data;
 	val = $(this).val();
 	if (val.substr(val.length - 1) == "/" || val == "") {
-		$.ajax({
-			data:{'group':'filesystem', 'action':'list', 'attributes':{'path':$(this).val()}},
-			type: 'post',
-			url: 'ajax/evqueue_api.php',
-			content:'xml',
-		}).done(function(xml){
+		evqueueAPI({'group':'filesystem', 'action':'list', 'attributes':{'path':$(this).val()}}).done(function(xml){
 			availableFiles = [];
 			
 			$(xml).find('response entry').each(function(){
