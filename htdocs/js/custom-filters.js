@@ -18,11 +18,11 @@
   */
 
 $(document).delegate(
-	'.instance-xml-output .xml_tagname, .instance-xml-output .xml_attributename, .instance-xml-output .xml_attributevalue',
+	'.task-xml-output .xml_tagname, .task-xml-output .xml_attributename, .task-xml-output .xml_attributevalue',
 	'click',
 	function () {
 	
-	var xml = $(this).parents('.instance-xml-output:eq(0)');
+	var xml = $(this).parents('.task-xml-output:eq(0)');
 	xml.find('.user_selected').removeClass('user_selected');
 	$(this).addClass('user_selected');
 	
@@ -30,17 +30,8 @@ $(document).delegate(
 });
 
 
-$(document).delegate('input[name=filter_on_taskpath], input[name=filter_on_inputname], input[name=filter_on_paramname]', 'click', function () {
-	$('.user_selected').click();
-});
-
-
 function get_xpath (el)
 {
-	var filter_on_taskpath = $('input[name=filter_on_taskpath]').is(':checked');
-	var filter_on_inputname = $('input[name=filter_on_inputname]').is(':checked');
-	var filter_on_paramname = $('input[name=filter_on_paramname]').is(':checked');
-	
 	var parent = el.parents('.parent_tag:eq(0)');
 	
 	if (el.is('.xml_tagname'))
@@ -58,9 +49,9 @@ function get_xpath (el)
 		var tagname = tag.text();
 		
 		var filter= '';
-		if (tagname == 'task' && filter_on_taskpath)       filter = '[@path="' + tag.data('path') + '"]';
-		if (tagname == 'input' && filter_on_inputname)     filter = '[@name="' + tag.data('name') + '"]';
-		if (tagname == 'parameter' && filter_on_paramname) filter = '[@name="' + tag.data('name') + '"]';
+		if (tagname == 'task')      filter = '[@path="' + tag.data('path') + '"]';
+		if (tagname == 'input')     filter = '[@name="' + tag.data('name') + '"]';
+		if (tagname == 'parameter') filter = '[@name="' + tag.data('name') + '"]';
 		
 		if (parent.length == 0)
 			return '/' + tagname + filter;
@@ -75,6 +66,7 @@ function get_xpath (el)
 $(document).delegate('form.add-custom-filter', 'submit', function () {
 	var _form = $(this);
 	var instance_id = _form.find('input[name=instance_id]').val();
+	var task_xpath = _form.next('.task-xml-output').data('task-xpath');
 	
 	GetWorkflowXML(instance_id).done(function(wf)
 	{
@@ -92,8 +84,8 @@ $(document).delegate('form.add-custom-filter', 'submit', function () {
 		
 		var filter = wf.xml.createElement('custom-filter');
 		filter.setAttribute('name',        _form.find('input[name=custom_filter_name]').val());
-		filter.setAttribute('select',      _form.find('input[name=xpath_expr]').val());
 		filter.setAttribute('description', _form.find('input[name=custom_filter_desc]').val());
+		filter.setAttribute('select', task_xpath + _form.find('input[name=xpath_expr]').val());
 		filters.appendChild(filter);
 		
 		SaveWorkflow (wf.id, wf.xml);
