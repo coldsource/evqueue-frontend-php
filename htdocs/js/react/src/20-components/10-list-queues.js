@@ -33,17 +33,17 @@ class ListQueues extends evQueueComponent {
 	
 	subscribe() {
 		var api = { group:'statistics',action:'query',attributes:{type:'queue'} };
-		this.evqueue.Subscribe('QUEUE_ENQUEUE',api,'/response/statistics/*');
-		this.evqueue.Subscribe('QUEUE_DEQUEUE',api,'/response/statistics/*');
-		this.evqueue.Subscribe('QUEUE_EXECUTE',api,'/response/statistics/*');
-		this.evqueue.Subscribe('QUEUE_TERMINATE',api,'/response/statistics/*');
+		this.evqueue.Subscribe('QUEUE_ENQUEUE',api);
+		this.evqueue.Subscribe('QUEUE_DEQUEUE',api);
+		this.evqueue.Subscribe('QUEUE_EXECUTE',api);
+		this.evqueue.Subscribe('QUEUE_TERMINATE',api,true);
 	}
 	
 	componentDidMount() {
 		var self = this;
 		super.componentDidMount().then( () => {
 			self.subscribe();
-			self.setState({nodes:self.evqueue.GetNodes()});
+			self.setState({nodes:self.GetNodes()});
 		});
 	}
 	
@@ -55,11 +55,9 @@ class ListQueues extends evQueueComponent {
 		});
 	}
 	
-	evQueueEvent(context,data) {
-		if(context.state.refresh)
-			context.setState({queues: data.response});
-		else
-			context.state.queues = data.response;
+	evQueueEvent(response) {
+		var data = this.parseResponse(response,'/response/statistics/*');
+		this.setState({queues: data.response});
 	}
 	
 	renderQueuesList() {
@@ -125,7 +123,7 @@ class ListQueues extends evQueueComponent {
 		return (
 			<div>
 				<div className="boxTitle">
-					<span className="title">Queues States</span>
+					<span className="title">aQueues States</span>
 					<span className={"faicon fa-refresh action"+(this.state.refresh?' fa-spin':'')} onClick={this.toggleAutorefresh}></span>
 				</div>
 				<ul className="reacttabs">{ this.renderNodesList() }</ul>

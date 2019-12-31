@@ -1,0 +1,54 @@
+div.formdiv {
+	form {
+		display: block;
+	}
+	
+	label {
+		min-width: 15em;
+		display: inline-block;
+		text-align: right;
+		margin-right: 1em;
+		vertical-align: middle;
+	}
+	
+	input[type=text]:not(.select2-search__field):not(.spinner):not(.datepicker):not(.timepicker) {
+		min-width: 22em;
+	}
+	
+	textarea {
+		min-width: 23em;
+		min-height: 7em;
+		resize: none;
+	}
+	
+	 input.spinner {
+		width: 40px;
+	}
+	
+	input[type='submit'] {
+		min-width: 10em;
+		display: block;
+		margin-left: 20em;
+		margin-top: 1em;
+	}
+	
+	input[type='checkbox'] {
+		min-width: 0em;
+		margin: 0px;
+	}
+	
+	 input[type='radio'] {
+		min-width: 0em;
+		margin: 0px;
+		display: inline-block;
+	}
+	
+	select {
+		width: 25em;
+	}
+	
+	form > div {
+		margin-top: 10px;
+		margin-bottom: 10px;
+	}
+}

@@ -19,163 +19,97 @@
 
 class evQueueWS
 {
-	constructor(context,callback)
+	constructor(node, callback)
 	{
-		this.context = context;
 		this.callback = callback;
 		
-		this.nodes = document.querySelector("body").dataset.nodes.split(',');
-		for(var i=0;i<this.nodes.length;i++)
-			this.nodes[i] = this.nodes[i].replace('tcp://','ws://');
+		this.node = node;
 		
-		this.nodes_names = document.querySelector("body").dataset.nodesnames.split(',');
-		
-		this.failed_nodes = 0;
-		this.connected_nodes = 0;
-		this.current_node = 0;
-		this.ws = [];
-		this.state = [];
-		this.promise = [];
+		this.state = 'DISCONNECTED'; // We start in disconnected state
+		this.api_promise = Promise.resolve(); // No previous query was run at this time
 	}
 	
-	GetNodes()
+	Connect()
 	{
-		return this.nodes_names;
-	}
-	
-	ChangeNode(idx)
-	{
-		if(idx==this.current_node)
-			return Promise.resolve();
-		
-		this.Close();
-		return this.Connect(idx);
-	}
-	
-	GetConnectedNodes()
-	{
-		return this.connected_nodes;
-	}
-	
-	Connect(idx = 0)
-	{
-		this.current_node = idx;
-		
 		var self = this;
+		var mode = self.callback===undefined?'api':'event';
+		
 		return new Promise(function(resolve, reject) {
-			if(idx=='*')
-			{
-				for(var i=0;i<self.nodes.length;i++)
-					self.connect(i,resolve,reject);
-			}
+			// Connect using appropriate protocol
+			if(mode=='api')
+				self.ws = new WebSocket(self.node, "api");
 			else
-				self.connect(idx,resolve,reject);
-		});
-	}
-	
-	connect(idx, resolve, reject)
-	{
-		var self = this;
-		
-		if(self.context===undefined)
-			self.ws[idx] = new WebSocket(self.nodes[idx], "api");
-		else
-			self.ws[idx] = new WebSocket(self.nodes[idx], "events");
-		
-		self.time_delta = 0;
-		
-		self.state[idx] = 'CONNECTING';
-		
-		self.ws[idx].onopen = function (event) {
-			console.log("Connected to node "+self.nodes_names[idx]);
-		};
-		
-		self.ws[idx].onclose = function(event) {
-			if(self.state[idx]=='READY')
-				self.connected_nodes--;
+				self.ws = new WebSocket(self.node, "events");
 			
-			self.failed_nodes++;
+			self.state = 'CONNECTING';
 			
-			self.state[idx] = 'DISCONNECTED';
-			console.log("Disconnected from node "+self.nodes_names[idx]);
-		}
-		
-		self.ws[idx].onmessage = function (event) {
-			var parser = new DOMParser();
-			var xmldoc = parser.parseFromString(event.data, "text/xml");
+			// Event on connection
+			self.ws.onopen = function (event) {
+				console.log("Connected to node "+self.node+" ("+mode+")");
+			};
 			
-			if(self.state[idx] == 'CONNECTING')
-			{
-				var challenge = xmldoc.documentElement.getAttribute("challenge");
-			
-				var user = document.querySelector("body").dataset.user;
-				var passwd_hash = CryptoJS.enc.Hex.parse(document.querySelector("body").dataset.password);
-				var response = CryptoJS.HmacSHA1(CryptoJS.enc.Hex.parse(challenge), passwd_hash).toString(CryptoJS.enc.Hex);
+			// Event on disconnection
+			self.ws.onclose = function(event) {
+				if(self.state=='DISCONNECTING')
+					self.state = 'DISCONNECTED'; // Disconnection was requested, this is OK
+				else
+					self.state = 'ERROR'; // Unexpected disconnection, set state to error
 				
-				self.ws[idx].send("<auth response='"+response+"' user='"+user+"' />");
-				self.state[idx] = 'AUTHENTICATED';
+				console.log("Disconnected from node "+self.node);
 			}
-			else if(self.state[idx] == 'AUTHENTICATED')
-			{
-				var time = xmldoc.documentElement.getAttribute("time");
-				self.time_delta = Date.now()-Date.parse(time);
-				
-				self.state[idx] = 'READY';
-				self.connected_nodes++;
-				if(self.connected_nodes+self.failed_nodes==self.nodes.length && self.current_node=='*')
-					resolve();
-				else if(self.current_node!='*')
-					resolve();
-			}
-			else if(self.state[idx]=='READY')
-			{
+			
+			self.ws.onmessage = function (event) {
 				var parser = new DOMParser();
 				var xmldoc = parser.parseFromString(event.data, "text/xml");
 				
-				var ret = { response: [] };
-				
-				var root = xmldoc.documentElement;
-				for(var i=0;i<root.attributes.length;i++)
-					ret[root.attributes[i].name] = root.attributes[i].value;
-				
-				var nodes_ite = xmldoc.evaluate(self.output_xpath_filter,xmldoc.documentElement);
-				var node;
-				while(node = nodes_ite.iterateNext())
+				if(self.state == 'CONNECTING')
 				{
-					var obj = {};
-					for(var i=0;i<node.attributes.length;i++)
-						obj[node.attributes[i].name] = node.attributes[i].value;
-					ret.response.push(obj);
+					// We are connecting, first message sent by engine is challeng for authentication
+					var challenge = xmldoc.documentElement.getAttribute("challenge");
+				
+					// Compute challenge response and send to complete authentication
+					var user = document.querySelector("body").dataset.user;
+					var passwd_hash = CryptoJS.enc.Hex.parse(document.querySelector("body").dataset.password);
+					var response = CryptoJS.HmacSHA1(CryptoJS.enc.Hex.parse(challenge), passwd_hash).toString(CryptoJS.enc.Hex);
+					
+					self.ws.send("<auth response='"+response+"' user='"+user+"' />");
+					self.state = 'AUTHENTICATED';
 				}
-				self.callback(self.context,ret);
+				else if(self.state == 'AUTHENTICATED')
+				{
+					self.state = 'READY';
+					resolve(); // We are now connected
+				}
+				else if(self.state=='READY')
+				{
+					if(mode=='event')
+					{
+						// Event protocol, notify callback
+						self.callback(new DOMParser().parseFromString(event.data, "text/xml"));
+					}
+					else
+					{
+						// API protocol, resolve our promise to send response
+						self.state = 'READY';
+						self.promise.resolve(new DOMParser().parseFromString(event.data, "text/xml"));
+					}
+				}
 			}
-			else if(self.state[idx]=='API_SENT')
-			{
-				self.state[idx] = 'READY';
-				self.promise[idx].resolve(new DOMParser().parseFromString(event.data, "text/xml"));
-			}
-		}
+		});
 	}
 	
 	Close()
 	{
-		if(this.current_node=='*')
-		{
-			for(var i=0;i<this.nodes.length;i++)
-				this.close(i);
-		}
-		else
-			this.close(this.current_node);
+		if(this.state=='DISCONNECTED')
+			return; // Node is not connected
+		
+		this.state = 'DISCONNECTING';
+		this.ws.close();
 	}
 	
-	close(idx)
+	GetState()
 	{
-		this.ws[idx].close();
-	}
-	
-	GetTimeDelta()
-	{
-		return this.time_delta;
+		return this.state;
 	}
 	
 	build_api_xml(api)
@@ -200,61 +134,26 @@ class evQueueWS
 		return new XMLSerializer().serializeToString(xmldoc);
 	}
 	
-	Subscribe(event,api,output_xpath_filter="/response/*")
-	{
-		if(this.current_node=='*')
-		{
-			for(var i=0;i<this.nodes.length;i++)
-				this.subscribe(i,event,api,output_xpath_filter);
-		}
-		else
-			this.subscribe(this.current_node,event,api,output_xpath_filter);
-	}
-	
-	subscribe(idx,event,api,output_xpath_filter="/response/*")
-	{
-		if(this.state[idx]!='READY')
-			return;
-		
-		this.output_xpath_filter = output_xpath_filter;
-		
-		var api_cmd = this.build_api_xml(api);
-		
-		var api_cmd_b64 = btoa(api_cmd);
-		this.ws[idx].send("<event action='subscribe' type='"+event+"' api_cmd='"+api_cmd_b64+"' />");
-	}
-	
-	UnsubscribeAll()
-	{
-		if(this.current_node=='*')
-		{
-			for(var i=0;i<this.nodes.length;i++)
-				this.unsubscribeAll(i);
-		}
-		else
-			this.unsubscribeAll(this.current_node);
-	}
-	
-	unsubscribeAll(idx)
-	{
-		if(this.state[idx]!='READY')
-			return;
-		
-		this.ws[idx].send("<event action='unsubscribeall' />");
-	}
-	
 	API(api)
 	{
-		var idx = this.current_node;
-		if(this.state[idx]!='READY')
-			return;
-		
 		var self = this;
-		return new Promise(function(resolve, reject) {
-			var api_cmd = self.build_api_xml(api);
-			self.ws[idx].send(api_cmd);
-			self.state[idx] = 'API_SENT';
-			self.promise[idx] = {resolve:resolve,reject:reject};
+		
+		var evq_ready;
+		if(this.state=='DISCONNECTED' || this.state=='ERROR')
+			self.api_promise = this.Connect();
+		
+		var old_api_promise = self.api_promise;
+		self.api_promise = new Promise(function(resolve, reject) {
+			old_api_promise.then( () => {
+				var api_cmd = self.build_api_xml(api);
+				self.ws.send(api_cmd);
+				if(self.callback!==undefined)
+					resolve(); // We are waiting no result to complete this action
+				else
+					self.promise = {resolve:resolve,reject:reject}; // Promise will be resolved once response is received
+			});
 		});
+		
+		return self.api_promise;
 	}
 }

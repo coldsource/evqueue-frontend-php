@@ -65,27 +65,27 @@ function evqueueAPI(options){
 		if (options.confirm && !confirm(options.confirm))
 			return promise.reject();
 		
-		var evq_ready;
 		if(evqueueAPI.evqueue===undefined)
 		{
-			evqueueAPI.evqueue = new evQueueWS();
-			evq_ready = evqueueAPI.evqueue.Connect(idx);
+			var nodes = document.querySelector("body").dataset.nodes.split(',');
+			for(var i=0;i<nodes.length;i++)
+				nodes[i] = nodes[i].replace('tcp://','ws://');
+			
+			var nodes_names = document.querySelector("body").dataset.nodesnames.split(',');
+			
+			evqueueAPI.evqueue = new evQueueCluster(nodes,nodes_names);
 		}
-		else
-			evq_ready = evqueueAPI.evqueue.ChangeNode(idx);
 		
-		evq_ready.then( () => {
-			evqueueAPI.evqueue.API(options).then( (xml) => {
-				error = $(xml).children('error');
-				if ($(error).length > 0) {
-					if(!options.ignore_errors)
-						alert(error.html());
-					promise.reject();
-					return;
-				}
-				
-				promise.resolve(xml);
-			});
+		evqueueAPI.evqueue.API(options).then( (xml) => {
+			error = $(xml).children('error');
+			if ($(error).length > 0) {
+				if(!options.ignore_errors)
+					alert(error.html());
+				promise.reject();
+				return;
+			}
+			
+			promise.resolve(xml);
 		});
 	});
 	

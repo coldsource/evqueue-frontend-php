@@ -128,24 +128,6 @@ span#message span+span:before {
 	content:", ";
 }
 
-ul.reacttabs {
-	margin:5px;
-	padding:5px;
-}
-
-ul.reacttabs li {
-	display: inline;
-	padding: 7px;
-	cursor: pointer;
-	border:1px solid grey;
-	border-radius: 3px;
-	margin:5px;
-}
-
-ul.reacttabs li.selected {
-	font-weight:bold;
-}
-
 ul.topmenu {
 	position:fixed;
 	top:0px;
@@ -292,21 +274,6 @@ div#wfs-editor fieldset {
 
 .submit {
 	float:right;
-}
-
-/* Global styles for tabbed presentation */
-fieldset.tabbed {
-	border-radius:5px;
-}
-
-.tabbed div div:nth-child(1) {
-	min-width:22em;
-	display:inline-block;
-}
-
-.tabbed div div:nth-child(2) {
-	font-weight:bold;
-	display:inline-block;
 }
 
 /* Global styles for tables */

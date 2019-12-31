@@ -21,7 +21,7 @@
 
 class TerminatedInstances extends ListInstances {
 	constructor(props) {
-		super(props);
+		super(props,'any');
 		
 		// Off-state attributes
 		this.search_filters = {};
@@ -31,15 +31,13 @@ class TerminatedInstances extends ListInstances {
 		// Bind actions
 		this.nextPage = this.nextPage.bind(this);
 		this.previousPage = this.previousPage.bind(this);
-		this.node = 'any';
+		this.removeInstance = this.removeInstance.bind(this);
 	}
 	
 	componentDidMount() {
-		var self = this;
-		super.componentDidMount().then( () => {
-			var api = { group:'instances',action:'list' };
-			self.evqueue.Subscribe('INSTANCE_TERMINATED',api);
-		});
+		var api = { node:'*',group:'instances',action:'list' };
+		this.Subscribe('INSTANCE_REMOVED',api);
+		this.Subscribe('INSTANCE_TERMINATED',api,true);
 	}
 	
 	workflowDuration(wf) {
@@ -50,12 +48,20 @@ class TerminatedInstances extends ListInstances {
 		return ( <span className="faicon fa-comment-o" title={"Comment : " + wf.comment}></span> );
 	}
 	
-	renderActions() {
+	renderActions(wf) {
 		return (
 			<td className="tdActions">
-				<span className="faicon fa-remove" title="Delete this instance"></span>
+				<span className="faicon fa-remove" title="Delete this instance" onClick={() => { this.removeInstance(wf.id); }}></span>
 			</td>
 		);
+	}
+	
+	removeInstance(id) {
+		this.simpleAPI({
+			group: 'instance',
+			action: 'delete',
+			attributes: { 'id': id }
+		}, 'Instance '+id+' removed', "You are about to remove instance "+id);
 	}
 	
 	WorkflowStatus(wf) {
@@ -67,28 +73,42 @@ class TerminatedInstances extends ListInstances {
 	}
 	
 	renderTitle() {
-		return (
-			<div className="boxTitle">
-				<div id="nodes-status"></div>
-				<span className="title">Terminated workflows</span>
+		var title = (
+			<span>
+				Terminated workflows
 				&#160;
 				{ this.current_page>1?(<span className="faicon fa-backward" onClick={this.previousPage}></span>):'' }
 				&#160;
-				{ (this.current_page-1)*this.items_per_page + 1 } - { this.current_page*this.items_per_page } &#47; {this.state.workflows.rows}
-				{ this.current_page*this.items_per_page<this.state.workflows.rows?(<span className="faicon fa-forward" onClick={this.nextPage}></span>):''}
-				<span className={"faicon fa-refresh action"+(this.state.refresh?' fa-spin':'')} onClick={this.toggleAutorefresh}></span>
-			</div>
+				{ (this.current_page-1)*this.items_per_page + 1 } - { this.current_page*this.items_per_page } &#47; {this.state.workflows.current.rows}
+				{ this.current_page*this.items_per_page<this.state.workflows.current.rows?(<span className="faicon fa-forward" onClick={this.nextPage}></span>):''}
+			</span>
+			
+		);
+		
+		var actions = [
+			{icon:'fa-refresh '+(this.state.refresh?' fa-spin':''), callback:this.toggleAutorefresh}
+		];
+		
+		return (
+			<Pannel left="" title={title} actions={actions} />
 		);
 	}
 	
 	updateFilters(search_filters) {
 		this.search_filters = search_filters;
 		
-		this.evqueue.UnsubscribeAll();
+		this.Unsubscribe('INSTANCE_TERMINATED');
 		
 		search_filters.limit = this.items_per_page;
 		search_filters.offset = (this.current_page-1)*this.items_per_page;
-		this.evqueue.Subscribe('INSTANCE_TERMINATED','instances','list',search_filters);
+		
+		var api = {
+			group: 'instances',
+			action: 'list',
+			attributes: search_filters
+		};
+		
+		this.Subscribe('INSTANCE_TERMINATED',api,true);
 	}
 	
 	nextPage() {

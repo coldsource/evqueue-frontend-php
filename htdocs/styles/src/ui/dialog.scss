@@ -1,0 +1,60 @@
+$outer-border: 3px;
+
+div.evq-dialog {
+	position: absolute;
+	
+	.evq-dialog-outer {
+		width: 100%;
+		height: 100%;
+		box-sizing: border-box;
+		border-radius: 5px;
+		padding: $outer-border;
+	}
+	
+	.evq-dialog-inner {
+		background-color: #ffffff;
+		border-radius: 5px;
+		border-width: 0px 1px 1px 1px;
+		border-color: #a0a0a0;
+		border-style: solid;
+		box-sizing: border-box;
+		position: absolute;
+		width: calc(100% - #{$outer-border * 2});
+		height: calc(100% - #{$outer-border * 2});
+		overflow: hidden;
+	}
+	
+	.evq-dlg-title {
+		border-radius:5px 5px 0px 0px;
+		background-color: #909090;
+		padding: 5px;
+		color: #f0f0f0;
+		font-weight: bold;
+		cursor: move;
+		height:16px;
+		
+		span.evq-dlg-close {
+			float: right;
+			cursor: pointer;
+		}
+	}
+	
+	.evq-dlg-content {
+		padding: 7px;
+		overflow: auto;
+	}
+	
+	h2 {
+		color: #333333;
+	}
+}
+
+div.evq-modal {
+	position: absolute;
+	background-color: rgba(0,0,0,0.2);
+	top: 0px;
+	left: 0px;
+	width: 100%;
+	height: 3000px;
+	z-index: 1000;
+}

@@ -24,6 +24,7 @@
 				<link rel="stylesheet" type="text/css" href="{$SITE_BASE}styles/jquery/select2.min.css"/>
 				<link rel="stylesheet" type="text/css" href="{$SITE_BASE}styles/font-awesome.css"/>
 				<link rel="stylesheet" type="text/css" href="{$SITE_BASE}styles/style.css"/>
+				<link rel="stylesheet" type="text/css" href="{$SITE_BASE}styles/ui.scss"/>
 				
 				<!-- Load additional CSS -->
 				<xsl:if test="$css != '' and exsl:node-set($css)/src">

@@ -1,0 +1,22 @@
+/* Global styles for tabbed presentation */
+fieldset.tabbed,div.tabbed {
+	border-radius: 5px;
+	margin-bottom: 15px;
+	
+	div {
+		margin-top: 5px;
+		margin-bottom: 5px;
+	
+		div:nth-child(1) {
+			margin: 0px;
+			min-width: 22em;
+			display: inline-block;
+		}
+		
+		div:nth-child(2) {
+			margin: 0px;
+			font-weight: bold;
+			display: inline-block;
+		}
+	}
+}

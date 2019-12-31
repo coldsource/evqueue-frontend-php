@@ -27,6 +27,7 @@ $.widget("ui.dialog", $.extend({}, $.ui.dialog.prototype, {
 	}
 }));
 
+// TODO : Remove
 $(document).delegate('.showWorkflowDetails','click',function() {
 	var wfid = $(this).data('id');
 	var node = $(this).data('node-name');
@@ -118,57 +119,6 @@ function TaskDialog(container,wfid,evqid,name,idx,noutputs)
 	dialog.delegate('.task_execution:not(:last-child)','click',function() {
 		TaskDialog(container,wfid,evqid,name,$(this).index()+1,noutputs);
 	});
-}
-
-function CancelInstance(id,node,killtasks = false)
-{
-	evqueueAPI({
-		group: 'instance',
-		action: 'query',
-		attributes: { 'id':id },
-		node: node
-	}).done( function (xml) {
-		var subjobs = xml.Query('//subjobs',xml.documentElement.firstChild);
-		
-		evqueueAPI({
-			group: 'instance',
-			action: 'cancel',
-			attributes: { 'id':id },
-			node: node
-		}).done(function() {
-			Message('Canceled instance '+id);
-			if(killtasks) {
-				for (i in subjobs)
-					KillRunningTasks(subjobs[i],id,node);
-			}
-		});
-	});
-}
-
-function KillRunningTasks(subjobs,id,node)
-{
-	var xmldoc = subjobs.ownerDocument;
-	jobs = xmldoc.Query('job',subjobs);
-	for(var i=0;i<jobs.length;i++)
-	{
-		var tasks = xmldoc.Query("tasks/task[@status = 'EXECUTING']",jobs[i]);
-		for(var j=0;j<tasks.length;j++)
-		{
-			var task_path = tasks[j].getAttribute('path');
-			evqueueAPI({
-				group: 'instance',
-				action: 'killtask',
-				attributes: { 'id':id, 'pid':tasks[j].getAttribute('pid') },
-				node: node
-			}).done(function() {
-				Message('Killed task '+task_path);
-			});
-		
-			var job_subjobs = xmldoc.Query('subjobs',jobs[i]);
-			if(job_subjobs.length>0)
-				KillRunningTasks(job_subjobs[0],id,node);
-		}
-	}
 }
 
 function DrawGraph(el,desc)

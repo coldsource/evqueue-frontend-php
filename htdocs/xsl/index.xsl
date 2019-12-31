@@ -18,26 +18,6 @@
 	</xsl:variable>
 
 	<xsl:template name="content">
-		<div class="dialog" id="workflow-dialog">
-			<ul>
-			</ul>
-			<div id="workflow-debug" class="hidden">
-				Debug mode is used to clone an existing instance and restart it. Successful tasks will not be executed and their output will be kept.
-				<br /><br />Loops and conditions that have already been evaluated will not be evaluated again.
-				<br /><br />Error tasks will be restarted and their attributes will be reset.
-				<br /><br />Modifications on the original workflow will not be taken into account as what is run is a clone of the previous instance.
-				<br /><br />This mode is used for debugging tasks and workflows without launching each time your full treatment chain.
-				<br /><br /><span class="faicon fa-step-forward">&#160;Relaunch this instance in debug mode</span>
-			</div>
-		</div>
-
-		<div class="dialog" id="task-dialog">
-			<ul>
-			</ul>
-		</div>
-
-		<div id="workflow-dialogs"></div>
-
 		<div id="workflow-stats-graph">
 			<div class="chartwrapper">
 				<div class="chart">
@@ -64,9 +44,6 @@
 			</div>
 		</div>
 
-		<xsl:call-template name="workflow-launch" />
-
-
 		<div id="executing-workflows"></div>
 		
 		<br />
@@ -76,71 +53,6 @@
 		<br />
 		
 		<div id="terminated-workflows"></div>
-	</xsl:template>
-
-	<xsl:template name="workflow-launch">
-		<div id="workflow-launch" class="dialog tabs">
-			<ul>
-				<li><a href="#workflow-launch-tab-workflow">Workflow</a></li>
-				<li><a href="#workflow-launch-tab-remote">Remote</a></li>
-				<li><a href="#workflow-launch-tab-node">Node</a></li>
-			</ul>
-			<div id="workflow-launch-tab-workflow">
-				<h2>
-					Select workflow
-					<span class="help faicon fa-question-circle" title="Select the workflow to launch.&#10;&#10;If the workflow needs parameters, you will be prompted for them.&#10;&#10;If needed, you can add an optional comment that will not be used by the engine."></span>
-				</h2>
-				<div class="formdiv" id="which_workflow">
-					<form>
-						<div>
-							<label>Workflow</label>
-							<select name="workflow_id" class="evq-autofill select2" data-type="workflows" data-valuetype="id"></select>
-						</div>
-						<div>
-							<label>Comment</label>
-							<input type="text" name="comment" />
-						</div>
-					</form>
-				</div>
-				<br /><button class="submit">Launch new instance</button>
-			</div>
-			<div id="workflow-launch-tab-remote">
-				<h2>
-					Remote execution
-					<span class="help faicon fa-question-circle" title="The workflow or task can be launched through SSH on a distant machine. Enter the user and host used for SSH connection."></span>
-				</h2>
-
-				<div class="formdiv">
-					<form>
-						<div>
-							<label>User</label>
-							<input name="user" />
-						</div>
-						<div>
-							<label>Host</label>
-							<input name="host" />
-						</div>
-					</form>
-				</div>
-				<br /><button class="submit">Launch new instance</button>
-			</div>
-			<div id="workflow-launch-tab-node">
-				<h2>
-					Cluster node
-					<span class="help faicon fa-question-circle" title="If you are using evQueue in a clustered environement, specify here the node on which the workflow will be launched."></span>
-				</h2>
-
-				<div class="formdiv">
-					<form>
-						<div>
-							<label>Node</label>
-							<select name="node" class="evq-autofill" data-type="node"></select>
-						</div>
-					</form>
-					<br /><button class="submit">Launch new instance</button>
-				</div>
-			</div>
-		</div>
 	</xsl:template>
 
 	<xsl:template name="filter">

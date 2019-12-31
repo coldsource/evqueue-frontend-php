@@ -1,0 +1,20 @@
+div.evq-pannel {
+	position: relative;
+	background-color: #DEE0E3;
+	border-top-left-radius: 10px;
+	border-top-right-radius: 10px;
+	color: #505050;
+	width: 100%;
+	display: inline-block;
+	padding: 2px 0 2px 0;
+	text-align: center;
+	font-weight: bold;
+	
+	.action {
+		cursor: pointer;
+		float: right;
+		margin-top: 4px;
+		margin-right: 7px;
+		font-weight: normal;
+	}
+}

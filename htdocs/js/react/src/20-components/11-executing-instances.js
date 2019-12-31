@@ -21,25 +21,22 @@
 
 class ExecutingInstances extends ListInstances {
 	constructor(props) {
-		super(props);
+		super(props,'*');
 		
 		this.state.now = 0;
 		this.state.ready = false;
 		this.timerID = false;
-		this.node = '*';
+		
+		this.retry = this.retry.bind(this);
 	}
 	
 	componentDidMount() {
-		var self = this;
-		
-		super.componentDidMount().then( () => {
-			var api = { group:'status', action:'query',attributes:{type:'workflows'} };
-			self.evqueue.Subscribe('INSTANCE_STARTED',api);
-			self.evqueue.Subscribe('INSTANCE_TERMINATED',api);
-			this.setState({ready: true});
-		});
+		var api = { node:'*', group:'status', action:'query',attributes:{type:'workflows'} };
+		this.Subscribe('INSTANCE_STARTED',api);
+		this.Subscribe('INSTANCE_TERMINATED',api,true).then( () => { this.setState({ready: true}) });
 		
 		this.setState({now: this.now()});
+		
 		this.timerID = setInterval(() => this.state.refresh?this.setState({now: this.now()}):this.state.now = this.now(),1000);
 	}
 	
@@ -48,8 +45,7 @@ class ExecutingInstances extends ListInstances {
 		clearInterval(this.timerID);
 	}
 	
-	now()
-	{
+	now() {
 		return Date.now();
 	}
 	
@@ -61,13 +57,62 @@ class ExecutingInstances extends ListInstances {
 		return ( <span className="faicon fa-info"></span> );
 	}
 	
-	renderActions() {
+	renderActions(wf) {
 		return (
 			<td className="tdActions">
-				<span className="faicon fa-ban" title="Cancel this instance"></span>
-				<span className="faicon fa-bomb" title="Kill this instance"></span>
+				<span className="faicon fa-ban" title="Cancel this instance" onClick={ () => this.cancel(wf) }></span>
+				<span className="faicon fa-bomb" title="Kill this instance" onClick={ () => this.cancel(wf,true) }></span>
 			</td>
 		);
+	}
+	
+	cancel(wf,killtasks = false) {
+		var self = this;
+		var message;
+		if(killtasks)
+			message = "You are about to kill this instance.\nRunning tasks will be killed with SIGKILL and workflow will end immediately.\nThis can lead to inconsistancies in running tasks.";
+		else
+			message = "You are about to cancel this instance.\nRunning tasks will continue to run normally but no new task will be launched.\nRetry schedules will be disabled.";
+		
+		Dialogs.open(Confirm,{
+			content: message,
+			confirm: () => { self._cancel(wf,killtasks) }
+		});
+	}
+	
+	_cancel(wf,killtasks = false) {
+		var self = this;
+		
+		this.API({
+			group: 'instance',
+			action: 'cancel',
+			attributes: { id:wf.id },
+			node: wf.node_name
+		}).then( () => {
+			Message('Canceled instance '+wf.id);
+			if(killtasks)
+			{
+				this.API({
+					group: 'instance',
+					action: 'query',
+					attributes: { id:wf.id }
+				}).then( (data) => {
+					var tasks = self.xpath("//task[@status='EXECUTING']",data.documentElement);
+					for(var i=0;i<tasks.length;i++)
+					{
+						var task_name = tasks[i].name?tasks[i].name:tasks[i].path;
+						evqueueAPI({
+							group: 'instance',
+							action: 'killtask',
+							attributes: { 'id':wf.id, 'pid':tasks[i].pid },
+							node: wf.node_name
+						}).done(function() {
+							Message('Killed task '+task_name);
+						});
+					}
+				});
+			}
+		});
 	}
 	
 	WorkflowStatus(wf) {
@@ -85,29 +130,31 @@ class ExecutingInstances extends ListInstances {
 		if(!this.state.ready)
 			return (<div></div>);
 		
-		var nodes_up = this.evqueue.GetConnectedNodes();
-		var nodes_down = this.evqueue.GetNodes().length-this.evqueue.GetConnectedNodes();
+		var nodes_up = this.evqueue_event.GetConnectedNodes();
+		var nodes_down = this.GetNodes().length-this.evqueue_event.GetConnectedNodes();
 		if(nodes_down==0)
-			return (<a href="nodes.php"><span className="success">{nodes_up} node{nodes_up!=1?'s':''} up</span></a>);
-		return (<a href="nodes.php"><span className="success">{nodes_up} node{nodes_up!=1?'s':''} up - <span className="error">{nodes_down} node{nodes_down!=1?'s':''} down</span></span></a>);
+			return (<div id="nodes-status"><a href="nodes.php"><span className="success">{nodes_up} node{nodes_up!=1?'s':''} up</span></a></div>);
+		return (<div id="nodes-status"><a href="nodes.php"><span className="success">{nodes_up} node{nodes_up!=1?'s':''} up - <span className="error">{nodes_down} node{nodes_down!=1?'s':''} down</span></span></a></div>);
 	}
 	
 	renderTitle() {
 		var n = 0;
 		for(var node in this.state.workflows)
-			n += this.state.workflows[node].length;
+			n += this.state.workflows[node].response.length;
+		
+		var actions = [
+			{icon: 'fa-clock-o',callback:this.retry},
+			{icon: 'fa-rocket',callback:() => { Dialogs.open(WorkflowLauncher,{}) }},
+			{icon:'fa-refresh '+(this.state.refresh?' fa-spin':''), callback:this.toggleAutorefresh}
+		];
 		
 		return (
-			<div className="boxTitle">
-				<div id="nodes-status">
-					{this.renderNodeStatus()}
-				</div>
-				<span className="title">Executing workflows</span>&#160;({n})
-				<span className={"faicon fa-refresh action"+(this.state.refresh?' fa-spin':'')} onClick={this.toggleAutorefresh}></span>
-				<span className="faicon fa-rocket action" title="Launch a new workflow"></span>
-				<span className="faicon fa-clock-o action" title="Retry all pending tasks"></span>
-			</div>
+			<Pannel left={this.renderNodeStatus()} title={'Executing workflows ('+ n +')'} actions={actions} />
 		);
+	}
+	
+	retry() {
+		this.simpleAPI({node:'*',group:'control',action:'retry',node:'*'},"Retrying all tasks","The retry counter of each task in error will be decremented. Continue ?");
 	}
 }
 

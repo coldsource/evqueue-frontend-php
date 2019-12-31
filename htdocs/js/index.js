@@ -22,10 +22,10 @@ var parameters = {};
 
 $(document).ready(function() {
 	// Launch button
-	$('#executing-workflows .fa-rocket').click(function() {
+	/*$('#executing-workflows .fa-rocket').click(function() {
 		$('#workflow-launch input[name=comment]').val('Launched by user "'+connected_user+'"');
 		$('#workflow-launch').dialog({width:'auto',height:'auto'});
-	});
+	});*/
 
 	// Read url parameters
 	if(document.location.search!='')
@@ -102,37 +102,6 @@ $(document).ready(function() {
 
 	$('#executing-workflows').delegate('td','mouseout', function() {
 		$('#workflow-stats-graph').hide();
-	});
-
-
-	// Remove instance
-	$(document).delegate('#terminated-workflows .fa-remove','click',function() {
-		var instance_id = $(this).parents('tr').data('id');
-		evqueueAPI({
-			confirm: 'You are about to delete instance '+instance_id,
-			group: 'instance',
-			action: 'delete',
-			attributes: { 'id':instance_id }
-		}).done( function () {
-			$('#terminated-workflows').evqautorefresh('refresh');
-			Message('Instance '+instance_id+' removed');
-		});
-	});
-
-	// Cancell instance
-	$(document).delegate('#executing-workflows .fa-ban','click',function() {
-		if(!confirm("You are about to cancel this instance.\n\nRunning tasks will continue to run normally but no new task will be launched.\n\nRetry schedules will be disabled."))
-			return;
-
-		CancelInstance($(this).parents('tr').data('id'),$(this).parents('tr').data('node'),false);
-	});
-
-	// Kill instance
-	$(document).delegate('#executing-workflows .fa-bomb','click',function() {
-		if(!confirm("You are about to kill this instance.\n\nRunning tasks will be killed with SIGKILL and workflow will end immediately.\n\nThis can lead to inconsistancies in running tasks."))
-			return;
-
-		CancelInstance($(this).parents('tr').data('id'),$(this).parents('tr').data('node'),true);
 	});
 
 	// Launch box : workflow change handler

@@ -20,29 +20,32 @@
 'use strict';
 
 class ListInstances extends evQueueComponent {
-	constructor(props) {
+	constructor(props,node) {
 		super(props);
 		
-		this.state.workflows = {
-		};
+		this.node = node;
+		
+		if(this.node=='*')
+			this.state.workflows = {};
+		else
+			this.state.workflows = {current:{response:[]}};
 	}
 	
-	evQueueEvent(context,data) {
-		if(context.node=='*')
+	evQueueEvent(response) {
+		var data = this.parseResponse(response);
+		
+		if(this.node=='*')
 		{
 			for(var i=0;i<data.response.length;i++)
 				data.response[i].node_name = data.node;
 			
-			var current_state = context.state.workflows;
-			current_state[data.node] = data.response;
+			var current_state = this.state.workflows;
+			current_state[data.node] = data;
 		}
 		else
-			var current_state = { current: data.response };
+			var current_state = { current: data };
 		
-		if(context.state.refresh)
-			context.setState({workflows: current_state});
-		else
-			context.state.workflows = current_state;
+		this.setState({workflows: current_state});
 	}
 	
 	humanTime(seconds) {
@@ -83,7 +86,7 @@ class ListInstances extends evQueueComponent {
 		
 		for(var node in this.state.workflows)
 		{
-			ret = ret.concat(this.state.workflows[node].map((wf) => {
+			ret = ret.concat(this.state.workflows[node].response.map((wf) => {
 				wf.wf_status = wf.status;  // .status seems to be reserved by react, in any case it is replaced by a boolean in the rendered HTML
 				return (
 						<tr key={wf.id}
@@ -99,7 +102,7 @@ class ListInstances extends evQueueComponent {
 								{ this.WorkflowStatus(wf) }
 							</td>
 							<td>
-								<span className="action showWorkflowDetails" data-id={wf.id} data-node-name={wf.node_name} data-status={wf.wf_status}>
+								<span className="action" data-id={wf.id} data-node-name={wf.node_name} data-status={wf.wf_status} onClick={() => { Dialogs.open(InstanceDetails,{id: wf.id, node: wf.node_name, width:300})}}>
 									{wf.id} – {wf.name} { this.workflowInfos(wf) } ({this.workflowDuration(wf)})
 								</span>
 								&#160;
@@ -109,7 +112,7 @@ class ListInstances extends evQueueComponent {
 							<td className="tdStarted">
 								{this.timeSpan(wf.start_time,wf.end_time)}
 							</td>
-							{ this.renderActions() }
+							{ this.renderActions(wf) }
 						</tr>
 				);
 			}));
@@ -124,7 +127,7 @@ class ListInstances extends evQueueComponent {
 		
 		var n = 0;
 		for(var node in this.state.workflows)
-			n += this.state.workflows[node].length;
+			n += this.state.workflows[node].response.length;
 		
 		if(n==0)
 			return (<div className="center"><br />No workflow.</div>);
