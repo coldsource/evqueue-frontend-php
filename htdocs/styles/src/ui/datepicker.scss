@@ -1,0 +1,38 @@
+div.evq-datepicker {
+	display: inline-block;
+	
+	input {
+		width: 5rem !important;
+		min-width: 5rem !important;
+	}
+	
+	div.evq-datepicker-calendar {
+		width: 15rem;
+		border: 1px solid grey;
+		border-radius: 0.3rem;
+		position: absolute;
+		background-color: white;
+		z-index: 100;
+		
+		div {
+			text-align: center;
+			
+			span.evq-datepicker-title {
+				display: inline-block;
+				width: 8rem;
+			}
+		}
+		
+		thead td {
+			color: grey;
+		}
+		
+		tbody td {
+			cursor: pointer;
+		}
+		
+		td {
+			border: 0px;
+		}
+	}
+}

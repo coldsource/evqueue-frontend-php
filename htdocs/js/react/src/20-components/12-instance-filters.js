@@ -203,17 +203,17 @@ class InstanceFilters extends evQueueComponent {
 					</div>
 					<div>
 						<label>Launched between</label>
-						Date&#160;:&#160;<input name="dt_inf" className="date" value={this.state.filters.dt_inf} onChange={this.filterChange} />
+						Date&#160;:&#160;<DatePicker name="dt_inf" value={this.state.filters.dt_inf} onChange={this.filterChange} />
 						&#160;
 						Hour&#160;:&#160;<input name="hr_inf" className="hour evq-autocomplete" data-type="time" onChange={this.filterChange} />
 						&#160;&#160;<b>and</b>&#160;&#160;
-						Date&#160;:&#160;<input name="dt_sup" className="date" onChange={this.filterChange} />
+						Date&#160;:&#160;<DatePicker name="dt_sup" value={this.state.filters.dt_sup} onChange={this.filterChange} />
 						&#160;
 						Hour&#160;:&#160;<input name="hr_sup" className="hour evq-autocomplete" data-type="time" onChange={this.filterChange} />
 					</div>
 					<div>
 						<label>Workflows that were running at</label>
-						Date&#160;:&#160;<input name="dt_at" className="date" onChange={this.filterChange} />
+						Date&#160;:&#160;<DatePicker name="dt_at" value={this.state.filters.dt_at} onChange={this.filterChange} />
 						&#160;
 						Hour&#160;:&#160;<input name="hr_at" className="hour evq-autocomplete" data-type="time" onChange={this.filterChange} />
 					</div>
