@@ -992,10 +992,10 @@ code.google.com/p/crypto-js/wiki/License
  */
 
 class evQueueWS {
-	constructor(node, callback) {
-		this.callback = callback;
-
-		this.node = node;
+	constructor(parameters) {
+		this.callback = parameters.callback;
+		this.node = parameters.node;
+		this.stateChange = parameters.stateChange;
 
 		this.state = 'DISCONNECTED'; // We start in disconnected state
 		this.api_promise = Promise.resolve(); // No previous query was run at this time
@@ -1018,10 +1018,23 @@ class evQueueWS {
 
 			// Event on disconnection
 			self.ws.onclose = function (event) {
-				if (self.state == 'DISCONNECTING') self.state = 'DISCONNECTED'; // Disconnection was requested, this is OK
-				else self.state = 'ERROR'; // Unexpected disconnection, set state to error
+				if (self.state == 'DISCONNECTING' || event.wasClean) {
+					// Disconnection was requested by JS or close was requested by browser (ie page closed), this is OK
+					self.state = 'DISCONNECTED';
+					console.log("Disconnected from node " + self.node);
+				} else {
+					if (self.state == 'CONNECTING') reject('Connection failed'); // Connecting failed,
 
-				console.log("Disconnected from node " + self.node);
+					self.state = 'ERROR'; // Unexpected disconnection, set state to error
+
+					// Try reconnecting if we are on event mode
+					if (self.callback !== undefined) setTimeout(() => {
+						self.api_promise = self.Connect();
+					}, 1000);
+				}
+
+				// Notify of state change
+				if (self.stateChange !== undefined) self.stateChange(self.node, self.state);
 			};
 
 			self.ws.onmessage = function (event) {
@@ -1041,6 +1054,10 @@ class evQueueWS {
 					self.state = 'AUTHENTICATED';
 				} else if (self.state == 'AUTHENTICATED') {
 					self.state = 'READY';
+
+					// Notify of state change
+					if (self.stateChange !== undefined) self.stateChange(self.node, self.state);
+
 					resolve(); // We are now connected
 				} else if (self.state == 'READY') {
 					if (mode == 'event') {
@@ -1067,6 +1084,7 @@ class evQueueWS {
 		return this.state;
 	}
 
+	// Build API XML from object
 	build_api_xml(api) {
 		var xmldoc = new Document();
 
@@ -1086,12 +1104,15 @@ class evQueueWS {
 		return new XMLSerializer().serializeToString(xmldoc);
 	}
 
+	// Execute API command on evqueue
 	API(api) {
 		var self = this;
 
+		// Handle late connection
 		var evq_ready;
 		if (this.state == 'DISCONNECTED' || this.state == 'ERROR') self.api_promise = this.Connect();
 
+		// This is used to serialize API commands
 		var old_api_promise = self.api_promise;
 		self.api_promise = new Promise(function (resolve, reject) {
 			old_api_promise.then(() => {
@@ -1125,9 +1146,16 @@ class evQueueWS {
  */
 
 class evQueueCluster {
-	constructor(nodes_desc, nodes_names, callback) {
+	constructor(nodes_desc, nodes_names, eventCallback, stateChange) {
+		this.stateChangeCallback = stateChange;
+		this.stateChange = this.stateChange.bind(this);
+
 		this.nodes = [];
-		for (var i = 0; i < nodes_desc.length; i++) this.nodes.push(new evQueueWS(nodes_desc[i], callback));
+		for (var i = 0; i < nodes_desc.length; i++) this.nodes.push(new evQueueWS({
+			node: nodes_desc[i],
+			callback: eventCallback,
+			stateChange: this.stateChange
+		}));
 
 		this.nodes_names = nodes_names;
 	}
@@ -1147,10 +1175,27 @@ class evQueueCluster {
 		return connected_nodes;
 	}
 
+	GetErrorNodes() {
+		var error_nodes = 0;
+		for (var i = 0; i < this.nodes.length; i++) {
+			if (this.nodes[i].GetState() == 'ERROR') error_nodes++;
+		}
+		return error_nodes;
+	}
+
+	GetUpNode() {
+		for (var i = 0; i < this.nodes.length; i++) {
+			if (this.nodes[i].GetState() == 'READY' || this.nodes[i].GetState() == 'DISCONNECTED') return i;
+		}
+
+		return -1;
+	}
+
 	API(api) {
 		var self = this;
 
-		var node = api.node !== undefined ? self.GetNodeByName(api.node) : 0;
+		var node = api.node !== undefined ? self.GetNodeByName(api.node) : this.GetUpNode();
+		if (node == -1) return Promise.reject('Cluster error : unknown node');
 
 		if (node == '*') {
 			return new Promise(function (resolve, reject) {
@@ -1171,6 +1216,10 @@ class evQueueCluster {
 
 	Close() {
 		for (var i = 0; i < this.nodes.length; i++) this.nodes[i].Close();
+	}
+
+	stateChange(node, state) {
+		if (this.stateChangeCallback !== undefined) this.stateChangeCallback(node, state);
 	}
 }
 /*
@@ -2000,7 +2049,11 @@ class evQueueComponent extends React.Component {
 		super(props);
 
 		this.nodes = document.querySelector("body").dataset.nodes.split(',');
-		for (var i = 0; i < this.nodes.length; i++) this.nodes[i] = this.nodes[i].replace('tcp://', 'ws://');
+		this.last_state = [];
+		for (var i = 0; i < this.nodes.length; i++) {
+			this.nodes[i] = this.nodes[i].replace('tcp://', 'ws://');
+			this.last_state[i] = 'DISCONNECTED';
+		}
 
 		this.nodes_names = document.querySelector("body").dataset.nodesnames.split(',');
 
@@ -2010,12 +2063,14 @@ class evQueueComponent extends React.Component {
 
 		// Global evqueue connections
 		this.eventDispatcher = this.eventDispatcher.bind(this);
+		this.stateChanged = this.stateChanged.bind(this);
 		if (evQueueComponent.global === undefined) {
 			evQueueComponent.global = {
-				evqueue_event: new evQueueCluster(this.nodes, this.nodes_names, this.eventDispatcher),
+				evqueue_event: new evQueueCluster(this.nodes, this.nodes_names, this.eventDispatcher, this.stateChanged),
 				evqueue_api: new evQueueCluster(this.nodes, this.nodes_names),
 				external_id: 0,
-				handlers: {}
+				handlers: {},
+				subscriptions: []
 			};
 		}
 
@@ -2034,6 +2089,11 @@ class evQueueComponent extends React.Component {
 
 	GetNodeByName(name) {
 		for (var i = 0; i < this.nodes_names.length; i++) if (this.nodes_names[i] == name) return i;
+		return -1;
+	}
+
+	GetNodeByCnx(name) {
+		for (var i = 0; i < this.nodes.length; i++) if (this.nodes[i] == name) return i;
 		return -1;
 	}
 
@@ -2119,10 +2179,21 @@ class evQueueComponent extends React.Component {
 	}
 
 	Subscribe(event, api, send_now, instance_id = 0) {
-		var api_cmd_b64 = btoa(this.evqueue_event.BuildAPI(api));
-
 		var external_id = ++evQueueComponent.global.external_id;
 		evQueueComponent.global.handlers[external_id] = this.evQueueEvent;
+		evQueueComponent.global.subscriptions.push({
+			event: event,
+			api: api,
+			instance: this,
+			instance_id: instance_id,
+			external_id: external_id
+		});
+
+		return this.subscribe(event, api, send_now, instance_id, external_id);
+	}
+
+	subscribe(event, api, send_now, instance_id, external_id) {
+		var api_cmd_b64 = btoa(this.evqueue_event.BuildAPI(api));
 
 		var attributes = {
 			type: event,
@@ -2142,8 +2213,19 @@ class evQueueComponent extends React.Component {
 	}
 
 	Unsubscribe(event, instance_id = 0) {
+		// Find correct subsciption
+		var subscriptions = evQueueComponent.global.subscriptions;
+		var external_id = 0;
+		for (var i = 0; i < subscriptions.length; i++) {
+			if (subscriptions[i].event == event && subscriptions[i].instance == this && subscriptions[i].instance_id == instance_id) {
+				external_id = subscriptions[i].external_id;
+				break;
+			}
+		}
+
 		var attributes = {
-			type: event
+			type: event,
+			external_id: external_id
 		};
 
 		if (instance_id) attributes.instance_id = instance_id;
@@ -2187,6 +2269,28 @@ class evQueueComponent extends React.Component {
 		var api = this.state.api;
 		if (event.target.name == 'node') api.node = event.target.value;else if (event.target.name.substr(0, 10) == 'parameter_') api.parameters[event.target.name.substr(10)] = event.target.value;else api.attributes[event.target.name] = event.target.value;
 		this.setState({ api: api });
+	}
+
+	stateChanged(node, state) {
+		var node_idx = this.GetNodeByCnx(node);
+		var node_name = this.GetNodeByIdx(node_idx);
+
+		if (this.last_state[node_idx] == 'ERROR' && state == 'READY') {
+			var subscriptions = evQueueComponent.global.subscriptions;
+			for (var i = 0; i < subscriptions.length; i++) {
+				if (subscriptions[i].api.node == '*' || subscriptions[i].api.node == node_name) {
+					// Change API commande to reconnect only to the needed node
+					var api = {};
+					Object.assign(api, subscriptions[i].api);
+					api.node = node_name;
+					this.subscribe(subscriptions[i].event, api, true, subscriptions[i].instance_id, subscriptions[i].external_id);
+				}
+			}
+		}
+
+		this.last_state[node_idx] = state;
+
+		if (this.clusterStateChanged !== undefined) this.clusterStateChanged(node, state);
 	}
 }
 /*
@@ -3405,7 +3509,6 @@ class WorkflowLauncher extends evQueueComponent {
 	constructor(props) {
 		super(props);
 
-		this.state.wfid = 0;
 		this.state.workflows = [];
 
 		this.state.api = {
@@ -3427,32 +3530,9 @@ class WorkflowLauncher extends evQueueComponent {
 		this.launch = this.launch.bind(this);
 	}
 
-	componentDidMount() {
-		var self = this;
-		var wfid = 0;
-		this.API({ group: 'workflows', action: 'list' }).then(data => {
-			var workflows = this.xpath('/response/workflow', data.documentElement);
-
-			var groupped_workflows = {};
-			for (var i = 0; i < workflows.length; i++) {
-				if (self.props.name && workflows[i].name == self.props.name) wfid = workflows[i].id;
-
-				var group = workflows[i].group ? workflows[i].group : 'No group';
-				if (groupped_workflows[group] === undefined) groupped_workflows[group] = [];
-				groupped_workflows[group].push(workflows[i]);
-			}
-
-			for (var group in groupped_workflows) groupped_workflows[group].sort(function (a, b) {
-				return a.name.toLowerCase() <= b.name.toLowerCase() ? -1 : 1;
-			});
-
-			self.setState({ wfid: wfid, workflows: groupped_workflows });
-		});
-	}
-
 	changeWorkflow(event) {
-		var id = event.target.value;
-		this.API({ group: 'workflow', action: 'get', attributes: { id: id } }).then(data => {
+		var name = event.target.value;
+		this.API({ group: 'workflow', action: 'get', attributes: { name: name } }).then(data => {
 			var workflow = this.xpath('/response/workflow', data.documentElement)[0];
 
 			var parameters = this.xpath('/response/workflow/workflow/parameters/parameter', data.documentElement);
@@ -3462,34 +3542,8 @@ class WorkflowLauncher extends evQueueComponent {
 			api.parameters = {};
 			for (var i = 0; i < parameters.length; i++) api.parameters[parameters[i].name] = '';
 
-			this.setState({ wfid: id, api: api });
+			this.setState({ api: api });
 		});
-	}
-
-	renderWorkflows() {
-		var ret_groups = [];
-		var groups = Object.keys(this.state.workflows);
-		groups.sort(function (a, b) {
-			return a.toLowerCase() <= b.toLowerCase() ? -1 : 1;
-		});
-		for (var i = 0; i < groups.length; i++) {
-			var group = groups[i];
-			var ret_wfs = [];
-			for (var j = 0; j < this.state.workflows[group].length; j++) {
-				var wf = this.state.workflows[group][j];
-				ret_wfs.push(React.createElement(
-					'option',
-					{ key: wf.name, value: wf.id },
-					wf.name
-				));
-			}
-			ret_groups.push(React.createElement(
-				'optgroup',
-				{ key: group, label: group },
-				ret_wfs
-			));
-		}
-		return ret_groups;
 	}
 
 	renderParameters() {
@@ -3567,11 +3621,7 @@ class WorkflowLauncher extends evQueueComponent {
 									null,
 									'Workflow'
 								),
-								React.createElement(
-									'select',
-									{ value: this.state.wfid, name: 'workflow', onChange: this.changeWorkflow },
-									this.renderWorkflows()
-								)
+								React.createElement(WorkflowSelector, { name: 'workflow', value: this.state.api.attributes.name, onChange: this.changeWorkflow })
 							),
 							this.renderParameters(),
 							React.createElement(
@@ -3695,12 +3745,108 @@ class WorkflowLauncher extends evQueueComponent {
 
 'use strict';
 
+class WorkflowSelector extends evQueueComponent {
+	constructor(props) {
+		super(props);
+
+		this.state.workflows = [];
+
+		this.changeWorkflow = this.changeWorkflow.bind(this);
+	}
+
+	componentDidMount() {
+		var self = this;
+		this.API({ group: 'workflows', action: 'list' }).then(data => {
+			var workflows = this.xpath('/response/workflow', data.documentElement);
+
+			var groupped_workflows = {};
+			for (var i = 0; i < workflows.length; i++) {
+				var group = workflows[i].group ? workflows[i].group : 'No group';
+				if (groupped_workflows[group] === undefined) groupped_workflows[group] = [];
+				groupped_workflows[group].push(workflows[i]);
+			}
+
+			for (var group in groupped_workflows) groupped_workflows[group].sort(function (a, b) {
+				return a.name.toLowerCase() <= b.name.toLowerCase() ? -1 : 1;
+			});
+
+			self.setState({ workflows: groupped_workflows });
+		});
+	}
+
+	renderWorkflows() {
+		var ret_groups = [];
+		var groups = Object.keys(this.state.workflows);
+		groups.sort(function (a, b) {
+			return a.toLowerCase() <= b.toLowerCase() ? -1 : 1;
+		});
+		for (var i = 0; i < groups.length; i++) {
+			var group = groups[i];
+			var ret_wfs = [];
+			for (var j = 0; j < this.state.workflows[group].length; j++) {
+				var wf = this.state.workflows[group][j];
+				var value = this.props.valueType == 'id' ? wf.id : wf.name;
+				ret_wfs.push(React.createElement(
+					'option',
+					{ key: wf.name, value: value },
+					wf.name
+				));
+			}
+			ret_groups.push(React.createElement(
+				'optgroup',
+				{ key: group, label: group },
+				ret_wfs
+			));
+		}
+		return ret_groups;
+	}
+
+	changeWorkflow(event) {
+		this.setState({ value: event.target.value });
+		if (this.props.onChange) this.props.onChange(event);
+	}
+
+	render() {
+		return React.createElement(
+			'select',
+			{ value: this.props.value, name: this.props.name, onChange: this.changeWorkflow },
+			React.createElement(
+				'option',
+				{ value: this.props.valueType == 'id' ? 0 : '' },
+				'Choose a workflow'
+			),
+			this.renderWorkflows()
+		);
+	}
+}
+/*
+ * This file is part of evQueue
+ *
+ * evQueue is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * evQueue is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with evQueue. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * Author: Thibault Kummer
+ */
+
+'use strict';
+
 class ExecutingInstances extends ListInstances {
 	constructor(props) {
 		super(props, '*');
 
+		this.state.nodes_up = 0;
+		this.state.nodes_down = 0;
 		this.state.now = 0;
-		this.state.ready = false;
 		this.timerID = false;
 
 		this.retry = this.retry.bind(this);
@@ -3709,9 +3855,7 @@ class ExecutingInstances extends ListInstances {
 	componentDidMount() {
 		var api = { node: '*', group: 'status', action: 'query', attributes: { type: 'workflows' } };
 		this.Subscribe('INSTANCE_STARTED', api);
-		this.Subscribe('INSTANCE_TERMINATED', api, true).then(() => {
-			this.setState({ ready: true });
-		});
+		this.Subscribe('INSTANCE_TERMINATED', api, true);
 
 		this.setState({ now: this.now() });
 
@@ -3798,12 +3942,15 @@ class ExecutingInstances extends ListInstances {
 		if (wf.retrying_tasks > 0) return React.createElement('span', { className: 'faicon fa-clock-o', title: 'A task ended badly and will retry' });
 	}
 
-	renderNodeStatus() {
-		if (!this.state.ready) return React.createElement('div', null);
+	clusterStateChanged() {
+		this.setState({
+			nodes_up: this.evqueue_event.GetConnectedNodes(),
+			nodes_down: this.evqueue_event.GetErrorNodes()
+		});
+	}
 
-		var nodes_up = this.evqueue_event.GetConnectedNodes();
-		var nodes_down = this.GetNodes().length - this.evqueue_event.GetConnectedNodes();
-		if (nodes_down == 0) return React.createElement(
+	renderNodeStatus() {
+		if (this.state.nodes_down == 0) return React.createElement(
 			'div',
 			{ id: 'nodes-status' },
 			React.createElement(
@@ -3812,9 +3959,9 @@ class ExecutingInstances extends ListInstances {
 				React.createElement(
 					'span',
 					{ className: 'success' },
-					nodes_up,
+					this.state.nodes_up,
 					' node',
-					nodes_up != 1 ? 's' : '',
+					this.state.nodes_up != 1 ? 's' : '',
 					' up'
 				)
 			)
@@ -3828,16 +3975,16 @@ class ExecutingInstances extends ListInstances {
 				React.createElement(
 					'span',
 					{ className: 'success' },
-					nodes_up,
+					this.state.nodes_up,
 					' node',
-					nodes_up != 1 ? 's' : '',
+					this.state.nodes_up != 1 ? 's' : '',
 					' up - ',
 					React.createElement(
 						'span',
 						{ className: 'error' },
-						nodes_down,
+						this.state.nodes_down,
 						' node',
-						nodes_down != 1 ? 's' : '',
+						this.state.nodes_down != 1 ? 's' : '',
 						' down'
 					)
 				)
@@ -3896,6 +4043,7 @@ class TerminatedInstances extends ListInstances {
 		this.nextPage = this.nextPage.bind(this);
 		this.previousPage = this.previousPage.bind(this);
 		this.removeInstance = this.removeInstance.bind(this);
+		this.updateFilters = this.updateFilters.bind(this);
 	}
 
 	componentDidMount() {
@@ -3957,12 +4105,12 @@ class TerminatedInstances extends ListInstances {
 	}
 
 	updateFilters(search_filters) {
-		this.search_filters = search_filters;
+		Object.assign(this.search_filters, search_filters);
 
 		this.Unsubscribe('INSTANCE_TERMINATED');
 
-		search_filters.limit = this.items_per_page;
-		search_filters.offset = (this.current_page - 1) * this.items_per_page;
+		this.search_filters.limit = this.items_per_page;
+		this.search_filters.offset = (this.current_page - 1) * this.items_per_page;
 
 		var api = {
 			group: 'instances',
@@ -3985,3 +4133,271 @@ class TerminatedInstances extends ListInstances {
 }
 
 if (document.querySelector('#terminated-workflows')) var terminated_instances = ReactDOM.render(React.createElement(TerminatedInstances, null), document.querySelector('#terminated-workflows'));
+/*
+ * This file is part of evQueue
+ *
+ * evQueue is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * evQueue is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with evQueue. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * Author: Thibault Kummer
+ */
+
+'use strict';
+
+class InstanceFilters extends evQueueComponent {
+	constructor(props) {
+		super(props, 'any');
+
+		this.state.filters = {
+			filter_node: '',
+			filter_name: '',
+			filter_tagged: '',
+			dt_inf: '',
+			hr_inf: '',
+			filter_launched_from: '',
+			dt_sup: '',
+			hr_sup: '',
+			filter_launched_until: '',
+			dt_at: '',
+			hr_at: '',
+			filter_ended_from: ''
+		};
+
+		this.state.tags = [];
+		this.state.opened = false;
+		this.state.parameters = [];
+
+		this.toggleFilters = this.toggleFilters.bind(this);
+		this.filterChange = this.filterChange.bind(this);
+		this.cleanFilters = this.cleanFilters.bind(this);
+	}
+
+	componentDidMount() {
+		this.API({
+			group: 'tags',
+			action: 'list'
+		}).then(data => {
+			var tags = this.xpath('/response/tag', data.documentElement);
+			this.setState({ tags: tags });
+		});
+	}
+
+	toggleFilters() {
+		this.setState({ opened: !this.state.opened });
+	}
+
+	renderNodes() {
+		return this.GetNodes().map(node => {
+			return React.createElement(
+				'option',
+				{ key: node, name: node },
+				node
+			);
+		});
+	}
+
+	renderTags() {
+		return this.state.tags.map(id => {
+			return React.createElement(
+				'option',
+				{ key: tag.id, value: tag.labal },
+				tag.label
+			);
+		});
+	}
+
+	implodeDate(date, hour) {
+		if (!date) return '';
+
+		if (date && !hour) return date;
+
+		return date + ' ' + hour;
+	}
+
+	filterChange(event) {
+		this.setFilter(event.target.name, event.target.value);
+
+		if (event.target.name == 'dt_inf' || event.target.name == 'hr_inf') this.setFilter('filter_launched_from', this.implodeDate(this.state.filters.dt_inf, this.state.filters.hr_inf));
+		if (event.target.name == 'dt_sup' || event.target.name == 'hr_sup') this.setFilter('filter_launched_until', this.implodeDate(this.state.filters.dt_sup, this.state.filters.hr_sup));
+		if (event.target.name == 'dt_at' || event.target.name == 'hr_at') {
+			var hr = this.state.filters.hr_at;
+			if (hr && hr.length <= 5) hr += ':59';
+
+			this.setFilter('filter_launched_until', this.implodeDate(this.state.filters.dt_at, hr));
+			this.setFilter('filter_ended_from', this.implodeDate(this.state.filters.dt_at, this.state.filters.hr_at));
+		}
+
+		if (this.props.onChange) this.props.onChange(this.state.filters);
+	}
+
+	setFilter(name, value) {
+		var filters = this.state.filters;
+		filters[name] = value;
+		this.setState({ filters: filters });
+	}
+
+	cleanFilters() {
+		var filters = this.state.filters;
+		for (name in filters) filters[name] = '';
+
+		this.setState({ filters: filters, opened: false });
+
+		if (this.props.onChange) this.props.onChange(filters);
+	}
+
+	hasFilter() {
+		var filters = this.state.filters;
+		for (name in filters) {
+			if (filters[name] != '') return true;
+		}
+		return false;
+	}
+
+	renderExplain() {
+		if (Object.keys(this.state.filters).length == 0) return 'Showing all terminated workflows';
+
+		var explain;
+		if (this.state.filters.filter_error) explain = 'Showing failed ';else explain = 'Showing terminated ';
+
+		explain += (this.state.filters.filter_workflow ? ' ' + this.state.filters.filter_workflow + ' ' : '') + 'workflows';
+		if (this.state.filters.filter_launched_until && this.state.filters.filter_ended_from) explain += ' that were running at ' + this.state.filters.filter_launched_until;else if (this.state.filters.filter_launched_from && this.state.filters.filter_launched_until) explain += ' between ' + this.state.filters.filter_launched_from + ' and ' + this.state.filters.filter_launched_until;else if (this.state.filters.filter_launched_from) explain += ' since ' + this.state.filters.filter_launched_from;else if (this.state.filters.filter_launched_until) explain += ' before ' + this.state.filters.filter_launched_until;else if (this.state.filters.filter_tag_id) explain += ' tagged ' + $('#searchform select[name=tagged] option[value=' + this.state.filters.filter_tag_id + ']').text();
+
+		var i = 0;
+		if (Object.keys(this.state.parameters).length) {
+			explain += ' having ';
+			for (var param in parameters) {
+				if (i > 0) explain += ', ';
+				explain += param.substr(10) + '=' + parameters[param];
+				i++;
+			}
+		}
+
+		if (this.state.filters.filter_node) explain += ' on node ' + this.state.filters.filter_node;
+
+		return explain;
+	}
+
+	renderFilters() {
+		if (!this.state.opened) return;
+
+		return React.createElement(
+			'div',
+			{ className: 'formdiv instance_filters' },
+			React.createElement(
+				'form',
+				{ id: 'searchform' },
+				React.createElement(
+					'div',
+					null,
+					React.createElement(
+						'label',
+						null,
+						'Node'
+					),
+					React.createElement(
+						'select',
+						{ name: 'filter_node', value: this.state.filters.filter_node, onChange: this.filterChange },
+						React.createElement(
+							'option',
+							{ value: '' },
+							'All'
+						),
+						this.renderNodes()
+					)
+				),
+				React.createElement(
+					'div',
+					null,
+					React.createElement(
+						'label',
+						null,
+						'Workflow'
+					),
+					React.createElement(WorkflowSelector, { valueType: 'name', name: 'filter_workflow', value: this.state.filters.filter_workflow, onChange: this.filterChange })
+				),
+				React.createElement(
+					'div',
+					{ id: 'searchtag' },
+					React.createElement(
+						'label',
+						null,
+						'Tag'
+					),
+					React.createElement(
+						'select',
+						{ name: 'tagged' },
+						this.renderTags()
+					)
+				),
+				React.createElement(
+					'div',
+					null,
+					React.createElement(
+						'label',
+						null,
+						'Launched between'
+					),
+					'Date\xA0:\xA0',
+					React.createElement('input', { name: 'dt_inf', className: 'date', value: this.state.filters.dt_inf, onChange: this.filterChange }),
+					'\xA0 Hour\xA0:\xA0',
+					React.createElement('input', { name: 'hr_inf', className: 'hour evq-autocomplete', 'data-type': 'time', onChange: this.filterChange }),
+					'\xA0\xA0',
+					React.createElement(
+						'b',
+						null,
+						'and'
+					),
+					'\xA0\xA0 Date\xA0:\xA0',
+					React.createElement('input', { name: 'dt_sup', className: 'date', onChange: this.filterChange }),
+					'\xA0 Hour\xA0:\xA0',
+					React.createElement('input', { name: 'hr_sup', className: 'hour evq-autocomplete', 'data-type': 'time', onChange: this.filterChange })
+				),
+				React.createElement(
+					'div',
+					null,
+					React.createElement(
+						'label',
+						null,
+						'Workflows that were running at'
+					),
+					'Date\xA0:\xA0',
+					React.createElement('input', { name: 'dt_at', className: 'date', onChange: this.filterChange }),
+					'\xA0 Hour\xA0:\xA0',
+					React.createElement('input', { name: 'hr_at', className: 'hour evq-autocomplete', 'data-type': 'time', onChange: this.filterChange })
+				)
+			)
+		);
+	}
+
+	render() {
+		return React.createElement(
+			'div',
+			null,
+			React.createElement(
+				'a',
+				{ className: 'action', onClick: this.toggleFilters },
+				'Filters'
+			),
+			' : ',
+			React.createElement(
+				'span',
+				null,
+				this.renderExplain()
+			),
+			this.hasFilter() ? React.createElement('span', { id: 'clearfilters', className: 'faicon fa-remove', title: 'Clear filters', onClick: this.cleanFilters }) : '',
+			this.renderFilters()
+		);
+	}
+}
+
+if (document.querySelector('#searchformcontainer')) var terminated_instances = ReactDOM.render(React.createElement(InstanceFilters, { onChange: terminated_instances.updateFilters }), document.querySelector('#searchformcontainer'));

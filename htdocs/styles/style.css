@@ -447,10 +447,6 @@ div#login div.form {
 	color:#4996ce;
 }
 
-#dt_inf, #dt_sup, #dt_at, #hr_inf, #hr_sup, #hr_at {
-	width: 6em;
-}
-
 /* Install page */
   div.install_content {
 	width: 540px;

@@ -24,8 +24,12 @@ class evQueueComponent extends React.Component {
 		super(props);
 		
 		this.nodes = document.querySelector("body").dataset.nodes.split(',');
+		this.last_state = [];
 		for(var i=0;i<this.nodes.length;i++)
+		{
 			this.nodes[i] = this.nodes[i].replace('tcp://','ws://');
+			this.last_state[i] = 'DISCONNECTED';
+		}
 		
 		this.nodes_names = document.querySelector("body").dataset.nodesnames.split(',');
 		
@@ -35,13 +39,15 @@ class evQueueComponent extends React.Component {
 		
 		// Global evqueue connections
 		this.eventDispatcher= this.eventDispatcher.bind(this);
+		this.stateChanged = this.stateChanged.bind(this);
 		if(evQueueComponent.global===undefined)
 		{
 			evQueueComponent.global = {
-				evqueue_event: new evQueueCluster(this.nodes, this.nodes_names, this.eventDispatcher),
+				evqueue_event: new evQueueCluster(this.nodes, this.nodes_names, this.eventDispatcher, this.stateChanged),
 				evqueue_api: new evQueueCluster(this.nodes, this.nodes_names),
 				external_id: 0,
-				handlers: {}
+				handlers: {},
+				subscriptions: []
 			};
 		}
 		
@@ -63,6 +69,13 @@ class evQueueComponent extends React.Component {
 	GetNodeByName(name) {
 		for(var i=0;i<this.nodes_names.length;i++)
 			if(this.nodes_names[i]==name)
+				return i;
+		return -1;
+	}
+	
+	GetNodeByCnx(name) {
+		for(var i=0;i<this.nodes.length;i++)
+			if(this.nodes[i]==name)
 				return i;
 		return -1;
 	}
@@ -150,10 +163,22 @@ class evQueueComponent extends React.Component {
 	
 	Subscribe(event,api,send_now,instance_id = 0)
 	{
-		var api_cmd_b64 = btoa(this.evqueue_event.BuildAPI(api));
-		
 		var external_id = ++evQueueComponent.global.external_id;
 		evQueueComponent.global.handlers[external_id] = this.evQueueEvent;
+		evQueueComponent.global.subscriptions.push({
+			event:event,
+			api: api,
+			instance: this,
+			instance_id: instance_id,
+			external_id:external_id,
+		});
+		
+		return this.subscribe(event,api,send_now,instance_id,external_id);
+	}
+	
+	subscribe(event,api,send_now,instance_id,external_id)
+	{
+		var api_cmd_b64 = btoa(this.evqueue_event.BuildAPI(api));
 		
 		var attributes = {
 			type: event,
@@ -166,17 +191,30 @@ class evQueueComponent extends React.Component {
 			attributes.instance_id = instance_id;
 		
 		return this.evqueue_event.API({
-			node:api.node,
+			node: api.node,
 			group: 'event',
 			action: 'subscribe',
 			attributes: attributes
-		});
+		})
 	}
 	
 	Unsubscribe(event,instance_id = 0)
 	{
+		// Find correct subsciption
+		var subscriptions = evQueueComponent.global.subscriptions;
+		var external_id = 0;
+		for(var i=0;i<subscriptions.length;i++)
+		{
+			if(subscriptions[i].event==event && subscriptions[i].instance==this && subscriptions[i].instance_id==instance_id)
+			{
+				external_id = subscriptions[i].external_id;
+				break;
+			}
+		}
+		
 		var attributes = {
-			type: event
+			type: event,
+			external_id: external_id
 		};
 		
 		if(instance_id)
@@ -232,5 +270,31 @@ class evQueueComponent extends React.Component {
 		else
 			api.attributes[event.target.name] = event.target.value;
 		this.setState({api:api});
+	}
+	
+	stateChanged(node, state) {
+		var node_idx = this.GetNodeByCnx(node);
+		var node_name = this.GetNodeByIdx(node_idx);
+		
+		if(this.last_state[node_idx]=='ERROR' && state=='READY')
+		{
+			var subscriptions = evQueueComponent.global.subscriptions;
+			for(var i=0;i<subscriptions.length;i++)
+			{
+				if(subscriptions[i].api.node=='*' || subscriptions[i].api.node==node_name)
+				{
+					// Change API commande to reconnect only to the needed node
+					var api = {};
+					Object.assign(api,subscriptions[i].api);
+					api.node = node_name;
+					this.subscribe(subscriptions[i].event,api,true,subscriptions[i].instance_id,subscriptions[i].external_id)
+				}
+			}
+		}
+		
+		this.last_state[node_idx] = state;
+		
+		if(this.clusterStateChanged!==undefined)
+			this.clusterStateChanged(node, state);
 	}
 }

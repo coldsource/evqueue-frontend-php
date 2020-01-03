@@ -23,7 +23,6 @@ class WorkflowLauncher extends evQueueComponent {
 	constructor(props) {
 		super(props);
 		
-		this.state.wfid = 0;
 		this.state.workflows = [];
 		
 		this.state.api = {
@@ -50,34 +49,9 @@ class WorkflowLauncher extends evQueueComponent {
 		this.launch = this.launch.bind(this);
 	}
 	
-	componentDidMount() {
-		var self = this;
-		var wfid = 0;
-		this.API({group:'workflows',action:'list'}).then( (data) => {
-			var workflows = this.xpath('/response/workflow',data.documentElement);
-			
-			var groupped_workflows = {};
-			for(var i=0;i<workflows.length;i++)
-			{
-				if(self.props.name && workflows[i].name==self.props.name)
-					wfid = workflows[i].id;
-				
-				var group = workflows[i].group?workflows[i].group:'No group';
-				if(groupped_workflows[group] === undefined)
-					groupped_workflows[group] = [];
-				groupped_workflows[group].push(workflows[i]);
-			}
-			
-			for(var group in groupped_workflows)
-				groupped_workflows[group].sort(function(a,b) {return a.name.toLowerCase()<=b.name.toLowerCase()?-1:1});
-			
-			self.setState({wfid:wfid,workflows:groupped_workflows});
-		});
-	}
-	
 	changeWorkflow(event) {
-		var id = event.target.value;
-		this.API({group:'workflow',action:'get',attributes:{id:id}}).then( (data) => {
+		var name = event.target.value;
+		this.API({group:'workflow',action:'get',attributes:{name:name}}).then( (data) => {
 			var workflow = this.xpath('/response/workflow',data.documentElement)[0];
 			
 			var parameters = this.xpath('/response/workflow/workflow/parameters/parameter',data.documentElement);
@@ -88,26 +62,8 @@ class WorkflowLauncher extends evQueueComponent {
 			for(var i=0;i<parameters.length;i++)
 				api.parameters[parameters[i].name] = '';
 			
-			this.setState({wfid:id,api:api});
+			this.setState({api:api});
 		});
-	}
-	
-	renderWorkflows() {
-		var ret_groups = [];
-		var groups = Object.keys(this.state.workflows);
-		groups.sort(function(a,b) { return a.toLowerCase()<=b.toLowerCase()?-1:1});
-		for(var i=0;i<groups.length;i++)
-		{
-			var group = groups[i];
-			var ret_wfs = [];
-			for(var j=0;j<this.state.workflows[group].length;j++)
-			{
-				var wf = this.state.workflows[group][j];
-				ret_wfs.push(<option key={wf.name} value={wf.id}>{wf.name}</option>);
-			}
-			ret_groups.push(<optgroup key={group} label={group}>{ret_wfs}</optgroup>);
-		}
-		return ret_groups;
 	}
 	
 	renderParameters() {
@@ -154,9 +110,7 @@ class WorkflowLauncher extends evQueueComponent {
 							<form>
 								<div>
 									<label>Workflow</label>
-									<select value={this.state.wfid} name="workflow" onChange={this.changeWorkflow}>
-										{this.renderWorkflows()}
-									</select>
+									<WorkflowSelector name="workflow" value={this.state.api.attributes.name} onChange={this.changeWorkflow} />
 								</div>
 								{this.renderParameters()}
 								<div>

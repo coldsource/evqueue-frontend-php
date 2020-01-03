@@ -23,8 +23,9 @@ class ExecutingInstances extends ListInstances {
 	constructor(props) {
 		super(props,'*');
 		
+		this.state.nodes_up = 0;
+		this.state.nodes_down = 0;
 		this.state.now = 0;
-		this.state.ready = false;
 		this.timerID = false;
 		
 		this.retry = this.retry.bind(this);
@@ -33,7 +34,7 @@ class ExecutingInstances extends ListInstances {
 	componentDidMount() {
 		var api = { node:'*', group:'status', action:'query',attributes:{type:'workflows'} };
 		this.Subscribe('INSTANCE_STARTED',api);
-		this.Subscribe('INSTANCE_TERMINATED',api,true).then( () => { this.setState({ready: true}) });
+		this.Subscribe('INSTANCE_TERMINATED',api,true);
 		
 		this.setState({now: this.now()});
 		
@@ -126,15 +127,17 @@ class ExecutingInstances extends ListInstances {
 			return <span className="faicon fa-clock-o" title="A task ended badly and will retry"></span>;
 	}
 	
+	clusterStateChanged() {
+		this.setState({
+			nodes_up: this.evqueue_event.GetConnectedNodes(),
+			nodes_down: this.evqueue_event.GetErrorNodes()
+		});
+	}
+	
 	renderNodeStatus() {
-		if(!this.state.ready)
-			return (<div></div>);
-		
-		var nodes_up = this.evqueue_event.GetConnectedNodes();
-		var nodes_down = this.GetNodes().length-this.evqueue_event.GetConnectedNodes();
-		if(nodes_down==0)
-			return (<div id="nodes-status"><a href="nodes.php"><span className="success">{nodes_up} node{nodes_up!=1?'s':''} up</span></a></div>);
-		return (<div id="nodes-status"><a href="nodes.php"><span className="success">{nodes_up} node{nodes_up!=1?'s':''} up - <span className="error">{nodes_down} node{nodes_down!=1?'s':''} down</span></span></a></div>);
+		if(this.state.nodes_down==0)
+			return (<div id="nodes-status"><a href="nodes.php"><span className="success">{this.state.nodes_up} node{this.state.nodes_up!=1?'s':''} up</span></a></div>);
+		return (<div id="nodes-status"><a href="nodes.php"><span className="success">{this.state.nodes_up} node{this.state.nodes_up!=1?'s':''} up - <span className="error">{this.state.nodes_down} node{this.state.nodes_down!=1?'s':''} down</span></span></a></div>);
 	}
 	
 	renderTitle() {

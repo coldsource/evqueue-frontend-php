@@ -48,52 +48,10 @@
 		
 		<br />
 
-		<xsl:call-template name="filter" />
+		<div id="searchformcontainer"></div>
 
 		<br />
 		
 		<div id="terminated-workflows"></div>
 	</xsl:template>
-
-	<xsl:template name="filter">
-		<div id="searchformcontainer">
-			<a onclick="$('#searchformcontainer .filter').toggle();" href="javascript:void(0)">Filters</a> : <span id="searchexplain">Showing all terminated workflows</span><span id="clearfilters" class="hidden faicon fa-remove" title="Clear filters"></span>
-
-			<div class="formdiv filter hidden">
-				<form id="searchform">
-					<div>
-						<label>Node</label>
-						<select name="node">
-							<option value="">All</option>
-							<xsl:for-each select="/page/evqueue-nodes/node">
-								<option value="{@name}"><xsl:value-of select="@name" /></option>
-							</xsl:for-each>
-						</select>
-					</div>
-					<div id="searchworkflow">
-						<label>Workflow</label>
-						<select name="wf_name" class="evq-autofill select2" data-type="workflows" data-valuetype="id"></select>
-					</div>
-					<div id="searchtag">
-						<label>Tag</label>
-						<select name="tagged" class="evq-autofill" data-type="tags"></select>
-					</div>
-					<div>
-						<label>Launched between</label>
-						Date&#160;:&#160;<input id="dt_inf" name="dt_inf" class="datepicker" />
-						Hour&#160;:&#160;<input id="hr_inf" name="hr_inf" class="timepicker evq-autocomplete" data-type="time" />
-						&#160;&#160;<b>and</b>&#160;&#160;
-						Date&#160;:&#160;<input id="dt_sup" name="dt_sup" class="datepicker" />
-						Hour&#160;:&#160;<input id="hr_sup" name="hr_sup" class="timepicker evq-autocomplete" data-type="time" />
-					</div>
-					<div>
-						<label>Workflows that were running at</label>
-						Date&#160;:&#160;<input id="dt_at" name="dt_at" class="datepicker" />
-						Hour&#160;:&#160;<input id="hr_at" name="hr_at" class="timepicker evq-autocomplete" data-type="time" />
-					</div>
-				</form>
-			</div>
-		</div>
-	</xsl:template>
-
 </xsl:stylesheet>

@@ -1,0 +1,241 @@
+ /*
+  * This file is part of evQueue
+  *
+  * evQueue is free software: you can redistribute it and/or modify
+  * it under the terms of the GNU General Public License as published by
+  * the Free Software Foundation, either version 3 of the License, or
+  * (at your option) any later version.
+  *
+  * evQueue is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+  * GNU General Public License for more details.
+  *
+  * You should have received a copy of the GNU General Public License
+  * along with evQueue. If not, see <http://www.gnu.org/licenses/>.
+  *
+  * Author: Thibault Kummer
+  */
+
+'use strict';
+
+class InstanceFilters extends evQueueComponent {
+	constructor(props) {
+		super(props,'any');
+		
+		this.state.filters = {
+			filter_node: '',
+			filter_name: '',
+			filter_tagged: '',
+			dt_inf: '',
+			hr_inf: '',
+			filter_launched_from: '',
+			dt_sup: '',
+			hr_sup: '',
+			filter_launched_until: '',
+			dt_at: '',
+			hr_at: '',
+			filter_ended_from: ''
+		}
+		
+		this.state.tags = [];
+		this.state.opened = false;
+		this.state.parameters = [];
+		
+		this.toggleFilters = this.toggleFilters.bind(this);
+		this.filterChange = this.filterChange.bind(this);
+		this.cleanFilters = this.cleanFilters.bind(this);
+	}
+	
+	componentDidMount() {
+		this.API({
+			group: 'tags',
+			action: 'list'
+		}).then( (data) => {
+			var tags = this.xpath('/response/tag',data.documentElement);
+			this.setState({tags: tags});
+		});
+	}
+	
+	toggleFilters() {
+		this.setState({opened:!this.state.opened});
+	}
+	
+	renderNodes() {
+		return this.GetNodes().map( (node) => {
+			return (
+				<option key={node} name={node}>{node}</option>
+			);
+		});
+	}
+	
+	renderTags() {
+		return this.state.tags.map( (id) => {
+			return (
+				<option key={tag.id} value={tag.labal}>{tag.label}</option>
+			);
+		});
+	}
+	
+	implodeDate(date,hour)
+	{
+		if(!date)
+			return '';
+		
+		if(date && !hour)
+			return date;
+		
+		return date+' '+hour;
+	}
+	
+	filterChange(event) {
+		this.setFilter(event.target.name,event.target.value);
+		
+		if(event.target.name=='dt_inf' || event.target.name=='hr_inf')
+			this.setFilter('filter_launched_from',this.implodeDate(this.state.filters.dt_inf,this.state.filters.hr_inf));
+		if(event.target.name=='dt_sup' || event.target.name=='hr_sup')
+			this.setFilter('filter_launched_until',this.implodeDate(this.state.filters.dt_sup,this.state.filters.hr_sup));
+		if(event.target.name=='dt_at' || event.target.name=='hr_at')
+		{
+			var hr = this.state.filters.hr_at;
+			if(hr && hr.length<=5)
+				hr += ':59';
+			
+			this.setFilter('filter_launched_until',this.implodeDate(this.state.filters.dt_at,hr));
+			this.setFilter('filter_ended_from',this.implodeDate(this.state.filters.dt_at,this.state.filters.hr_at));
+		}
+		
+		if(this.props.onChange)
+			this.props.onChange(this.state.filters);
+	}
+	
+	setFilter(name,value) {
+		var filters = this.state.filters;
+		filters[name] = value;
+		this.setState({filters:filters});
+	}
+	
+	cleanFilters() {
+		var filters = this.state.filters;
+		for(name in filters)
+			filters[name] = '';
+		
+		this.setState({filters:filters, opened:false});
+		
+		if(this.props.onChange)
+			this.props.onChange(filters);
+	}
+	
+	hasFilter() {
+		var filters = this.state.filters;
+		for(name in filters)
+		{
+			if(filters[name]!='')
+				return true;
+		}
+		return false;
+	}
+	
+	renderExplain() {
+		if(Object.keys(this.state.filters).length==0)
+			return 'Showing all terminated workflows';
+		
+		var explain;
+		if(this.state.filters.filter_error)
+			explain = 'Showing failed ';
+		else
+			explain = 'Showing terminated ';
+
+		explain += (this.state.filters.filter_workflow?' '+this.state.filters.filter_workflow+' ':'')+'workflows';
+		if(this.state.filters.filter_launched_until && this.state.filters.filter_ended_from)
+			explain += ' that were running at '+this.state.filters.filter_launched_until;
+		else if(this.state.filters.filter_launched_from && this.state.filters.filter_launched_until)
+			explain += ' between '+this.state.filters.filter_launched_from+' and '+this.state.filters.filter_launched_until;
+		else if(this.state.filters.filter_launched_from)
+			explain += ' since '+this.state.filters.filter_launched_from;
+		else if(this.state.filters.filter_launched_until)
+			explain += ' before '+this.state.filters.filter_launched_until;
+		else if(this.state.filters.filter_tag_id)
+			explain += ' tagged '+$('#searchform select[name=tagged] option[value='+this.state.filters.filter_tag_id+']').text();
+
+		var i = 0;
+		if(Object.keys(this.state.parameters).length)
+		{
+			explain += ' having ';
+			for(var param in parameters)
+			{
+				if(i>0)
+					explain += ', ';
+				explain+= param.substr(10)+'='+parameters[param];
+				i++;
+			}
+		}
+
+		if(this.state.filters.filter_node)
+			explain += ' on node '+this.state.filters.filter_node;
+		
+		return explain;
+	}
+	
+	renderFilters() {
+		if(!this.state.opened)
+			return;
+		
+		return (
+			<div className="formdiv instance_filters">
+				<form id="searchform">
+					<div>
+						<label>Node</label>
+						<select name="filter_node" value={this.state.filters.filter_node} onChange={this.filterChange}>
+							<option value="">All</option>
+							{this.renderNodes()}
+						</select>
+					</div>
+					<div>
+						<label>Workflow</label>
+						<WorkflowSelector valueType="name" name="filter_workflow" value={this.state.filters.filter_workflow} onChange={this.filterChange}/>
+					</div>
+					<div id="searchtag">
+						<label>Tag</label>
+						<select name="tagged">
+							{this.renderTags()}
+						</select>
+					</div>
+					<div>
+						<label>Launched between</label>
+						Date&#160;:&#160;<input name="dt_inf" className="date" value={this.state.filters.dt_inf} onChange={this.filterChange} />
+						&#160;
+						Hour&#160;:&#160;<input name="hr_inf" className="hour evq-autocomplete" data-type="time" onChange={this.filterChange} />
+						&#160;&#160;<b>and</b>&#160;&#160;
+						Date&#160;:&#160;<input name="dt_sup" className="date" onChange={this.filterChange} />
+						&#160;
+						Hour&#160;:&#160;<input name="hr_sup" className="hour evq-autocomplete" data-type="time" onChange={this.filterChange} />
+					</div>
+					<div>
+						<label>Workflows that were running at</label>
+						Date&#160;:&#160;<input name="dt_at" className="date" onChange={this.filterChange} />
+						&#160;
+						Hour&#160;:&#160;<input name="hr_at" className="hour evq-autocomplete" data-type="time" onChange={this.filterChange} />
+					</div>
+				</form>
+			</div>
+		);
+	}
+	
+	render() {
+		return (
+			<div>
+				<a className="action" onClick={this.toggleFilters}>Filters</a> : <span>{this.renderExplain()}</span>
+				{
+					this.hasFilter()?
+					(<span id="clearfilters" className="faicon fa-remove" title="Clear filters" onClick={this.cleanFilters}></span>):
+					''
+				}
+				{this.renderFilters()}
+			</div>
+		);
+	}
+}
+
+if(document.querySelector('#searchformcontainer'))
+	var terminated_instances = ReactDOM.render(<InstanceFilters onChange={terminated_instances.updateFilters}/>, document.querySelector('#searchformcontainer'));

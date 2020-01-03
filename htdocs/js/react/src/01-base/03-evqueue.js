@@ -50,9 +50,10 @@ class evQueueWS
 			
 			// Event on disconnection
 			self.ws.onclose = function(event) {
-				if(self.state=='DISCONNECTING')
+				if(self.state=='DISCONNECTING' || event.wasClean)
 				{
-					self.state = 'DISCONNECTED'; // Disconnection was requested, this is OK
+					// Disconnection was requested by JS or close was requested by browser (ie page closed), this is OK
+					self.state = 'DISCONNECTED';
 					console.log("Disconnected from node "+self.node);
 				}
 				else

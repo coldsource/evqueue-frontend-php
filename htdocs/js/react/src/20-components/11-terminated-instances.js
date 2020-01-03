@@ -32,6 +32,7 @@ class TerminatedInstances extends ListInstances {
 		this.nextPage = this.nextPage.bind(this);
 		this.previousPage = this.previousPage.bind(this);
 		this.removeInstance = this.removeInstance.bind(this);
+		this.updateFilters = this.updateFilters.bind(this);
 	}
 	
 	componentDidMount() {
@@ -95,12 +96,12 @@ class TerminatedInstances extends ListInstances {
 	}
 	
 	updateFilters(search_filters) {
-		this.search_filters = search_filters;
+		Object.assign(this.search_filters, search_filters);
 		
 		this.Unsubscribe('INSTANCE_TERMINATED');
 		
-		search_filters.limit = this.items_per_page;
-		search_filters.offset = (this.current_page-1)*this.items_per_page;
+		this.search_filters.limit = this.items_per_page;
+		this.search_filters.offset = (this.current_page-1)*this.items_per_page;
 		
 		var api = {
 			group: 'instances',
