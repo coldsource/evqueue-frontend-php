@@ -19,11 +19,18 @@
 
 class evQueueCluster
 {
-	constructor(nodes_desc, nodes_names, callback)
+	constructor(nodes_desc, nodes_names, eventCallback, stateChange)
 	{
+		this.stateChangeCallback = stateChange;
+		this.stateChange = this.stateChange.bind(this);
+		
 		this.nodes = [];
 		for(var i=0;i<nodes_desc.length;i++)
-			this.nodes.push(new evQueueWS(nodes_desc[i],callback));
+			this.nodes.push(new evQueueWS({
+				node: nodes_desc[i],
+				callback: eventCallback,
+				stateChange: this.stateChange
+			}));
 		
 		this.nodes_names = nodes_names;
 	}
@@ -50,11 +57,35 @@ class evQueueCluster
 		return connected_nodes;
 	}
 	
+	GetErrorNodes()
+	{
+		var error_nodes = 0;
+		for(var i=0;i<this.nodes.length;i++)
+		{
+			if(this.nodes[i].GetState()=='ERROR')
+				error_nodes++;
+		}
+		return error_nodes;
+	}
+	
+	GetUpNode()
+	{
+		for(var i=0;i<this.nodes.length;i++)
+		{
+			if(this.nodes[i].GetState()=='READY' || this.nodes[i].GetState()=='DISCONNECTED')
+				return i;
+		}
+		
+		return -1;
+	}
+	
 	API(api)
 	{
 		var self = this;
 		
-		var node = api.node!==undefined?self.GetNodeByName(api.node):0;
+		var node = api.node!==undefined?self.GetNodeByName(api.node):this.GetUpNode();
+		if(node==-1)
+			return Promise.reject('Cluster error : unknown node');
 		
 		if(node=='*')
 		{
@@ -83,5 +114,10 @@ class evQueueCluster
 	{
 		for(var i=0;i<this.nodes.length;i++)
 			this.nodes[i].Close();
+	}
+	
+	stateChange(node,state) {
+		if(this.stateChangeCallback!==undefined)
+			this.stateChangeCallback(node,state);
 	}
 }

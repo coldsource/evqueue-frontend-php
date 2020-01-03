@@ -19,11 +19,11 @@
 
 class evQueueWS
 {
-	constructor(node, callback)
+	constructor(parameters)
 	{
-		this.callback = callback;
-		
-		this.node = node;
+		this.callback = parameters.callback;
+		this.node = parameters.node;
+		this.stateChange = parameters.stateChange;
 		
 		this.state = 'DISCONNECTED'; // We start in disconnected state
 		this.api_promise = Promise.resolve(); // No previous query was run at this time
@@ -51,11 +51,24 @@ class evQueueWS
 			// Event on disconnection
 			self.ws.onclose = function(event) {
 				if(self.state=='DISCONNECTING')
+				{
 					self.state = 'DISCONNECTED'; // Disconnection was requested, this is OK
+					console.log("Disconnected from node "+self.node);
+				}
 				else
+				{
+					if(self.state=='CONNECTING')
+						reject('Connection failed'); // Connecting failed,
+					
 					self.state = 'ERROR'; // Unexpected disconnection, set state to error
+					
+					// Try reconnecting if we are on event mode
+					if(self.callback!==undefined)
+						setTimeout(() => { self.api_promise = self.Connect(); }, 1000);
+				}
 				
-				console.log("Disconnected from node "+self.node);
+				if(self.stateChange!==undefined)
+					self.stateChange(self.node, self.state);
 			}
 			
 			self.ws.onmessage = function (event) {
@@ -78,6 +91,10 @@ class evQueueWS
 				else if(self.state == 'AUTHENTICATED')
 				{
 					self.state = 'READY';
+					
+					if(self.stateChange!==undefined)
+						self.stateChange(self.node, self.state);
+					
 					resolve(); // We are now connected
 				}
 				else if(self.state=='READY')
