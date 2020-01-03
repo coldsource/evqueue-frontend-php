@@ -67,6 +67,7 @@ class evQueueWS
 						setTimeout(() => { self.api_promise = self.Connect(); }, 1000);
 				}
 				
+				// Notify of state change
 				if(self.stateChange!==undefined)
 					self.stateChange(self.node, self.state);
 			}
@@ -92,6 +93,7 @@ class evQueueWS
 				{
 					self.state = 'READY';
 					
+					// Notify of state change
 					if(self.stateChange!==undefined)
 						self.stateChange(self.node, self.state);
 					
@@ -129,6 +131,7 @@ class evQueueWS
 		return this.state;
 	}
 	
+	// Build API XML from object
 	build_api_xml(api)
 	{
 		var xmldoc = new Document();
@@ -151,14 +154,17 @@ class evQueueWS
 		return new XMLSerializer().serializeToString(xmldoc);
 	}
 	
+	// Execute API command on evqueue
 	API(api)
 	{
 		var self = this;
 		
+		// Handle late connection
 		var evq_ready;
 		if(this.state=='DISCONNECTED' || this.state=='ERROR')
 			self.api_promise = this.Connect();
 		
+		// This is used to serialize API commands
 		var old_api_promise = self.api_promise;
 		self.api_promise = new Promise(function(resolve, reject) {
 			old_api_promise.then( () => {
