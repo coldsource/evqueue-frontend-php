@@ -26,7 +26,6 @@ class InstanceFilters extends evQueueComponent {
 		this.state.filters = {
 			filter_node: '',
 			filter_name: '',
-			filter_tagged: '',
 			dt_inf: '',
 			hr_inf: '',
 			filter_launched_from: '',
@@ -38,43 +37,29 @@ class InstanceFilters extends evQueueComponent {
 			filter_ended_from: ''
 		}
 		
-		this.state.tags = [];
 		this.state.opened = false;
 		this.state.parameters = [];
+		
+		this.hours = [];
+		for(var i=0;i<24;i++)
+		{
+			var h = (''+i).padStart(2,'0');
+			this.hours.push(h+':00');
+			this.hours.push(h+':30');
+		}
+		
+		this.state.nodes = [{name: 'All', value: '' }];
+		var nodes = this.GetNodes();
+		for(var i=0;i<nodes.length;i++)
+			this.state.nodes.push({name: nodes[i], value: nodes[i]});
 		
 		this.toggleFilters = this.toggleFilters.bind(this);
 		this.filterChange = this.filterChange.bind(this);
 		this.cleanFilters = this.cleanFilters.bind(this);
 	}
 	
-	componentDidMount() {
-		this.API({
-			group: 'tags',
-			action: 'list'
-		}).then( (data) => {
-			var tags = this.xpath('/response/tag',data.documentElement);
-			this.setState({tags: tags});
-		});
-	}
-	
 	toggleFilters() {
 		this.setState({opened:!this.state.opened});
-	}
-	
-	renderNodes() {
-		return this.GetNodes().map( (node) => {
-			return (
-				<option key={node} name={node}>{node}</option>
-			);
-		});
-	}
-	
-	renderTags() {
-		return this.state.tags.map( (id) => {
-			return (
-				<option key={tag.id} value={tag.labal}>{tag.label}</option>
-			);
-		});
 	}
 	
 	implodeDate(date,hour)
@@ -183,39 +168,39 @@ class InstanceFilters extends evQueueComponent {
 		
 		return (
 			<div className="formdiv instance_filters">
-				<form id="searchform">
+				<form>
 					<div>
 						<label>Node</label>
-						<select name="filter_node" value={this.state.filters.filter_node} onChange={this.filterChange}>
-							<option value="">All</option>
-							{this.renderNodes()}
-						</select>
+						<Select filter={false} name="filter_node" value={this.state.filters.filter_node} values={this.state.nodes} onChange={this.filterChange}>
+						</Select>
 					</div>
 					<div>
 						<label>Workflow</label>
 						<WorkflowSelector valueType="name" name="filter_workflow" value={this.state.filters.filter_workflow} onChange={this.filterChange}/>
 					</div>
-					<div id="searchtag">
+					<div>
 						<label>Tag</label>
-						<select name="tagged">
-							{this.renderTags()}
-						</select>
+						<TagSelector name="filter_tagged" value={this.state.filters.filter_tagged} onChange={this.filterChange}/>
+					</div>
+					<div>
+						<label>Test</label>
+						<input type="text" name="aze" />
 					</div>
 					<div>
 						<label>Launched between</label>
 						Date&#160;:&#160;<DatePicker name="dt_inf" value={this.state.filters.dt_inf} onChange={this.filterChange} />
 						&#160;
-						Hour&#160;:&#160;<input name="hr_inf" className="hour evq-autocomplete" data-type="time" onChange={this.filterChange} />
+						Hour&#160;:&#160;<Autocomplete className="hour" name="hr_inf" value={this.state.filters.hr_inf} autocomplete={this.hours} onChange={this.filterChange} />
 						&#160;&#160;<b>and</b>&#160;&#160;
 						Date&#160;:&#160;<DatePicker name="dt_sup" value={this.state.filters.dt_sup} onChange={this.filterChange} />
 						&#160;
-						Hour&#160;:&#160;<input name="hr_sup" className="hour evq-autocomplete" data-type="time" onChange={this.filterChange} />
+						Hour&#160;:&#160;<Autocomplete className="hour" name="hr_sup" value={this.state.filters.hr_inf} autocomplete={this.hours} onChange={this.filterChange} />
 					</div>
 					<div>
 						<label>Workflows that were running at</label>
 						Date&#160;:&#160;<DatePicker name="dt_at" value={this.state.filters.dt_at} onChange={this.filterChange} />
 						&#160;
-						Hour&#160;:&#160;<input name="hr_at" className="hour evq-autocomplete" data-type="time" onChange={this.filterChange} />
+						Hour&#160;:&#160;<Autocomplete className="hour" name="hr_at" value={this.state.filters.hr_inf} autocomplete={this.hours} onChange={this.filterChange} />
 					</div>
 				</form>
 			</div>
@@ -228,7 +213,7 @@ class InstanceFilters extends evQueueComponent {
 				<a className="action" onClick={this.toggleFilters}>Filters</a> : <span>{this.renderExplain()}</span>
 				{
 					this.hasFilter()?
-					(<span id="clearfilters" className="faicon fa-remove" title="Clear filters" onClick={this.cleanFilters}></span>):
+					(<span className="faicon fa-remove" title="Clear filters" onClick={this.cleanFilters}></span>):
 					''
 				}
 				{this.renderFilters()}
@@ -238,4 +223,4 @@ class InstanceFilters extends evQueueComponent {
 }
 
 if(document.querySelector('#searchformcontainer'))
-	var terminated_instances = ReactDOM.render(<InstanceFilters onChange={terminated_instances.updateFilters}/>, document.querySelector('#searchformcontainer'));
+	ReactDOM.render(<InstanceFilters onChange={terminated_instances.updateFilters}/>, document.querySelector('#searchformcontainer'));

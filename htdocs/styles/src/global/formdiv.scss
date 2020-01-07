@@ -1,0 +1,27 @@
+div.formdiv {
+	form {
+		display: block;
+		
+		&>div {
+			margin-top: 10px;
+			margin-bottom: 10px;
+			
+			&>label {
+				min-width: 15em;
+				display: inline-block;
+				text-align: right;
+				margin-right: 1em;
+				vertical-align: middle;
+			}
+			
+			&>input[type='text'] {
+				width: 21rem;
+				box-sizing: border-box;
+			}
+			
+			&>.evq-select {
+				width: 21rem;
+			}
+		}
+	}
+}

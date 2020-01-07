@@ -1,0 +1,40 @@
+div.evq-autocomplete {
+	display: inline-block;
+	
+	input {
+		box-sizing: border-box;
+		width: 100%;
+	}
+	
+	div.evq-autocomplete-dropdown {
+		box-sizing: border-box;
+		position: absolute;
+		z-index: 100;
+		background-color: #ffffff;
+		border-style: solid;
+		border-color: grey;
+		border-width: 0px 1px 1px 1px;
+		border-radius: 0rem 0rem 0.2rem 0.2rem;
+		max-height: 12rem;
+		overflow: auto;
+		
+		ul {
+			padding-left: 0rem;
+			padding-top: 0.1rem;
+			margin-top: 0px;
+			margin-bottom: 0px;
+		}
+		
+		li {
+			padding: 0.4rem 0rem 0.4rem 0rem;
+			cursor: pointer;
+			height: auto;
+			list-style: none;
+			
+			&:hover {
+				background-color: #5897fb;
+				color: #ffffff;
+			}
+		}
+	}
+}

@@ -212,62 +212,6 @@ div#footer {
   margin-top: 10px;
   margin-bottom: 10px; }
 
-/* Global styles for forms */
-div.formdiv form {
-	display:block;
-}
-
-div.formdiv label {
-	min-width: 15em;
-	display: inline-block;
-	text-align: right;
-	margin-right:1em;
-	vertical-align:middle;
-}
-
-div.formdiv input[type=text]:not(.select2-search__field):not(.spinner):not(.datepicker):not(.timepicker) {
-	min-width:22em;
-}
-
-div.formdiv textarea {
-	min-width:23em;
-	min-height:7em;
-	resize:none;
-}
-
-div.formdiv input.spinner {
-	width:40px;
-}
-
-
-div.formdiv input[type='submit'] {
-	min-width:10em;
-	display:block;
-	margin-left:20em;
-	margin-top:1em;
-}
-
-div.formdiv input[type='checkbox'] {
-	min-width:0em;
-	margin:0px;
-}
-
-div.formdiv input[type='radio'] {
-	min-width:0em;
-	margin:0px;
-	display:inline-block;
-}
-
-
-div.formdiv select {
-	width:25em;
-}
-
-div.formdiv form > div {
-	margin-top: 10px;
-	margin-bottom:10px;
-}
-
 div#wfs-editor fieldset {
 	border-radius:5px;
 }
@@ -276,46 +220,7 @@ div#wfs-editor fieldset {
 	float:right;
 }
 
-/* Global styles for tables */
-table {
-	border-collapse: collapse;
-	border-spacing: 0;
-	width: 100%;
-}
 
-table th, td {
-	border: 1px solid #DEE0E3;
-	line-height: 20px;
-	padding: 2px 3px;
-}
-
-th.thActions {
-	width:80px;
-}
-
-table.highlight_row tr:hover {
-	border-left: 3px solid #647FE0;
-	border-right: 3px solid #647FE0;
-}
-
-tr.group {
-	background: #CCC;
-}
-
-tr.group td {
-	font-size: 15px;
-	font-weight: bold;
-	padding: 7px;
-}
-
-tr.groupspace td {
-	height: 2em;
-	border: none;
-}
-
-td.tdActions {
-	text-align:center;
-}
 
 
 /* Linked objects to display next to a 'parent' object, e.g. workflows using a given retry schedule */
@@ -434,18 +339,6 @@ div#login div.form {
 
 /* jQuery */
 .ui-autocomplete { height: 200px; overflow-y: scroll; overflow-x: hidden;}
-
-/* Search form */
-#searchformcontainer {
-	border:1px solid;
-	border-radius:5px;
-	padding:5px;
-	border-color:grey;
-}
-
-#searchformcontainer a {
-	color:#4996ce;
-}
 
 /* Install page */
   div.install_content {

@@ -1,5 +1,14 @@
-div.instance_filters {
+#searchformcontainer {
+	border: 1px solid;
+	border-radius: 5px;
+	padding: 5px;
+	border-color: grey;
+	
 	.date, .hour {
 		width: 6em;
 	}
+}
+
+#searchformcontainer a {
+	color: #4996ce;
 }

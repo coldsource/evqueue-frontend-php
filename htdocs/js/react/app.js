@@ -1302,6 +1302,134 @@ class Alert extends React.Component {
 
 'use strict';
 
+class Autocomplete extends React.Component {
+	constructor(props) {
+		super(props);
+
+		this.state = {
+			dropdown_opened: false,
+			filter: ''
+		};
+
+		this.ref = React.createRef();
+
+		this.toggleDropdown = this.toggleDropdown.bind(this);
+		this._mouseDown = this._mouseDown.bind(this);
+		this.applyFilter = this.applyFilter.bind(this);
+		this.changeValue = this.changeValue.bind(this);
+	}
+
+	componentDidMount() {
+		document.addEventListener('mousedown', this._mouseDown);
+
+		this.global_width = window.getComputedStyle(this.ref.current).getPropertyValue('width');
+	}
+
+	componentWillUnmount() {
+		document.removeEventListener('mousedown', this._mouseDown);
+	}
+
+	_mouseDown(event) {
+		if (this.ref.current && !this.ref.current.contains(event.target)) this.setState({ dropdown_opened: false });
+	}
+
+	toggleDropdown() {
+		this.setState({ dropdown_opened: !this.state.dropdown_opened });
+	}
+
+	applyFilter() {
+		var filter = this.props.value.toLowerCase();
+
+		if (filter == '') return this.props.autocomplete;
+
+		var autocomplete = [];
+		for (var i = 0; i < this.props.autocomplete.length; i++) {
+			if (this.props.autocomplete[i].toLowerCase().includes(filter)) autocomplete.push(this.props.autocomplete[i]);
+		}
+
+		return autocomplete;
+	}
+
+	changeValue(value) {
+		var event = {
+			target: {
+				name: this.props.name,
+				value: value
+			}
+		};
+
+		if (this.props.onChange) this.props.onChange(event);
+	}
+
+	renderDropdown() {
+		if (!this.state.dropdown_opened) return;
+
+		return React.createElement(
+			'div',
+			{ className: 'evq-autocomplete-dropdown', style: { width: this.global_width } },
+			React.createElement(
+				'ul',
+				null,
+				this.renderAutocomplete()
+			)
+		);
+	}
+
+	renderAutocomplete() {
+		var autocomplete = this.applyFilter();
+
+		if (autocomplete.length == 0) return React.createElement(
+			'li',
+			null,
+			'No results found'
+		);
+
+		return autocomplete.map(value => {
+			return React.createElement(
+				'li',
+				{ key: value, onClick: () => {
+						this.setState({ dropdown_opened: false });this.changeValue(value);
+					} },
+				value
+			);
+		});
+	}
+
+	render() {
+		var className = 'evq-autocomplete';
+		if (this.props.className) className += ' ' + this.props.className;
+
+		return React.createElement(
+			'div',
+			{ ref: this.ref, className: className },
+			React.createElement('input', { type: 'text', value: this.props.value, onChange: event => {
+					this.changeValue(event.target.value);
+				}, onFocus: this.toggleDropdown }),
+			this.renderDropdown()
+		);
+	}
+}
+/*
+ * This file is part of evQueue
+ *
+ * evQueue is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * evQueue is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with evQueue. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * Author: Thibault Kummer
+ */
+
+'use strict';
+
 class Confirm extends React.Component {
 	constructor(props) {
 		super(props);
@@ -1645,6 +1773,7 @@ class Dialog extends React.Component {
 
 		// Global styles
 		this.height_delta = 0;
+		this.content_vert_padding = 0;
 		this.resize_border = 7;
 		this.auto_height = !props.height || props.height == 'auto' ? true : false;
 
@@ -1678,6 +1807,9 @@ class Dialog extends React.Component {
 			this.height_delta += parseInt(window.getComputedStyle(this.dlg_title.current).getPropertyValue('height'));
 		}
 
+		this.content_vert_padding += parseInt(window.getComputedStyle(this.dlg_content.current).getPropertyValue('padding-top'));
+		this.content_vert_padding += parseInt(window.getComputedStyle(this.dlg_content.current).getPropertyValue('padding-bottom'));
+
 		if (this.auto_height) this.componentDidUpdate();
 	}
 
@@ -1685,7 +1817,7 @@ class Dialog extends React.Component {
 		if (this.state.resizing || this.state.moving || !this.auto_height) return;
 
 		var old_height = this.state.height;
-		var new_height = this.node.querySelector(".evq-dlg-content").clientHeight + this.height_delta;
+		var new_height = this.node.querySelector(".evq-dlg-content").clientHeight + this.content_vert_padding + this.height_delta;
 		if (old_height != new_height) this.setState({ height: new_height });
 	}
 
@@ -2032,6 +2164,227 @@ class Pannel extends React.Component {
 				this.props.title
 			),
 			this.renderActions()
+		);
+	}
+}
+/*
+ * This file is part of evQueue
+ *
+ * evQueue is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * evQueue is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with evQueue. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * Author: Thibault Kummer
+ */
+
+'use strict';
+
+class Select extends React.Component {
+	constructor(props) {
+		super(props);
+
+		this.state = {
+			dropdown_opened: false,
+			filter: ''
+		};
+
+		this.ref = React.createRef();
+
+		this.toggleDropdown = this.toggleDropdown.bind(this);
+		this._mouseDown = this._mouseDown.bind(this);
+		this.applyFilter = this.applyFilter.bind(this);
+		this.changeFilter = this.changeFilter.bind(this);
+		this.changeValue = this.changeValue.bind(this);
+	}
+
+	componentDidMount() {
+		document.addEventListener('mousedown', this._mouseDown);
+
+		this.global_width = window.getComputedStyle(this.ref.current).getPropertyValue('width');
+	}
+
+	componentWillUnmount() {
+		document.removeEventListener('mousedown', this._mouseDown);
+	}
+
+	_mouseDown(event) {
+		if (this.ref.current && !this.ref.current.contains(event.target)) this.setState({ dropdown_opened: false });
+	}
+
+	toggleDropdown() {
+		this.setState({ dropdown_opened: !this.state.dropdown_opened });
+	}
+
+	changeFilter(event) {
+		this.setState({ filter: event.target.value });
+	}
+
+	applyFilter() {
+		var filter = this.state.filter.toLowerCase();
+
+		if (filter == '') return this.props.values;
+
+		var values = [];
+		for (var i = 0; i < this.props.values.length; i++) {
+			if (this.props.values[i].name.toLowerCase().includes(filter)) values.push(this.props.values[i]);
+		}
+
+		return values;
+	}
+
+	changeValue(value) {
+		var event = {
+			target: {
+				name: this.props.name,
+				value: value
+			}
+		};
+
+		this.setState({ dropdown_opened: false });
+		if (this.props.onChange) this.props.onChange(event);
+	}
+
+	getValueName(value) {
+		for (i = 0; i < this.props.values.length; i++) {
+			if (this.props.values[i].value == value) return this.props.values[i].name;
+		}
+
+		return undefined;
+	}
+
+	renderFilter() {
+		if (this.props.filter !== undefined && !this.props.filter) return;
+
+		return React.createElement('input', { autoFocus: true, type: 'text', value: this.state.filter, onChange: this.changeFilter });
+	}
+
+	renderDropdown() {
+		if (!this.state.dropdown_opened) return;
+
+		return React.createElement(
+			'div',
+			{ className: 'evq-select-dropdown', style: { width: this.global_width } },
+			this.renderFilter(),
+			React.createElement(
+				'div',
+				{ className: 'evq-select-list' },
+				this.renderValues()
+			)
+		);
+	}
+
+	renderValues() {
+		var values = this.applyFilter();
+
+		if (values.length == 0) return React.createElement(
+			'div',
+			null,
+			'No results found'
+		);
+
+		var groupped_values = {};
+		for (var i = 0; i < values.length; i++) {
+			var group = values[i].group ? values[i].group : 'No group';
+			if (groupped_values[group] === undefined) groupped_values[group] = [];
+
+			groupped_values[group].push(values[i]);
+		}
+
+		// No groups where set
+		if (groupped_values['No group'] && groupped_values['No group'].length == values.length) return React.createElement(
+			'ul',
+			null,
+			this.renderGroup(groupped_values['No group'])
+		);
+
+		var ret = [];
+
+		var groups = Object.keys(groupped_values);
+		groups.sort(function (a, b) {
+			return a.toLowerCase() <= b.toLowerCase() ? -1 : 1;
+		});
+		for (var i = 0; i < groups.length; i++) {
+			var group = groups[i];
+			ret.push(React.createElement(
+				'div',
+				{ className: 'evq-select-group', key: group },
+				React.createElement(
+					'h3',
+					{ key: 'group_' + group },
+					groups.length > 1 ? group : ''
+				),
+				React.createElement(
+					'ul',
+					null,
+					this.renderGroup(groupped_values[group])
+				)
+			));
+		}
+
+		return ret;
+	}
+
+	renderGroup(group) {
+		return group.map(value => {
+			return React.createElement(
+				'li',
+				{ key: value.value, onClick: () => {
+						this.changeValue(value.value);
+					} },
+				value.name
+			);
+		});
+	}
+
+	renderValue() {
+		if (this.props.value !== undefined && this.getValueName(this.props.value) !== undefined) return React.createElement(
+			'span',
+			null,
+			this.getValueName(this.props.value),
+			React.createElement('span', { className: 'down faicon fa-chevron-down' })
+		);
+
+		if (this.props.placeholder) return React.createElement(
+			'span',
+			{ className: 'evq-select-placeholder' },
+			this.props.placeholder,
+			React.createElement('span', { className: 'down faicon fa-chevron-down' })
+		);
+
+		return React.createElement(
+			'span',
+			null,
+			'\xA0',
+			React.createElement('span', { className: 'down faicon fa-chevron-down' })
+		);
+	}
+
+	render() {
+		var className = 'evq-select';
+		if (this.props.className) className += ' ' + this.props.className;
+
+		var value_style = {
+			borderRadius: this.state.dropdown_opened ? '0.4rem 0.4rem 0rem 0rem' : '0.4rem 0.4rem 0.4rem 0.4rem'
+		};
+
+		return React.createElement(
+			'div',
+			{ ref: this.ref, className: className },
+			React.createElement(
+				'div',
+				{ className: 'evq-select-value', style: value_style, onClick: this.toggleDropdown },
+				this.renderValue()
+			),
+			this.renderDropdown()
 		);
 	}
 }
@@ -2989,7 +3342,7 @@ class ListInstances extends evQueueComponent {
 			{ className: 'workflow-list' },
 			React.createElement(
 				'table',
-				null,
+				{ className: 'border' },
 				React.createElement(
 					'thead',
 					null,
@@ -3264,6 +3617,59 @@ class ListQueues extends evQueueComponent {
 }
 
 if (document.querySelector('#queues')) ReactDOM.render(React.createElement(ListQueues, null), document.querySelector('#queues'));
+/*
+ * This file is part of evQueue
+ *
+ * evQueue is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * evQueue is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with evQueue. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * Author: Thibault Kummer
+ */
+
+'use strict';
+
+class TagSelector extends evQueueComponent {
+	constructor(props) {
+		super(props);
+
+		this.state.values = [];
+
+		this.changeTag = this.changeTag.bind(this);
+	}
+
+	componentDidMount() {
+		var self = this;
+		this.API({
+			group: 'tags',
+			action: 'list'
+		}).then(data => {
+			var tags = this.xpath('/response/tag', data.documentElement);
+
+			var values = [];
+			for (var i = 0; i < tags.length; i++) values.push({ name: tag.label, value: tag.id });
+			this.setState({ values: values });
+		});
+	}
+
+	changeTag(event) {
+		this.setState({ value: event.target.value });
+		if (this.props.onChange) this.props.onChange(event);
+	}
+
+	render() {
+		return React.createElement(Select, { value: this.props.value, values: this.state.values, name: this.props.name, placeholder: 'Choose a tag', onChange: this.changeTag });
+	}
+}
 /*
  * This file is part of evQueue
  *
@@ -3976,7 +4382,7 @@ class WorkflowSelector extends evQueueComponent {
 	constructor(props) {
 		super(props);
 
-		this.state.workflows = [];
+		this.state.values = [];
 
 		this.changeWorkflow = this.changeWorkflow.bind(this);
 	}
@@ -3986,46 +4392,17 @@ class WorkflowSelector extends evQueueComponent {
 		this.API({ group: 'workflows', action: 'list' }).then(data => {
 			var workflows = this.xpath('/response/workflow', data.documentElement);
 
-			var groupped_workflows = {};
+			var values = [];
 			for (var i = 0; i < workflows.length; i++) {
-				var group = workflows[i].group ? workflows[i].group : 'No group';
-				if (groupped_workflows[group] === undefined) groupped_workflows[group] = [];
-				groupped_workflows[group].push(workflows[i]);
+				values.push({
+					group: workflows[i].group ? workflows[i].group : 'No group',
+					name: workflows[i].name,
+					value: this.props.valueType == 'id' ? workflows[i].id : workflows[i].name
+				});
 			}
 
-			for (var group in groupped_workflows) groupped_workflows[group].sort(function (a, b) {
-				return a.name.toLowerCase() <= b.name.toLowerCase() ? -1 : 1;
-			});
-
-			self.setState({ workflows: groupped_workflows });
+			this.setState({ values: values });
 		});
-	}
-
-	renderWorkflows() {
-		var ret_groups = [];
-		var groups = Object.keys(this.state.workflows);
-		groups.sort(function (a, b) {
-			return a.toLowerCase() <= b.toLowerCase() ? -1 : 1;
-		});
-		for (var i = 0; i < groups.length; i++) {
-			var group = groups[i];
-			var ret_wfs = [];
-			for (var j = 0; j < this.state.workflows[group].length; j++) {
-				var wf = this.state.workflows[group][j];
-				var value = this.props.valueType == 'id' ? wf.id : wf.name;
-				ret_wfs.push(React.createElement(
-					'option',
-					{ key: wf.name, value: value },
-					wf.name
-				));
-			}
-			ret_groups.push(React.createElement(
-				'optgroup',
-				{ key: group, label: group },
-				ret_wfs
-			));
-		}
-		return ret_groups;
 	}
 
 	changeWorkflow(event) {
@@ -4034,16 +4411,7 @@ class WorkflowSelector extends evQueueComponent {
 	}
 
 	render() {
-		return React.createElement(
-			'select',
-			{ value: this.props.value, name: this.props.name, onChange: this.changeWorkflow },
-			React.createElement(
-				'option',
-				{ value: this.props.valueType == 'id' ? 0 : '' },
-				'Choose a workflow'
-			),
-			this.renderWorkflows()
-		);
+		return React.createElement(Select, { value: this.props.value, values: this.state.values, name: this.props.name, placeholder: 'Choose a workflow', onChange: this.changeWorkflow });
 	}
 }
 /*
@@ -4388,7 +4756,6 @@ class InstanceFilters extends evQueueComponent {
 		this.state.filters = {
 			filter_node: '',
 			filter_name: '',
-			filter_tagged: '',
 			dt_inf: '',
 			hr_inf: '',
 			filter_launched_from: '',
@@ -4400,47 +4767,27 @@ class InstanceFilters extends evQueueComponent {
 			filter_ended_from: ''
 		};
 
-		this.state.tags = [];
 		this.state.opened = false;
 		this.state.parameters = [];
+
+		this.hours = [];
+		for (var i = 0; i < 24; i++) {
+			var h = ('' + i).padStart(2, '0');
+			this.hours.push(h + ':00');
+			this.hours.push(h + ':30');
+		}
+
+		this.state.nodes = [{ name: 'All', value: '' }];
+		var nodes = this.GetNodes();
+		for (var i = 0; i < nodes.length; i++) this.state.nodes.push({ name: nodes[i], value: nodes[i] });
 
 		this.toggleFilters = this.toggleFilters.bind(this);
 		this.filterChange = this.filterChange.bind(this);
 		this.cleanFilters = this.cleanFilters.bind(this);
 	}
 
-	componentDidMount() {
-		this.API({
-			group: 'tags',
-			action: 'list'
-		}).then(data => {
-			var tags = this.xpath('/response/tag', data.documentElement);
-			this.setState({ tags: tags });
-		});
-	}
-
 	toggleFilters() {
 		this.setState({ opened: !this.state.opened });
-	}
-
-	renderNodes() {
-		return this.GetNodes().map(node => {
-			return React.createElement(
-				'option',
-				{ key: node, name: node },
-				node
-			);
-		});
-	}
-
-	renderTags() {
-		return this.state.tags.map(id => {
-			return React.createElement(
-				'option',
-				{ key: tag.id, value: tag.labal },
-				tag.label
-			);
-		});
 	}
 
 	implodeDate(date, hour) {
@@ -4522,7 +4869,7 @@ class InstanceFilters extends evQueueComponent {
 			{ className: 'formdiv instance_filters' },
 			React.createElement(
 				'form',
-				{ id: 'searchform' },
+				null,
 				React.createElement(
 					'div',
 					null,
@@ -4531,16 +4878,7 @@ class InstanceFilters extends evQueueComponent {
 						null,
 						'Node'
 					),
-					React.createElement(
-						'select',
-						{ name: 'filter_node', value: this.state.filters.filter_node, onChange: this.filterChange },
-						React.createElement(
-							'option',
-							{ value: '' },
-							'All'
-						),
-						this.renderNodes()
-					)
+					React.createElement(Select, { filter: false, name: 'filter_node', value: this.state.filters.filter_node, values: this.state.nodes, onChange: this.filterChange })
 				),
 				React.createElement(
 					'div',
@@ -4554,17 +4892,23 @@ class InstanceFilters extends evQueueComponent {
 				),
 				React.createElement(
 					'div',
-					{ id: 'searchtag' },
+					null,
 					React.createElement(
 						'label',
 						null,
 						'Tag'
 					),
+					React.createElement(TagSelector, { name: 'filter_tagged', value: this.state.filters.filter_tagged, onChange: this.filterChange })
+				),
+				React.createElement(
+					'div',
+					null,
 					React.createElement(
-						'select',
-						{ name: 'tagged' },
-						this.renderTags()
-					)
+						'label',
+						null,
+						'Test'
+					),
+					React.createElement('input', { type: 'text', name: 'aze' })
 				),
 				React.createElement(
 					'div',
@@ -4577,7 +4921,7 @@ class InstanceFilters extends evQueueComponent {
 					'Date\xA0:\xA0',
 					React.createElement(DatePicker, { name: 'dt_inf', value: this.state.filters.dt_inf, onChange: this.filterChange }),
 					'\xA0 Hour\xA0:\xA0',
-					React.createElement('input', { name: 'hr_inf', className: 'hour evq-autocomplete', 'data-type': 'time', onChange: this.filterChange }),
+					React.createElement(Autocomplete, { className: 'hour', name: 'hr_inf', value: this.state.filters.hr_inf, autocomplete: this.hours, onChange: this.filterChange }),
 					'\xA0\xA0',
 					React.createElement(
 						'b',
@@ -4587,7 +4931,7 @@ class InstanceFilters extends evQueueComponent {
 					'\xA0\xA0 Date\xA0:\xA0',
 					React.createElement(DatePicker, { name: 'dt_sup', value: this.state.filters.dt_sup, onChange: this.filterChange }),
 					'\xA0 Hour\xA0:\xA0',
-					React.createElement('input', { name: 'hr_sup', className: 'hour evq-autocomplete', 'data-type': 'time', onChange: this.filterChange })
+					React.createElement(Autocomplete, { className: 'hour', name: 'hr_sup', value: this.state.filters.hr_inf, autocomplete: this.hours, onChange: this.filterChange })
 				),
 				React.createElement(
 					'div',
@@ -4600,7 +4944,7 @@ class InstanceFilters extends evQueueComponent {
 					'Date\xA0:\xA0',
 					React.createElement(DatePicker, { name: 'dt_at', value: this.state.filters.dt_at, onChange: this.filterChange }),
 					'\xA0 Hour\xA0:\xA0',
-					React.createElement('input', { name: 'hr_at', className: 'hour evq-autocomplete', 'data-type': 'time', onChange: this.filterChange })
+					React.createElement(Autocomplete, { className: 'hour', name: 'hr_at', value: this.state.filters.hr_inf, autocomplete: this.hours, onChange: this.filterChange })
 				)
 			)
 		);
@@ -4621,10 +4965,10 @@ class InstanceFilters extends evQueueComponent {
 				null,
 				this.renderExplain()
 			),
-			this.hasFilter() ? React.createElement('span', { id: 'clearfilters', className: 'faicon fa-remove', title: 'Clear filters', onClick: this.cleanFilters }) : '',
+			this.hasFilter() ? React.createElement('span', { className: 'faicon fa-remove', title: 'Clear filters', onClick: this.cleanFilters }) : '',
 			this.renderFilters()
 		);
 	}
 }
 
-if (document.querySelector('#searchformcontainer')) var terminated_instances = ReactDOM.render(React.createElement(InstanceFilters, { onChange: terminated_instances.updateFilters }), document.querySelector('#searchformcontainer'));
+if (document.querySelector('#searchformcontainer')) ReactDOM.render(React.createElement(InstanceFilters, { onChange: terminated_instances.updateFilters }), document.querySelector('#searchformcontainer'));

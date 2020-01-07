@@ -1,3 +1,7 @@
+@import 'src/global/tabbed.scss';
+@import 'src/global/formdiv.scss';
+@import 'src/global/table.scss';
+
 @import 'src/ui/dialog.scss';
 @import 'src/ui/confirm.scss';
 @import 'src/ui/alert.scss';
@@ -5,7 +9,7 @@
 @import 'src/ui/pannel.scss';
 @import 'src/ui/xml.scss';
 @import 'src/ui/datepicker.scss';
+@import 'src/ui/select.scss';
+@import 'src/ui/autocomplete.scss';
 
-@import 'src/components/tabbed.scss';
-@import 'src/components/formdiv.scss';
 @import 'src/components/instancefilters.scss';

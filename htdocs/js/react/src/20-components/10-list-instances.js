@@ -134,7 +134,7 @@ class ListInstances extends evQueueComponent {
 		
 		return (
 			<div className="workflow-list">
-				<table>
+				<table className="border">
 					<thead>
 						<tr>
 							<th style={{width:'80px'}} className="center">State</th>

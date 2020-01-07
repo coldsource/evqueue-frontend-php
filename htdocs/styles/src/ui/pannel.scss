@@ -9,11 +9,13 @@ div.evq-pannel {
 	padding: 2px 0 2px 0;
 	text-align: center;
 	font-weight: bold;
+	vertical-align: middle;
+	padding: 0.3rem;
+	box-sizing: border-box;
 	
 	.action {
 		cursor: pointer;
 		float: right;
-		margin-top: 4px;
 		margin-right: 7px;
 		font-weight: normal;
 	}

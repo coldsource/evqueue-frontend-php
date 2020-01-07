@@ -1,0 +1,78 @@
+div.evq-select {
+	display: inline-block;
+	
+	div.evq-select-value {
+		box-sizing: border-box;
+		border: 1px solid grey;
+		border-radius: 0.4rem 0.4rem 0rem 0rem;
+		padding: 0.4rem;
+		cursor: pointer;
+		
+		span.evq-select-placeholder {
+			color: grey;
+		}
+		
+		span.down {
+			float: right;
+			font-size: 0.6rem;
+			position: relative;
+			top: 3px;
+		}
+	}
+	
+	div.evq-select-dropdown {
+		box-sizing: border-box;
+		position: absolute;
+		z-index: 100;
+		background-color: #ffffff;
+		border-style: solid;
+		border-color: grey;
+		border-width: 0px 1px 1px 1px;
+		border-radius: 0rem 0rem 0.2rem 0.2rem;
+		
+		input {
+			box-sizing: border-box;
+			margin: 0.4rem;
+			width: calc(100% - 0.4rem * 2);
+		}
+	}
+	
+	div.evq-select-list {
+		overflow: auto;
+		padding: 0rem 0.4rem 0.4rem 0.4rem;
+		max-height: 12rem;
+		margin-top: 0.4rem;
+		
+		div.evq-select-group {
+			margin-left: 0.4rem;
+			
+			ul {
+				padding-left: 0.8rem;
+				margin-bottom: 0px;
+			}
+		}
+		
+		h3 {
+			margin: 0rem;
+		}
+		
+		ul {
+			padding-left: 0rem;
+			padding-top: 0.1rem;
+			margin-top: 0px;
+			margin-bottom: 0px;
+		}
+		
+		li {
+			padding: 0.4rem 0rem 0.4rem 0rem;
+			cursor: pointer;
+			height: auto;
+			list-style: none;
+			
+			&:hover {
+				background-color: #5897fb;
+				color: #ffffff;
+			}
+		}
+	}
+}

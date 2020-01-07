@@ -19,35 +19,31 @@
 
 'use strict';
 
-class WorkflowSelector extends evQueueComponent {
+class TagSelector extends evQueueComponent {
 	constructor(props) {
 		super(props);
 		
 		this.state.values = [];
 		
-		this.changeWorkflow = this.changeWorkflow.bind(this);
+		this.changeTag = this.changeTag.bind(this);
 	}
 	
 	componentDidMount() {
 		var self = this;
-		this.API({group:'workflows',action:'list'}).then( (data) => {
-			var workflows = this.xpath('/response/workflow',data.documentElement);
+		this.API({
+			group: 'tags',
+			action: 'list'
+		}).then( (data) => {
+			var tags = this.xpath('/response/tag',data.documentElement);
 			
 			var values = [];
-			for(var i=0;i<workflows.length;i++)
-			{
-				values.push({
-					group: workflows[i].group?workflows[i].group:'No group',
-					name: workflows[i].name,
-					value: this.props.valueType=='id'?workflows[i].id:workflows[i].name
-				});
-			}
-			
+			for(var i=0;i<tags.length;i++)
+				values.push({name: tag.label, value: tag.id});
 			this.setState({values: values});
 		});
 	}
 	
-	changeWorkflow(event) {
+	changeTag(event) {
 		this.setState({value:event.target.value});
 		if(this.props.onChange)
 			this.props.onChange(event);
@@ -55,7 +51,7 @@ class WorkflowSelector extends evQueueComponent {
 	
 	render() {
 		return (
-			<Select value={this.props.value} values={this.state.values} name={this.props.name} placeholder="Choose a workflow" onChange={this.changeWorkflow}>
+			<Select value={this.props.value} values={this.state.values} name={this.props.name} placeholder="Choose a tag" onChange={this.changeTag}>
 			</Select>
 		);
 	}
