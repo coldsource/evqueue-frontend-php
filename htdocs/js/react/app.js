@@ -4931,7 +4931,7 @@ class InstanceFilters extends evQueueComponent {
 					'\xA0\xA0 Date\xA0:\xA0',
 					React.createElement(DatePicker, { name: 'dt_sup', value: this.state.filters.dt_sup, onChange: this.filterChange }),
 					'\xA0 Hour\xA0:\xA0',
-					React.createElement(Autocomplete, { className: 'hour', name: 'hr_sup', value: this.state.filters.hr_inf, autocomplete: this.hours, onChange: this.filterChange })
+					React.createElement(Autocomplete, { className: 'hour', name: 'hr_sup', value: this.state.filters.hr_sup, autocomplete: this.hours, onChange: this.filterChange })
 				),
 				React.createElement(
 					'div',
@@ -4944,7 +4944,7 @@ class InstanceFilters extends evQueueComponent {
 					'Date\xA0:\xA0',
 					React.createElement(DatePicker, { name: 'dt_at', value: this.state.filters.dt_at, onChange: this.filterChange }),
 					'\xA0 Hour\xA0:\xA0',
-					React.createElement(Autocomplete, { className: 'hour', name: 'hr_at', value: this.state.filters.hr_inf, autocomplete: this.hours, onChange: this.filterChange })
+					React.createElement(Autocomplete, { className: 'hour', name: 'hr_at', value: this.state.filters.hr_at, autocomplete: this.hours, onChange: this.filterChange })
 				)
 			)
 		);

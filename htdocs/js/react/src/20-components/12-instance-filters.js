@@ -194,13 +194,13 @@ class InstanceFilters extends evQueueComponent {
 						&#160;&#160;<b>and</b>&#160;&#160;
 						Date&#160;:&#160;<DatePicker name="dt_sup" value={this.state.filters.dt_sup} onChange={this.filterChange} />
 						&#160;
-						Hour&#160;:&#160;<Autocomplete className="hour" name="hr_sup" value={this.state.filters.hr_inf} autocomplete={this.hours} onChange={this.filterChange} />
+						Hour&#160;:&#160;<Autocomplete className="hour" name="hr_sup" value={this.state.filters.hr_sup} autocomplete={this.hours} onChange={this.filterChange} />
 					</div>
 					<div>
 						<label>Workflows that were running at</label>
 						Date&#160;:&#160;<DatePicker name="dt_at" value={this.state.filters.dt_at} onChange={this.filterChange} />
 						&#160;
-						Hour&#160;:&#160;<Autocomplete className="hour" name="hr_at" value={this.state.filters.hr_inf} autocomplete={this.hours} onChange={this.filterChange} />
+						Hour&#160;:&#160;<Autocomplete className="hour" name="hr_at" value={this.state.filters.hr_at} autocomplete={this.hours} onChange={this.filterChange} />
 					</div>
 				</form>
 			</div>
