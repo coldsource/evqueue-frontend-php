@@ -1,22 +1,32 @@
 div.evq-pannel {
-	position: relative;
-	background-color: #DEE0E3;
-	border-top-left-radius: 10px;
-	border-top-right-radius: 10px;
-	color: #505050;
-	width: 100%;
-	display: inline-block;
-	padding: 2px 0 2px 0;
-	text-align: center;
-	font-weight: bold;
-	vertical-align: middle;
-	padding: 0.3rem;
-	box-sizing: border-box;
+	div.evq-pannel-content {
+		border-style: solid;
+		border-width: 0px 1px 1px 1px;
+		border-color: #DEE0E3;
+		border-radius: 0px 0px 5px 5px;
+		overflow: auto;
+	}
 	
-	.action {
-		cursor: pointer;
-		float: right;
-		margin-right: 7px;
-		font-weight: normal;
+	div.evq-pannel-title {
+		position: relative;
+		background-color: #DEE0E3;
+		border-top-left-radius: 10px;
+		border-top-right-radius: 10px;
+		color: #505050;
+		width: 100%;
+		display: inline-block;
+		padding: 2px 0 2px 0;
+		text-align: center;
+		font-weight: bold;
+		vertical-align: middle;
+		padding: 0.3rem;
+		box-sizing: border-box;
+		
+		.action {
+			cursor: pointer;
+			float: right;
+			margin-right: 7px;
+			font-weight: normal;
+		}
 	}
 }

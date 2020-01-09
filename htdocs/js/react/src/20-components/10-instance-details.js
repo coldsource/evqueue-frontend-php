@@ -66,8 +66,8 @@ class InstanceDetails extends evQueueComponent {
 		Dialogs.open(WorkflowLauncher,{
 			node:this.props.node,
 			name: name,
-			user: user,
-			host: host,
+			user: user?user:'',
+			host: host?host:'',
 			parameters: parameters_obj
 		});
 	}

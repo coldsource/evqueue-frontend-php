@@ -7,8 +7,8 @@ $QUEUEING = [
 ];
 
 $QUEUEING_WS = [
-	'tcp://srvdev:5001',
-	'tcp://srvdev:5003',
+	'tcp://srvdev.yellow.local:5001',
+	'tcp://srvdev.yellow.local:5003',
 ];
 
 ?>

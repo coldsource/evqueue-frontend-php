@@ -2,24 +2,27 @@ table {
 	border-collapse: collapse;
 	border-spacing: 0;
 	width: 100%;
+	
+	th.thActions {
+		width:80px;
+	}
+	
+	table.highlight_row tr:hover {
+		border-left: 3px solid #647FE0;
+		border-right: 3px solid #647FE0;
+	}
+	
+	th, td {
+		line-height: 20px;
+		padding: 2px 3px;
+	}
 }
 
 table.border {
 	th, td {
 		border: 1px solid #DEE0E3;
-		line-height: 20px;
-		padding: 2px 3px;
 	}
-
-	th.thActions {
-		width:80px;
-	}
-
-	table.highlight_row tr:hover {
-		border-left: 3px solid #647FE0;
-		border-right: 3px solid #647FE0;
-	}
-
+	
 	tr.group {
 		background: #CCC;
 	}

@@ -40,9 +40,14 @@ class Pannel extends React.Component {
 	render() {
 		return (
 			<div className="evq-pannel">
-				{this.props.left?this.props.left:''}
-				<span className="evq-pannel-title">{this.props.title}</span>
-				{this.renderActions()}
+				<div className="evq-pannel-title">
+					{this.props.left?this.props.left:''}
+					<span className="evq-pannel-title">{this.props.title}</span>
+					{this.renderActions()}
+				</div>
+				<div className="evq-pannel-content">
+					{this.props.children}
+				</div>
 			</div>
 		);
 	}

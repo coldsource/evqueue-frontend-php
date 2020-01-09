@@ -27,41 +27,41 @@ class ListQueues extends evQueueComponent {
 		this.state.queues = [];
 		this.state.idx = 0;
 		
-		this.changeNode = this.changeNode.bind(this);
-		this.node = 0;
-	}
-	
-	subscribe() {
-		var api = { group:'statistics',action:'query',attributes:{type:'queue'} };
-		this.evqueue.Subscribe('QUEUE_ENQUEUE',api);
-		this.evqueue.Subscribe('QUEUE_DEQUEUE',api);
-		this.evqueue.Subscribe('QUEUE_EXECUTE',api);
-		this.evqueue.Subscribe('QUEUE_TERMINATE',api,true);
+		this.renderTabs = this.renderTabs.bind(this);
 	}
 	
 	componentDidMount() {
-		var self = this;
-		super.componentDidMount().then( () => {
-			self.subscribe();
-			self.setState({nodes:self.GetNodes()});
-		});
-	}
-	
-	changeNode(event) {
-		var self = this;
-		self.setState({idx:event.target.dataset.idx});
-		this.evqueue.ChangeNode(event.target.dataset.idx).then( () => {
-			self.subscribe();
-		});
+		var api = { node:'*', group:'statistics',action:'query',attributes:{type:'queue'} };
+		this.Subscribe('QUEUE_ENQUEUE',api);
+		this.Subscribe('QUEUE_DEQUEUE',api);
+		this.Subscribe('QUEUE_EXECUTE',api);
+		this.Subscribe('QUEUE_TERMINATE',api,true);
+		
+		this.setState({nodes:this.GetNodes()});
 	}
 	
 	evQueueEvent(response) {
 		var data = this.parseResponse(response,'/response/statistics/*');
-		this.setState({queues: data.response});
+		
+		var queues = this.state.queues;
+		var node_idx = this.GetNodeByName(data.node);
+		queues[node_idx] = data.response;
+		
+		this.setState({queues: queues});
 	}
 	
-	renderQueuesList() {
-		return this.state.queues.map((queue) => {
+	renderNodesList() {
+		var ret = [];
+		for(var i=0;i<this.state.nodes.length;i++)
+		{
+			var node = this.state.nodes[i];
+			ret.push(<Tab key={node} title={node} />);
+		}
+		return ret;
+	}
+	
+	renderQueuesList(idx) {
+		return this.state.queues[idx].map((queue) => {
 			var running_prct = queue.running_tasks / queue.concurrency * 100;
 			var queue_prct = queue.size>20?100:queue.size/20*100;
 			return (
@@ -90,17 +90,7 @@ class ListQueues extends evQueueComponent {
 		});
 	}
 	
-	renderNodesList() {
-		var ret = [];
-		for(var i=0;i<this.state.nodes.length;i++)
-		{
-			var node = this.state.nodes[i];
-			ret.push(<li key={node} data-idx={i} className={this.state.idx==i?'selected':''} onClick={this.changeNode}>{node}</li>);
-		}
-		return ret;
-	}
-	
-	renderQueues() {
+	renderQueues(idx) {
 		return (
 			<div className="workflow-list">
 				<table>
@@ -113,21 +103,31 @@ class ListQueues extends evQueueComponent {
 							<th>Queued tasks</th>
 						</tr>
 					</thead>
-					<tbody>{ this.renderQueuesList() }</tbody>
+					<tbody>{ this.renderQueuesList(idx) }</tbody>
 				</table>
 			</div>
 		);
 	}
+	
+	renderTabs(idx) {
+		if(this.state.queues.length==0)
+			return;
+		
+		return this.renderQueues(idx);
+	}
 
 	render() {
+		var actions = [
+			{icon:'fa-refresh '+(this.state.refresh?' fa-spin':''), callback:this.toggleAutorefresh}
+		];
+		
 		return (
-			<div>
-				<div className="boxTitle">
-					<span className="title">aQueues States</span>
-					<span className={"faicon fa-refresh action"+(this.state.refresh?' fa-spin':'')} onClick={this.toggleAutorefresh}></span>
-				</div>
-				<ul className="reacttabs">{ this.renderNodesList() }</ul>
-				{ this.renderQueues() }
+			<div id="listqueues">
+				<Pannel left="" title="Queues States" actions={actions}>
+					<Tabs render={this.renderTabs}>
+						{ this.renderNodesList() }
+					</Tabs>
+				</Pannel>
 			</div>
 		);
 	}
