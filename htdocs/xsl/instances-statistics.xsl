@@ -25,7 +25,7 @@
 				<xsl:text> - </xsl:text>
 				<input type="radio" name="groupby" value="day" checked="checked" />&#160;Daily
 				<xsl:text> - </xsl:text>
-				<input type="radio" name="groupby" value="month" />&#160;Daily
+				<input type="radio" name="groupby" value="month" />&#160;Monthly
 				<xsl:text> - </xsl:text>
 				<input type="radio" name="groupby" value="year" />&#160;Yearly
 				<xsl:text> - </xsl:text>
