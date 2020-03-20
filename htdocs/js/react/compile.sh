@@ -1,3 +1,3 @@
 #!/bin/bash
 
-babeljs --watch src/*/*.js --out-file app.js --presets react
+babeljs --watch src --out-dir dist --presets react

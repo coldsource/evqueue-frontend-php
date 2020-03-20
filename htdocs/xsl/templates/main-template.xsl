@@ -20,8 +20,6 @@
 				<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 
 				<!-- Load base CSS -->
-				<link rel="stylesheet" type="text/css" href="{$SITE_BASE}styles/jquery/jquery-ui.min.css"/>
-				<link rel="stylesheet" type="text/css" href="{$SITE_BASE}styles/jquery/select2.min.css"/>
 				<link rel="stylesheet" type="text/css" href="{$SITE_BASE}styles/font-awesome.css"/>
 				<link rel="stylesheet" type="text/css" href="{$SITE_BASE}styles/style.css"/>
 				<link rel="stylesheet" type="text/css" href="{$SITE_BASE}styles/ui.scss"/>
@@ -38,11 +36,6 @@
 					var connected_user = '<xsl:value-of select="$LOGIN" />';
 				</script>
 
-				<!-- Load base javascript -->
-				<script type="text/javascript" src="{$SITE_BASE}js/jquery/jquery-1.12.4.min.js" />
-				<script type="text/javascript" src="{$SITE_BASE}js/jquery/jquery-ui.min.js" />
-				<script type="text/javascript" src="{$SITE_BASE}js/jquery/select2.full.min.js" />
-				
 				<title><xsl:value-of select="$title" /></title>
 			</head>
 			<body data-user="{$USER}" data-password="{$PASSWORD}" data-nodes="{$NODES}" data-nodesnames="{$NODES_NAMES}">
@@ -67,12 +60,7 @@
 				
 				<script src="https://unpkg.com/react@16/umd/react.development.js" crossorigin="crossorigin"></script>
 				<script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js" crossorigin="crossorigin"></script>
-				<script src="js/react/app.js"></script>
 				
-				<script type="text/javascript" src="{$SITE_BASE}js/forms.js" />
-				<script type="text/javascript" src="{$SITE_BASE}js/global.js" />
-				<script type="text/javascript" src="{$SITE_BASE}js/preferences.js" />
-
 				<!-- Load additional javascript -->
 				<xsl:if test="$javascript != '' and exsl:node-set($javascript)/src">
 					<xsl:for-each select="exsl:node-set($javascript)/src">

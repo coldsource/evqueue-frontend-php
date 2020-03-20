@@ -11,10 +11,6 @@
 	</xsl:variable>
 
 	<xsl:variable name="javascript">
-		<src>js/instance.js</src>
-		<src>js/tags.js</src>
-		<src>js/custom-filters.js</src>
-		<src>js/index.js</src>
 	</xsl:variable>
 
 	<xsl:template name="content">
@@ -54,6 +50,6 @@
 		
 		<div id="terminated-workflows"></div>
 		
-		<script type="module" src="/js/react/dist/home.js"></script>
+		<script type="module" src="/js/react/dist/pages/home.js"></script>
 	</xsl:template>
 </xsl:stylesheet>
