@@ -53,5 +53,7 @@
 		<br />
 		
 		<div id="terminated-workflows"></div>
+		
+		<script type="module" src="/js/react/dist/home.js"></script>
 	</xsl:template>
 </xsl:stylesheet>

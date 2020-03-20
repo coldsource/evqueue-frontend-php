@@ -183,10 +183,6 @@ class InstanceFilters extends evQueueComponent {
 						<TagSelector name="filter_tagged" value={this.state.filters.filter_tagged} onChange={this.filterChange}/>
 					</div>
 					<div>
-						<label>Test</label>
-						<input type="text" name="aze" />
-					</div>
-					<div>
 						<label>Launched between</label>
 						Date&#160;:&#160;<DatePicker name="dt_inf" value={this.state.filters.dt_inf} onChange={this.filterChange} />
 						&#160;

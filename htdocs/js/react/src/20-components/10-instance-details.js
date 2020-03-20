@@ -24,6 +24,7 @@ class InstanceDetails extends evQueueComponent {
 		super(props);
 		
 		this.details_dlg = [];
+		this.state.tag_label = '';
 		
 		this.dlg = React.createRef();
 		
@@ -32,24 +33,54 @@ class InstanceDetails extends evQueueComponent {
 		this.relaunch = this.relaunch.bind(this);
 		this.debug = this.debug.bind(this);
 		this.kill = this.kill.bind(this);
+		this.tag = this.tag.bind(this);
+		this.untag = this.untag.bind(this);
+		this.changeTag = this.changeTag.bind(this);
+		
+		this.evQueueEventWorkflow = this.evQueueEventWorkflow.bind(this);
+		this.evQueueEventWorkflowTags = this.evQueueEventWorkflowTags.bind(this);
+		this.evQueueEventTags = this.evQueueEventTags.bind(this);
 	}
 	
 	componentDidMount() {
 		var api = { node:this.props.node, group:'instance',action:'query',attributes:{id:this.props.id} };
-		this.Subscribe('TASK_QUEUE',api,false,this.props.id);
-		this.Subscribe('TASK_EXECUTE',api,false,this.props.id);
-		this.Subscribe('TASK_TERMINATE',api,true,this.props.id);
+		this.Subscribe('TASK_QUEUE',api,false,this.props.id,this.evQueueEventWorkflow);
+		this.Subscribe('TASK_EXECUTE',api,false,this.props.id,this.evQueueEventWorkflow);
+		this.Subscribe('TASK_TERMINATE',api,true,this.props.id,this.evQueueEventWorkflow);
+		
+		var api = { node:this.props.node, group:'instances',action:'list',attributes:{filter_id:this.props.id} };
+		this.Subscribe('INSTANCE_TAGGED',api,false,this.props.id,this.evQueueEventWorkflowTags);
+		this.Subscribe('INSTANCE_UNTAGGED',api,true,this.props.id,this.evQueueEventWorkflowTags);
+		
+		var api = { node:this.props.node, group:'tags',action:'list',attributes:{} };
+		this.Subscribe('TAG_CREATED',api,false,this.props.id,this.evQueueEventTags);
+		this.Subscribe('TAG_MODIFIED',api,false,this.props.id,this.evQueueEventTags);
+		this.Subscribe('TAG_REMOVED',api,true,this.props.id,this.evQueueEventTags);
 	}
 	
 	componentWillUnmount() {
 		this.Unsubscribe('TASK_QUEUE',this.props.id);
 		this.Unsubscribe('TASK_EXECUTE',this.props.id);
 		this.Unsubscribe('TASK_TERMINATE',this.props.id);
+		this.Unsubscribe('INSTANCE_TAGGED',this.props.id);
+		this.Unsubscribe('INSTANCE_UNTAGGED',this.props.id);
 	}
 	
-	evQueueEvent(data) {
+	evQueueEventWorkflow(data) {
 		this.setState({workflow: data});
 		this.notifyTasksDetail();
+	}
+	
+	evQueueEventWorkflowTags(data) {
+		this.setState({workflowtags: this.xpath('/response/workflow/tags/tag',data.documentElement)});
+	}
+	
+	evQueueEventTags(data) {
+		var ret_tags = this.xpath('/response/tag',data.documentElement);
+		var tags = [];
+		for(var i=0;i<ret_tags.length;i++)
+			tags.push(ret_tags[i].label);
+		this.setState({tags: tags});
 	}
 	
 	relaunch() {
@@ -95,6 +126,29 @@ class InstanceDetails extends evQueueComponent {
 		);
 	}
 	
+	changeTag(event) {
+		this.setState({tag_label:event.target.value});
+	}
+	
+	tag(tag_id) {
+		this.simpleAPI({
+			group: 'instance',
+			action: 'tag',
+			attributes: {id:this.props.id, tag_id:tag_id},
+			node: this.props.node
+		},'Tagged instance '+this.props.id);
+	}
+	
+	untag(tag_id) {
+		console.log("untag");
+		this.simpleAPI({
+			group: 'instance',
+			action: 'untag',
+			attributes: {id:this.props.id, tag_id:tag_id},
+			node: this.props.node
+		},'Untagged instance '+this.props.id);
+	}
+	
 	title() {
 		return (
 			<span>Instance {this.props.id} <span className="faicon fa-rocket" title="Relaunch this instance" onClick={this.relaunch}></span></span>
@@ -109,6 +163,8 @@ class InstanceDetails extends evQueueComponent {
 		else if(idx==2)
 			return this.tabParameters();
 		else if(idx==3)
+			return this.tabTags();
+		else if(idx==4)
 			return this.tabDebug();
 	}
 	
@@ -238,6 +294,22 @@ class InstanceDetails extends evQueueComponent {
 		);
 	}
 	
+	tabTags() {
+		return (
+			<div id="workflowtags">
+				Tag instance : <Autocomplete name="tag" value={this.state.tag_label} autocomplete={this.state.tags} onChange={this.changeTag} />
+				<br /><br />
+				<ul>{this.renderTags()}</ul>
+			</div>
+		);
+	}
+	
+	renderTags() {
+		return this.state.workflowtags.map( (tag) => {
+			return (<li key={tag.id}>{tag.label}<span className="faicon fa-remove" onClick={() => { this.untag(tag.id); }}></span></li>);
+		});
+	}
+	
 	tabDebug() {
 		return (
 			<div>
@@ -271,6 +343,7 @@ class InstanceDetails extends evQueueComponent {
 						<Tab title="Tree" />
 						<Tab title="XML" />
 						<Tab title="Parameters" />
+						<Tab title="Tags" />
 						<Tab title="Debug" />
 					</Tabs>
 				</Dialog>

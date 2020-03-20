@@ -161,10 +161,10 @@ class evQueueComponent extends React.Component {
 		});
 	}
 	
-	Subscribe(event,api,send_now,instance_id = 0)
+	Subscribe(event,api,send_now,instance_id = 0, handler = undefined)
 	{
 		var external_id = ++evQueueComponent.global.external_id;
-		evQueueComponent.global.handlers[external_id] = this.evQueueEvent;
+		evQueueComponent.global.handlers[external_id] = handler!==undefined?handler:this.evQueueEvent;
 		evQueueComponent.global.subscriptions.push({
 			event:event,
 			api: api,
