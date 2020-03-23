@@ -20,11 +20,9 @@
 'use strict';
 
 import {HeaderMenu} from '../components/menus/header.js';
-import {ExecutingInstances} from '../components/panels/instances/executing.js';
-import {InstanceFilters} from '../components/panels/instances/filters.js';
-import {TerminatedInstances} from '../components/panels/instances/terminated.js';
+import {ListQueues} from '../components/panels/queues/list.js';
 
-export class PageHome extends React.Component {
+export class PageSystemState extends React.Component {
 	constructor(props) {
 		super(props);
 		
@@ -35,11 +33,7 @@ export class PageHome extends React.Component {
 		return (
 			<div>
 				<HeaderMenu />
-				<ExecutingInstances />
-				<br />
-				<InstanceFilters onChange={this.terminated_instances}/>
-				<br />
-				<TerminatedInstances ref={this.terminated_instances} />
+				<ListQueues />
 			</div>
 		);
 	}

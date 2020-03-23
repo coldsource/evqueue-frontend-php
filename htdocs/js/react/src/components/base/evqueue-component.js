@@ -19,6 +19,7 @@
 
 'use strict';
 
+import {App} from './app.js';
 import {evQueueCluster} from '../../evqueue/evqueue-cluster.js';
 import {Dialogs} from '../../ui/dialogs.js';
 import {Confirm} from '../../ui/confirm.js';
@@ -28,7 +29,7 @@ export class evQueueComponent extends React.Component {
 	constructor(props) {
 		super(props);
 		
-		this.nodes = document.querySelector("body").dataset.nodes.split(',');
+		this.nodes = App.global.cluster_config;
 		this.last_state = [];
 		for(var i=0;i<this.nodes.length;i++)
 		{
@@ -36,14 +37,13 @@ export class evQueueComponent extends React.Component {
 			this.last_state[i] = 'DISCONNECTED';
 		}
 		
-		this.nodes_names = document.querySelector("body").dataset.nodesnames.split(',');
+		this.nodes_names = window.localStorage.nodes_names.split(',');
 		
 		this.state = {
 			refresh: true,
 		};
 		
 		// Global evqueue connections
-		this.eventDispatcher= this.eventDispatcher.bind(this);
 		this.stateChanged = this.stateChanged.bind(this);
 		if(evQueueComponent.global===undefined)
 		{

@@ -19,7 +19,7 @@
 
 'use strict';
 
-export class Pannel extends React.Component {
+export class Panel extends React.Component {
 	constructor(props) {
 		super(props);
 	}

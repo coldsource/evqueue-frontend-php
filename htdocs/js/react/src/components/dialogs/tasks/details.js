@@ -19,9 +19,9 @@
 
 'use strict';
 
-import {Dialog} from '../../ui/dialog.js';
-import {Tabs} from '../../ui/tabs.js';
-import {Tab} from '../../ui/tab.js';
+import {Dialog} from '../../../ui/dialog.js';
+import {Tabs} from '../../../ui/tabs.js';
+import {Tab} from '../../../ui/tab.js';
 
 export class TaskDetails extends React.Component {
 	constructor(props) {

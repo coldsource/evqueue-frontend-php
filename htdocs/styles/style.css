@@ -128,67 +128,7 @@ span#message span+span:before {
 	content:", ";
 }
 
-ul.topmenu {
-	position:fixed;
-	top:0px;
-	left:0px;
-	width:100%;
-	margin: 0;
-	padding: 5px 0px 5px 0px;
-	background-color: #E0E0E0;
-	height: 20px;
-	margin-bottom:50px;
-	padding-left:150px;
-	z-index:99;
-}
 
-ul.topmenu li {
-	display: inline;
-	padding: 7px;
-	cursor: pointer;
-}
-
-div.topmenu img{
-	width:140px;
-	position:fixed;
-	left:10px;
-	top:3px;
-	z-index:100;
-}
-
-ul.topmenu li.logo a {
-	color: #000000;
-}
-
-ul.topmenu li.selected {
-	background-color: #EEEEEE;
-}
-
-ul.topmenu li:hover {
-	background-color: #4993ce;
-}
-
-ul.submenu {
-	position:fixed;
-	top:30px;
-	left:0px;
-	width:100%;
-	margin: 0px 0px 0px 0px;
-	padding: 3px 0px 3px 160px;
-	background-color: #EEEEEE;
-	height: 20px;
-	z-index:99;
-}
-
-ul.submenu li {
-	display: inline;
-	padding: 10px;
-}
-
-ul.submenu li a {
-	text-decoration: none;
-	color: #4993CE;
-}
 
 div#userInfo {
 	position: fixed;
@@ -196,14 +136,6 @@ div#userInfo {
 	top: 0px;
 	padding: 5px;
 	z-index:100;
-}
-
-div.content {
-	margin-top:80px;
-	padding: 5px;
-	max-width:1280px;
-	margin-left:auto;
-	margin-right:auto;
 }
 
 /* Footer */
@@ -288,33 +220,6 @@ div.boxTitle .filter {
 
 div.boxTitle div.pages {
 	display:inline-block;
-}
-
-/* Login page */
-div#login {
-	text-align:center;
-	margin:auto;
-	margin-bottom:300px;
-}
-
-div#login fieldset {
-	border-radius: 20px;
-	display: inline-block;
-	padding: 20px;
-}
-
-div#login div.logo {
-	display:inline-block;
-	vertical-align:top;
-}
-
-div#login div.logo img {
-	width:200px;
-}
-
-div#login div.form {
-	display:inline-block;
-	margin-left:20px;
 }
 
 /* Git */

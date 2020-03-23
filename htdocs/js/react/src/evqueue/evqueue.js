@@ -52,7 +52,7 @@ export class evQueueWS
 			
 			// Event on disconnection
 			self.ws.onclose = function(event) {
-				if(self.state=='DISCONNECTING' || event.wasClean)
+				if(self.state!='AUTHENTICATING' && (self.state=='DISCONNECTING' || event.wasClean))
 				{
 					// Disconnection was requested by JS or close was requested by browser (ie page closed), this is OK
 					self.state = 'DISCONNECTED';
@@ -62,6 +62,9 @@ export class evQueueWS
 				{
 					if(self.state=='CONNECTING')
 						reject('Connection failed'); // Connecting failed,
+					
+					if(self.state=='AUTHENTICATING')
+						reject('Authentication error');
 					
 					self.state = 'ERROR'; // Unexpected disconnection, set state to error
 					
@@ -85,14 +88,14 @@ export class evQueueWS
 					var challenge = xmldoc.documentElement.getAttribute("challenge");
 				
 					// Compute challenge response and send to complete authentication
-					var user = document.querySelector("body").dataset.user;
-					var passwd_hash = CryptoJS.enc.Hex.parse(document.querySelector("body").dataset.password);
+					var user = window.localStorage.user;
+					var passwd_hash = CryptoJS.enc.Hex.parse(window.localStorage.password);
 					var response = CryptoJS.HmacSHA1(CryptoJS.enc.Hex.parse(challenge), passwd_hash).toString(CryptoJS.enc.Hex);
 					
 					self.ws.send("<auth response='"+response+"' user='"+user+"' />");
-					self.state = 'AUTHENTICATED';
+					self.state = 'AUTHENTICATING';
 				}
-				else if(self.state == 'AUTHENTICATED')
+				else if(self.state == 'AUTHENTICATING')
 				{
 					self.state = 'READY';
 					
@@ -177,7 +180,7 @@ export class evQueueWS
 					resolve(); // We are waiting no result to complete this action
 				else
 					self.promise = {resolve:resolve,reject:reject}; // Promise will be resolved once response is received
-			});
+			}, (reason) =>  reject(reason) );
 		});
 		
 		return self.api_promise;

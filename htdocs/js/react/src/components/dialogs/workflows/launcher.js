@@ -19,12 +19,12 @@
 
 'use strict';
 
-import {evQueueComponent} from './evqueue-component.js';
-import {WorkflowSelector} from './workflow-selector.js';
-import {Dialog} from '../../ui/dialog.js';
-import {Tabs} from '../../ui/tabs.js';
-import {Tab} from '../../ui/tab.js';
-import {Help} from '../../ui/help.js';
+import {evQueueComponent} from '../../base/evqueue-component.js';
+import {WorkflowSelector} from '../../base/workflow-selector.js';
+import {Dialog} from '../../../ui/dialog.js';
+import {Tabs} from '../../../ui/tabs.js';
+import {Tab} from '../../../ui/tab.js';
+import {Help} from '../../../ui/help.js';
 
 export class WorkflowLauncher extends evQueueComponent {
 	constructor(props) {

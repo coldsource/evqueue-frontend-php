@@ -19,11 +19,11 @@
 
 'use strict';
 
-import {ListInstances} from './list-instances.js';
-import {WorkflowLauncher} from '../base/workflow-launcher.js';
-import {Pannel} from '../../ui/pannel.js';
-import {Dialogs} from '../../ui/dialogs.js';
-import {Dialog} from '../../ui/dialog.js';
+import {ListInstances} from './list.js';
+import {WorkflowLauncher} from '../../dialogs/workflows/launcher.js';
+import {Panel} from '../../../ui/panel.js';
+import {Dialogs} from '../../../ui/dialogs.js';
+import {Dialog} from '../../../ui/dialog.js';
 
 export class ExecutingInstances extends ListInstances {
 	constructor(props) {
@@ -48,7 +48,6 @@ export class ExecutingInstances extends ListInstances {
 	}
 	
 	componentWillUnmount() {
-		super.componentWillUnmount();
 		clearInterval(this.timerID);
 	}
 	
@@ -158,7 +157,7 @@ export class ExecutingInstances extends ListInstances {
 		];
 		
 		return (
-			<Pannel left={this.renderNodeStatus()} title={'Executing workflows ('+ n +')'} actions={actions} />
+			<Panel left={this.renderNodeStatus()} title={'Executing workflows ('+ n +')'} actions={actions} />
 		);
 	}
 	

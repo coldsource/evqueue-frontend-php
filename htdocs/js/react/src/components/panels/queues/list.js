@@ -19,7 +19,12 @@
 
 'use strict';
 
-class ListQueues extends evQueueComponent {
+import {evQueueComponent} from '../../base/evqueue-component.js';
+import {Panel} from '../../../ui/panel.js';
+import {Tabs} from '../../../ui/tabs.js';
+import {Tab} from '../../../ui/tab.js';
+
+export class ListQueues extends evQueueComponent {
 	constructor(props) {
 		super(props);
 		
@@ -123,11 +128,11 @@ class ListQueues extends evQueueComponent {
 		
 		return (
 			<div id="listqueues">
-				<Pannel left="" title="Queues States" actions={actions}>
+				<Panel left="" title="Queues States" actions={actions}>
 					<Tabs render={this.renderTabs}>
 						{ this.renderNodesList() }
 					</Tabs>
-				</Pannel>
+				</Panel>
 			</div>
 		);
 	}

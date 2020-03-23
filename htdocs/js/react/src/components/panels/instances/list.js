@@ -19,9 +19,9 @@
 
 'use strict';
 
-import {evQueueComponent} from '../base/evqueue-component.js';
-import {InstanceDetails} from './instance-details.js';
-import {Dialogs} from '../../ui/dialogs.js';
+import {evQueueComponent} from '../../base/evqueue-component.js';
+import {InstanceDetails} from '../../dialogs/instances/details.js';
+import {Dialogs} from '../../../ui/dialogs.js';
 
 export class ListInstances extends evQueueComponent {
 	constructor(props,node) {

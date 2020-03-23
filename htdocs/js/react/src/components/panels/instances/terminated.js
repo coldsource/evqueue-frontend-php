@@ -19,8 +19,8 @@
 
 'use strict';
 
-import {ListInstances} from '../../components/pannels/list-instances.js';
-import {Pannel} from '../../ui/pannel.js';
+import {ListInstances} from './list.js';
+import {Panel} from '../../../ui/panel.js';
 
 export class TerminatedInstances extends ListInstances {
 	constructor(props) {
@@ -94,7 +94,7 @@ export class TerminatedInstances extends ListInstances {
 		];
 		
 		return (
-			<Pannel left="" title={title} actions={actions} />
+			<Panel left="" title={title} actions={actions} />
 		);
 	}
 	

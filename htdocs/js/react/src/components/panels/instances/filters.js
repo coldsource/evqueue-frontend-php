@@ -19,12 +19,12 @@
 
 'use strict';
 
-import {evQueueComponent} from '../base/evqueue-component.js';
-import {WorkflowSelector} from '../base/workflow-selector.js';
-import {TagSelector} from '../base/tag-selector.js';
-import {Select} from '../../ui/select.js';
-import {DatePicker} from '../../ui/datepicker.js';
-import {Autocomplete} from '../../ui/autocomplete.js';
+import {evQueueComponent} from '../../base/evqueue-component.js';
+import {WorkflowSelector} from '../../base/workflow-selector.js';
+import {TagSelector} from '../../base/tag-selector.js';
+import {Select} from '../../../ui/select.js';
+import {DatePicker} from '../../../ui/datepicker.js';
+import {Autocomplete} from '../../../ui/autocomplete.js';
 
 export class InstanceFilters extends evQueueComponent {
 	constructor(props) {
@@ -97,8 +97,8 @@ export class InstanceFilters extends evQueueComponent {
 			this.setFilter('filter_ended_from',this.implodeDate(this.state.filters.dt_at,this.state.filters.hr_at));
 		}
 		
-		if(this.props.onChange)
-			this.props.onChange(this.state.filters);
+		if(this.props.onChange.current)
+			this.props.onChange.current.updateFilters(this.state.filters);
 	}
 	
 	setFilter(name,value) {
@@ -114,8 +114,8 @@ export class InstanceFilters extends evQueueComponent {
 		
 		this.setState({filters:filters, opened:false});
 		
-		if(this.props.onChange)
-			this.props.onChange(filters);
+		if(this.props.onChange.current)
+			this.props.onChange.current.updateFilters(filters);
 	}
 	
 	hasFilter() {
@@ -212,7 +212,7 @@ export class InstanceFilters extends evQueueComponent {
 	
 	render() {
 		return (
-			<div>
+			<div id="searchformcontainer">
 				<a className="action" onClick={this.toggleFilters}>Filters</a> : <span>{this.renderExplain()}</span>
 				{
 					this.hasFilter()?

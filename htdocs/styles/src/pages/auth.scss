@@ -1,0 +1,25 @@
+div#login {
+	text-align: center;
+	margin: auto;
+	margin-bottom: 300px;
+	
+	fieldset {
+		border-radius: 20px;
+		display: inline-block;
+		padding: 20px;
+		
+		div.logo {
+			display: inline-block;
+			vertical-align: top;
+			
+			img {
+				width: 200px;
+			}
+		}
+		
+		div.form {
+			display: inline-block;
+			margin-left: 20px;
+		}
+	}
+}

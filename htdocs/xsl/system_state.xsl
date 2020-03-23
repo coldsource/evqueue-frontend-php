@@ -9,6 +9,8 @@
 	
 	<xsl:template name="content">
 		<div id="queues"></div>
+		
+		<script type="module" src="/js/react/dist/pages/system-state.js"></script>
 	</xsl:template>
 
 </xsl:stylesheet>

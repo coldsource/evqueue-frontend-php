@@ -1,0 +1,58 @@
+div.evq-headermenu {
+	img{
+		width: 140px;
+		position: fixed;
+		left: 10px;
+		top: 3px;
+		z-index:100;
+	}
+	
+	ul.level1 {
+		position: fixed;
+		top: 0px;
+		left: 0px;
+		width: 100%;
+		margin: 0px;
+		padding: 5px 0px 5px 160px;
+		background-color: #E0E0E0;
+		height: 20px;
+		margin-bottom: 50px;
+		z-index: 99;
+		
+		li {
+			display: inline;
+			padding: 10px;
+			cursor: pointer;
+			
+			&.selected {
+				background-color: #EEEEEE;
+			}
+			
+			&:hover {
+				background-color: #4993ce;
+			}
+		}
+	}
+
+	ul.level2 {
+		position: fixed;
+		top: 30px;
+		left: 0px;
+		width: 100%;
+		margin: 0px;
+		padding: 3px 0px 3px 160px;
+		background-color: #EEEEEE;
+		height: 20px;
+		z-index: 99;
+		
+		li {
+			display: inline;
+			padding: 10px;
+			
+			a {
+				text-decoration: none;
+				color: #4993CE;
+			}
+		}
+	}
+}

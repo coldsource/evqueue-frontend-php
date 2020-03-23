@@ -93,13 +93,17 @@ export class evQueueCluster
 		{
 			return new Promise(function(resolve, reject) {
 				var resolved = 0;
+				var data = [];
 				for(var i=0;i<self.nodes.length;i++)
 				{
-					self.nodes[i].API(api).then( () => {
+					self.nodes[i].API(api).then( (xml) => {
 						resolved++;
+						data.push(xml);
 						if(resolved==self.nodes.length)
-							resolve();
-					});
+							resolve(data);
+					},
+						(reason) => reject(reason)
+					);
 				}
 			});
 		}

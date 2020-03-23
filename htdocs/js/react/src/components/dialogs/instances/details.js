@@ -19,14 +19,15 @@
 
 'use strict';
 
-import {evQueueComponent} from '../base/evqueue-component.js';
-import {TaskDetails} from './task-details.js';
-import {Dialogs} from '../../ui/dialogs.js';
-import {Dialog} from '../../ui/dialog.js';
-import {Tabs} from '../../ui/tabs.js';
-import {Tab} from '../../ui/tab.js';
-import {XML} from '../../ui/xml.js';
-import {Autocomplete} from '../../ui/autocomplete.js';
+import {evQueueComponent} from '../../base/evqueue-component.js';
+import {WorkflowLauncher} from '../workflows/launcher.js';
+import {TaskDetails} from '../tasks/details.js';
+import {Dialogs} from '../../../ui/dialogs.js';
+import {Dialog} from '../../../ui/dialog.js';
+import {Tabs} from '../../../ui/tabs.js';
+import {Tab} from '../../../ui/tab.js';
+import {XML} from '../../../ui/xml.js';
+import {Autocomplete} from '../../../ui/autocomplete.js';
 
 export class InstanceDetails extends evQueueComponent {
 	constructor(props) {

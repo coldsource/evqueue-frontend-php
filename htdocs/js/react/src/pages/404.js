@@ -20,26 +20,17 @@
 'use strict';
 
 import {HeaderMenu} from '../components/menus/header.js';
-import {ExecutingInstances} from '../components/panels/instances/executing.js';
-import {InstanceFilters} from '../components/panels/instances/filters.js';
-import {TerminatedInstances} from '../components/panels/instances/terminated.js';
 
-export class PageHome extends React.Component {
+export class Page404 extends React.Component {
 	constructor(props) {
 		super(props);
-		
-		this.terminated_instances = React.createRef();
 	}
 	
 	render() {
 		return (
 			<div>
 				<HeaderMenu />
-				<ExecutingInstances />
-				<br />
-				<InstanceFilters onChange={this.terminated_instances}/>
-				<br />
-				<TerminatedInstances ref={this.terminated_instances} />
+				<h1>Oops page was not found</h1>
 			</div>
 		);
 	}

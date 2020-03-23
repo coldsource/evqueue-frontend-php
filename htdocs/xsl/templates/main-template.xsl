@@ -31,28 +31,18 @@
 					</xsl:for-each>
 				</xsl:if>
 
-				<script type="text/javascript">
-					var site_base = '<xsl:value-of select="$SITE_BASE" />';
-					var connected_user = '<xsl:value-of select="$LOGIN" />';
-				</script>
-
 				<title><xsl:value-of select="$title" /></title>
 			</head>
-			<body data-user="{$USER}" data-password="{$PASSWORD}" data-nodes="{$NODES}" data-nodesnames="{$NODES_NAMES}">
-				<xsl:if test="$FULLSCREEN = 'no'">
-					<xsl:if test="$topmenu != ''">
-						<xsl:call-template name="topmenu" />
-						<xsl:call-template name="user-preferences-editor" />
-					</xsl:if>
-
-					<div class="content">
-						<xsl:call-template name="content" />
-					</div>
-				</xsl:if>
-
-				<xsl:if test="$FULLSCREEN = 'yes'">
-					<xsl:call-template name="content" />
-				</xsl:if>
+			<body>
+				<div style="text-align: center; margin: 5rem;" id="pre-content">
+					Loading interface...
+					<br /><br />
+					<img src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+PHN2ZyB4bWxuczpzdmc9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB2ZXJzaW9uPSIxLjAiIHdpZHRoPSI2NHB4IiBoZWlnaHQ9IjY0cHgiIHZpZXdCb3g9IjAgMCAxMjggMTI4IiB4bWw6c3BhY2U9InByZXNlcnZlIj48cmVjdCB4PSIwIiB5PSIwIiB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjRkZGRkZGIiAvPjxnPjxjaXJjbGUgY3g9IjE2IiBjeT0iNjQiIHI9IjE2IiBmaWxsPSIjNDk5M2NlIiBmaWxsLW9wYWNpdHk9IjEiLz48Y2lyY2xlIGN4PSIxNiIgY3k9IjY0IiByPSIxNC4zNDQiIGZpbGw9IiM0OTkzY2UiIGZpbGwtb3BhY2l0eT0iMSIgdHJhbnNmb3JtPSJyb3RhdGUoNDUgNjQgNjQpIi8+PGNpcmNsZSBjeD0iMTYiIGN5PSI2NCIgcj0iMTIuNTMxIiBmaWxsPSIjNDk5M2NlIiBmaWxsLW9wYWNpdHk9IjEiIHRyYW5zZm9ybT0icm90YXRlKDkwIDY0IDY0KSIvPjxjaXJjbGUgY3g9IjE2IiBjeT0iNjQiIHI9IjEwLjc1IiBmaWxsPSIjNDk5M2NlIiBmaWxsLW9wYWNpdHk9IjEiIHRyYW5zZm9ybT0icm90YXRlKDEzNSA2NCA2NCkiLz48Y2lyY2xlIGN4PSIxNiIgY3k9IjY0IiByPSIxMC4wNjMiIGZpbGw9IiM0OTkzY2UiIGZpbGwtb3BhY2l0eT0iMSIgdHJhbnNmb3JtPSJyb3RhdGUoMTgwIDY0IDY0KSIvPjxjaXJjbGUgY3g9IjE2IiBjeT0iNjQiIHI9IjguMDYzIiBmaWxsPSIjNDk5M2NlIiBmaWxsLW9wYWNpdHk9IjEiIHRyYW5zZm9ybT0icm90YXRlKDIyNSA2NCA2NCkiLz48Y2lyY2xlIGN4PSIxNiIgY3k9IjY0IiByPSI2LjQzOCIgZmlsbD0iIzQ5OTNjZSIgZmlsbC1vcGFjaXR5PSIxIiB0cmFuc2Zvcm09InJvdGF0ZSgyNzAgNjQgNjQpIi8+PGNpcmNsZSBjeD0iMTYiIGN5PSI2NCIgcj0iNS4zNzUiIGZpbGw9IiM0OTkzY2UiIGZpbGwtb3BhY2l0eT0iMSIgdHJhbnNmb3JtPSJyb3RhdGUoMzE1IDY0IDY0KSIvPjxhbmltYXRlVHJhbnNmb3JtIGF0dHJpYnV0ZU5hbWU9InRyYW5zZm9ybSIgdHlwZT0icm90YXRlIiB2YWx1ZXM9IjAgNjQgNjQ7MzE1IDY0IDY0OzI3MCA2NCA2NDsyMjUgNjQgNjQ7MTgwIDY0IDY0OzEzNSA2NCA2NDs5MCA2NCA2NDs0NSA2NCA2NCIgY2FsY01vZGU9ImRpc2NyZXRlIiBkdXI9IjcyMG1zIiByZXBlYXRDb3VudD0iaW5kZWZpbml0ZSI+PC9hbmltYXRlVHJhbnNmb3JtPjwvZz48L3N2Zz4=" />
+				</div>
+				
+				<div id="content">
+					<script type="module" src="/js/react/dist/components/base/app.js"></script>
+				</div>
 				
 				<div id="footer">
 					Licensed under GPLv3 (<a target="_blank" href="http://www.evqueue.net">evqueue.net</a>)
@@ -60,13 +50,6 @@
 				
 				<script src="https://unpkg.com/react@16/umd/react.development.js" crossorigin="crossorigin"></script>
 				<script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js" crossorigin="crossorigin"></script>
-				
-				<!-- Load additional javascript -->
-				<xsl:if test="$javascript != '' and exsl:node-set($javascript)/src">
-					<xsl:for-each select="exsl:node-set($javascript)/src">
-						<script type="text/javascript" src="{$SITE_BASE}{.}"><xsl:text><![CDATA[]]></xsl:text></script>
-					</xsl:for-each>
-				</xsl:if>
 			</body>
 		</html>
 	</xsl:template>
@@ -106,86 +89,6 @@
 		</xsl:if>
 	</xsl:template>
 
-	<xsl:template name="topmenu">
-		<div class="topmenu"><a href="{$SITE_BASE}index.php"><img src="{$SITE_BASE}images/evQueue-small.svg" title="evQueue" /></a></div>
-		<ul class="topmenu">
-			<li class="logo"></li>
-			<li id="system-state">
-				<xsl:if test="$topmenu='system-state'"><xsl:attribute name="class">selected</xsl:attribute></xsl:if>
-				<span class="faicon fa-desktop"></span>
-				System state
-			</li>
-			<li id="settings">
-				<xsl:if test="$topmenu='settings'"><xsl:attribute name="class">selected</xsl:attribute></xsl:if>
-				<span class="faicon fa-cogs"></span>
-				Settings
-			</li>
-			<li id="notifications">
-				<xsl:if test="$topmenu='notifications'"><xsl:attribute name="class">selected</xsl:attribute></xsl:if>
-				<span class="faicon fa-rss"></span>
-				Notifications
-			</li>
-			<li id="statistics">
-				<xsl:if test="$topmenu='statistics'"><xsl:attribute name="class">selected</xsl:attribute></xsl:if>
-				<span class="faicon fa-area-chart"></span>
-				Statistics
-			</li>
-			<li id="logging">
-				<xsl:if test="$topmenu='logging'"><xsl:attribute name="class">selected</xsl:attribute></xsl:if>
-				<span class="faicon fa-file-text-o"></span>
-				Logging
-			</li>
-			<span id="message"></span>
-		</ul>
-		<ul class="submenu" id="submenu-system-state">
-			<xsl:if test="$topmenu!='system-state'"><xsl:attribute name="style">display:none;</xsl:attribute></xsl:if>
-			<li><a href="{$SITE_BASE}index.php"><span class="faicon fa-cubes"></span>&#160;Workflows instances</a></li>
-			<li><a href="{$SITE_BASE}system_state.php"><span class="faicon fa-hand-stop-o"></span>&#160;Queues</a></li>
-			<li><a href="{$SITE_BASE}system_configuration.php"><span class="faicon fa-terminal"></span>&#160;Running configuration</a></li>
-		</ul>
-		<xsl:if test="$PROFILE = 'ADMIN'">
-			<ul class="submenu" id="submenu-settings">
-				<xsl:if test="$topmenu!='settings'"><xsl:attribute name="style">display:none;</xsl:attribute></xsl:if>
-				<li><a href="{$SITE_BASE}workflow.php"><span class="faicon fa-cubes"></span>&#160;Workflows</a></li>
-				<li><a href="{$SITE_BASE}workflow-schedules.php"><span class="faicon fa-calendar"></span>&#160;Scheduled workflows</a></li>
-				<li><a href="{$SITE_BASE}schedule.php"><span class="faicon fa-clock-o"></span>&#160;Retry Schedules</a></li>
-				<li><a href="{$SITE_BASE}queue.php"><span class="faicon fa-hand-stop-o"></span>&#160;Queues</a></li>
-				<li><a href="{$SITE_BASE}user.php"><span class="faicon fa-user-o"></span>&#160;Users</a></li>
-			</ul>
-			<ul class="submenu" id="submenu-notifications">
-				<xsl:if test="$topmenu!='notifications'"><xsl:attribute name="style">display:none;</xsl:attribute></xsl:if>
-				<li><a href="{$SITE_BASE}notification.php"><span class="faicon fa-rss"></span>&#160;Configure</a></li>
-				<li><a href="{$SITE_BASE}notification-types.php"><span class="faicon fa-plug"></span>&#160;Manage plugins</a></li>
-			</ul>
-			<ul class="submenu" id="submenu-statistics">
-				<xsl:if test="$topmenu!='statistics'"><xsl:attribute name="style">display:none;</xsl:attribute></xsl:if>
-				<li><a href="{$SITE_BASE}workflows-statistics.php"><span class="faicon fa-cubes"></span>&#160;Workflows</a></li>
-				<li><a href="{$SITE_BASE}instances-statistics.php"><span class="faicon fa-line-chart"></span>&#160;Instances</a></li>
-				<li><a href="{$SITE_BASE}system-statistics.php"><span class="faicon fa-percent"></span>&#160;Global</a></li>
-			</ul>
-			<ul class="submenu" id="submenu-logging">
-				<xsl:if test="$topmenu!='logging'"><xsl:attribute name="style">display:none;</xsl:attribute></xsl:if>
-				<li><a href="{$SITE_BASE}logs.php"><span class="faicon fa-file-text-o"></span>&#160;Engine logs</a></li>
-				<li><a href="{$SITE_BASE}logsapi.php"><span class="faicon fa-file-text-o"></span>&#160;API logs</a></li>
-				<li><a href="{$SITE_BASE}logsnotifications.php"><span class="faicon fa-file-text-o"></span>&#160;Notifications logs</a></li>
-			</ul>
-		</xsl:if>
-
-		<xsl:choose>
-			<xsl:when test="$LOGIN != ''">
-				<div id="userInfo">
-					<span><xsl:value-of select="$LOGIN" /></span>
-					<xsl:text>&#160;</xsl:text>
-					<span class="faicon fa-pencil" title="My preferences"></span>
-					<xsl:text>&#160;</xsl:text>
-					<a href="{$SITE_BASE}auth.php?action=logout" title="Log out">
-						<span class="faicon fa-power-off"></span>
-					</a>
-				</div>
-			</xsl:when>
-		</xsl:choose>
-	</xsl:template>
-	
 	<xsl:template name="user-preferences-editor">
 		<div id="user-preferences-editor" class="dialog formdiv">
 			<h2>
