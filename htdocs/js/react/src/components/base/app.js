@@ -37,8 +37,9 @@ export class App extends React.Component {
 		
 		document.querySelector('#pre-content').style.display='none';
 		
+		var self = this;
 		window.onpopstate = (e) => {
-			console.log("popstate");
+			self.changeURL(document.location.pathname);
 			return false;
 		};
 		
