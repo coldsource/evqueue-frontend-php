@@ -48,6 +48,8 @@ export class ExecutingInstances extends ListInstances {
 	}
 	
 	componentWillUnmount() {
+		super.componentWillUnmount();
+		
 		clearInterval(this.timerID);
 	}
 	
@@ -132,17 +134,21 @@ export class ExecutingInstances extends ListInstances {
 			return <span className="faicon fa-clock-o" title="A task ended badly and will retry"></span>;
 	}
 	
-	clusterStateChanged() {
-		this.setState({
-			nodes_up: this.evqueue_event.GetConnectedNodes(),
-			nodes_down: this.evqueue_event.GetErrorNodes()
-		});
-	}
-	
 	renderNodeStatus() {
-		if(this.state.nodes_down==0)
-			return (<div id="nodes-status"><a href="nodes.php"><span className="success">{this.state.nodes_up} node{this.state.nodes_up!=1?'s':''} up</span></a></div>);
-		return (<div id="nodes-status"><a href="nodes.php"><span className="success">{this.state.nodes_up} node{this.state.nodes_up!=1?'s':''} up - <span className="error">{this.state.nodes_down} node{this.state.nodes_down!=1?'s':''} down</span></span></a></div>);
+		var nodes_up = 0;
+		var nodes_down = 0;
+		var states = this.state.cluster.nodes_states;
+		for(var i=0;i<states.length;i++)
+		{
+			if(states[i]=='READY')
+				nodes_up++;
+			else if(states[i]=='ERROR')
+				nodes_down++;
+		}
+		
+		if(nodes_down==0)
+			return (<div id="nodes-status"><a href="nodes.php"><span className="success">{nodes_up} node{nodes_up!=1?'s':''} up</span></a></div>);
+		return (<div id="nodes-status"><a href="nodes.php"><span className="success">{nodes_up} node{nodes_up!=1?'s':''} up - <span className="error">{nodes_down} node{nodes_down!=1?'s':''} down</span></span></a></div>);
 	}
 	
 	renderTitle() {

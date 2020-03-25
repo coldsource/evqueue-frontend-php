@@ -28,6 +28,8 @@ export class evQueueWS
 		this.stateChange = parameters.stateChange;
 		
 		this.state = 'DISCONNECTED'; // We start in disconnected state
+		this.name = 'offline'; // Name will be known upon connecton
+		this.last_error = false;
 		this.api_promise = Promise.resolve(); // No previous query was run at this time
 	}
 	
@@ -36,7 +38,7 @@ export class evQueueWS
 		var self = this;
 		var mode = self.callback===undefined?'api':'event';
 		
-		return new Promise(function(resolve, reject) {
+		return self.api_promise = new Promise(function(resolve, reject) {
 			// Connect using appropriate protocol
 			if(mode=='api')
 				self.ws = new WebSocket(self.node, "api");
@@ -55,27 +57,37 @@ export class evQueueWS
 				if(self.state!='AUTHENTICATING' && (self.state=='DISCONNECTING' || event.wasClean))
 				{
 					// Disconnection was requested by JS or close was requested by browser (ie page closed), this is OK
+					self.last_error = false;
 					self.state = 'DISCONNECTED';
 					console.log("Disconnected from node "+self.node);
 				}
 				else
 				{
 					if(self.state=='CONNECTING')
-						reject('Connection failed'); // Connecting failed,
+					{
+						self.last_error = 'CONNECTION';
+						reject('Connection failed'); // Connecting failed
+					}
 					
 					if(self.state=='AUTHENTICATING')
+					{
+						self.last_error = 'AUTHENTICATION';
 						reject('Authentication error');
+					}
+					else
+					{
+						console.log("Node "+self.node+" is down");
+						
+						// Try reconnecting
+						setTimeout(() => { self.api_promise = self.Connect(); }, 5000);
+					}
 					
 					self.state = 'ERROR'; // Unexpected disconnection, set state to error
-					
-					// Try reconnecting if we are on event mode
-					if(self.callback!==undefined)
-						setTimeout(() => { self.api_promise = self.Connect(); }, 1000);
 				}
 				
 				// Notify of state change
 				if(self.stateChange!==undefined)
-					self.stateChange(self.node, self.state);
+					self.stateChange(self.node, self.name, self.state);
 			}
 			
 			self.ws.onmessage = function (event) {
@@ -99,9 +111,12 @@ export class evQueueWS
 				{
 					self.state = 'READY';
 					
+					// Set our name
+					self.name = xmldoc.documentElement.getAttribute('node');
+					
 					// Notify of state change
 					if(self.stateChange!==undefined)
-						self.stateChange(self.node, self.state);
+						self.stateChange(self.node, self.name, self.state);
 					
 					resolve(); // We are now connected
 				}
@@ -135,6 +150,11 @@ export class evQueueWS
 	GetState()
 	{
 		return this.state;
+	}
+	
+	GetLastError()
+	{
+		return this.last_error;
 	}
 	
 	// Build API XML from object

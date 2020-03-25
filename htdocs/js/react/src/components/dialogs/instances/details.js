@@ -68,14 +68,6 @@ export class InstanceDetails extends evQueueComponent {
 		this.Subscribe('TAG_REMOVED',api,true,this.props.id,this.evQueueEventTags);
 	}
 	
-	componentWillUnmount() {
-		this.Unsubscribe('TASK_QUEUE',this.props.id);
-		this.Unsubscribe('TASK_EXECUTE',this.props.id);
-		this.Unsubscribe('TASK_TERMINATE',this.props.id);
-		this.Unsubscribe('INSTANCE_TAGGED',this.props.id);
-		this.Unsubscribe('INSTANCE_UNTAGGED',this.props.id);
-	}
-	
 	evQueueEventWorkflow(data) {
 		this.setState({workflow: data});
 		this.notifyTasksDetail();

@@ -46,7 +46,7 @@ export class App extends React.Component {
 			var el = e.target;
 			while(el)
 			{
-				if(el.tagName=='A')
+				if(el.tagName=='A' && el.hasAttribute('href'))
 				{
 					e.preventDefault();
 			

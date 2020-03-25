@@ -21,6 +21,7 @@
 
 import {evQueueComponent} from '../../base/evqueue-component.js';
 import {WorkflowSelector} from '../../base/workflow-selector.js';
+import {NodeSelector} from '../../base/node-selector.js';
 import {Dialog} from '../../../ui/dialog.js';
 import {Tabs} from '../../../ui/tabs.js';
 import {Tab} from '../../../ui/tab.js';
@@ -82,12 +83,6 @@ export class WorkflowLauncher extends evQueueComponent {
 					<input type="text" name={"parameter_"+parameter} value={self.state.api.parameters[parameter]} onChange={self.prepareAPI} />
 				</div>
 			);
-		});
-	}
-	
-	renderNodes() {
-		return this.GetNodes().map( (name) => {
-			return (<option key={name} value={name}>{name}</option>);
 		});
 	}
 	
@@ -154,9 +149,7 @@ export class WorkflowLauncher extends evQueueComponent {
 							<form>
 								<div>
 									<label>Node</label>
-									<select name="node" value={this.state.api.node} onChange={this.prepareAPI}>
-										{this.renderNodes()}
-									</select>
+									<NodeSelector name="node" value={this.state.api.node} onChange={this.prepareAPI} />
 								</div>
 							</form>
 						</div>

@@ -21,6 +21,7 @@
 
 import {App} from './app.js';
 import {evQueueCluster} from '../../evqueue/evqueue-cluster.js';
+import {EventDispatcher} from '../../evqueue/event-dispatcher.js';
 import {Dialogs} from '../../ui/dialogs.js';
 import {Confirm} from '../../ui/confirm.js';
 import {Alert} from '../../ui/alert.js';
@@ -32,27 +33,14 @@ export class evQueueComponent extends React.Component {
 		this.nodes = App.global.cluster_config;
 		this.last_state = [];
 		for(var i=0;i<this.nodes.length;i++)
-		{
-			this.nodes[i] = this.nodes[i].replace('tcp://','ws://');
 			this.last_state[i] = 'DISCONNECTED';
-		}
-		
-		this.nodes_names = window.localStorage.nodes_names.split(',');
-		
-		this.state = {
-			refresh: true,
-		};
 		
 		// Global evqueue connections
-		this.stateChanged = this.stateChanged.bind(this);
 		if(evQueueComponent.global===undefined)
 		{
 			evQueueComponent.global = {
-				evqueue_event: new evQueueCluster(this.nodes, this.nodes_names, this.eventDispatcher, this.stateChanged),
-				evqueue_api: new evQueueCluster(this.nodes, this.nodes_names),
-				external_id: 0,
-				handlers: {},
-				subscriptions: []
+				event_dispatcher: new EventDispatcher(this.nodes),
+				evqueue_api: new evQueueCluster(this.nodes),
 			};
 		}
 		
@@ -60,33 +48,28 @@ export class evQueueComponent extends React.Component {
 		if(this.evQueueEvent!==undefined)
 			this.evQueueEvent = this.evQueueEvent.bind(this);
 		
-		this.evqueue_event = evQueueComponent.global.evqueue_event;
+		this.event_dispatcher = evQueueComponent.global.event_dispatcher;
+		this.evqueue_event = evQueueComponent.global.event_dispatcher.GetEVQ();
 		this.evqueue_api = evQueueComponent.global.evqueue_api;
 		
 		this.prepareAPI = this.prepareAPI.bind(this);
+		this.clusterStateChanged = this.clusterStateChanged.bind(this);
+		this.event_dispatcher.SubscribeClusterState(this, this.clusterStateChanged);
+		
+		// Set initial state
+		this.state = {
+			refresh: true,
+			cluster: {
+				nodes_names: this.evqueue_event.GetNodes(),
+				nodes_states: this.evqueue_event.GetStates()
+			}
+		};
 	}
 	
-	GetNodes()
+	componentWillUnmount()
 	{
-		return this.nodes_names;
-	}
-	
-	GetNodeByName(name) {
-		for(var i=0;i<this.nodes_names.length;i++)
-			if(this.nodes_names[i]==name)
-				return i;
-		return -1;
-	}
-	
-	GetNodeByCnx(name) {
-		for(var i=0;i<this.nodes.length;i++)
-			if(this.nodes[i]==name)
-				return i;
-		return -1;
-	}
-	
-	GetNodeByIdx(idx) {
-		return this.nodes_names[idx];
+		this.event_dispatcher.UnsubscribeClusterState(this);
+		this.event_dispatcher.Unsubscribe(this);
 	}
 	
 	toggleAutorefresh() {
@@ -99,11 +82,6 @@ export class evQueueComponent extends React.Component {
 		else if(this.state.refresh)
 			return true;
 		return false;
-	}
-	
-	eventDispatcher(data) {
-		var external_id = parseInt(data.documentElement.getAttribute('external-id'));
-		evQueueComponent.global.handlers[external_id](data);
 	}
 	
 	xpath(xpath,context)
@@ -166,82 +144,6 @@ export class evQueueComponent extends React.Component {
 		});
 	}
 	
-	Subscribe(event,api,send_now,instance_id = 0, handler = undefined)
-	{
-		var external_id = ++evQueueComponent.global.external_id;
-		evQueueComponent.global.handlers[external_id] = handler!==undefined?handler:this.evQueueEvent;
-		evQueueComponent.global.subscriptions.push({
-			event:event,
-			api: api,
-			instance: this,
-			instance_id: instance_id,
-			external_id:external_id,
-		});
-		
-		return this.subscribe(event,api,send_now,instance_id,external_id);
-	}
-	
-	subscribe(event,api,send_now,instance_id,external_id)
-	{
-		var api_cmd_b64 = btoa(this.evqueue_event.BuildAPI(api));
-		
-		var attributes = {
-			type: event,
-			api_cmd: api_cmd_b64,
-			send_now: (send_now?'yes':'no'),
-			external_id: external_id
-		};
-		
-		if(instance_id)
-			attributes.instance_id = instance_id;
-		
-		return this.evqueue_event.API({
-			node: api.node,
-			group: 'event',
-			action: 'subscribe',
-			attributes: attributes
-		})
-	}
-	
-	Unsubscribe(event,instance_id = 0)
-	{
-		// Find correct subsciption
-		var subscriptions = evQueueComponent.global.subscriptions;
-		var external_id = 0;
-		for(var i=0;i<subscriptions.length;i++)
-		{
-			if(subscriptions[i].event==event && subscriptions[i].instance==this && subscriptions[i].instance_id==instance_id)
-			{
-				external_id = subscriptions[i].external_id;
-				break;
-			}
-		}
-		
-		var attributes = {
-			type: event,
-			external_id: external_id
-		};
-		
-		if(instance_id)
-			attributes.instance_id = instance_id;
-		
-		return this.evqueue_event.API({
-			node:'*',
-			group: 'event',
-			action: 'unsubscribe',
-			attributes: attributes
-		});
-	}
-	
-	UnsubscribeAll()
-	{
-		return this.evqueue_event.API({
-			node:api.node,
-			group: 'event',
-			action: 'unsubscribeall'
-		});
-	}
-	
 	simpleAPI(api,message=false,confirm=false) {
 		var self = this;
 		
@@ -277,29 +179,24 @@ export class evQueueComponent extends React.Component {
 		this.setState({api:api});
 	}
 	
-	stateChanged(node, state) {
-		var node_idx = this.GetNodeByCnx(node);
-		var node_name = this.GetNodeByIdx(node_idx);
+	Subscribe(event,api,send_now,instance_id = 0, handler = undefined)
+	{
+		if(handler===undefined)
+			handler = this.evQueueEvent;
 		
-		if(this.last_state[node_idx]=='ERROR' && state=='READY')
-		{
-			var subscriptions = evQueueComponent.global.subscriptions;
-			for(var i=0;i<subscriptions.length;i++)
-			{
-				if(subscriptions[i].api.node=='*' || subscriptions[i].api.node==node_name)
-				{
-					// Change API commande to reconnect only to the needed node
-					var api = {};
-					Object.assign(api,subscriptions[i].api);
-					api.node = node_name;
-					this.subscribe(subscriptions[i].event,api,true,subscriptions[i].instance_id,subscriptions[i].external_id)
-				}
-			}
-		}
-		
-		this.last_state[node_idx] = state;
-		
-		if(this.clusterStateChanged!==undefined)
-			this.clusterStateChanged(node, state);
+		return this.event_dispatcher.Subscribe(event, api, send_now, instance_id, this, handler);
+	}
+	
+	Unsubscribe(event,instance_id = 0)
+	{
+		return this.event_dispatcher.Unsubscribe(this, event, instance_id);
+	}
+	
+	clusterStateChanged(node, name, state)
+	{
+		this.setState({cluster: {
+			nodes_names: this.evqueue_event.GetNodes(),
+			nodes_states: this.evqueue_event.GetStates()
+		}});
 	}
 }

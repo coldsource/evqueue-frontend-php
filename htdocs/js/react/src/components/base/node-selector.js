@@ -1,4 +1,3 @@
-<?php
  /*
   * This file is part of evQueue
   *
@@ -15,12 +14,30 @@
   * You should have received a copy of the GNU General Public License
   * along with evQueue. If not, see <http://www.gnu.org/licenses/>.
   *
-  * Authors: Nicolas Jean, Christophe Marti
+  * Author: Thibault Kummer
   */
 
-require_once __DIR__ . '/logger.php';
-require_once __DIR__ . '/../lib/XSLEngine.php';
+'use strict';
 
-session_start();
-require_once __DIR__ . '/evqueue.php';
-?>
+import {evQueueComponent} from './evqueue-component.js';
+import {Select} from '../../ui/select.js';
+
+export class NodeSelector extends evQueueComponent {
+	constructor(props) {
+		super(props);
+	}
+	
+	render() {
+		var nodes = this.state.cluster.nodes_names;
+		var values = [];
+		if(this.props.all)
+			values.push({name: 'All', value: ''});
+		for(var i=0;i<nodes.length;i++)
+			values.push({name: nodes[i], value: nodes[i]});
+		
+		return (
+			<Select filter={false} value={this.props.value} values={values} name={this.props.name} placeholder="Choose a node" onChange={this.props.onChange}>
+			</Select>
+		);
+	}
+}

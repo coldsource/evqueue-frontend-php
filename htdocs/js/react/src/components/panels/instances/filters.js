@@ -21,6 +21,7 @@
 
 import {evQueueComponent} from '../../base/evqueue-component.js';
 import {WorkflowSelector} from '../../base/workflow-selector.js';
+import {NodeSelector} from '../../base/node-selector.js';
 import {TagSelector} from '../../base/tag-selector.js';
 import {Select} from '../../../ui/select.js';
 import {DatePicker} from '../../../ui/datepicker.js';
@@ -56,7 +57,7 @@ export class InstanceFilters extends evQueueComponent {
 		}
 		
 		this.state.nodes = [{name: 'All', value: '' }];
-		var nodes = this.GetNodes();
+		var nodes = this.state.cluster.nodes_names;
 		for(var i=0;i<nodes.length;i++)
 			this.state.nodes.push({name: nodes[i], value: nodes[i]});
 		
@@ -178,8 +179,7 @@ export class InstanceFilters extends evQueueComponent {
 				<form>
 					<div>
 						<label>Node</label>
-						<Select filter={false} name="filter_node" value={this.state.filters.filter_node} values={this.state.nodes} onChange={this.filterChange}>
-						</Select>
+						<NodeSelector all={true} name="filter_node" value={this.state.filters.filter_node} onChange={this.filterChange} />
 					</div>
 					<div>
 						<label>Workflow</label>

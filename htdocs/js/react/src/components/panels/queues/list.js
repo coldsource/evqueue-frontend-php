@@ -28,7 +28,6 @@ export class ListQueues extends evQueueComponent {
 	constructor(props) {
 		super(props);
 		
-		this.state.nodes = [];
 		this.state.queues = [];
 		this.state.idx = 0;
 		
@@ -41,15 +40,13 @@ export class ListQueues extends evQueueComponent {
 		this.Subscribe('QUEUE_DEQUEUE',api);
 		this.Subscribe('QUEUE_EXECUTE',api);
 		this.Subscribe('QUEUE_TERMINATE',api,true);
-		
-		this.setState({nodes:this.GetNodes()});
 	}
 	
 	evQueueEvent(response) {
 		var data = this.parseResponse(response,'/response/statistics/*');
 		
 		var queues = this.state.queues;
-		var node_idx = this.GetNodeByName(data.node);
+		var node_idx = this.evqueue_event.GetNodeByName(data.node);
 		queues[node_idx] = data.response;
 		
 		this.setState({queues: queues});
@@ -57,9 +54,10 @@ export class ListQueues extends evQueueComponent {
 	
 	renderNodesList() {
 		var ret = [];
-		for(var i=0;i<this.state.nodes.length;i++)
+		var nodes = this.state.cluster.nodes_names;
+		for(var i=0;i<nodes.length;i++)
 		{
-			var node = this.state.nodes[i];
+			var node = nodes[i];
 			ret.push(<Tab key={node} title={node} />);
 		}
 		return ret;

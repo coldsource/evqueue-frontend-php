@@ -21,20 +21,57 @@ import {evQueueWS} from './evqueue.js';
 
 export class evQueueCluster
 {
-	constructor(nodes_desc, nodes_names, eventCallback, stateChange)
+	constructor(nodes_desc, eventCallback, stateChange)
 	{
 		this.stateChangeCallback = stateChange;
 		this.stateChange = this.stateChange.bind(this);
 		
+		// Init global state
+		if(this.stateChangeCallback!==undefined)
+		{
+			evQueueCluster.global = {};
+			evQueueCluster.global.nodes_names = [];
+			evQueueCluster.global.nodes_states = [];
+			for(var i=0;i<nodes_desc.length;i++)
+			{
+				evQueueCluster.global.nodes_names.push('offline');
+				evQueueCluster.global.nodes_states.push('DISCONNECTED');
+			}
+		}
+		
+		this.nodes_desc = nodes_desc;
 		this.nodes = [];
 		for(var i=0;i<nodes_desc.length;i++)
-			this.nodes.push(new evQueueWS({
+		{
+			var evq = new evQueueWS({
 				node: nodes_desc[i],
 				callback: eventCallback,
-				stateChange: this.stateChange
-			}));
+				stateChange: stateChange===undefined?undefined:this.stateChange
+			});
+			
+			if(this.stateChangeCallback!==undefined)
+				evq.Connect();
+			
+			this.nodes.push(evq);
+		}
+	}
+	
+	GetNodes()
+	{
+		return evQueueCluster.global.nodes_names;
+	}
+	
+	GetStates()
+	{
+		return evQueueCluster.global.nodes_states;
+	}
+	
+	GetNodeByCnx(cnx) {
+		for(var i=0;i<this.nodes_desc.length;i++)
+			if(this.nodes_desc[i]==cnx)
+				return i;
 		
-		this.nodes_names = nodes_names;
+		return -1;
 	}
 	
 	GetNodeByName(name)
@@ -42,73 +79,86 @@ export class evQueueCluster
 		if(name=='*')
 			return '*';
 		
-		for(var i=0;i<this.nodes_names.length;i++)
-			if(this.nodes_names[i]==name)
+		var nodes_names = evQueueCluster.global.nodes_names;
+		for(var i=0;i<nodes_names.length;i++)
+			if(nodes_names[i]==name)
 				return i;
 		return -1;
-	}
-	
-	GetConnectedNodes()
-	{
-		var connected_nodes = 0;
-		for(var i=0;i<this.nodes.length;i++)
-		{
-			if(this.nodes[i].GetState()=='READY')
-				connected_nodes++;
-		}
-		return connected_nodes;
-	}
-	
-	GetErrorNodes()
-	{
-		var error_nodes = 0;
-		for(var i=0;i<this.nodes.length;i++)
-		{
-			if(this.nodes[i].GetState()=='ERROR')
-				error_nodes++;
-		}
-		return error_nodes;
 	}
 	
 	GetUpNode()
 	{
 		for(var i=0;i<this.nodes.length;i++)
 		{
-			if(this.nodes[i].GetState()=='READY' || this.nodes[i].GetState()=='DISCONNECTED')
+			if(this.nodes[i].GetState()!='ERROR')
 				return i;
 		}
 		
 		return -1;
 	}
 	
-	API(api)
+	
+	_api(api, resolve, reject)
 	{
 		var self = this;
 		
-		var node = api.node!==undefined?self.GetNodeByName(api.node):this.GetUpNode();
-		if(node==-1)
-			return Promise.reject('Cluster error : unknown node');
-		
-		if(node=='*')
+		// Connecttion requested to all nodes, success only if all nodes are successful
+		if(api.node=='*')
 		{
-			return new Promise(function(resolve, reject) {
-				var resolved = 0;
-				var data = [];
-				for(var i=0;i<self.nodes.length;i++)
-				{
-					self.nodes[i].API(api).then( (xml) => {
+			var resolved = 0;
+			var data = [];
+			for(var i=0;i<self.nodes.length;i++)
+			{
+				self.nodes[i].API(api).then(
+					(xml) => {
 						resolved++;
 						data.push(xml);
 						if(resolved==self.nodes.length)
 							resolve(data);
 					},
-						(reason) => reject(reason)
-					);
-				}
-			});
+					(reason) => reject(reason)
+				);
+			}
 		}
 		else
-			return self.nodes[node].API(api);
+		{
+			// Specific node is requested
+			if(api.node!==undefined)
+			{
+				var node = self.GetNodeByName(api.node)
+				if(node==-1)
+					return reject('Cluster error : unknown node');
+				
+				return self.nodes[node].API(api).then(
+					(xml) => resolve(xml),
+					(reason) => reject(reason)
+				);
+			}
+			
+			// Request for any up nodes, try to find one answering
+			var node = self.GetUpNode();
+			if(node==-1)
+				return reject('Cluster error : no nodes up');
+			
+			self.nodes[node].API(api).then(
+				(xml) => resolve(xml),
+				(reason) => {
+					if(self.nodes[node].GetLastError()=='AUTHENTICATION')
+						reject(reason); // No need to retry on authentication error
+					else
+						self._api(api, resolve, reject); // Connection error, try another node
+				}
+			);
+		}
+	}
+	
+	API(api)
+	{
+		var self = this;
+		
+		return new Promise(function(resolve, reject) {
+			return self._api(api, resolve, reject);
+		});
 	}
 	
 	BuildAPI(api)
@@ -122,8 +172,52 @@ export class evQueueCluster
 			this.nodes[i].Close();
 	}
 	
-	stateChange(node,state) {
+	stateChange(node, name, state) {
+		var idx = this.GetNodeByCnx(node);
+		evQueueCluster.global.nodes_names[idx] = name;
+		evQueueCluster.global.nodes_states[idx] = state;
+		
 		if(this.stateChangeCallback!==undefined)
-			this.stateChangeCallback(node,state);
+			this.stateChangeCallback(node, name, state);
+	}
+	
+	Subscribe(event,api,send_now,instance_id,external_id)
+	{
+		var api_cmd_b64 = btoa(this.BuildAPI(api));
+		
+		var attributes = {
+			type: event,
+			api_cmd: api_cmd_b64,
+			send_now: (send_now?'yes':'no'),
+			external_id: external_id
+		};
+		
+		if(instance_id)
+			attributes.instance_id = instance_id;
+		
+		return this.API({
+			node: api.node,
+			group: 'event',
+			action: 'subscribe',
+			attributes: attributes
+		});
+	}
+	
+	Unsubscribe(event, external_id, instance_id = 0)
+	{
+		var attributes = {
+			type: event,
+			external_id: external_id
+		};
+		
+		if(instance_id)
+			attributes.instance_id = instance_id;
+		
+		return this.API({
+			node:'*',
+			group: 'event',
+			action: 'unsubscribe',
+			attributes: attributes
+		});
 	}
 }
