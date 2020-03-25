@@ -94,6 +94,9 @@ export class ListQueues extends evQueueComponent {
 	}
 	
 	renderQueues(idx) {
+		if(this.state.cluster.nodes_states[idx]!='READY')
+			return (<div className="center error">Engine is offline</div>);
+		
 		return (
 			<div className="workflow-list">
 				<table>
