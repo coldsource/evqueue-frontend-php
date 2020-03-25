@@ -109,12 +109,15 @@ export class App extends React.Component {
 		
 		this.setState({messages: messages});
 		
+		var timeout = 3000;
+		if(severity=='warning')
+			timeout = 7000;
 		var self = this;
 		setTimeout( () => {
 			var messages = this.state.messages;
 			messages.splice(0,1);
 			this.setState({messages: messages});
-		}, 3000);
+		}, timeout);
 	}
 	
 	route() {

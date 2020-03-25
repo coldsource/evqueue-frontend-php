@@ -126,16 +126,7 @@ export class evQueueComponent extends React.Component {
 				{
 					var error = xml.documentElement.getAttribute('error');
 					var code = xml.documentElement.getAttribute('error-code');
-					Dialogs.open(Alert,{content: (
-						<div>
-							evQueue engine returned error :
-							<br />
-							<br />Code : <b>{code}</b>
-							<br />Message : <b>{error}</b>
-							<br />
-							<br />It is likely that your last action didn't worked
-						</div>
-					)});
+					App.warning("evQueue engine returned error : "+error+" ("+code+")");
 					reject(error);
 				}
 				else
