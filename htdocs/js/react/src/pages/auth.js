@@ -53,7 +53,7 @@ export class PageAuth extends React.Component {
 				evq.Close();
 				
 				window.localStorage.authenticated = 'true';
-				App.global.instance.changeURL('/');
+				App.changeURL('/');
 			},
 			(reason) => this.setState({error: reason})
 		);

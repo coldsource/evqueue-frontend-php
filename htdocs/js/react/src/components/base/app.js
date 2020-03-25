@@ -33,6 +33,7 @@ export class App extends React.Component {
 		this.state = {
 			path: this.getPath(),
 			ready: false,
+			messages: [],
 		};
 		
 		document.querySelector('#pre-content').style.display='none';
@@ -62,6 +63,10 @@ export class App extends React.Component {
 		}, false);
 		
 		this.loadClusterConfig();
+		
+		App.notice = this.notice.bind(this);
+		App.warning = this.warning.bind(this);
+		App.changeURL = this.changeURL.bind(this);
 	}
 	
 	loadClusterConfig() {
@@ -87,6 +92,31 @@ export class App extends React.Component {
 		return url.pathname;
 	}
 	
+	notice(msg)	{
+		return this.message('notice', msg);
+	}
+	
+	warning(msg)	{
+		return this.message('warning', msg);
+	}
+	
+	message(severity, msg) {
+		var messages = this.state.messages;
+		messages.push({
+			severity: severity,
+			content: msg
+		});
+		
+		this.setState({messages: messages});
+		
+		var self = this;
+		setTimeout( () => {
+			var messages = this.state.messages;
+			messages.splice(0,1);
+			this.setState({messages: messages});
+		}, 3000);
+	}
+	
 	route() {
 		var path = this.state.path;
 		
@@ -106,6 +136,18 @@ export class App extends React.Component {
 		return (<Page404 />);
 	}
 	
+	renderMessages() {
+		if(this.state.messages.length==0)
+			return;
+		
+		return this.state.messages.map( (msg, idx) => {
+			if(msg.severity=='notice')
+				return (<div key={idx}><span className="notice">{msg.content}</span></div>);
+			if(msg.severity=='warning')
+				return (<div key={idx}><span className="warning">{msg.content}</span></div>);
+		});
+	}
+	
 	render() {
 		if(!this.state.ready)
 			return (<div></div>);
@@ -113,6 +155,9 @@ export class App extends React.Component {
 		return (
 			<div>
 				{ this.route() }
+				<div className="evq-messages">
+					{ this.renderMessages() }
+				</div>
 			</div>
 		);
 	}

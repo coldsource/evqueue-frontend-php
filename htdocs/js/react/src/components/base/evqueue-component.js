@@ -154,7 +154,7 @@ export class evQueueComponent extends React.Component {
 				confirm: () => {
 					self.API(api).then( () => {
 						if(message!==false)
-							Message(message);
+							App.notice(message);
 					});
 				}
 			});
@@ -163,7 +163,7 @@ export class evQueueComponent extends React.Component {
 		{
 			self.API(api).then( () => {
 				if(message!==false)
-					Message(message);
+					App.notice(message);
 			});
 		}
 	}

@@ -1,0 +1,26 @@
+div.evq-messages {
+	position: fixed;
+	left: 0px;
+	bottom: 0px;
+	width: 100%;
+	padding: 0.4rem;
+	width: 20%;
+	
+	div {
+		border: 1px solid;
+		border-radius: 0.4rem;
+		background: rgba(0, 0, 0, 0.3);
+		padding: 0.4rem;
+		margin: 0.4rem;
+	}
+	
+	span.notice {
+		font-weight: bold;
+		color: green;
+	}
+	
+	span.warning {
+		font-weight: bold;
+		color: red;
+	}
+}

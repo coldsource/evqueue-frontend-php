@@ -19,6 +19,7 @@
 
 'use strict';
 
+import {App} from '../../base/app.js';
 import {evQueueComponent} from '../../base/evqueue-component.js';
 import {WorkflowSelector} from '../../base/workflow-selector.js';
 import {NodeSelector} from '../../base/node-selector.js';
@@ -90,7 +91,7 @@ export class WorkflowLauncher extends evQueueComponent {
 		var self = this;
 		this.API(this.state.api).then( (data) => {
 			var instance_id = data.documentElement.getAttribute('workflow-instance-id');
-			Message("Launched instance "+instance_id);
+			App.notice("Launched instance "+instance_id);
 			self.dlg.current.close();
 		});
 	}

@@ -19,11 +19,13 @@
 
 'use strict';
 
+import {App} from '../../base/app.js';
 import {ListInstances} from './list.js';
 import {WorkflowLauncher} from '../../dialogs/workflows/launcher.js';
 import {Panel} from '../../../ui/panel.js';
 import {Dialogs} from '../../../ui/dialogs.js';
 import {Dialog} from '../../../ui/dialog.js';
+import {Confirm} from '../../../ui/confirm.js';
 
 export class ExecutingInstances extends ListInstances {
 	constructor(props) {
@@ -97,7 +99,7 @@ export class ExecutingInstances extends ListInstances {
 			attributes: { id:wf.id },
 			node: wf.node_name
 		}).then( () => {
-			Message('Canceled instance '+wf.id);
+			App.notice('Canceled instance '+wf.id);
 			if(killtasks)
 			{
 				this.API({
@@ -109,14 +111,12 @@ export class ExecutingInstances extends ListInstances {
 					for(var i=0;i<tasks.length;i++)
 					{
 						var task_name = tasks[i].name?tasks[i].name:tasks[i].path;
-						evqueueAPI({
+						this.simpleAPI({
 							group: 'instance',
 							action: 'killtask',
 							attributes: { 'id':wf.id, 'pid':tasks[i].pid },
 							node: wf.node_name
-						}).done(function() {
-							Message('Killed task '+task_name);
-						});
+						}, "'Killed task "+task_name);
 					}
 				});
 			}
