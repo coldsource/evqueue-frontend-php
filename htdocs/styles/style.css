@@ -31,10 +31,6 @@ ul.unstyled {
 	padding-left: 0;
 }
 
-div.prctgradient {
-	background:linear-gradient(to right,#E5FCE6,#8BE082 50%,#F7B471 80%,#FF6666 100%);
-}
-
 .flexContainer {
 	display: flex;
 	flex-wrap: wrap;

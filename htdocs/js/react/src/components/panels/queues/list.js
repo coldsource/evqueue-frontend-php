@@ -71,27 +71,15 @@ export class ListQueues extends evQueueComponent {
 			var running_prct = queue.running_tasks / queue.concurrency * 100;
 			var queue_prct = queue.size>20?100:queue.size/20*100;
 			return (
-				<tr key={queue.name} className="evenOdd">
-					<td>{queue.name}</td>
-					<td className="center">{queue.scheduler}</td>
-					<td className="center">{queue.concurrency}</td>
-					<td>
-						<div className="prctgradient">
-							<div style={{background:'linear-gradient(to right,transparent '+running_prct+'%,white '+running_prct+'%)'}}>
-								<div style={{ textAlign:'right',width:running_prct+'%' }}>{Math.round(running_prct)}&#160;%</div>
-							</div>
-						</div>
-						{queue.running_tasks} task{queue.running_tasks?'s':''} running.
-					</td>
-					<td>
-						<div className="prctgradient">
-							<div style={{ background:"linear-gradient(to right,transparent "+queue_prct+"%,white "+queue_prct+"%)" }}>
-								<div style={{ textAlign:'right',width:queue_prct+'%' }}>&#160;</div>
-							</div>
-						</div>
-						{queue.size} awaiting task{queue.size>1?'s':''} in queue.
-					</td>
-				</tr>
+				<div className="queue prctgradient" key={queue.name}>
+					<div className="queue-inner" style={{background:'linear-gradient(to top,transparent '+running_prct+'%,white '+running_prct+'%)'}}>
+						<h2>{queue.name}</h2>
+						<div>Scheduler : <span className="bold">{queue.scheduler}</span></div>
+						<div>Concurrency : <span className="bold">{queue.concurrency}</span></div>
+						<div><span className="bold">{queue.running_tasks}</span> task{queue.running_tasks?'s':''} (<span className="bold">{running_prct} %</span>) running.</div>
+						<div><span className="fa fa-hand-stop-o"></span> <span className="bold">{queue.size}</span> awaiting task{queue.size>1?'s':''} in queue.</div>
+					</div>
+				</div>
 			);
 		});
 	}
@@ -101,18 +89,9 @@ export class ListQueues extends evQueueComponent {
 			return (<div className="center error">Engine is offline</div>);
 		
 		return (
-			<table>
-				<thead>
-					<tr>
-						<th>Name</th>
-						<th>Scheduler</th>
-						<th>Concurrency</th>
-						<th>Running tasks</th>
-						<th>Queued tasks</th>
-					</tr>
-				</thead>
-				<tbody>{ this.renderQueuesList(idx) }</tbody>
-			</table>
+			<div className="queues">
+				{ this.renderQueuesList(idx) }
+			</div>
 		);
 	}
 	

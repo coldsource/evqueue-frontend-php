@@ -1,9 +1,46 @@
 #listqueues {
+	div.queues {
+		display: flex;
+		flex-wrap: wrap;
+	}
+	
+	div.queue {
+		margin: 0.7rem;
+		width: 23%;
+		border: 1px solid grey;
+		
+		div.queue-inner {
+			padding: 0.4rem;
+		}
+		
+		h2 {
+			text-align: center;
+			font-weight: bold;
+			font-size: 1rem;
+		}
+	}
+	
+	div.prctgradient {
+		background: linear-gradient(to top,#E5FCE6,#8BE082 50%,#F7B471 80%,#FF6666 100%);
+	}
 	.evq-tabs {
 		margin-top: 0.4rem;
 	}
 	
-	.prctgradient {
-		border:1px solid lightgrey;
+	th:nth-child(1) {
+		width: 8rem;
+	}
+	
+	th:nth-child(2) {
+		width: 6rem;
+	}
+	
+	th:nth-child(3) {
+		width: 7rem;
+	}
+	
+	tbody tr {
+		//border: 1px solid grey;
+		margin: 5px;
 	}
 }
