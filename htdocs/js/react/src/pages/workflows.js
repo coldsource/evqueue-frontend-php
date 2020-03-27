@@ -30,7 +30,7 @@ export class PageWorkflows extends React.Component {
 	render() {
 		return (
 			<div>
-				<HeaderMenu />
+				<HeaderMenu current="Settings"/>
 				<WorkflowsList />
 			</div>
 		);

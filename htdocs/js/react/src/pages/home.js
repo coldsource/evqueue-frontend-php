@@ -34,7 +34,7 @@ export class PageHome extends React.Component {
 	render() {
 		return (
 			<div>
-				<HeaderMenu />
+				<HeaderMenu current="System state" />
 				<ExecutingInstances />
 				<br />
 				<InstanceFilters onChange={this.terminated_instances}/>

@@ -32,7 +32,7 @@ export class PageSystemState extends React.Component {
 	render() {
 		return (
 			<div>
-				<HeaderMenu />
+				<HeaderMenu current="System state" />
 				<ListQueues />
 			</div>
 		);

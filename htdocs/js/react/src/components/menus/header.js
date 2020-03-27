@@ -41,8 +41,15 @@ export class HeaderMenu extends React.Component {
 			}
 		];
 		
+		for(var idx = 0;idx<this.menu.length;idx++)
+			if(this.menu[idx].label==this.props.current)
+				break;
+		
+			if(idx==this.menu.length)
+				idx = 0;
+		
 		this.state = {
-			sel1: 0,
+			sel1: idx,
 			sel2: 0
 		};
 	}
