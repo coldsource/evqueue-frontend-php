@@ -64,6 +64,9 @@ export class ListQueues extends evQueueComponent {
 	}
 	
 	renderQueuesList(idx) {
+		if(idx>=this.state.queues)
+			return;
+		
 		return this.state.queues[idx].map((queue) => {
 			var running_prct = queue.running_tasks / queue.concurrency * 100;
 			var queue_prct = queue.size>20?100:queue.size/20*100;
