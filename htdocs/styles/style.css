@@ -14,15 +14,6 @@ tr:hover {
 	vertical-align:top;
 }
 
-.success { color: #27ae60 }
-.errorThenSuccess, .warning { color: #e67e22; }
-.error { color: #c0392b; }
-.skipped { color: #95a5a6; }
-
-.action {
-	cursor: pointer;
-}
-
 .hidden, .dialog {
 	display:none;
 }

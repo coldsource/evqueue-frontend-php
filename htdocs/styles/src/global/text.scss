@@ -5,3 +5,18 @@
 .right {
 	text-align: right;
 }
+
+.success { color: #27ae60 }
+.errorThenSuccess, .warning { color: #e67e22; }
+.error { color: #c0392b; }
+.skipped { color: #95a5a6; }
+
+div.error {
+	color: red;
+	font-weight: bold;
+	padding: 0.3rem;
+}
+
+.action {
+	cursor: pointer;
+}

@@ -21,7 +21,6 @@
 
 				<!-- Load base CSS -->
 				<link rel="stylesheet" type="text/css" href="{$SITE_BASE}styles/font-awesome.css"/>
-				<link rel="stylesheet" type="text/css" href="{$SITE_BASE}styles/style.css"/>
 				<link rel="stylesheet" type="text/css" href="{$SITE_BASE}styles/ui.scss"/>
 				
 				<!-- Load additional CSS -->
