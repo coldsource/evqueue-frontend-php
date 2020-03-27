@@ -143,7 +143,9 @@ export class evQueueComponent extends React.Component {
 			Dialogs.open(Confirm,{
 				content: confirm,
 				confirm: () => {
+					document.documentElement.style.cursor = 'progress';
 					self.API(api).then( () => {
+						document.documentElement.style.cursor = 'default';
 						if(message!==false)
 							App.notice(message);
 					});
@@ -152,7 +154,9 @@ export class evQueueComponent extends React.Component {
 		}
 		else
 		{
+			document.documentElement.style.cursor = 'progress';
 			self.API(api).then( () => {
+				document.documentElement.style.cursor = 'default';
 				if(message!==false)
 					App.notice(message);
 			});

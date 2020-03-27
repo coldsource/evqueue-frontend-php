@@ -5,14 +5,6 @@ body {
 	margin: 0px;
 }
 
-a {
-	text-decoration: none;
-}
-
-a, a:visited {
-	color: #000000;
-}
-
 tr:hover {
 	background-color: #ecf0f1;
 }
@@ -22,10 +14,6 @@ tr:hover {
 	vertical-align:top;
 }
 
-.faicon {
-	font-family:FontAwesome;
-	cursor:pointer;
-}
 .success { color: #27ae60 }
 .errorThenSuccess, .warning { color: #e67e22; }
 .error { color: #c0392b; }
@@ -33,10 +21,6 @@ tr:hover {
 
 .action {
 	cursor: pointer;
-}
-
-.faicon, .fa-spinner {
-	margin-left: 5px;
 }
 
 .hidden, .dialog {
@@ -137,13 +121,6 @@ div#userInfo {
 	padding: 5px;
 	z-index:100;
 }
-
-/* Footer */
-div#footer {
-  text-align: center;
-  margin-top: 10px;
-  margin-bottom: 10px; }
-
 div#wfs-editor fieldset {
 	border-radius:5px;
 }
@@ -220,22 +197,6 @@ div.boxTitle .filter {
 
 div.boxTitle div.pages {
 	display:inline-block;
-}
-
-/* Git */
-.git_uptodate {
-}
-
-.git_needpull {
-	color:orange;
-}
-
-.git_needpush {
-	color:green;
-}
-
-.git_conflict {
-	color:red;
 }
 
 .task div.task_icon{

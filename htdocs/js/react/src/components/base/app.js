@@ -21,6 +21,7 @@
 
 import {PageHome} from '../../pages/home.js';
 import {PageSystemState} from '../../pages/system-state.js';
+import {PageWorkflows} from '../../pages/workflows.js';
 import {Page404} from '../../pages/404.js';
 import {PageAuth} from '../../pages/auth.js';
 
@@ -131,10 +132,12 @@ export class App extends React.Component {
 		
 		if(path=='/')
 			return (<PageHome />);
-		if(path=='/auth')
+		else if(path=='/auth')
 			return (<PageAuth />);
-		if(path=='/system-state')
+		else if(path=='/system-state')
 			return (<PageSystemState />);
+		else if(path=='/workflows')
+			return (<PageWorkflows />);
 		
 		return (<Page404 />);
 	}

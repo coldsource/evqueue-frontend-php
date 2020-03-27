@@ -278,7 +278,7 @@ export class Dialog extends React.Component {
 			<div>
 				<div className="evq-dialog" style={style}>
 					<div ref={this.dlg_outer} className="evq-dialog-outer" style={{backgroundColor:(this.state.active && !this.props.modal)?'rgba(61,174,233,0.2)':''}}>
-						<div ref={this.dlg_inner} className="evq-dialog-inner" onMouseDown={this.activate}>
+						<div ref={this.dlg_inner} className="evq-dialog-inner" style={{borderTopWidth:this.hasTitle?0:1}} onMouseDown={this.activate}>
 							{this.renderTitle()}
 							<div ref={this.dlg_content} className="evq-dlg-content" style={!this.auto_height?{height:this.state.height-this.height_delta}:{}}>
 								{ this.props.children }

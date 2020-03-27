@@ -98,20 +98,18 @@ export class ListQueues extends evQueueComponent {
 			return (<div className="center error">Engine is offline</div>);
 		
 		return (
-			<div className="workflow-list">
-				<table>
-					<thead>
-						<tr>
-							<th>Name</th>
-							<th>Scheduler</th>
-							<th>Concurrency</th>
-							<th>Running tasks</th>
-							<th>Queued tasks</th>
-						</tr>
-					</thead>
-					<tbody>{ this.renderQueuesList(idx) }</tbody>
-				</table>
-			</div>
+			<table>
+				<thead>
+					<tr>
+						<th>Name</th>
+						<th>Scheduler</th>
+						<th>Concurrency</th>
+						<th>Running tasks</th>
+						<th>Queued tasks</th>
+					</tr>
+				</thead>
+				<tbody>{ this.renderQueuesList(idx) }</tbody>
+			</table>
 		);
 	}
 	
@@ -138,6 +136,3 @@ export class ListQueues extends evQueueComponent {
 		);
 	}
 }
-
-if(document.querySelector('#queues'))
-	ReactDOM.render(<ListQueues />, document.querySelector('#queues'));

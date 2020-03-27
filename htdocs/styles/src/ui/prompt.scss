@@ -1,0 +1,22 @@
+div.evq-prompt {
+	div.evq-content {
+		padding: 5px;
+		text-align: center;
+		
+		div {
+			margin-bottom:0.5rem;
+		}
+	}
+	
+	div.evq-buttons {
+		text-align: center;
+	}
+	
+	input {
+		width: calc(100% - 2rem);
+	}
+	
+	button {
+		margin: 1rem 1rem 0rem 1rem;
+	}
+}

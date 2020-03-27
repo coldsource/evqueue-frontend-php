@@ -3,9 +3,13 @@
 @import 'src/global/formdiv.scss';
 @import 'src/global/table.scss';
 @import 'src/global/errors.scss';
+@import 'src/global/fonts.scss';
+@import 'src/global/text.scss';
+@import 'src/global/footer.scss';
 
 @import 'src/ui/dialog.scss';
 @import 'src/ui/confirm.scss';
+@import 'src/ui/prompt.scss';
 @import 'src/ui/alert.scss';
 @import 'src/ui/tabs.scss';
 @import 'src/ui/pannel.scss';
@@ -19,6 +23,7 @@
 @import 'src/components/panels/instances/details.scss';
 @import 'src/components/panels/instances/filters.scss';
 @import 'src/components/panels/queues/list.scss';
+@import 'src/components/panels/workflows/list.scss';
 @import 'src/components/menus/header.scss';
 
 @import 'src/pages/auth.scss';

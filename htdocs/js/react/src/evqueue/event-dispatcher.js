@@ -37,6 +37,7 @@ export class EventDispatcher {
 		// States for evqueue events
 		this.external_id = 0;
 		this.handlers = {};
+		this.external_id_ref = {};
 		this.subscriptions = [];
 		
 		// State for cluster events
@@ -73,6 +74,7 @@ export class EventDispatcher {
 		// Store state
 		var external_id = ++this.external_id;
 		this.handlers[external_id] = handler;
+		this.external_id_ref[external_id] = api.ref;
 		this.subscriptions.push({
 			event:event,
 			api: api,
@@ -96,6 +98,7 @@ export class EventDispatcher {
 				external_id = subscriptions[i].external_id;
 				subscriptions.splice(i,1);
 				delete this.handlers[external_id];
+				delete this.external_id_ref[external_id];
 				this.evqueue_event.Unsubscribe(event, external_id, instance_id);
 				return;
 			}
@@ -104,7 +107,8 @@ export class EventDispatcher {
 	
 	Dispatch(data) {
 		var external_id = parseInt(data.documentElement.getAttribute('external-id'));
-		this.handlers[external_id](data);
+		var ref = this.external_id_ref[external_id];
+		this.handlers[external_id](data, ref);
 	}
 	
 	StateChange(node, name, state) {

@@ -1,0 +1,16 @@
+div.evq-workflows-list {
+	.git_uptodate {
+	}
+
+	.git_needpull {
+		color: orange;
+	}
+
+	.git_needpush {
+		color: green;
+	}
+
+	.git_conflict {
+		color: red;
+	}
+}

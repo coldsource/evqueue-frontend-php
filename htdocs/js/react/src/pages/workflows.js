@@ -16,38 +16,22 @@
   *
   * Author: Thibault Kummer
   */
-
+ 
 'use strict';
 
-export class Panel extends React.Component {
+import {HeaderMenu} from '../components/menus/header.js';
+import {WorkflowsList} from '../components/panels/workflows/list.js';
+
+export class PageWorkflows extends React.Component {
 	constructor(props) {
 		super(props);
 	}
 	
-	renderActions() {
-		if(!this.props.actions)
-			return;
-		
-		var ret = [];
-		for(var idx=this.props.actions.length-1;idx>=0;idx--)
-		{
-			var action = this.props.actions[idx];
-			ret.push(<span key={idx} className={'action faicon '+ action.icon} title={action.title} onClick={action.callback}></span>);
-		}
-		return ret;
-	}
-	
 	render() {
 		return (
-			<div className="evq-pannel">
-				<div className="evq-pannel-title">
-					{this.props.left?this.props.left:''}
-					<span className="evq-pannel-title">{this.props.title}</span>
-					{this.renderActions()}
-				</div>
-				<div className={this.props.noborder?"":"evq-pannel-content"}>
-					{this.props.children}
-				</div>
+			<div>
+				<HeaderMenu />
+				<WorkflowsList />
 			</div>
 		);
 	}
