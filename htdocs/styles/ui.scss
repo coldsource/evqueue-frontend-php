@@ -1,3 +1,5 @@
+@import 'src/variables/colors.scss';
+
 @import 'src/global/content.scss';
 @import 'src/global/tabbed.scss';
 @import 'src/global/formdiv.scss';
@@ -23,6 +25,8 @@
 @import 'src/components/panels/instances/filters.scss';
 @import 'src/components/panels/queues/list.scss';
 @import 'src/components/panels/workflows/list.scss';
+@import 'src/components/panels/logs/filters.scss';
+@import 'src/components/panels/logs/engine.scss';
 @import 'src/components/menus/header.scss';
 
 @import 'src/pages/auth.scss';

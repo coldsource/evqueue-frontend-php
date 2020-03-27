@@ -122,14 +122,30 @@ export class evQueueComponent extends React.Component {
 		var self = this;
 		return new Promise(function(resolve, reject) {
 			self.evqueue_api.API(api).then( (xml) => {
-				if(xml && xml.documentElement.getAttribute('error'))
+				var has_error = false;
+				
+				if(xml)
 				{
-					var error = xml.documentElement.getAttribute('error');
-					var code = xml.documentElement.getAttribute('error-code');
-					App.warning("evQueue engine returned error : "+error+" ("+code+")");
-					reject(error);
+					var xmla;
+					if(!Array.isArray(xml))
+						xmla = [ xml ];
+					else
+						xmla = xml;
+					
+					for(var i=0;i<xmla.length;i++)
+					{
+						if(xmla[i].documentElement.hasAttribute('error'))
+						{
+							var error = xmla[i].documentElement.getAttribute('error');
+							var code = xmla[i].documentElement.getAttribute('error-code');
+							App.warning("evQueue engine returned error : "+error+" ("+code+")");
+							reject(error);
+							has_error = true;
+						}
+					}
 				}
-				else
+				
+				if(!has_error)
 					resolve(xml);
 			});
 		});

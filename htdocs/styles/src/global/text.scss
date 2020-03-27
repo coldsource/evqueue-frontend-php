@@ -6,9 +6,9 @@
 	text-align: right;
 }
 
-.success { color: #27ae60 }
+.success { color: $evq-success }
 .errorThenSuccess, .warning { color: #e67e22; }
-.error { color: #c0392b; }
+.error { color: $evq-error; }
 .skipped { color: #95a5a6; }
 
 div.error {
@@ -19,4 +19,8 @@ div.error {
 
 .action {
 	cursor: pointer;
+}
+
+.bold {
+	font-weight: bold;
 }

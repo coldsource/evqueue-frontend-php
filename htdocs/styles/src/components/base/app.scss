@@ -16,13 +16,13 @@ div.evq-messages {
 	
 	span.notice {
 		font-weight: bold;
-		color: green;
+		color: $evq-success;
 		line-height: 150%;
 	}
 	
 	span.warning {
 		font-weight: bold;
-		color: #f52302;
+		color: $evq-error;
 		line-height: 150%;
 	}
 }

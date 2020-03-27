@@ -38,6 +38,13 @@ export class HeaderMenu extends React.Component {
 				submenu: [
 					{ label: 'Workflows', icon: 'fa-cubes', url: '/workflows' }
 				]
+			},
+			{
+				label: 'Logging',
+				icon: 'fa-file-text-o',
+				submenu: [
+					{ label: 'Engine logs', icon: 'fa-file-text-o', url: '/logs-engine' }
+				]
 			}
 		];
 		

@@ -1,0 +1,33 @@
+.evq-engine-logs {
+	.LOG_EMERG {
+		background-color: #FF0000;
+	}
+	
+	.LOG_ALERT {
+		background-color: #FF1A13;
+	}
+	
+	.LOG_CRIT {
+		background-color: #FF4B23;
+	}
+	
+	.LOG_ERR {
+		background-color: #FF823E;
+	}
+	
+	.LOG_WARNING {
+		background-color: #FFA149;
+	}
+	
+	.LOG_NOTICE {
+		background-color: #43bd24;
+	}
+	
+	.LOG_INFO {
+		background-color: #90FF8A;
+	}
+	
+	.LOG_DEBUG {
+		background-color: #FFFFFF;
+	}
+}
