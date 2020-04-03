@@ -20,18 +20,86 @@
 'use strict';
 
 import {job} from './job.js';
+import {task} from './task.js';
 
 export class workflow {
 	constructor()
 	{
 		this.subjobs = [ new job({name: "New job"}) ];
 		
+		this.wf_pre_undo = '';
 		this.wf_undo = [];
 		this.wf_redo = [];
 	}
 	
+	loadXML(workflow) {
+		this.subjobs = [];
+		
+		this.name= workflow.hasAttribute('name')?workflow.getAttribute('name'):'';
+		this.comment = workflow.hasAttribute('comment')?workflow.getAttribute('comment'):'';
+		this.group= workflow.hasAttribute('group')?workflow.getAttribute('group'):'';
+		
+		var subjobs_ite = workflow.ownerDocument.evaluate('workflow/subjobs',workflow);
+		var subjobs_node = subjobs_ite.iterateNext();
+		this.load_subjobs(subjobs_node, this.subjobs);
+	}
+	
+	load_subjobs(subjobs_node, subjobs) {
+		var jobs_ite = subjobs_node.ownerDocument.evaluate('job',subjobs_node);
+		
+		var job_node;
+		while(job_node = jobs_ite.iterateNext())
+		{
+			var new_job = new job(this.node_to_object(job_node));
+			
+			var tasks_ite = job_node.ownerDocument.evaluate('tasks',job_node);
+			var tasks_node = tasks_ite.iterateNext();
+			if(tasks_node)
+				this.load_tasks(tasks_node, new_job.tasks);
+			
+			subjobs.push(new_job);
+			
+			var subjobs_node2 = job_node.ownerDocument.evaluate('subjobs',job_node).iterateNext();
+			if(subjobs_node2)
+				this.load_subjobs(subjobs_node2, new_job.subjobs);
+		}
+	}
+	
+	load_tasks(tasks_node, tasks) {
+		var tasks_ite = tasks_node.ownerDocument.evaluate('task',tasks_node);
+		
+		var task_node;
+		while(task_node = tasks_ite.iterateNext())
+		{
+			var new_task = new task(this.node_to_object(task_node));
+			
+			tasks.push(new_task);
+		}
+	}
+	
+	node_to_object(node) {
+		var obj = {};
+		for(var i=0;i<node.attributes.length;i++)
+			obj[node.attributes[i].name] = node.attributes[i].value;
+		return obj;
+	}
+	
 	backup() {
 		this.wf_undo.push(JSON.stringify(this.subjobs));
+		this.wf_redo = [];
+	}
+	
+	preBackup() {
+		this.wf_pre_undo = JSON.stringify(this.subjobs);
+	}
+	
+	postBackup() {
+		if(this.wf_pre_undo!='')
+		{
+			this.wf_undo.push(this.wf_pre_undo);
+			this.wf_pre_undo = '';
+		}
+		
 		this.wf_redo = [];
 	}
 	
@@ -64,7 +132,7 @@ export class workflow {
 		if(this.wf_redo.length==0)
 			return;
 		
-		this.wf_undo.push(JSON.stringify(this.state.workflow));
+		this.wf_undo.push(JSON.stringify(this.subjobs));
 		this.subjobs = this.restore(this.wf_redo.pop());
 	}
 	
@@ -79,8 +147,6 @@ export class workflow {
 			if(subjobs[idx]===new_job || subjobs[idx-1]===new_job)
 				return "Cannot move a job left of itself";
 
-			this.backup();
-			
 			subjobs.splice(idx,0, new_job);
 			
 			if(type=='job')
@@ -91,8 +157,6 @@ export class workflow {
 			if(subjobs[idx]===new_job || subjobs[idx+1]===new_job)
 				return "Cannot move a job right of itself";
 			
-			this.backup();
-			
 			subjobs.splice(idx+1,0, new_job);
 			
 			if(type=='job')
@@ -102,8 +166,6 @@ export class workflow {
 		{
 			if(subjobs[idx]===new_job)
 				 return "Cannot move a job above itself";
-			
-			this.backup();
 			
 			if(type=='job')
 				new_job.subjobs = [ subjobs[idx] ];
@@ -125,8 +187,6 @@ export class workflow {
 				if(subjobs[idx].subjobs[i]===new_job)
 					return "Cannot move a job above itself";
 			}
-			
-			this.backup();
 			
 			if(type=='job')
 				new_job.subjobs = subjobs[idx].subjobs;

@@ -176,36 +176,34 @@ export class InstanceFilters extends evQueueComponent {
 		
 		return (
 			<div className="formdiv instance_filters">
-				<form>
-					<div>
-						<label>Node</label>
-						<NodeSelector all={true} name="filter_node" value={this.state.filters.filter_node} onChange={this.filterChange} />
-					</div>
-					<div>
-						<label>Workflow</label>
-						<WorkflowSelector valueType="name" name="filter_workflow" value={this.state.filters.filter_workflow} onChange={this.filterChange}/>
-					</div>
-					<div>
-						<label>Tag</label>
-						<TagSelector name="filter_tagged" value={this.state.filters.filter_tagged} onChange={this.filterChange}/>
-					</div>
-					<div>
-						<label>Launched between</label>
-						Date&#160;:&#160;<DatePicker name="dt_inf" value={this.state.filters.dt_inf} onChange={this.filterChange} />
-						&#160;
-						Hour&#160;:&#160;<Autocomplete className="hour" name="hr_inf" value={this.state.filters.hr_inf} autocomplete={this.hours} onChange={this.filterChange} />
-						&#160;&#160;<b>and</b>&#160;&#160;
-						Date&#160;:&#160;<DatePicker name="dt_sup" value={this.state.filters.dt_sup} onChange={this.filterChange} />
-						&#160;
-						Hour&#160;:&#160;<Autocomplete className="hour" name="hr_sup" value={this.state.filters.hr_sup} autocomplete={this.hours} onChange={this.filterChange} />
-					</div>
-					<div>
-						<label>Workflows that were running at</label>
-						Date&#160;:&#160;<DatePicker name="dt_at" value={this.state.filters.dt_at} onChange={this.filterChange} />
-						&#160;
-						Hour&#160;:&#160;<Autocomplete className="hour" name="hr_at" value={this.state.filters.hr_at} autocomplete={this.hours} onChange={this.filterChange} />
-					</div>
-				</form>
+				<div>
+					<label>Node</label>
+					<NodeSelector all={true} name="filter_node" value={this.state.filters.filter_node} onChange={this.filterChange} />
+				</div>
+				<div>
+					<label>Workflow</label>
+					<WorkflowSelector valueType="name" name="filter_workflow" value={this.state.filters.filter_workflow} onChange={this.filterChange}/>
+				</div>
+				<div>
+					<label>Tag</label>
+					<TagSelector name="filter_tagged" value={this.state.filters.filter_tagged} onChange={this.filterChange}/>
+				</div>
+				<div>
+					<label>Launched between</label>
+					Date&#160;:&#160;<DatePicker name="dt_inf" value={this.state.filters.dt_inf} onChange={this.filterChange} />
+					&#160;
+					Hour&#160;:&#160;<Autocomplete className="hour" name="hr_inf" value={this.state.filters.hr_inf} autocomplete={this.hours} onChange={this.filterChange} />
+					&#160;&#160;<b>and</b>&#160;&#160;
+					Date&#160;:&#160;<DatePicker name="dt_sup" value={this.state.filters.dt_sup} onChange={this.filterChange} />
+					&#160;
+					Hour&#160;:&#160;<Autocomplete className="hour" name="hr_sup" value={this.state.filters.hr_sup} autocomplete={this.hours} onChange={this.filterChange} />
+				</div>
+				<div>
+					<label>Workflows that were running at</label>
+					Date&#160;:&#160;<DatePicker name="dt_at" value={this.state.filters.dt_at} onChange={this.filterChange} />
+					&#160;
+					Hour&#160;:&#160;<Autocomplete className="hour" name="hr_at" value={this.state.filters.hr_at} autocomplete={this.hours} onChange={this.filterChange} />
+				</div>
 			</div>
 		);
 	}

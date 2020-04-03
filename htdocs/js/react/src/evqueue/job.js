@@ -23,7 +23,7 @@ export class job {
 	constructor(desc = {})
 	{
 		if(typeof desc=='object') {
-			this.name = desc.name?desc.name:'New job';
+			this.name = desc.name?desc.name:'';
 			this.condition = desc.condition?desc.condition:'';
 			this.loop = desc.loop?desc.loop:'';
 			this.iteration_condition = desc.iteration_condition?desc.iteration_condition:'';
@@ -40,5 +40,22 @@ export class job {
 		if(job.subjobs.length==0)
 			return job;
 		return this.left_leaf(job.subjobs[0]);
+	}
+	
+	addTask(task) {
+		if(this.tasks.indexOf(task)!=-1)
+			return "This task is already in the job";
+		
+		this.tasks.push(task);
+		return true;
+	}
+	
+	removeTask(task) {
+		var idx = this.tasks.indexOf(task);
+		if(idx==-1)
+			return;
+		
+		this.tasks.splice(idx, 1);
+		return true;
 	}
 }

@@ -22,11 +22,16 @@
 export class task {
 	constructor(desc = {})
 	{
+		this.type = 'BINARY';
+		this.path = '';
+		this.wd = '';
+		this.condition = '';
+		this.loop = '';
+		this.iteration_condition = '';
+		this.retry_schedule = '';
+		
 		if(typeof desc=='object') {
-			this.path = desc.path?desc.path:'/bin/ls';
-			this.condition = desc.condition?desc.condition:'';
-			this.loop = desc.loop?desc.loop:'';
-			this.iteration_condition = desc.iteration_condition?desc.iteration_condition:'';
+			Object.assign(this, desc);
 		}
 	}
 }

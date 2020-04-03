@@ -1,7 +1,7 @@
-$job-width: 12rem;
+$job-width: 13rem;
 $job-height: 5rem;
 $job-hspace: 1rem;
-$job-vspace: 1rem;
+$job-vspace: 0.5rem;
 $separator-color: #e74c3c;
 
 .evq-workflow-editor {
@@ -9,7 +9,7 @@ $separator-color: #e74c3c;
 	font-size: 0px;
 	
 	.dragover {
-		border: 1px dotted;
+		border: 1px dotted !important;
 	}
 	
 	.trash {
@@ -95,6 +95,20 @@ $separator-color: #e74c3c;
 			span {
 				float: left;
 			}
+		}
+	}
+	
+	div.task {
+		span.cmd {
+			font-size: 0.8rem;
+		}
+		
+		span.params {
+			font-size: 0.6rem;
+		}
+		
+		span.faicon {
+			font-size: 0.8rem;
 		}
 	}
 }

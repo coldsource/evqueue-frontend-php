@@ -21,6 +21,7 @@
 
 import {Dialogs} from '../../ui/dialogs.js';
 import {JobEditor} from '../dialogs/jobs/editor.js';
+import {Task} from './task.js';
 
 export class Job extends React.Component {
 	constructor(props) {
@@ -32,8 +33,10 @@ export class Job extends React.Component {
 	}
 	
 	renderTasksList() {
-		return this.props.desc.tasks.map( (task, idx) => {
-			return (<div key={idx}>{task.path}</div>);
+		return this.props.job.tasks.map( (task, idx) => {
+			return (
+				<Task task={task} key={idx} onDragStart={ (e) => this.props.onTaskDragStart(e, this.props.job, task) } />
+			);
 		});
 	}
 	
@@ -41,23 +44,26 @@ export class Job extends React.Component {
 		return (
 			<div className="tasks">
 				{ this.renderTasksList() }
-				{ (this.state.add_task && this.props.onTaskAdd)?(<span className="faicon fa-plus" title="Add a new task to this job" onClick={ (e) => this.props.onTaskAdd(e, this.props.desc) }></span>):'' }
+				{ (this.state.add_task && this.props.onTaskAdd)?(<span className="faicon fa-plus" title="Add a new task to this job" onClick={ (e) => this.props.onTaskAdd(e, this.props.job) }></span>):'' }
 			</div>
 		);
 	}
 	
 	render() {
-		var job = this.props.desc;
+		var job = this.props.job;
 		
 		return (
 			<div className="job" draggable
-				onDragStart={ (e) => this.props.onDragStart(e, this.props.desc) }
+				onDragStart={ (e) => this.props.onJobDragStart(e, this.props.job) }
+				onDragOver={ this.props.onJobDragOver }
+				onDragLeave={ this.props.onJobDragLeave }
+				onDrop={ this.props.onJobDrop }
 				onMouseEnter={ () => this.setState({add_task: true}) }
 				onMouseLeave={ () => this.setState({add_task: false}) }
 			>
-				<div className="action title" onClick={ (e) => this.props.onChange?Dialogs.open(JobEditor, {desc:this.props.desc, onChange: this.props.onChange}) :false }>
-					{ job.condition || job.iteration_condition?(<span className="faicon fa-code-fork"></span>):'' }
-					{ job.loop?(<span className="faicon fa-repeat"></span>):'' }
+				<div className="action title" onClick={ (e) => this.props.onChange?Dialogs.open(JobEditor, {desc:this.props.job, onChange: this.props.onChange}) :false }>
+					{ job.condition || job.iteration_condition?(<span className="faicon fa-code-fork" title="This job has a condition"></span>):'' }
+					{ job.loop?(<span className="faicon fa-repeat" title="This job has a loop"></span>):'' }
 					{ job.name }
 				</div>
 				{ this.renderTasks() }
