@@ -60,7 +60,7 @@ export class TaskEditor extends React.Component {
 				</div>
 				<div>
 					<label>Path</label>
-					<input type="text" name="name" value={task.name} onChange={this.props.onChange} />
+					<input type="text" name="path" value={task.path} onChange={this.props.onChange} />
 				</div>
 				<div>
 					<label>Working directory</label>

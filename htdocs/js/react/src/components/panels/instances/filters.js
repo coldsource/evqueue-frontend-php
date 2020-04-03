@@ -34,6 +34,8 @@ export class InstanceFilters extends evQueueComponent {
 		this.state.filters = {
 			filter_node: '',
 			filter_name: '',
+			filter_tag_id: 0,
+			tag_label: '',
 			dt_inf: '',
 			hr_inf: '',
 			filter_launched_from: '',
@@ -81,8 +83,8 @@ export class InstanceFilters extends evQueueComponent {
 		return date+' '+hour;
 	}
 	
-	filterChange(event) {
-		this.setFilter(event.target.name,event.target.value);
+	filterChange(event, opt) {
+		this.setFilter(event.target.name,event.target.value, opt);
 		
 		if(event.target.name=='dt_inf' || event.target.name=='hr_inf')
 			this.setFilter('filter_launched_from',this.implodeDate(this.state.filters.dt_inf,this.state.filters.hr_inf));
@@ -102,9 +104,11 @@ export class InstanceFilters extends evQueueComponent {
 			this.props.onChange.current.updateFilters(this.state.filters);
 	}
 	
-	setFilter(name,value) {
+	setFilter(name,value, opt) {
 		var filters = this.state.filters;
 		filters[name] = value;
+		if(name=='filter_tag_id')
+			filters.tag_label = opt;
 		this.setState({filters:filters});
 	}
 	
@@ -149,7 +153,7 @@ export class InstanceFilters extends evQueueComponent {
 		else if(this.state.filters.filter_launched_until)
 			explain += ' before '+this.state.filters.filter_launched_until;
 		else if(this.state.filters.filter_tag_id)
-			explain += ' tagged '+$('#searchform select[name=tagged] option[value='+this.state.filters.filter_tag_id+']').text();
+			explain += ' tagged « '+this.state.filters.tag_label+' »';
 
 		var i = 0;
 		if(Object.keys(this.state.parameters).length)
@@ -186,7 +190,7 @@ export class InstanceFilters extends evQueueComponent {
 				</div>
 				<div>
 					<label>Tag</label>
-					<TagSelector name="filter_tagged" value={this.state.filters.filter_tagged} onChange={this.filterChange}/>
+					<TagSelector name="filter_tag_id" value={this.state.filters.filter_tag_id} onChange={this.filterChange}/>
 				</div>
 				<div>
 					<label>Launched between</label>

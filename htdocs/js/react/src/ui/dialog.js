@@ -105,6 +105,10 @@ export class Dialog extends React.Component {
 			this.componentDidUpdate();
 	}
 	
+	componentWillUnmount() {
+		this.close();
+	}
+	
 	componentDidUpdate() {
 		if(this.state.resizing || this.state.moving || !this.auto_height)
 			return;

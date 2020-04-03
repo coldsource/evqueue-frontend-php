@@ -50,6 +50,7 @@ export class WorkflowEditor extends evQueueComponent {
 		this.redo = this.redo.bind(this);
 		
 		this.jobUpdate = this.jobUpdate.bind(this);
+		this.taskUpdate = this.taskUpdate.bind(this);
 		this.taskAdd = this.taskAdd.bind(this);
 	}
 	
@@ -158,6 +159,16 @@ export class WorkflowEditor extends evQueueComponent {
 		Dialogs.instance.forceUpdate();
 	}
 	
+	taskUpdate(e, job, task) {
+		this.state.workflow.backup();
+		
+		task[e.target.name] = e.target.value;
+		this.setState({workflow: this.state.workflow});
+		
+		// Force dialogs to update because dialogs are rendered outside of this component 
+		Dialogs.instance.forceUpdate();
+	}
+	
 	taskAdd(e, job) {
 		this.state.workflow.backup();
 		
@@ -192,7 +203,8 @@ export class WorkflowEditor extends evQueueComponent {
 						onJobDragOver={ (e) => this.onDragOver(e, 'job') }
 						onJobDragLeave={ this.onDragLeave }
 						onJobDrop={ (e) => this.onDrop(e, subjobs, idx, 'job') }
-						onChange={ (e) => this.jobUpdate(e, job) }
+						onJobChange={ (e) => this.jobUpdate(e, job) }
+						onTaskChange={ this.taskUpdate }
 						onTaskDragStart={ this.onTaskDragStart }
 						onTaskAdd={ this.taskAdd }
 					/>

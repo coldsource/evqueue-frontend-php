@@ -44,6 +44,11 @@ export class evQueueComponent extends React.Component {
 			};
 		}
 		
+		// Subscriptions state
+		this.subscriptions_asked = 0;
+		this.subscriptions_done = 0;
+		this.subscriptions_error = 0;
+		
 		this.toggleAutorefresh = this.toggleAutorefresh.bind(this);
 		if(this.evQueueEvent!==undefined)
 			this.evQueueEvent = this.evQueueEvent.bind(this);
@@ -62,14 +67,18 @@ export class evQueueComponent extends React.Component {
 			cluster: {
 				nodes_names: this.evqueue_event.GetNodes(),
 				nodes_states: this.evqueue_event.GetStates()
-			}
+			},
+			subscriptions: 'PENDING'
 		};
+		
+		this.is_mounted = true;
 	}
 	
 	componentWillUnmount()
 	{
 		this.event_dispatcher.UnsubscribeClusterState(this);
 		this.event_dispatcher.Unsubscribe(this);
+		this.is_mounted = false;
 	}
 	
 	toggleAutorefresh() {
@@ -192,10 +201,27 @@ export class evQueueComponent extends React.Component {
 	
 	Subscribe(event,api,send_now,instance_id = 0, handler = undefined)
 	{
+		var self = this;
+		
 		if(handler===undefined)
 			handler = this.evQueueEvent;
 		
-		return this.event_dispatcher.Subscribe(event, api, send_now, instance_id, this, handler);
+		this.subscriptions_asked++;
+		this.event_dispatcher.Subscribe(event, api, send_now, instance_id, this, handler).then(
+			() => {
+				this.subscriptions_done++;
+				if(this.subscriptions_done==this.subscriptions_asked && self.is_mounted)
+					this.setState({subscriptions: 'DONE'});
+			},
+			(error) => {
+				if(this.subscriptions_error==0)
+					App.warning(error);
+				
+				this.subscriptions_error++;
+				if(self.is_mounted)
+					this.setState({subscriptions: 'ERROR'});
+			}
+		);
 	}
 	
 	Unsubscribe(event,instance_id = 0)

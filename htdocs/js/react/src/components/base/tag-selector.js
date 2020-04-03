@@ -28,37 +28,48 @@ export class TagSelector extends evQueueComponent {
 		
 		this.state.values = [];
 		
+		this.tags = {};
+		
 		this.changeTag = this.changeTag.bind(this);
 	}
 	
 	componentDidMount() {
-		var self = this;
-		this.API({
-			group: 'tags',
-			action: 'list'
-		}).then( (data) => {
-			var tags = this.xpath('/response/tag',data.documentElement);
-			
-			var values = [];
-			for(var i=0;i<tags.length;i++)
-			{
-				var tag = tags[i];
-				values.push({name: tag.label, value: tag.id});
-			}
-			this.setState({values: values});
-		});
+		var api = { node:this.props.node, group:'tags',action:'list',attributes:{} };
+		this.Subscribe('TAG_CREATED',api,false,this.props.id,this.evQueueEventTags);
+		this.Subscribe('TAG_MODIFIED',api,false,this.props.id,this.evQueueEventTags);
+		this.Subscribe('TAG_REMOVED',api,true,this.props.id,this.evQueueEventTags);
+	}
+	
+	evQueueEvent(data) {
+		var tags = this.xpath('/response/tag',data.documentElement);
+		
+		var values = [];
+		for(var i=0;i<tags.length;i++)
+		{
+			var tag = tags[i];
+			values.push({name: tag.label, value: tag.id});
+			this.tags[tag.id] = tag.label;
+		}
+		
+		this.setState({values: values});
 	}
 	
 	changeTag(event) {
 		this.setState({value:event.target.value});
 		if(this.props.onChange)
-			this.props.onChange(event);
+			this.props.onChange(event, this.tags[event.target.value]);
 	}
 	
 	render() {
 		return (
-			<Select value={this.props.value} values={this.state.values} name={this.props.name} placeholder="Choose a tag" onChange={this.changeTag}>
-			</Select>
+			<Select
+				value={this.props.value}
+				values={this.state.values}
+				name={this.props.name}
+				placeholder="Choose a tag"
+				onChange={this.changeTag}
+				onSubmit={this.props.onSubmit}
+			/>
 		);
 	}
 }

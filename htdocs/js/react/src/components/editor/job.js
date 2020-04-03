@@ -35,7 +35,12 @@ export class Job extends React.Component {
 	renderTasksList() {
 		return this.props.job.tasks.map( (task, idx) => {
 			return (
-				<Task task={task} key={idx} onDragStart={ (e) => this.props.onTaskDragStart(e, this.props.job, task) } />
+				<Task
+					task={task}
+					key={idx}
+					onDragStart={ (e) => this.props.onTaskDragStart(e, this.props.job, task) }
+					onChange={ (e) => this.props.onTaskChange(e, this.props.job, task) }
+				/>
 			);
 		});
 	}
@@ -61,7 +66,7 @@ export class Job extends React.Component {
 				onMouseEnter={ () => this.setState({add_task: true}) }
 				onMouseLeave={ () => this.setState({add_task: false}) }
 			>
-				<div className="action title" onClick={ (e) => this.props.onChange?Dialogs.open(JobEditor, {desc:this.props.job, onChange: this.props.onChange}) :false }>
+				<div className="action title" onClick={ (e) => this.props.onJobChange?Dialogs.open(JobEditor, {desc:this.props.job, onChange: this.props.onJobChange}) :false }>
 					{ job.condition || job.iteration_condition?(<span className="faicon fa-code-fork" title="This job has a condition"></span>):'' }
 					{ job.loop?(<span className="faicon fa-repeat" title="This job has a loop"></span>):'' }
 					{ job.name }

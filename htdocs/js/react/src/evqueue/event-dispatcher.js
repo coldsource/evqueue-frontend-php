@@ -126,7 +126,7 @@ export class EventDispatcher {
 					var api = {};
 					Object.assign(api,subscriptions[i].api);
 					api.node = name;
-					this.evqueue_event.Subscribe(subscriptions[i].event,api,true,subscriptions[i].instance_id,subscriptions[i].external_id)
+					this.evqueue_event.Subscribe(subscriptions[i].event,api,true,subscriptions[i].instance_id,subscriptions[i].external_id);
 				}
 			}
 		}

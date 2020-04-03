@@ -32,6 +32,8 @@ export class Autocomplete extends React.Component {
 		
 		this.toggleDropdown = this.toggleDropdown.bind(this);
 		this._mouseDown = this._mouseDown.bind(this);
+		this._keyUp= this._keyUp.bind(this);
+		this.click = this.click.bind(this);
 		this.applyFilter = this.applyFilter.bind(this);
 		this.changeValue = this.changeValue.bind(this);
 	}
@@ -49,6 +51,29 @@ export class Autocomplete extends React.Component {
   _mouseDown(event) {
 		if(this.ref.current && !this.ref.current.contains(event.target))
 			this.setState({dropdown_opened:false});
+	}
+	
+	_keyUp(e) {
+		 if(e.keyCode!==13)
+			 return;
+		 
+		 this.submit(this.props.value);
+	}
+	
+	submit(value) {
+		this.setState({dropdown_opened: false});
+		
+		if(this.props.onSubmit)
+			 this.props.onSubmit(value);
+	}
+	
+	click(value) {
+		this.setState({dropdown_opened:false});
+		
+		this.changeValue(value);
+		
+		if(this.props.onChoose)
+			this.props.onChoose(value);
 	}
 	
 	toggleDropdown() {
@@ -101,7 +126,7 @@ export class Autocomplete extends React.Component {
 			return (<li>No results found</li>);
 		
 		return autocomplete.map( (value) => {
-			return (<li key={value} onClick={ () => {this.setState({dropdown_opened:false}); this.changeValue(value)} }>{value}</li>);
+			return (<li key={value} onClick={ () => this.click(value) }>{value}</li>);
 		});
 	}
 	
@@ -110,9 +135,21 @@ export class Autocomplete extends React.Component {
 		if(this.props.className)
 			className += ' '+this.props.className;
 		
+		var value_style = {
+			borderRadius: this.state.dropdown_opened?'0.4rem 0.4rem 0rem 0rem':'0.4rem 0.4rem 0.4rem 0.4rem'
+		};
+		
 		return (
 			<div ref={this.ref} className={className}>
-				<input type="text" value={this.props.value} onChange={ (event) => {this.changeValue(event.target.value)} } onFocus={this.toggleDropdown} />
+				<input
+					type="text"
+					value={this.props.value}
+					style={value_style}
+					onChange={ (event) => {this.changeValue(event.target.value)} }
+					onClick={ (e) => { if(!this.state.dropdown_opened) this.toggleDropdown() } }
+					onFocus={this.toggleDropdown}
+					onKeyUp={this._keyUp}
+				/>
 				{this.renderDropdown()}
 			</div>
 		);

@@ -34,6 +34,9 @@ export class InstanceDetails extends evQueueComponent {
 		super(props);
 		
 		this.details_dlg = [];
+		
+		this.state.tags = [];
+		this.state.tags_id = [];
 		this.state.tag_label = '';
 		
 		this.dlg = React.createRef();
@@ -80,9 +83,14 @@ export class InstanceDetails extends evQueueComponent {
 	evQueueEventTags(data) {
 		var ret_tags = this.xpath('/response/tag',data.documentElement);
 		var tags = [];
+		var tags_id = [];
 		for(var i=0;i<ret_tags.length;i++)
+		{
 			tags.push(ret_tags[i].label);
-		this.setState({tags: tags});
+			tags_id.push(ret_tags[i].id);
+		}
+		
+		this.setState({tags: tags, tags_id: tags_id});
 	}
 	
 	relaunch() {
@@ -132,17 +140,35 @@ export class InstanceDetails extends evQueueComponent {
 		this.setState({tag_label:event.target.value});
 	}
 	
-	tag(tag_id) {
+	tag(tag) {
+		this.setState({tag_label: ''});
+		
+		var idx = this.state.tags.indexOf(tag);
+		if(idx==-1) {
+			this.API({
+				group: 'tag',
+				action: 'create',
+				attributes: { label: tag },
+				node: this.props.node
+			}).then( (xml) => {
+				var tag_id = xml.documentElement.getAttribute('tag-id');
+				return this._tag(tag_id, tag);
+			});
+		}
+		else
+			return this._tag(this.state.tags_id[idx], tag);
+	}
+	
+	_tag(tag_id, tag) {
 		this.simpleAPI({
 			group: 'instance',
 			action: 'tag',
 			attributes: {id:this.props.id, tag_id:tag_id},
 			node: this.props.node
-		},'Tagged instance '+this.props.id);
+		},'Tagged instance '+this.props.id+" with « "+tag+" »");
 	}
 	
 	untag(tag_id) {
-		console.log("untag");
 		this.simpleAPI({
 			group: 'instance',
 			action: 'untag',
@@ -298,17 +324,18 @@ export class InstanceDetails extends evQueueComponent {
 	
 	tabTags() {
 		return (
-			<div id="workflowtags">
-				Tag instance : <Autocomplete name="tag" value={this.state.tag_label} autocomplete={this.state.tags} onChange={this.changeTag} />
+			<div className="workflowtags">
+				<br />
+				Tag instance : <Autocomplete name="tag" value={this.state.tag_label} autocomplete={this.state.tags} onChange={this.changeTag} onSubmit={this.tag} onChoose={this.tag} />
 				<br /><br />
-				<ul>{this.renderTags()}</ul>
+				<ul className="workflowtags">{this.renderTags()}</ul>
 			</div>
 		);
 	}
 	
 	renderTags() {
 		return this.state.workflowtags.map( (tag) => {
-			return (<li key={tag.id}>{tag.label}<span className="faicon fa-remove" onClick={() => { this.untag(tag.id); }}></span></li>);
+			return (<li key={tag.id}><span className="faicon fa-remove" onClick={() => { this.untag(tag.id); }}></span>&#160;{tag.label}</li>);
 		});
 	}
 	
@@ -338,18 +365,19 @@ export class InstanceDetails extends evQueueComponent {
 	}
 	
 	render() {
+		if(this.state.subscriptions=='ERROR')
+			return (<div></div>);
+		
 		return (
-			<div>
-				<Dialog dlgid={this.props.dlgid} title={this.title()} width="400" height="auto" ref={this.dlg}>
-					<Tabs render={this.tabs} updateNotify={this.dlg}>
-						<Tab title="Tree" />
-						<Tab title="XML" />
-						<Tab title="Parameters" />
-						<Tab title="Tags" />
-						<Tab title="Debug" />
-					</Tabs>
-				</Dialog>
-			</div>
+			<Dialog dlgid={this.props.dlgid} title={this.title()} width="400" height="auto" ref={this.dlg}>
+				<Tabs render={this.tabs} updateNotify={this.dlg}>
+					<Tab title="Tree" />
+					<Tab title="XML" />
+					<Tab title="Parameters" />
+					<Tab title="Tags" />
+					<Tab title="Debug" />
+				</Tabs>
+			</Dialog>
 		);
 	}
 }
