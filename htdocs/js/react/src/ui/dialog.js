@@ -30,9 +30,12 @@ export class Dialog extends React.Component {
 			Dialogs.global.active.setState({active:false});
 		
 		// Add this instance to global state
+		this.dlgid = Dialogs.instance.dlgid++;
 		var zindex = this.props.modal?1001:Dialogs.global.max_z++;
 		Dialogs.global.active = this;
-		Dialogs.instance.state[this.props.dlgid].instance = this;
+		
+		if(Dialogs.instance.state[this.dlgid]!==undefined)
+			Dialogs.instance.state[this.dlgid].instance = this;
 		
 		
 		// Local state
@@ -221,7 +224,11 @@ export class Dialog extends React.Component {
 	}
 	
 	close() {
-		Dialogs.close(this.props.dlgid);
+		if(this.props.onClose!==undefined)
+			this.props.onClose();
+		
+		if(Dialogs.instance.state[this.dlgid]!==undefined)
+			Dialogs.close(this.dlgid);
 		
 		if(Dialogs.global.active==this)
 		{

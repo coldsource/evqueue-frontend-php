@@ -19,6 +19,7 @@
 
 'use strict';
 
+import {App} from '../../base/app.js';
 import {evQueueComponent} from '../../base/evqueue-component.js';
 import {Panel} from '../../../ui/panel.js';
 import {Tabs} from '../../../ui/tabs.js';
@@ -113,6 +114,10 @@ export class WorkflowsList extends evQueueComponent {
 		}
 		
 		this.setState({git_only_workflows: git_only_workflows});
+	}
+	
+	createWorkflow() {
+		App.changeURL('/workflow-editor');
 	}
 	
 	gitPull() {
@@ -261,7 +266,7 @@ export class WorkflowsList extends evQueueComponent {
 	render() {
 		var actions = [
 			{icon:'fa-cloud', title: "Pull git repository", callback:this.gitPull},
-			{icon:'fa-file-o', title: "Create new repository", callback:this.createWorkflow}
+			{icon:'fa-file-o', title: "Create new workflow", callback:this.createWorkflow}
 		];
 		
 		return (

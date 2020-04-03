@@ -47,7 +47,6 @@ export class Dialogs extends React.Component {
 	_open(dlg,props) {
 		props.ref=React.createRef();
 		this.setState({[this.dlgid]:{dlg:dlg,props:props}});
-		this.dlgid++;
 		return props.ref;
 	}
 	

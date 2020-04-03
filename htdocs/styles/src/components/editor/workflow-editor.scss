@@ -1,0 +1,100 @@
+$job-width: 12rem;
+$job-height: 5rem;
+$job-hspace: 1rem;
+$job-vspace: 1rem;
+$separator-color: #e74c3c;
+
+.evq-workflow-editor {
+	text-align: center;
+	font-size: 0px;
+	
+	.dragover {
+		border: 1px dotted;
+	}
+	
+	.trash {
+		position: fixed;
+		display: inline-bloc;
+		top: 2.5rem;
+		left: 0.5rem;
+		border-radius: 0.4rem;
+		font-size: 0.8rem;
+		width: $job-width;
+		
+		span {
+			font-size: 2rem;
+			padding: 0px;
+			margin: 0px;
+		}
+	}
+	
+	.new-job {
+		position: fixed;
+		display: inline-bloc;
+		top: 8.5rem;
+		left: 0.5rem;
+		width: $job-width;
+		font-size: 0.8rem;
+		
+		span {
+			font-size: 2rem;
+			padding: 0px;
+			margin: 0px;
+		}
+	}
+	
+	div.branch {
+		vertical-align: top;
+		display: inline-block;
+	}
+	
+	div.side-separator {
+		display: inline-block;
+		width: calc((100% - #{$job-width}) / 2 - #{$job-hspace});
+		min-width: $job-hspace;
+		height: $job-height;
+	}
+	
+	div.post-separator, div.pre-separator {
+		display: block;
+		width: 0px;
+		height: $job-vspace;
+		margin: auto;
+		border: 1px solid;
+		border-color: $separator-color;
+	}
+	
+	div.separator {
+		border: 1px solid;
+		height: 0px;
+		border-color: $separator-color;
+	}
+	
+	div.left-separator {
+		margin-left: calc(50% - 1px);
+	}
+	
+	div.right-separator {
+		margin-right: calc(50% - 1px);
+	}
+	
+	div.job  {
+		display: inline-block;
+		border: 1px solid #95a5a6;
+		border-radius: 0.4rem;
+		width: $job-width;
+		min-height: $job-height;
+		vertical-align: top;
+		font-size: $font-size;
+		
+		.title {
+			color: #34495e;
+			background-color: #bdc3c7;
+			padding: 0.5rem;
+			
+			span {
+				float: left;
+			}
+		}
+	}
+}

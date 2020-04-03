@@ -2,6 +2,8 @@ $outer-border: 3px;
 
 div.evq-dialog {
 	position: absolute;
+	text-align: left;
+	cursor: default;
 	
 	.evq-dialog-outer {
 		width: 100%;
@@ -24,6 +26,7 @@ div.evq-dialog {
 	}
 	
 	.evq-dlg-title {
+		text-align: left;
 		border-radius:5px 5px 0px 0px;
 		background-color: #909090;
 		padding: 5px;

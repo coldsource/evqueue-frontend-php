@@ -23,6 +23,7 @@ import {PageHome} from '../../pages/home.js';
 import {PageSystemState} from '../../pages/system-state.js';
 import {PageWorkflows} from '../../pages/workflows.js';
 import {PageEngineLogs} from '../../pages/enginelogs.js';
+import {PageWorkflowEditor} from '../../pages/workflow-editor.js';
 import {Page404} from '../../pages/404.js';
 import {PageAuth} from '../../pages/auth.js';
 
@@ -43,7 +44,7 @@ export class App extends React.Component {
 		var self = this;
 		window.onpopstate = (e) => {
 			self.changeURL(document.location.pathname);
-			return false;
+			return true;
 		};
 		
 		document.addEventListener('click', (e) => {
@@ -141,6 +142,8 @@ export class App extends React.Component {
 			return (<PageWorkflows />);
 		else if(path=='/logs-engine')
 			return (<PageEngineLogs />);
+		else if(path=='/workflow-editor')
+			return (<PageWorkflowEditor />);
 		
 		return (<Page404 />);
 	}

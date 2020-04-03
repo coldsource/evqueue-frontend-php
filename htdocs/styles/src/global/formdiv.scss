@@ -1,27 +1,25 @@
 div.formdiv {
-	form {
-		display: block;
+	display: block;
+	
+	&>div {
+		margin-top: 10px;
+		margin-bottom: 10px;
 		
-		&>div {
-			margin-top: 10px;
-			margin-bottom: 10px;
-			
-			&>label {
-				min-width: 15em;
-				display: inline-block;
-				text-align: right;
-				margin-right: 1em;
-				vertical-align: middle;
-			}
-			
-			&>input[type='text'] {
-				width: 21rem;
-				box-sizing: border-box;
-			}
-			
-			&>.evq-select {
-				width: 21rem;
-			}
+		&>label {
+			min-width: 15em;
+			display: inline-block;
+			text-align: right;
+			margin-right: 1em;
+			vertical-align: middle;
+		}
+		
+		&>input[type='text'] {
+			width: 21rem;
+			box-sizing: border-box;
+		}
+		
+		&>.evq-select {
+			width: 21rem;
 		}
 	}
 }

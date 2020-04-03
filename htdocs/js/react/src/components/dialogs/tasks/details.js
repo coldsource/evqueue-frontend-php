@@ -44,8 +44,6 @@ export class TaskDetails extends React.Component {
 	}
 	
 	componentWillUnmount() {
-		super.componentWillUnmount();
-		
 		if(this.timerID!==undefined)
 			clearInterval(this.timerID);
 	}
