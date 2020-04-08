@@ -21,7 +21,7 @@
 
 				<!-- Load base CSS -->
 				<link rel="stylesheet" type="text/css" href="{$SITE_BASE}styles/font-awesome.css"/>
-				<link rel="stylesheet" type="text/css" href="{$SITE_BASE}styles/ui.scss"/>
+				<link rel="stylesheet" type="text/css" href="{$SITE_BASE}styles/ui.css"/>
 				
 				<!-- Load additional CSS -->
 				<xsl:if test="$css != '' and exsl:node-set($css)/src">
