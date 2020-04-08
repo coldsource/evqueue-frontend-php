@@ -116,6 +116,7 @@ export class InstanceFilters extends evQueueComponent {
 		var filters = this.state.filters;
 		for(name in filters)
 			filters[name] = '';
+		filters.filter_tag_id = 0;
 		
 		this.setState({filters:filters, opened:false});
 		

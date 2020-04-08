@@ -53,44 +53,44 @@ export class JobEditor extends React.Component {
 			<div className="formdiv">
 				<div>
 					<label>Name</label>
-					<input type="text" name="name" value={this.props.desc.name} onChange={this.props.onChange} />
+					<input type="text" name="name" value={this.props.job.name} onChange={this.props.onChange} />
 				</div>
 			</div>
 		);
 	}
 	
 	renderTabConditionsLoop() {
-		var wait_condition = this.props.desc.condition.substr(0,8)=="evqWait(";
-		var wait_iteration_condition = this.props.desc.iteration_condition.substr(0,8)=="evqWait(";
+		var wait_condition = this.props.job.condition.substr(0,8)=="evqWait(";
+		var wait_iteration_condition = this.props.job.iteration_condition.substr(0,8)=="evqWait(";
 		
 		return (
 			<div className="formdiv">
 				<div>
 					<label>Condition</label>
-					<input type="text" name="condition" value={this.props.desc.condition} onChange={this.props.onChange} />
+					<input type="text" name="condition" value={this.props.job.condition} onChange={this.props.onChange} />
 				</div>
 				<div>
 					<label>Wait for condition to become true</label>
-					<Checkbox name="wait_condition" value={wait_condition} onChange={ (e) => this.changeWait(e,'condition',this.props.desc.condition) } />
+					<Checkbox name="wait_condition" value={wait_condition} onChange={ (e) => this.changeWait(e,'condition',this.props.job.condition) } />
 				</div>
 				<div>
 					<label>Loop</label>
-					<input type="text" name="loop" value={this.props.desc.loop} onChange={this.props.onChange} />
+					<input type="text" name="loop" value={this.props.job.loop} onChange={this.props.onChange} />
 				</div>
 				<div>
 					<label>Iteration condition</label>
-					<input type="text" name="iteration_condition" value={this.props.desc.iteration_condition} onChange={this.props.onChange} />
+					<input type="text" name="iteration_condition" value={this.props.job.iteration_condition} onChange={this.props.onChange} />
 				</div>
 				<div>
 					<label>Wait for condition to become true</label>
-					<Checkbox name="wait_iteration_condition" value={wait_iteration_condition} onChange={ (e) => this.changeWait(e,'iteration_condition',this.props.desc.iteration_condition) } />
+					<Checkbox name="wait_iteration_condition" value={wait_iteration_condition} onChange={ (e) => this.changeWait(e,'iteration_condition',this.props.job.iteration_condition) } />
 				</div>
 			</div>
 		);
 	}
 	
 	render() {
-		var name = this.props.desc.name?this.props.desc.name:'unnamed';
+		var name = this.props.job.name?this.props.job.name:'unnamed';
 		return (
 			<Dialog title={"Edit job « "+name+" »"} width="800" height="300" onClose={ this.props.onClose }>
 				<Tabs>

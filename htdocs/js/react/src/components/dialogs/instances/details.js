@@ -35,6 +35,7 @@ export class InstanceDetails extends evQueueComponent {
 		
 		this.details_dlg = [];
 		
+		this.state.workflowtags = [];
 		this.state.tags = [];
 		this.state.tags_id = [];
 		this.state.tag_label = '';
@@ -66,9 +67,9 @@ export class InstanceDetails extends evQueueComponent {
 		this.Subscribe('INSTANCE_UNTAGGED',api,true,this.props.id,this.evQueueEventWorkflowTags);
 		
 		var api = { node:this.props.node, group:'tags',action:'list',attributes:{} };
-		this.Subscribe('TAG_CREATED',api,false,this.props.id,this.evQueueEventTags);
-		this.Subscribe('TAG_MODIFIED',api,false,this.props.id,this.evQueueEventTags);
-		this.Subscribe('TAG_REMOVED',api,true,this.props.id,this.evQueueEventTags);
+		this.Subscribe('TAG_CREATED',api,false,0,this.evQueueEventTags);
+		this.Subscribe('TAG_MODIFIED',api,false,0,this.evQueueEventTags);
+		this.Subscribe('TAG_REMOVED',api,true,0,this.evQueueEventTags);
 	}
 	
 	evQueueEventWorkflow(data) {

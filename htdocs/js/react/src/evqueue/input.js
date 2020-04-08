@@ -19,14 +19,14 @@
  
 'use strict';
 
-import {task} from './task.js';
+import {input_part} from './input-part.js';
 
-export class job {
+export class input {
 	constructor(desc = {})
 	{
-		if(job.global===undefined)
+		if(input.global===undefined)
 		{
-			job.global = {
+			input.global = {
 				id: 1
 			};
 		}
@@ -34,46 +34,40 @@ export class job {
 		this.name = '';
 		this.condition = '';
 		this.loop = '';
-		this.iteration_condition = '';
-		this.tasks = [];
-		this.subjobs = [];
+		this.parts = [];
 		
 		if(typeof desc=='object') {
 			Object.assign(this, desc);
 		}
 		
-		this._id = job.global.id++;
+		this._id = input.global.id++;
 	}
 	
-	leftLeaf() {
-		return this.left_leaf(this);
+	getTaskId() {
+		return this._parent_id;
 	}
 	
-	left_leaf(job) {
-		if(job.subjobs.length==0)
-			return job;
-		return this.left_leaf(job.subjobs[0]);
+	addPart(part, copy) {
+		var parts = this.parts;
+		if(copy)
+			parts = this.parts.concat();
+		
+		if(part===undefined)
+			part = new input_part();
+		
+		part._parent_id = this._id;
+		parts.push(part);
+		
+		return parts;
 	}
 	
-	addTask(taskobj) {
-		if(taskobj===undefined)
-			taskobj = new task();
+	removePart(idx, copy) {
+		var parts = this.parts;
+		if(copy)
+			parts = this.parts.concat();
 		
-		if(this.tasks.indexOf(taskobj)!=-1)
-			return "This task is already in the job";
+		parts.splice(idx, 1);
 		
-		taskobj._parent_id = this._id;
-		this.tasks.push(taskobj);
-		
-		return true;
-	}
-	
-	removeTask(task) {
-		var idx = this.tasks.indexOf(task);
-		if(idx==-1)
-			return;
-		
-		this.tasks.splice(idx, 1);
-		return true;
+		return parts;
 	}
 }

@@ -7,7 +7,9 @@
 @import 'src/global/fonts.scss';
 @import 'src/global/text.scss';
 @import 'src/global/footer.scss';
+@import 'src/global/button.scss';
 
+@import 'src/ui/help.scss';
 @import 'src/ui/dialog.scss';
 @import 'src/ui/confirm.scss';
 @import 'src/ui/prompt.scss';
@@ -21,12 +23,15 @@
 @import 'src/ui/input.scss';
 
 @import 'src/components/base/app.scss';
+@import 'src/components/base/xpath-helper.scss';
 @import 'src/components/panels/instances/details.scss';
 @import 'src/components/panels/instances/filters.scss';
 @import 'src/components/panels/queues/list.scss';
 @import 'src/components/panels/workflows/list.scss';
 @import 'src/components/panels/logs/filters.scss';
 @import 'src/components/panels/logs/engine.scss';
+@import 'src/components/dialogs/tasks/editor.scss';
+@import 'src/components/dialogs/workflows/value-selector.scss';
 @import 'src/components/menus/header.scss';
 @import 'src/components/menus/workflow-editor.scss';
 @import 'src/components/editor/workflow-editor.scss';

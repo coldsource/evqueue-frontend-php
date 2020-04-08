@@ -82,7 +82,7 @@ export class ListInstances extends evQueueComponent {
 		if(duration < 60)
 			dts[1] = false;
 
-		return dts[1] ? dts[0] + '→' + dts[1] : dts[0];
+		return dts[1] ? dts[0] + ' → ' + dts[1] : dts[0];
 	}
 	
 	renderWorkflowsList() {

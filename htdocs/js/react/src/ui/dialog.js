@@ -61,6 +61,8 @@ export class Dialog extends React.Component {
 			active:true
 		};
 		
+		this.closed = false;
+		
 		// Global styles
 		this.height_delta = 0;
 		this.content_vert_padding = 0;
@@ -106,7 +108,8 @@ export class Dialog extends React.Component {
 	}
 	
 	componentWillUnmount() {
-		this.close();
+		if(!this.closed)
+			this.close();
 	}
 	
 	componentDidUpdate() {
@@ -228,6 +231,8 @@ export class Dialog extends React.Component {
 	}
 	
 	close() {
+		this.closed = true;
+		
 		if(this.props.onClose!==undefined)
 			this.props.onClose();
 		

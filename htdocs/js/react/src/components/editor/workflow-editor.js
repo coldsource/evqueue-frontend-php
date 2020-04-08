@@ -26,19 +26,27 @@ import {Job} from './job.js';
 import {job} from '../../evqueue/job.js';
 import {workflow} from '../../evqueue/workflow.js';
 import {task} from '../../evqueue/task.js';
+import {JobEditor} from '../dialogs/jobs/editor.js';
+import {TaskEditor} from '../dialogs/tasks/editor.js';
+import {TaskInputEditor} from '../dialogs/tasks/input-editor.js';
+import {ValueSelector} from '../dialogs/workflows/value-selector.js';
 
 export class WorkflowEditor extends evQueueComponent {
 	constructor(props) {
 		super(props);
 		
 		this.state.workflow = new workflow();
-		
 		this.state.new_job = false;
+		
+		this.state.dialogs = [];
 		
 		this.origin_job = false;
 		this.origin_subjobs = false;
 		this.origin_idx = false;
 		this.origin_task = false;
+		
+		this.openDialog = this.openDialog.bind(this);
+		this.closeDialog = this.closeDialog.bind(this);
 		
 		this.onJobDragStart = this.onJobDragStart.bind(this);
 		this.onTaskDragStart = this.onTaskDragStart.bind(this);
@@ -49,9 +57,8 @@ export class WorkflowEditor extends evQueueComponent {
 		this.undo = this.undo.bind(this);
 		this.redo = this.redo.bind(this);
 		
-		this.jobUpdate = this.jobUpdate.bind(this);
-		this.taskUpdate = this.taskUpdate.bind(this);
-		this.taskAdd = this.taskAdd.bind(this);
+		this.objectUpdate = this.objectUpdate.bind(this);
+		this.onDlgChange = this.onDlgChange.bind(this);
 	}
 	
 	componentDidMount() {
@@ -149,32 +156,72 @@ export class WorkflowEditor extends evQueueComponent {
 		this.setState({new_job: false, workflow: this.state.workflow});
 	}
 	
-	jobUpdate(e, job) {
+	objectUpdate(e, obj) {
 		this.state.workflow.backup();
 		
-		job[e.target.name] = e.target.value;
-		this.setState({workflow: this.state.workflow});
+		if(Array.isArray(e.target.name))
+		{
+			for(var i=0;i<e.target.name.length;i++)
+				obj[e.target.name[i]] = e.target.value[i];
+		}
+		else
+			obj[e.target.name] = e.target.value;
 		
-		// Force dialogs to update because dialogs are rendered outside of this component 
-		Dialogs.instance.forceUpdate();
+		this.setState({workflow: this.state.workflow});
 	}
 	
-	taskUpdate(e, job, task) {
-		this.state.workflow.backup();
-		
-		task[e.target.name] = e.target.value;
-		this.setState({workflow: this.state.workflow});
-		
-		// Force dialogs to update because dialogs are rendered outside of this component 
-		Dialogs.instance.forceUpdate();
+	onDlgChange(e, event_obj, cur_obj) {
+		if(event_obj!==undefined)
+			return this.objectUpdate(e, event_obj);
+		return this.objectUpdate(e, cur_obj);
 	}
 	
-	taskAdd(e, job) {
-		this.state.workflow.backup();
+	openDialog(type, id) {
+		var dialogs = this.state.dialogs;
+		dialogs.push({
+			type: type,
+			id: id
+		});
 		
-		job.tasks.push(new task());
-		
-		this.setState({workflow: this.state.workflow});
+		this.setState({dialogs: dialogs});
+	}
+	
+	closeDialog(dlg) {
+		var dialogs = this.state.dialogs;
+		for(var i=0;i<dialogs.length;i++)
+		{
+			if(dialogs[i].type==dlg.type && dialogs[i].id==dlg.id)
+			{
+				dialogs.splice(i, 1);
+				return this.setState({dialogs: dialogs});
+			}
+		}
+	}
+	
+	renderDialogs() {
+		return this.state.dialogs.map( (dialog) => {
+			var key = dialog.type+'|'+dialog.id;
+			if(dialog.type=='job')
+			{
+				let job = this.state.workflow.getJob(dialog.id);
+				return (<JobEditor key={key} workflow={this.state.workflow} job={job} onChange={ (e, obj) => this.onDlgChange(e, obj, job) } onClose={ (e) => this.closeDialog(dialog) } />);
+			}
+			else if(dialog.type=='task')
+			{
+				let task = this.state.workflow.getTask(dialog.id);
+				return (<TaskEditor key={key} workflow={this.state.workflow} task={task} onChange={ (e, obj) => this.onDlgChange(e, obj, task) } openDialog={ this.openDialog } onClose={ (e) => this.closeDialog(dialog) } />);
+			}
+			else if(dialog.type=='task-input')
+			{
+				let input = this.state.workflow.getInput(dialog.id);
+				return (<TaskInputEditor key={key} workflow={this.state.workflow} input={input} onChange={ (e, obj) => this.onDlgChange(e, obj, input) } onClose={ (e) => this.closeDialog(dialog) } />);
+			}
+			else if(dialog.type=='task-input-select')
+			{
+				let part = this.state.workflow.getInputPart(dialog.id);
+				return (<ValueSelector key={key} workflow={this.state.workflow} part={part} onChange={ (e, obj) => this.onDlgChange(e, obj, part) } onClose={ (e) => this.closeDialog(dialog) } />);
+			}
+		});
 	}
 	
 	renderSubjobs(subjobs) {
@@ -199,14 +246,13 @@ export class WorkflowEditor extends evQueueComponent {
 					<div className="side-separator" onDragOver={ (e) => this.onDragOver(e, 'job-slot') } onDragLeave={ this.onDragLeave } onDrop={ (e) => this.onDrop(e, subjobs, idx, 'left') }></div>
 					<Job
 						job={job}
+						openDialog={ this.openDialog }
+						onChange={ (e) => this.objectUpdate(e, job) }
 						onJobDragStart={ (e, job) => this.onJobDragStart(e, job, subjobs, idx) }
 						onJobDragOver={ (e) => this.onDragOver(e, 'job') }
 						onJobDragLeave={ this.onDragLeave }
 						onJobDrop={ (e) => this.onDrop(e, subjobs, idx, 'job') }
-						onJobChange={ (e) => this.jobUpdate(e, job) }
-						onTaskChange={ this.taskUpdate }
 						onTaskDragStart={ this.onTaskDragStart }
-						onTaskAdd={ this.taskAdd }
 					/>
 					<div className="side-separator" onDragOver={ (e) => this.onDragOver(e, 'job-slot') } onDragLeave={ this.onDragLeave } onDrop={ (e) => this.onDrop(e, subjobs, idx, 'right') }></div>
 					<div onDragOver={ (e) => this.onDragOver(e, 'job-slot') } onDragLeave={ this.onDragLeave } onDrop={ (e) => this.onDrop(e, subjobs, idx, 'bottom') }>
@@ -221,18 +267,23 @@ export class WorkflowEditor extends evQueueComponent {
 	
 	render() {
 		return (
-			<div className="evq-workflow-editor">
-				<div className="trash" title="Trash" onDragOver={ (e) => this.onDragOver(e, 'trash') } onDragLeave={ this.onDragLeave } onDrop={ (e) => this.onDrop(e, false, false, 'trash') }>
-					<span className="faicon fa-trash"></span>
-					<br />Drop elements here to remove them
+			<div>
+				<div className="evq-workflow-editor">
+					<div className="trash" title="Trash" onDragOver={ (e) => this.onDragOver(e, 'trash') } onDragLeave={ this.onDragLeave } onDrop={ (e) => this.onDrop(e, false, false, 'trash') }>
+						<span className="faicon fa-trash"></span>
+						<br />Drop elements here to remove them
+					</div>
+					<div className="new-job">
+						{ this.state.new_job?
+							(<Job job={new job({name: 'New job'})} onJobDragStart={ (e, job) => this.onJobDragStart(e, job, false, false) } />):
+							(<div><span className="faicon fa-plus" onClick={ (e) => this.setState({new_job: true}) }></span><br />Create a new job</div>)
+						}
+					</div>
+					{ this.renderSubjobs(this.state.workflow.subjobs) }
 				</div>
-				<div className="new-job">
-					{ this.state.new_job?
-						(<Job job={new job({name: 'New job'})} onJobDragStart={ (e, job) => this.onJobDragStart(e, job, false, false) } />):
-						(<div><span className="faicon fa-plus" onClick={ (e) => this.setState({new_job: true}) }></span><br />Create a new job</div>)
-					}
+				<div>
+					{ this.renderDialogs() }
 				</div>
-				{ this.renderSubjobs(this.state.workflow.subjobs) }
 			</div>
 		);
 	}

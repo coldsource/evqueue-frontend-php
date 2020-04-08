@@ -20,7 +20,6 @@
 'use strict';
 
 import {Dialogs} from '../../ui/dialogs.js';
-import {TaskEditor} from '../dialogs/tasks/editor.js';
 
 export class Task extends React.Component {
 	constructor(props) {
@@ -29,6 +28,9 @@ export class Task extends React.Component {
 	
 	renderName() {
 		var task = this.props.task;
+		
+		if(this.props.task.path=='')
+			return (<span className="cmd action error">empty task</span>);
 		
 		var parts = this.props.task.path.split('/');
 		
@@ -41,6 +43,9 @@ export class Task extends React.Component {
 			params = cmd.substr(idx);
 			cmd = cmd.substr(0,idx);
 		}
+		
+		if(cmd=='')
+			return (<span className="cmd action error">incomplete filename</span>);
 		
 		return (
 			<span>
@@ -55,7 +60,7 @@ export class Task extends React.Component {
 	
 	render() {
 		return (
-			<div draggable className="task" onDragStart={this.props.onDragStart} onClick={ (e) => Dialogs.open(TaskEditor, {task:this.props.task, onChange: this.props.onChange}) }>
+			<div draggable className="task" onDragStart={this.props.onDragStart} onClick={ (e) => this.props.openDialog('task', this.props.task._id) }>
 				{ this.renderName() }
 			</div>
 		);

@@ -19,9 +19,18 @@
  
 'use strict';
 
+import {input} from './input.js';
+
 export class task {
 	constructor(desc = {})
 	{
+		if(task.global===undefined)
+		{
+			task.global = {
+				id: 1
+			};
+		}
+		
 		this.type = 'BINARY';
 		this.path = '';
 		this.wd = '';
@@ -29,9 +38,44 @@ export class task {
 		this.loop = '';
 		this.iteration_condition = '';
 		this.retry_schedule = '';
+		this.parametersmode = 'CMDLINE';
+		this.inputs = [];
 		
 		if(typeof desc=='object') {
 			Object.assign(this, desc);
 		}
+		
+		this._id = task.global.id++;
+	}
+	
+	addInput(inputobj, copy) {
+		var inputs = this.inputs;
+		if(copy)
+			inputs = this.inputs.concat();
+		
+		if(inputobj===undefined)
+			inputobj = new input();
+		
+		inputobj._parent_id = this._id;
+		inputs.push(inputobj);
+		
+		return inputs;
+	}
+	
+	removeInput(input, copy) {
+		var inputs = this.inputs;
+		if(copy)
+			inputs = this.inputs.concat();
+		
+		for(var i=0;i<inputs.length;i++)
+		{
+			if(inputs[i]===input)
+			{
+				inputs.splice(i, 1);
+				return inputs;
+			}
+		}
+		
+		return inputs;
 	}
 }

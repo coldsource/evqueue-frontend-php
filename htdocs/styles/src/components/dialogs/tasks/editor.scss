@@ -1,0 +1,26 @@
+div.evq-task-editor {
+	div.inputs {
+		div.input {
+			margin-bottom: 0.4rem;
+		}
+		
+		div.input-name {
+			display: inline-block;
+			min-width: 15rem;
+			margin-right: 1rem;
+		}
+		
+		div.input-value {
+			display: inline-block;
+		}
+		
+		div.input-part {
+			display: inline-block;
+			border: 1px dotted black;
+			border-radius: 0.4rem;
+			padding: 0.3rem;
+			margin-right: 0.3rem;
+			cursor: pointer;
+		}
+	}
+}

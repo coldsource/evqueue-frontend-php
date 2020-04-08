@@ -98,7 +98,7 @@ export class WorkflowLauncher extends evQueueComponent {
 	
 	render() {
 		return (
-			<Dialog dlgid={this.props.dlgid} ref={this.dlg} title="Launch a new workflow instance" width="600">
+			<Dialog dlgid={this.props.dlgid} ref={this.dlg} title="Launch a new workflow instance" width="650">
 				<Tabs updateNotify={this.dlg}>
 					<Tab title="Workflow">
 						<h2>
@@ -110,17 +110,15 @@ export class WorkflowLauncher extends evQueueComponent {
 							</Help>
 						</h2>
 						<div className="formdiv">
-							<form>
-								<div>
-									<label>Workflow</label>
-									<WorkflowSelector name="workflow" value={this.state.api.attributes.name} onChange={this.changeWorkflow} />
-								</div>
-								{this.renderParameters()}
-								<div>
-									<label>Comment</label>
-									<input type="text" name="comment" onChange={this.prepareAPI} />
-								</div>
-							</form>
+							<div>
+								<label>Workflow</label>
+								<WorkflowSelector name="workflow" value={this.state.api.attributes.name} onChange={this.changeWorkflow} />
+							</div>
+							{this.renderParameters()}
+							<div>
+								<label>Comment</label>
+								<input type="text" name="comment" onChange={this.prepareAPI} />
+							</div>
 						</div>
 					</Tab>
 					<Tab title="Remote">
@@ -129,16 +127,14 @@ export class WorkflowLauncher extends evQueueComponent {
 							<Help>The workflow or task can be launched through SSH on a distant machine. Enter the user and host used for SSH connection.</Help>
 						</h2>
 						<div className="formdiv">
-							<form>
-								<div>
-									<label>User</label>
-									<input name="user" onChange={this.prepareAPI} />
-								</div>
-								<div>
-									<label>Host</label>
-									<input name="host" onChange={this.prepareAPI} />
-								</div>
-							</form>
+							<div>
+								<label>User</label>
+								<input name="user" onChange={this.prepareAPI} />
+							</div>
+							<div>
+								<label>Host</label>
+								<input name="host" onChange={this.prepareAPI} />
+							</div>
 						</div>
 					</Tab>
 					<Tab title="Node">
@@ -147,12 +143,10 @@ export class WorkflowLauncher extends evQueueComponent {
 							<Help>If you are using evQueue in a clustered environement, specify here the node on which the workflow will be launched.</Help>
 						</h2>
 						<div className="formdiv">
-							<form>
-								<div>
-									<label>Node</label>
-									<NodeSelector name="node" value={this.state.api.node} onChange={this.prepareAPI} />
-								</div>
-							</form>
+							<div>
+								<label>Node</label>
+								<NodeSelector name="node" value={this.state.api.node} onChange={this.prepareAPI} />
+							</div>
 						</div>
 					</Tab>
 				</Tabs>

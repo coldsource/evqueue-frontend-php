@@ -1,0 +1,12 @@
+button {
+	background-color: $evq-light-grey;
+	border: 1px solid $evq-light-blue;
+	border-radius: 0.4rem;
+	padding: 0.2rem 0.5rem 0.2rem 0.5rem;
+	font-weight: bold;
+	
+	&.submit {
+		float: right;
+		margin-right: 2rem;
+	}
+}

@@ -1,0 +1,26 @@
+div.evq-xpath-helper {
+	display: flex;
+	
+	fieldset {
+		width: calc(50% - 0.6rem);
+		box-sizing: border-box;
+		display: flex;
+		align-items: center;
+		align-items: center;
+		margin: 0 0.6rem 0 0;
+		height: 4rem;
+		
+		&:last-child {
+			margin: 0;
+		}
+		
+		.evq-select {
+			width: 100%;
+		}
+		
+		input {
+			width: 100%;
+			box-sizing: border-box;
+		}
+	}
+}

@@ -20,7 +20,6 @@
 'use strict';
 
 import {Dialogs} from '../../ui/dialogs.js';
-import {JobEditor} from '../dialogs/jobs/editor.js';
 import {Task} from './task.js';
 
 export class Job extends React.Component {
@@ -30,6 +29,21 @@ export class Job extends React.Component {
 		this.state = {
 			add_task: false
 		};
+		
+		this.addTask = this.addTask.bind(this);
+	}
+	
+	addTask(e) {
+		this.props.job.addTask();
+		
+		var event = {
+			target: {
+				name: 'tasks',
+				value: this.props.job.tasks
+			}
+		};
+		
+		this.props.onChange(event);
 	}
 	
 	renderTasksList() {
@@ -39,7 +53,7 @@ export class Job extends React.Component {
 					task={task}
 					key={idx}
 					onDragStart={ (e) => this.props.onTaskDragStart(e, this.props.job, task) }
-					onChange={ (e) => this.props.onTaskChange(e, this.props.job, task) }
+					openDialog={ this.props.openDialog }
 				/>
 			);
 		});
@@ -49,7 +63,7 @@ export class Job extends React.Component {
 		return (
 			<div className="tasks">
 				{ this.renderTasksList() }
-				{ (this.state.add_task && this.props.onTaskAdd)?(<span className="faicon fa-plus" title="Add a new task to this job" onClick={ (e) => this.props.onTaskAdd(e, this.props.job) }></span>):'' }
+				{ (this.state.add_task && this.props.openDialog)?(<span className="faicon fa-plus" title="Add a new task to this job" onClick={ this.addTask }></span>):'' }
 			</div>
 		);
 	}
@@ -66,7 +80,7 @@ export class Job extends React.Component {
 				onMouseEnter={ () => this.setState({add_task: true}) }
 				onMouseLeave={ () => this.setState({add_task: false}) }
 			>
-				<div className="action title" onClick={ (e) => this.props.onJobChange?Dialogs.open(JobEditor, {desc:this.props.job, onChange: this.props.onJobChange}) :false }>
+				<div className="action title" onClick={ (e) => this.props.openDialog?this.props.openDialog('job', job._id) :false }>
 					{ job.condition || job.iteration_condition?(<span className="faicon fa-code-fork" title="This job has a condition"></span>):'' }
 					{ job.loop?(<span className="faicon fa-repeat" title="This job has a loop"></span>):'' }
 					{ job.name }

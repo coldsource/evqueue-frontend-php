@@ -2,14 +2,14 @@ div.evq-pannel {
 	div.evq-pannel-content {
 		border-style: solid;
 		border-width: 0px 1px 1px 1px;
-		border-color: #DEE0E3;
+		border-color: $evq-light-grey;
 		border-radius: 0px 0px 5px 5px;
 		overflow: auto;
 	}
 	
 	div.evq-pannel-title {
 		position: relative;
-		background-color: #DEE0E3;
+		background-color: $evq-light-grey;
 		border-top-left-radius: 10px;
 		border-top-right-radius: 10px;
 		color: #505050;

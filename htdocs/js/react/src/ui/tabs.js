@@ -26,7 +26,7 @@ export class Tabs extends React.Component {
 		super(props);
 		
 		this.state = {
-			current:0
+			current:this.props.active!==undefined?this.props.active:0
 		}
 	}
 	

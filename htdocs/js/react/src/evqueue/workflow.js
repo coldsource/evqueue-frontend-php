@@ -21,6 +21,8 @@
 
 import {job} from './job.js';
 import {task} from './task.js';
+import {input} from './input.js';
+import {input_part} from './input-part.js';
 
 export class workflow {
 	constructor()
@@ -30,6 +32,8 @@ export class workflow {
 		this.wf_pre_undo = '';
 		this.wf_undo = [];
 		this.wf_redo = [];
+		
+		this.parent_depth = 0;
 	}
 	
 	loadXML(workflow) {
@@ -55,7 +59,7 @@ export class workflow {
 			var tasks_ite = job_node.ownerDocument.evaluate('tasks',job_node);
 			var tasks_node = tasks_ite.iterateNext();
 			if(tasks_node)
-				this.load_tasks(tasks_node, new_job.tasks);
+				this.load_tasks(tasks_node, new_job);
 			
 			subjobs.push(new_job);
 			
@@ -65,7 +69,7 @@ export class workflow {
 		}
 	}
 	
-	load_tasks(tasks_node, tasks) {
+	load_tasks(tasks_node, job) {
 		var tasks_ite = tasks_node.ownerDocument.evaluate('task',tasks_node);
 		
 		var task_node;
@@ -73,7 +77,35 @@ export class workflow {
 		{
 			var new_task = new task(this.node_to_object(task_node));
 			
-			tasks.push(new_task);
+			this.load_inputs(task_node, new_task);
+			
+			job.addTask(new_task);
+		}
+	}
+	
+	load_inputs(task_node, task) {
+		var inputs_ite = task_node.ownerDocument.evaluate('input',task_node);
+		
+		var input_node;
+		while(input_node = inputs_ite.iterateNext())
+		{
+			var new_input = new input(this.node_to_object(input_node));
+			
+			this.load_input_parts(input_node, new_input);
+			
+			task.addInput(new_input);
+		}
+	}
+	
+	load_input_parts(input_node, input) {
+		var part_node = input_node.firstChild;
+		while(part_node) {
+			if(part_node.nodeType==Node.TEXT_NODE)
+				input.addPart(new input_part({type: 'text', value: part_node.nodeValue}));
+			else if(part_node.nodeType==Node.ELEMENT_NODE)
+				input.addPart(new input_part({type: part_node.nodeName, value: part_node.getAttribute('select')}));
+				
+			part_node = part_node.nextSibling;
 		}
 	}
 	
@@ -115,7 +147,17 @@ export class workflow {
 			jobobj.subjobs[i] = this._restore(jobobj.subjobs[i]);
 		
 		for(var i=0;i<jobobj.tasks.length;i++)
+		{
 			jobobj.tasks[i] = Object.setPrototypeOf(jobobj.tasks[i], task.prototype);
+			
+			for(var j=0;j<jobobj.tasks[i].inputs.length;j++)
+			{
+				jobobj.tasks[i].inputs[j] = Object.setPrototypeOf(jobobj.tasks[i].inputs[j], input.prototype);
+				
+				for(var k=0;k<jobobj.tasks[i].inputs[j].parts.length;k++)
+					jobobj.tasks[i].inputs[j].parts[k] = Object.setPrototypeOf(jobobj.tasks[i].inputs[j].parts[k], input_part.prototype);
+			}
+		}
 		
 		return Object.setPrototypeOf(jobobj, job.prototype);
 	}
@@ -217,5 +259,100 @@ export class workflow {
 		}
 		
 		return true;
+	}
+	
+	getJob(id) {
+		return this.getObject('job', id, this.subjobs);
+	}
+	
+	getTask(id) {
+		return this.getObject('task', id, this.subjobs);
+	}
+	
+	getTaskPath(id) {
+		var path = [];
+		var ret = this.getObject('task', id, this.subjobs, path);
+		return ret===false?false:path;
+	}
+	
+	getInput(id) {
+		return this.getObject('input', id, this.subjobs);
+	}
+	
+	getInputPart(id) {
+		return this.getObject('input-part', id, this.subjobs);
+	}
+	
+	getObject(type, id, subjobs, path) {
+		for(var i=0;i<subjobs.length;i++)
+		{
+			if(type=='job' && subjobs[i]._id==id)
+			{
+				if(subjobs[i].loop)
+				{
+					path.push({group: 'Current job', values: [{value: 'evqGetCurrentJob()/evqGetContext()', name: 'Loop context'}]});
+				
+					this.parent_depth = 0;
+				}
+				
+				return subjobs[i];
+			}
+			else if(type=='task' || type=='input' || type=='input-part')
+			{
+				for(var j=0;j<subjobs[i].tasks.length;j++)
+				{
+					if(type=='task' && subjobs[i].tasks[j]._id==id)
+					{
+						if(path!==undefined && subjobs[i].tasks[j].loop)
+						{
+							path.push({group: 'Current task', value: '.', name: 'Loop context'});
+							
+							if(subjobs[i].loop)
+								path.push({group: 'Current job', value: 'evqGetCurrentJob()/evqGetContext()', name: 'Loop context'});
+							
+							this.parent_depth = 0;
+						}
+						return subjobs[i].tasks[j];
+					}
+					else if(type=='input' || type=='input-part')
+					{
+						for(var k=0;k<subjobs[i].tasks[j].inputs.length;k++)
+						{
+							if(type=='input' && subjobs[i].tasks[j].inputs[k]._id==id)
+								return subjobs[i].tasks[j].inputs[k];
+							
+							if(type=='input-part')
+							{
+								for(var l=0;l<subjobs[i].tasks[j].inputs[k].parts.length;l++)
+								{
+									if(subjobs[i].tasks[j].inputs[k].parts[l]._id==id)
+										return subjobs[i].tasks[j].inputs[k].parts[l];
+								}
+							}
+						}
+					}
+				}
+			}
+			
+			let job = this.getObject(type, id, subjobs[i].subjobs, path);
+			if(job!==false)
+			{
+				if(path!==undefined)
+				{
+					var group = 'Parent job '+(this.parent_depth+1);
+					if(subjobs[i].loop)
+						path.push({group: group, value: 'evqGetParentJob('+(this.parent_depth)+'/evqGetContext()', name: 'Loop context'});
+					
+					for(var j=0;j<subjobs[i].tasks.length;j++)
+						path.push({group: group, value: "evqGetParentJob("+(this.parent_depth)+")/evqGetOutput('"+subjobs[i].tasks[j].path+"')", name:"Task: "+subjobs[i].tasks[j].path});
+					
+					this.parent_depth++;
+				}
+				
+				return job;
+			}
+		}
+		
+		return false;
 	}
 }

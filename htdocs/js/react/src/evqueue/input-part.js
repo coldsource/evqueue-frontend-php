@@ -19,61 +19,27 @@
  
 'use strict';
 
-import {task} from './task.js';
-
-export class job {
+export class input_part {
 	constructor(desc = {})
 	{
-		if(job.global===undefined)
+		if(input_part.global===undefined)
 		{
-			job.global = {
+			input_part.global = {
 				id: 1
 			};
 		}
 		
-		this.name = '';
-		this.condition = '';
-		this.loop = '';
-		this.iteration_condition = '';
-		this.tasks = [];
-		this.subjobs = [];
+		this.type = '';
+		this.value = '';
 		
 		if(typeof desc=='object') {
 			Object.assign(this, desc);
 		}
 		
-		this._id = job.global.id++;
+		this._id = input_part.global.id++;
 	}
 	
-	leftLeaf() {
-		return this.left_leaf(this);
-	}
-	
-	left_leaf(job) {
-		if(job.subjobs.length==0)
-			return job;
-		return this.left_leaf(job.subjobs[0]);
-	}
-	
-	addTask(taskobj) {
-		if(taskobj===undefined)
-			taskobj = new task();
-		
-		if(this.tasks.indexOf(taskobj)!=-1)
-			return "This task is already in the job";
-		
-		taskobj._parent_id = this._id;
-		this.tasks.push(taskobj);
-		
-		return true;
-	}
-	
-	removeTask(task) {
-		var idx = this.tasks.indexOf(task);
-		if(idx==-1)
-			return;
-		
-		this.tasks.splice(idx, 1);
-		return true;
+	getInputId() {
+		return this._parent_id;
 	}
 }

@@ -35,9 +35,9 @@ export class TagSelector extends evQueueComponent {
 	
 	componentDidMount() {
 		var api = { node:this.props.node, group:'tags',action:'list',attributes:{} };
-		this.Subscribe('TAG_CREATED',api,false,this.props.id,this.evQueueEventTags);
-		this.Subscribe('TAG_MODIFIED',api,false,this.props.id,this.evQueueEventTags);
-		this.Subscribe('TAG_REMOVED',api,true,this.props.id,this.evQueueEventTags);
+		this.Subscribe('TAG_CREATED',api,false,this.props.id);
+		this.Subscribe('TAG_MODIFIED',api,false,this.props.id);
+		this.Subscribe('TAG_REMOVED',api,true,this.props.id);
 	}
 	
 	evQueueEvent(data) {
