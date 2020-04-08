@@ -26,6 +26,7 @@ import {Select} from '../../../ui/select.js';
 import {Tabs} from '../../../ui/tabs.js';
 import {Tab} from '../../../ui/tab.js';
 import {FilesystemAutocomplete} from '../../base/filesystem-autocomplete.js';
+import {MagicWand} from '../../base/magic-wand.js';
 import {Sortable} from '../../../ui/sortable.js';
 import {SortableHandle} from '../../../ui/sortable-handle.js';
 import {TaskInput} from './input.js';
@@ -158,26 +159,39 @@ export class TaskEditor extends React.Component {
 		var wait_iteration_condition = task.iteration_condition.substr(0,8)=="evqWait(";
 		
 		return (
-			<div className="formdiv">
-				<div>
-					<label>Condition</label>
-					<input type="text" name="condition" value={task.condition} openDialog={ this.props.openDialog } />
-				</div>
-				<div>
-					<label>Wait for condition to become true</label>
-					<Checkbox name="wait_condition" value={wait_condition} onChange={ (e) => this.changeWait(e,'condition',task.condition) } />
-				</div>
-				<div>
-					<label>Loop</label>
-					<input type="text" name="loop" value={task.loop} onChange={this.props.onChange} />
-				</div>
-				<div>
-					<label>Iteration condition</label>
-					<input type="text" name="iteration_condition" value={task.iteration_condition} onChange={this.props.onChange} />
-				</div>
-				<div>
-					<label>Wait for condition to become true</label>
-					<Checkbox name="wait_iteration_condition" value={wait_iteration_condition} onChange={ (e) => this.changeWait(e,'iteration_condition',task.iteration_condition) } />
+			<div>
+				<h2>
+					Conditions &amp; loops
+					<Help>
+						It is possible to loop on a task output to execute one action several times. Loop context can be used to access the current value of the loop iteration.
+						<br /><br />
+						Condition is used to skip one task. This condition is evaluated before the loop. Iteration condition is evaluated after the loop, on each task. It can refer to loop context.
+					</Help>
+ 				</h2>
+				<div className="formdiv">
+					<div>
+						<label>Condition</label>
+						<input type="text" name="condition" value={task.condition} onChange={this.props.onChange} />
+						<MagicWand name="condition" workflow={this.props.workflow} task={task} onChange={this.props.onChange} />
+					</div>
+					<div>
+						<label>Wait for condition to become true</label>
+						<Checkbox name="wait_condition" value={wait_condition} onChange={ (e) => this.changeWait(e,'condition',task.condition) } />
+					</div>
+					<div>
+						<label>Loop</label>
+						<input type="text" name="loop" value={task.loop} onChange={this.props.onChange} />
+						<MagicWand name="loop" workflow={this.props.workflow} task={task} onChange={this.props.onChange} />
+					</div>
+					<div>
+						<label>Iteration condition</label>
+						<input type="text" name="iteration_condition" value={task.iteration_condition} onChange={this.props.onChange} />
+						<MagicWand name="iteration_condition" workflow={this.props.workflow} task={task} onChange={this.props.onChange} />
+					</div>
+					<div>
+						<label>Wait for condition to become true</label>
+						<Checkbox name="wait_iteration_condition" value={wait_iteration_condition} onChange={ (e) => this.changeWait(e,'iteration_condition',task.iteration_condition) } />
+					</div>
 				</div>
 			</div>
 		);

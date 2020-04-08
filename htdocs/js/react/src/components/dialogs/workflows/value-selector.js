@@ -20,15 +20,18 @@
 'use strict';
 
 import {App} from '../../base/app.js';
+import {evQueueComponent} from '../../base/evqueue-component.js';
 import {XPathHelper} from '../../base/xpath-helper.js';
 import {Dialog} from '../../../ui/dialog.js';
 import {Tabs} from '../../../ui/tabs.js';
 import {Tab} from '../../../ui/tab.js';
 import {Select} from '../../../ui/select.js';
 
-export class ValueSelector extends React.Component {
+export class ValueSelector extends evQueueComponent {
 	constructor(props) {
 		super(props);
+		
+		this.state.xpath_error = '';
 		
 		this.changeMode = this.changeMode.bind(this);
 	}
@@ -41,11 +44,34 @@ export class ValueSelector extends React.Component {
 			}
 		};
 		
+		if(type!='text')
+		{
+			this.API({
+				group: 'xpath',
+				action: 'parse',
+				attributes: { expression: value }
+			}).then( (response) => {
+				if(response.documentElement.hasAttribute('parse-error'))
+					this.setState({xpath_error: response.documentElement.getAttribute('parse-error')});
+				else
+					this.setState({xpath_error: ''});
+			});
+		}
+		
 		this.props.onChange(event);
 	}
 	
 	changeMode(e) {
 		this.triggerPartChange(e.target.value, this.props.part.value);
+	}
+	
+	renderXPathError() {
+		if(!this.state.xpath_error)
+			return;
+		
+		return(
+			<div className="light-error">{this.state.xpath_error}</div>
+		);
 	}
 	
 	render() {
@@ -93,6 +119,7 @@ export class ValueSelector extends React.Component {
 								<Select values={[{name: 'value', value: 'value'},{name: 'copy', value: 'copy'}]} value={type} filter={false} onChange={this.changeMode} />
 							</div>
 							<input type="text" name="advanced" value={this.props.part.value} onChange={ (e) => this.triggerPartChange(this.props.part.type, e.target.value) } />
+							{ this.renderXPathError() }
 						</Tab>
 					</Tabs>
 				</div>

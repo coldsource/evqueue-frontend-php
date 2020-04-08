@@ -19,7 +19,6 @@
 
 'use strict';
 
-import {evQueueComponent} from './evqueue-component.js';
 import {Select} from '../../ui/select.js';
 
 export class XPathHelper extends React.Component {

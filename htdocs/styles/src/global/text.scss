@@ -12,9 +12,13 @@
 .skipped { color: #95a5a6; }
 
 div.error {
-	color: red;
+	color: $evq-error;
 	font-weight: bold;
 	padding: 0.3rem;
+}
+
+div.light-error {
+	color: $evq-error;
 }
 
 .action {
