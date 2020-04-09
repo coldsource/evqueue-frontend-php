@@ -172,7 +172,7 @@ export class TaskEditor extends React.Component {
 					<div>
 						<label>Condition</label>
 						<input type="text" name="condition" value={task.condition} onChange={this.props.onChange} />
-						<MagicWand name="condition" workflow={this.props.workflow} task={task} onChange={this.props.onChange} />
+						<MagicWand name="condition" task={task} onChange={this.props.onChange} />
 					</div>
 					<div>
 						<label>Wait for condition to become true</label>
@@ -181,12 +181,12 @@ export class TaskEditor extends React.Component {
 					<div>
 						<label>Loop</label>
 						<input type="text" name="loop" value={task.loop} onChange={this.props.onChange} />
-						<MagicWand name="loop" workflow={this.props.workflow} task={task} onChange={this.props.onChange} />
+						<MagicWand name="loop" task={task} onChange={this.props.onChange} />
 					</div>
 					<div>
 						<label>Iteration condition</label>
 						<input type="text" name="iteration_condition" value={task.iteration_condition} onChange={this.props.onChange} />
-						<MagicWand name="iteration_condition" workflow={this.props.workflow} task={task} onChange={this.props.onChange} />
+						<MagicWand name="iteration_condition" task={task} onChange={this.props.onChange} />
 					</div>
 					<div>
 						<label>Wait for condition to become true</label>

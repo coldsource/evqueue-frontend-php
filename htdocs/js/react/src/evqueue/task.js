@@ -48,15 +48,23 @@ export class task {
 		this._id = task.global.id++;
 	}
 	
+	getWorkflow() {
+		return this._workflow;
+	}
+	
+	getJob() {
+		return this._parent;
+	}
+	
 	addInput(inputobj, copy) {
 		var inputs = this.inputs;
 		if(copy)
 			inputs = this.inputs.concat();
 		
 		if(inputobj===undefined)
-			inputobj = new input();
+			inputobj = this._workflow.createInput();
 		
-		inputobj._parent_id = this._id;
+		inputobj._parent = this;
 		inputs.push(inputobj);
 		
 		return inputs;

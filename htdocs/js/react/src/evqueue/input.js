@@ -43,8 +43,12 @@ export class input {
 		this._id = input.global.id++;
 	}
 	
-	getTaskId() {
-		return this._parent_id;
+	getWorkflow() {
+		return this._workflow;
+	}
+	
+	getTask() {
+		return this._parent;
 	}
 	
 	addPart(part, copy) {
@@ -53,9 +57,9 @@ export class input {
 			parts = this.parts.concat();
 		
 		if(part===undefined)
-			part = new input_part();
+			part = this._workflow.createInputPart();
 		
-		part._parent_id = this._id;
+		part._parent = this;
 		parts.push(part);
 		
 		return parts;

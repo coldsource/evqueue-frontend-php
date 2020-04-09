@@ -45,6 +45,10 @@ export class job {
 		this._id = job.global.id++;
 	}
 	
+	getWorkflow() {
+		return this._workflow;
+	}
+	
 	leftLeaf() {
 		return this.left_leaf(this);
 	}
@@ -57,12 +61,12 @@ export class job {
 	
 	addTask(taskobj) {
 		if(taskobj===undefined)
-			taskobj = new task();
+			taskobj = this._workflow.createTask();
 		
 		if(this.tasks.indexOf(taskobj)!=-1)
 			return "This task is already in the job";
 		
-		taskobj._parent_id = this._id;
+		taskobj._parent = this;
 		this.tasks.push(taskobj);
 		
 		return true;

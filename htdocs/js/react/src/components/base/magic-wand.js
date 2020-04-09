@@ -42,7 +42,6 @@ export class MagicWand extends React.Component {
 	
 	render() {
 		var props = {
-			workflow: this.props.workflow,
 			onSubmit: this.change
 		};
 		if(this.props.task)

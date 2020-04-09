@@ -76,12 +76,12 @@ export class ValueSelector extends evQueueComponent {
 	
 	render() {
 		var part = this.props.part;
-		var input = this.props.workflow.getInput(part.getInputId());
-		var task = this.props.workflow.getTask(input.getTaskId());
+		var input = part.getInput();
+		var task = input.getTask();
 		
 		var type = part.type!=''?part.type:'value';
 		
-		var path = this.props.workflow.getTaskPath(task._id);
+		var path = task.getWorkflow().getTaskPath(task._id);
 		
 		var active_tab;
 		if(part.type=='text')

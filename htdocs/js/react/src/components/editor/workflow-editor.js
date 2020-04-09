@@ -204,22 +204,22 @@ export class WorkflowEditor extends evQueueComponent {
 			if(dialog.type=='job')
 			{
 				let job = this.state.workflow.getJob(dialog.id);
-				return (<JobEditor key={key} workflow={this.state.workflow} job={job} onChange={ (e, obj) => this.onDlgChange(e, obj, job) } onClose={ (e) => this.closeDialog(dialog) } />);
+				return (<JobEditor key={key} job={job} onChange={ (e, obj) => this.onDlgChange(e, obj, job) } onClose={ (e) => this.closeDialog(dialog) } />);
 			}
 			else if(dialog.type=='task')
 			{
 				let task = this.state.workflow.getTask(dialog.id);
-				return (<TaskEditor key={key} workflow={this.state.workflow} task={task} onChange={ (e, obj) => this.onDlgChange(e, obj, task) } openDialog={ this.openDialog } onClose={ (e) => this.closeDialog(dialog) } />);
+				return (<TaskEditor key={key} task={task} onChange={ (e, obj) => this.onDlgChange(e, obj, task) } openDialog={ this.openDialog } onClose={ (e) => this.closeDialog(dialog) } />);
 			}
 			else if(dialog.type=='task-input')
 			{
 				let input = this.state.workflow.getInput(dialog.id);
-				return (<TaskInputEditor key={key} workflow={this.state.workflow} input={input} onChange={ (e, obj) => this.onDlgChange(e, obj, input) } onClose={ (e) => this.closeDialog(dialog) } />);
+				return (<TaskInputEditor key={key} input={input} onChange={ (e, obj) => this.onDlgChange(e, obj, input) } onClose={ (e) => this.closeDialog(dialog) } />);
 			}
 			else if(dialog.type=='task-input-select')
 			{
 				let part = this.state.workflow.getInputPart(dialog.id);
-				return (<ValueSelector key={key} workflow={this.state.workflow} part={part} onChange={ (e, obj) => this.onDlgChange(e, obj, part) } onClose={ (e) => this.closeDialog(dialog) } />);
+				return (<ValueSelector key={key} part={part} onChange={ (e, obj) => this.onDlgChange(e, obj, part) } onClose={ (e) => this.closeDialog(dialog) } />);
 			}
 		});
 	}
@@ -275,7 +275,7 @@ export class WorkflowEditor extends evQueueComponent {
 					</div>
 					<div className="new-job">
 						{ this.state.new_job?
-							(<Job job={new job({name: 'New job'})} onJobDragStart={ (e, job) => this.onJobDragStart(e, job, false, false) } />):
+							(<Job job={this.state.workflow.createJob({name: 'New job'})} onJobDragStart={ (e, job) => this.onJobDragStart(e, job, false, false) } />):
 							(<div><span className="faicon fa-plus" onClick={ (e) => this.setState({new_job: true}) }></span><br />Create a new job</div>)
 						}
 					</div>

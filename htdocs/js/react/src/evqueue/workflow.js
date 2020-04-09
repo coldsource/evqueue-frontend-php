@@ -27,13 +27,37 @@ import {input_part} from './input-part.js';
 export class workflow {
 	constructor()
 	{
-		this.subjobs = [ new job({name: "New job"}) ];
+		this.subjobs = [ this.createJob({name: "New job"}) ];
 		
 		this.wf_pre_undo = '';
 		this.wf_undo = [];
 		this.wf_redo = [];
 		
 		this.parent_depth = 0;
+	}
+	
+	createJob(desc = {}) {
+		var new_job = new job(desc);
+		new_job._workflow = this;
+		return new_job;
+	}
+	
+	createTask(desc = {}) {
+		var new_task = new task(desc);
+		new_task._workflow = this;
+		return new_task;
+	}
+	
+	createInput(desc = {}) {
+		var new_input = new input(desc);
+		new_input._workflow = this;
+		return new_input;
+	}
+	
+	createInputPart(desc = {}) {
+		var new_input_part = new input_part(desc);
+		new_input_part._workflow = this;
+		return new_input_part;
 	}
 	
 	loadXML(workflow) {
@@ -45,16 +69,17 @@ export class workflow {
 		
 		var subjobs_ite = workflow.ownerDocument.evaluate('workflow/subjobs',workflow);
 		var subjobs_node = subjobs_ite.iterateNext();
-		this.load_subjobs(subjobs_node, this.subjobs);
+		this.load_subjobs(subjobs_node, this.subjobs, undefined);
 	}
 	
-	load_subjobs(subjobs_node, subjobs) {
+	load_subjobs(subjobs_node, subjobs, parent) {
 		var jobs_ite = subjobs_node.ownerDocument.evaluate('job',subjobs_node);
 		
 		var job_node;
 		while(job_node = jobs_ite.iterateNext())
 		{
-			var new_job = new job(this.node_to_object(job_node));
+			var new_job = this.createJob(this.node_to_object(job_node));
+			new_job._parent = parent;
 			
 			var tasks_ite = job_node.ownerDocument.evaluate('tasks',job_node);
 			var tasks_node = tasks_ite.iterateNext();
@@ -63,9 +88,10 @@ export class workflow {
 			
 			subjobs.push(new_job);
 			
+			
 			var subjobs_node2 = job_node.ownerDocument.evaluate('subjobs',job_node).iterateNext();
 			if(subjobs_node2)
-				this.load_subjobs(subjobs_node2, new_job.subjobs);
+				this.load_subjobs(subjobs_node2, new_job.subjobs, new_job);
 		}
 	}
 	
@@ -75,7 +101,7 @@ export class workflow {
 		var task_node;
 		while(task_node = tasks_ite.iterateNext())
 		{
-			var new_task = new task(this.node_to_object(task_node));
+			var new_task = this.createTask(this.node_to_object(task_node));
 			
 			this.load_inputs(task_node, new_task);
 			
@@ -89,7 +115,7 @@ export class workflow {
 		var input_node;
 		while(input_node = inputs_ite.iterateNext())
 		{
-			var new_input = new input(this.node_to_object(input_node));
+			var new_input = this.createInput(this.node_to_object(input_node));
 			
 			this.load_input_parts(input_node, new_input);
 			
@@ -101,9 +127,9 @@ export class workflow {
 		var part_node = input_node.firstChild;
 		while(part_node) {
 			if(part_node.nodeType==Node.TEXT_NODE)
-				input.addPart(new input_part({type: 'text', value: part_node.nodeValue}));
+				input.addPart(this.createInputPart({type: 'text', value: part_node.nodeValue}));
 			else if(part_node.nodeType==Node.ELEMENT_NODE)
-				input.addPart(new input_part({type: part_node.nodeName, value: part_node.getAttribute('select')}));
+				input.addPart(this.createInputPart({type: part_node.nodeName, value: part_node.getAttribute('select')}));
 				
 			part_node = part_node.nextSibling;
 		}
@@ -116,13 +142,21 @@ export class workflow {
 		return obj;
 	}
 	
+	stringify(obj) {
+		return JSON.stringify(obj, (name, value) => {
+			if(name.substr(0,1)=='_' && name!='_id')
+				return undefined;
+			return value;
+		});
+	}
+	
 	backup() {
-		this.wf_undo.push(JSON.stringify(this.subjobs));
+		this.wf_undo.push(this.stringify(this.subjobs));
 		this.wf_redo = [];
 	}
 	
 	preBackup() {
-		this.wf_pre_undo = JSON.stringify(this.subjobs);
+		this.wf_pre_undo = this.stringify(this.subjobs);
 	}
 	
 	postBackup() {
@@ -144,18 +178,26 @@ export class workflow {
 	
 	_restore(jobobj) {
 		for(var i=0;i<jobobj.subjobs.length;i++)
+		{
 			jobobj.subjobs[i] = this._restore(jobobj.subjobs[i]);
+			jobobj.subjobs[i]._parent = jobobj;
+		}
 		
 		for(var i=0;i<jobobj.tasks.length;i++)
 		{
 			jobobj.tasks[i] = Object.setPrototypeOf(jobobj.tasks[i], task.prototype);
+			jobobj.tasks[i]._parent = jobobj;
 			
 			for(var j=0;j<jobobj.tasks[i].inputs.length;j++)
 			{
 				jobobj.tasks[i].inputs[j] = Object.setPrototypeOf(jobobj.tasks[i].inputs[j], input.prototype);
+				jobobj.tasks[i].inputs[j]._parent = jobobj.tasks[i];
 				
 				for(var k=0;k<jobobj.tasks[i].inputs[j].parts.length;k++)
+				{
 					jobobj.tasks[i].inputs[j].parts[k] = Object.setPrototypeOf(jobobj.tasks[i].inputs[j].parts[k], input_part.prototype);
+					jobobj.tasks[i].inputs[j].parts[k]._parent = jobobj.tasks[i].inputs[j];
+				}
 			}
 		}
 		
@@ -166,7 +208,7 @@ export class workflow {
 		if(this.wf_undo.length==0)
 			return;
 		
-		this.wf_redo.push(JSON.stringify(this.subjobs));
+		this.wf_redo.push(this.stringify(this.subjobs));
 		this.subjobs = this.restore(this.wf_undo.pop());
 	}
 	
@@ -174,7 +216,7 @@ export class workflow {
 		if(this.wf_redo.length==0)
 			return;
 		
-		this.wf_undo.push(JSON.stringify(this.subjobs));
+		this.wf_undo.push(this.stringify(this.subjobs));
 		this.subjobs = this.restore(this.wf_redo.pop());
 	}
 	

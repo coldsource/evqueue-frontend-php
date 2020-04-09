@@ -39,7 +39,11 @@ export class input_part {
 		this._id = input_part.global.id++;
 	}
 	
-	getInputId() {
-		return this._parent_id;
+	getWorkflow() {
+		return this._workflow;
+	}
+	
+	getInput() {
+		return this._parent;
 	}
 }
