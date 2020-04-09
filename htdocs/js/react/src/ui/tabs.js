@@ -19,6 +19,7 @@
 
 'use strict';
 
+import {DialogContext} from './dialog.js';
 import {Tab} from './tab.js';
 
 export class Tabs extends React.Component {
@@ -31,8 +32,8 @@ export class Tabs extends React.Component {
 	}
 	
 	componentDidUpdate() {
-		if(this.props.updateNotify && this.props.updateNotify.current)
-			this.props.updateNotify.current.componentDidUpdate();
+		if(this.context.onComponentUpdate)
+			this.context.onComponentUpdate();
 	}
 	
 	changeTab(idx) {
@@ -76,3 +77,5 @@ export class Tabs extends React.Component {
 		);
 	}
 }
+
+Tabs.contextType = DialogContext;

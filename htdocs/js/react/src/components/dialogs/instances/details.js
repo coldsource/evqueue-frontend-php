@@ -40,9 +40,6 @@ export class InstanceDetails extends evQueueComponent {
 		this.state.tags_id = [];
 		this.state.tag_label = '';
 		
-		this.dlg = React.createRef();
-		
-		this.tabs = this.tabs.bind(this);
 		this.taskDetail = this.taskDetail.bind(this);
 		this.relaunch = this.relaunch.bind(this);
 		this.debug = this.debug.bind(this);
@@ -184,20 +181,10 @@ export class InstanceDetails extends evQueueComponent {
 		);
 	}
 	
-	tabs(idx) {
-		if(idx==0)
-			return this.tabWorkflow();
-		else if(idx==1)
-			return this.tabXML();
-		else if(idx==2)
-			return this.tabParameters();
-		else if(idx==3)
-			return this.tabTags();
-		else if(idx==4)
-			return this.tabDebug();
-	}
-	
 	tabXML() {
+		if(!this.state.workflow)
+			return;
+		
 		return (<XML xml={this.state.workflow.documentElement.firstChild}/>);
 	}
 	
@@ -316,6 +303,9 @@ export class InstanceDetails extends evQueueComponent {
 	}
 	
 	tabParameters() {
+		if(!this.state.workflow)
+			return;
+		
 		return (
 			<div className="tabbed">
 				{this.renderParameters()}
@@ -370,13 +360,23 @@ export class InstanceDetails extends evQueueComponent {
 			return (<div></div>);
 		
 		return (
-			<Dialog dlgid={this.props.dlgid} title={this.title()} width="400" height="auto" ref={this.dlg}>
-				<Tabs render={this.tabs} updateNotify={this.dlg}>
-					<Tab title="Tree" />
-					<Tab title="XML" />
-					<Tab title="Parameters" />
-					<Tab title="Tags" />
-					<Tab title="Debug" />
+			<Dialog dlgid={this.props.dlgid} title={this.title()} width="400" height="auto">
+				<Tabs>
+					<Tab title="Tree">
+						{ this.tabWorkflow() }
+					</Tab>
+					<Tab title="XML">
+						{ this.tabXML() }
+					</Tab>
+					<Tab title="Parameters">
+						{ this.tabParameters() }
+					</Tab>
+					<Tab title="Tags">
+						{ this.tabTags() }
+					</Tab>
+					<Tab title="Debug">
+						{ this.tabDebug() }
+					</Tab>
 				</Tabs>
 			</Dialog>
 		);

@@ -99,7 +99,7 @@ export class WorkflowLauncher extends evQueueComponent {
 	render() {
 		return (
 			<Dialog dlgid={this.props.dlgid} ref={this.dlg} title="Launch a new workflow instance" width="650">
-				<Tabs updateNotify={this.dlg}>
+				<Tabs>
 					<Tab title="Workflow">
 						<h2>
 							Select workflow

@@ -213,7 +213,7 @@ export class TaskEditor extends React.Component {
 		var task = this.props.task;
 		
 		return (
-			<Dialog title={"Edit task « "+task.path+" »"} width="800" height="300" onClose={ this.props.onClose }>
+			<Dialog title={"Edit task « "+task.path+" »"} width="800" onClose={ this.props.onClose }>
 				<div className="evq-task-editor">
 					<Tabs>
 						<Tab title="Path">

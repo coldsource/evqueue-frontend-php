@@ -21,6 +21,8 @@
 
 import {Dialogs} from './dialogs.js';
 
+export const DialogContext = React.createContext({});
+
 export class Dialog extends React.Component {
 	constructor(props) {
 		super(props);
@@ -84,6 +86,8 @@ export class Dialog extends React.Component {
 		this.resize = this.resize.bind(this);
 		this.close = this.close.bind(this);
 		this.activate = this.activate.bind(this);
+		
+		this.componentDidUpdate = this.componentDidUpdate.bind(this);
 	}
 	
 	componentDidMount() {
@@ -291,7 +295,7 @@ export class Dialog extends React.Component {
 		};
 		
 		return (
-			<div>
+			<DialogContext.Provider value={{onComponentUpdate: this.componentDidUpdate}}>
 				<div className="evq-dialog" style={style}>
 					<div ref={this.dlg_outer} className="evq-dialog-outer" style={{backgroundColor:(this.state.active && !this.props.modal)?'rgba(61,174,233,0.2)':''}}>
 						<div ref={this.dlg_inner} className="evq-dialog-inner" style={{borderTopWidth:this.hasTitle?0:1}} onMouseDown={this.activate}>
@@ -312,7 +316,7 @@ export class Dialog extends React.Component {
 					</div>
 				</div>
 				{this.props.modal?(<div className="evq-modal"></div>):''}
-			</div>
+			</DialogContext.Provider>
 		);
 	}
 }

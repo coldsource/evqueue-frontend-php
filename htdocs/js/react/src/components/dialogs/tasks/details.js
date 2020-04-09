@@ -33,8 +33,6 @@ export class TaskDetails extends React.Component {
 			now: Date.now()
 		}
 		
-		this.dlg = React.createRef();
-		
 		this.changeExecution = this.changeExecution.bind(this);
 	}
 	
@@ -162,8 +160,8 @@ export class TaskDetails extends React.Component {
 		}
 		
 		return (
-			<Dialog dlgid={this.props.dlgid} ref={this.dlg} title={'Task '+(task.type=='SCRIPT'?task.name:task.path)} width="600">
-				<Tabs updateNotify={this.dlg}>
+			<Dialog dlgid={this.props.dlgid} title={'Task '+(task.type=='SCRIPT'?task.name:task.path)} width="600">
+				<Tabs>
 					<Tab title="General">
 						<fieldset className="tabbed">
 							<legend>Description</legend>
