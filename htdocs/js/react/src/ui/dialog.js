@@ -67,7 +67,6 @@ export class Dialog extends React.Component {
 		
 		// Global styles
 		this.height_delta = 0;
-		this.content_vert_padding = 0;
 		this.resize_border = 7;
 		this.auto_height = !props.height || props.height=='auto'?true:false;
 		
@@ -104,9 +103,6 @@ export class Dialog extends React.Component {
 			this.height_delta += parseInt(window.getComputedStyle(this.dlg_title.current).getPropertyValue('height'));
 		}
 		
-		this.content_vert_padding += parseInt(window.getComputedStyle(this.dlg_content.current).getPropertyValue('padding-top'));
-		this.content_vert_padding += parseInt(window.getComputedStyle(this.dlg_content.current).getPropertyValue('padding-bottom'));
-		
 		if(this.auto_height)
 			this.componentDidUpdate();
 	}
@@ -121,7 +117,7 @@ export class Dialog extends React.Component {
 			return;
 		
 		var old_height = this.state.height;
-		var new_height = this.node.querySelector(".evq-dlg-content").clientHeight+this.content_vert_padding+this.height_delta;
+		var new_height = this.node.querySelector(".evq-dlg-content").clientHeight+this.height_delta;
 		if(old_height!=new_height)
 			this.setState({height: new_height});
 	}
