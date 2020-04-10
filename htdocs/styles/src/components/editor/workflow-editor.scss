@@ -82,6 +82,7 @@ $separator-color: #e74c3c;
 		display: inline-block;
 		border: 1px solid #95a5a6;
 		border-radius: 0.4rem;
+		background-color: #ecf0f1;
 		width: $job-width;
 		min-height: $job-height;
 		vertical-align: top;
@@ -90,7 +91,7 @@ $separator-color: #e74c3c;
 		.title {
 			color: #34495e;
 			background-color: #bdc3c7;
-			padding: 0.5rem;
+			padding: 0.2rem;
 			position: relative;
 			
 			.icons {
@@ -102,6 +103,10 @@ $separator-color: #e74c3c;
 	}
 	
 	div.task {
+		margin: 0.2rem;
+		font-size: 0.7rem;
+		color: #2c3e50;
+		
 		span.cmd {
 			font-size: 0.8rem;
 		}
