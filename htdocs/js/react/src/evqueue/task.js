@@ -56,11 +56,13 @@ export class task {
 		this.stdin = workflow.createInput({name: 'stdin'});
 		this.stdin._parent = this;
 		
-		if(typeof desc=='object')
-			this.fromObject(desc);
-		
 		this._id = task.global.id++;
 		this._workflow = workflow;
+		
+		if(desc instanceof Element)
+			this.fromXML(desc);
+		else if(typeof desc=='object')
+			this.fromObject(desc);
 	}
 	
 	getWorkflow() {
@@ -132,8 +134,7 @@ export class task {
 		var input_node;
 		while(input_node = inputs_ite.iterateNext())
 		{
-			var new_input = this._workflow.createInput();
-			new_input.fromXML(input_node);
+			var new_input = this._workflow.createInput(input_node);
 			this.addInput(new_input);
 		}
 	}

@@ -37,7 +37,7 @@ export class workflow {
 	}
 	
 	createJob(desc = {}) {
-		var new_job = new job(desc);
+		var new_job = new job(desc, this);
 		new_job._workflow = this;
 		return new_job;
 	}
@@ -72,8 +72,7 @@ export class workflow {
 		var job_node;
 		while(job_node = jobs_ite.iterateNext())
 		{
-			var new_job = this.createJob();
-			new_job.fromXML(job_node);
+			var new_job = this.createJob(job_node);
 			new_job._parent = parent;
 			
 			subjobs.push(new_job);

@@ -39,11 +39,13 @@ export class job {
 		this.tasks = [];
 		this.subjobs = [];
 		
-		if(typeof desc=='object')
-			this.fromObject(desc);
-		
 		this._id = job.global.id++;
 		this._workflow = workflow;
+		
+		if(desc instanceof Element)
+			this.fromXML(desc);
+		else if(typeof desc=='object')
+			this.fromObject(desc);
 	}
 	
 	getWorkflow() {
@@ -101,9 +103,7 @@ export class job {
 		var task_node;
 		while(task_node = tasks_ite.iterateNext())
 		{
-			var new_task = this._workflow.createTask();
-			new_task.fromXML(task_node);
-			
+			var new_task = this._workflow.createTask(task_node);
 			this.addTask(new_task);
 		}
 	}

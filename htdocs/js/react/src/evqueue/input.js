@@ -37,11 +37,13 @@ export class input {
 		this.loop = '';
 		this.parts = [];
 		
-		if(typeof desc=='object')
-			this.fromObject(desc);
-		
 		this._id = input.global.id++;
 		this._workflow = workflow;
+		
+		if(desc instanceof Element)
+			this.fromXML(desc);
+		else if(typeof desc=='object')
+			this.fromObject(desc);
 	}
 	
 	getWorkflow() {
