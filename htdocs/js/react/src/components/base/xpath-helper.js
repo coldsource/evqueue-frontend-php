@@ -64,7 +64,7 @@ export class XPathHelper extends React.Component {
 		for(var i=0;i<path.length;i++)
 		{
 			var xpath_value = path[i].value;
-			if(value.substr(0,xpath_value.length+1)==xpath_value+'/')
+			if(value.substr(0,xpath_value.length+1)==xpath_value+'/' || value==xpath_value)
 			{
 				composed.node = xpath_value;
 				composed.name = path[i].name;

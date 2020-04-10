@@ -64,6 +64,8 @@ export class workflow {
 		var subjobs_ite = workflow.ownerDocument.evaluate('workflow/subjobs',workflow);
 		var subjobs_node = subjobs_ite.iterateNext();
 		this.load_subjobs(subjobs_node, this.subjobs, undefined);
+		
+		this.saveXML();
 	}
 	
 	load_subjobs(subjobs_node, subjobs, parent) {
@@ -81,6 +83,18 @@ export class workflow {
 			if(subjobs_node2)
 				this.load_subjobs(subjobs_node2, new_job.subjobs, new_job);
 		}
+	}
+	
+	saveXML() {
+		let xmldoc = new Document();
+		
+		let workflow_node = xmldoc.appendChild(xmldoc.createElement('workflow'));
+		let subjobs_node = workflow_node.appendChild(xmldoc.createElement('subjobs'));
+		
+		for(let i=0;i<this.subjobs.length;i++)
+			subjobs_node.appendChild(this.subjobs[i].toXML(xmldoc));
+		
+		let xml = new XMLSerializer().serializeToString(xmldoc);
 	}
 	
 	stringify(obj) {

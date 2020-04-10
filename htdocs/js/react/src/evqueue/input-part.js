@@ -47,4 +47,19 @@ export class input_part {
 	getInput() {
 		return this._parent;
 	}
+	
+	toXML(xmldoc) {
+		if(this.type=='text')
+			return xmldoc.createTextNode(this.value);
+		
+		let node
+		if(this.type=='value')
+			node = xmldoc.createElement('value');
+		else
+			node = xmldoc.createElement('copy');
+		
+		node.setAttribute('select', this.value);
+		
+		return node;
+	}
 }

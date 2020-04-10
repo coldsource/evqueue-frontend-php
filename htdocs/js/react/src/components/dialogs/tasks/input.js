@@ -73,11 +73,12 @@ export class TaskInput extends React.Component {
 					
 					let cmd_parts = cmd.split(' ');
 					name = 'Task: '+cmd_parts[cmd_parts.length-1];
+					name += ', node: '+composed.xpath;
 				}
+				else if(composed.name)
+					name = composed.name+', node: '+composed.xpath;
 				else
-					name = composed.name;
-				
-				name += ', node: '+composed.xpath;
+					name = part.value;
 			}
 			
 			return (

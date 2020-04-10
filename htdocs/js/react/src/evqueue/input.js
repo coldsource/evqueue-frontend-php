@@ -99,4 +99,13 @@ export class input {
 			part_node = part_node.nextSibling;
 		}
 	}
+	
+	toXML(xmldoc) {
+		let input_node = xmldoc.createElement('input');
+		
+		for(let i=0;i<this.parts.length;i++)
+			input_node.appendChild(this.parts[i].toXML(xmldoc));
+		
+		return input_node;
+	}
 }

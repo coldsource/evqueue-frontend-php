@@ -34,6 +34,7 @@ export class task {
 		
 		this.type = 'BINARY';
 		this.path = '';
+		this.name = '';
 		this.script_type = 'static';
 		this.script_xpath = '';
 		this.script_source = '';
@@ -51,10 +52,9 @@ export class task {
 		this.user = '';
 		this.host = '';
 		this.use_agent = false;
-		this.inputs = [];
 		
-		this.stdin = workflow.createInput({name: 'stdin'});
-		this.stdin._parent = this;
+		this.inputs = [];
+		this.setStdin(workflow.createInput());
 		
 		this._id = task.global.id++;
 		this._workflow = workflow;
@@ -108,6 +108,12 @@ export class task {
 		return inputs;
 	}
 	
+	setStdin(stdin) {
+		this.stdin = stdin;
+		this.stdin.name = 'stdin';
+		stdin._parent = this;
+	}
+	
 	fromObject(desc) {
 		Object.assign(this, desc);
 		
@@ -129,13 +135,77 @@ export class task {
 	}
 	
 	load_inputs(task_node) {
-		var inputs_ite = task_node.ownerDocument.evaluate('input',task_node);
+		let inputs_ite = task_node.ownerDocument.evaluate('input',task_node);
 		
-		var input_node;
+		let input_node;
 		while(input_node = inputs_ite.iterateNext())
 		{
-			var new_input = this._workflow.createInput(input_node);
+			let new_input = this._workflow.createInput(input_node);
 			this.addInput(new_input);
 		}
+		
+		let stdin_ite = task_node.ownerDocument.evaluate('stdin',task_node);
+		let stdin_node = stdin_ite.iterateNext();
+		if(stdin_node)
+			this.setStdin(this._workflow.createInput(stdin_node));
+	}
+	
+	toXML(xmldoc) {
+		let task_node = xmldoc.createElement('task');
+		
+		if(this.type && this.type=='SCRIPT')
+			task_node.setAttribute('type', this.type);
+		if(this.type=='BINARY')
+			task_node.setAttribute('path', this.path);
+		else if(this.type=='SCRIPT')
+		{
+			task_node.setAttribute('name', this.name);
+			
+			let script_node = task_node.appendChild(xmldoc.createElement('script'));
+			if(script_type=='static')
+				script_node.appendChild(xmldoc.createTextNode(this.script_source));
+			else if(script_type=='dynamic')
+			{
+				let value_node = script_node.appendChild(xmldoc.createElement('value'));
+				value_node.setAttribute('select', this.script_xpath);
+			}
+		}
+		task_node.setAttribute('output-method', this.output_method);
+		task_node.setAttribute('merge-stderr', this.merge_stderr?'yes':'no');
+		if(this.wd)
+			task_node.setAttribute('wd', this.wd);
+		if(this.condition)
+			task_node.setAttribute('condition', this.condition);
+		if(this.loop)
+			task_node.setAttribute('loop', this.loop);
+		if(this.iteration_condition)
+			task_node.setAttribute('iteration-condition', this.iteration_condition);
+		if(this.retry_schedule)
+			task_node.setAttribute('retry_schedule', this.retry_schedule);
+		if(this.retry_retval)
+			task_node.setAttribute('retry_retval', this.retry_retval);
+		task_node.setAttribute('parameters-mode', this.parametersmode);
+		if(this.queue)
+			task_node.setAttribute('queue', this.queue);
+		if(this.queue_host)
+			task_node.setAttribute('queue_host', this.queue_host);
+		if(this.user)
+			task_node.setAttribute('user', this.user);
+		if(this.host)
+			task_node.setAttribute('host', this.host);
+		if(this.use_agent)
+			task_node.setAttribute('use-agent', this.use_agent?'yes':'no');
+		
+		for(let i=0;i<this.inputs.length;i++)
+			task_node.appendChild(this.inputs[i].toXML(xmldoc));
+		
+		if(this.stdin.parts.length>0)
+		{
+			let stdin_node = task_node.appendChild(xmldoc.createElement('stdin'));
+			for(let i=0;i<this.stdin.parts.length;i++)
+				stdin_node.appendChild(this.stdin.parts[i].toXML(xmldoc));
+		}
+		
+		return task_node;
 	}
 }

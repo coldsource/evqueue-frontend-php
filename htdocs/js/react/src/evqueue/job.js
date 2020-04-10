@@ -107,4 +107,30 @@ export class job {
 			this.addTask(new_task);
 		}
 	}
+	
+	toXML(xmldoc) {
+		let job_node = xmldoc.createElement('job');
+		
+		if(this.name)
+			job_node.setAttribute('name', this.name);
+		if(this.condition)
+			job_node.setAttribute('condition', this.condition);
+		if(this.loop)
+			job_node.setAttribute('loop', this.loop);
+		if(this.iteration_condition)
+			job_node.setAttribute('iteration_condition', this.iteration_condition);
+		
+		let tasks_node = job_node.appendChild(xmldoc.createElement('tasks'));
+		for(let i=0;i<this.tasks.length;i++)
+			tasks_node.appendChild(this.tasks[i].toXML(xmldoc));
+		
+		if(this.subjobs.length>0)
+		{
+			let subjobs_node = job_node.appendChild(xmldoc.createElement('subjobs'));
+			for(let i=0;i<this.subjobs.length;i++)
+				subjobs_node.appendChild(this.subjobs[i].toXML(xmldoc));
+		}
+		
+		return job_node;
+	}
 }
