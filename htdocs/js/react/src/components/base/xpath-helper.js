@@ -56,6 +56,8 @@ export class XPathHelper extends React.Component {
 	static parseValue(path, value) {
 		var composed = {
 			node: '',
+			name: '',
+			path: '',
 			xpath: ''
 		};
 		
@@ -65,6 +67,9 @@ export class XPathHelper extends React.Component {
 			if(value.substr(0,xpath_value.length+1)==xpath_value+'/')
 			{
 				composed.node = xpath_value;
+				composed.name = path[i].name;
+				if(path[i].path!==undefined)
+					composed.path = path[i].path;
 				composed.xpath = value.substr(xpath_value.length+1);
 				break;
 			}

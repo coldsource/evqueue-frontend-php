@@ -92,7 +92,7 @@ export class JobEditor extends React.Component {
 	render() {
 		var name = this.props.job.name?this.props.job.name:'unnamed';
 		return (
-			<Dialog title={"Edit job « "+name+" »"} width="800" height="300" onClose={ this.props.onClose }>
+			<Dialog title={"Edit job « "+name+" »"} width="800" onClose={ this.props.onClose }>
 				<Tabs>
 					<Tab title="Description">
 						{ this.renderTabDescription() }

@@ -81,9 +81,11 @@ export class Job extends React.Component {
 				onMouseLeave={ () => this.setState({add_task: false}) }
 			>
 				<div className="action title" onClick={ (e) => this.props.openDialog?this.props.openDialog('job', job._id) :false }>
-					{ job.condition || job.iteration_condition?(<span className="faicon fa-code-fork" title="This job has a condition"></span>):'' }
-					{ job.loop?(<span className="faicon fa-repeat" title="This job has a loop"></span>):'' }
-					{ job.name }
+					<div className="icons">
+						{ job.condition || job.iteration_condition?(<span className="faicon fa-code-fork" title="This job has a condition"></span>):'' }
+						{ job.loop?(<span className="faicon fa-repeat" title="This job has a loop"></span>):'' }
+					</div>
+					{ job.name?job.name:"\xa0" }
 				</div>
 				{ this.renderTasks() }
 			</div>

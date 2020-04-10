@@ -22,7 +22,7 @@
 import {input} from './input.js';
 
 export class task {
-	constructor(desc = {})
+	constructor(desc = {}, workflow)
 	{
 		if(task.global===undefined)
 		{
@@ -33,19 +33,37 @@ export class task {
 		
 		this.type = 'BINARY';
 		this.path = '';
+		this.script_type = 'static';
+		this.script_xpath = '';
+		this.script_source = '';
+		this.output_method = '';
+		this.merge_stderr = false;
 		this.wd = '';
 		this.condition = '';
 		this.loop = '';
 		this.iteration_condition = '';
 		this.retry_schedule = '';
+		this.retry_retval = '';
 		this.parametersmode = 'CMDLINE';
+		this.queue = 'default';
+		this.queue_host = '';
+		this.user = '';
+		this.host = '';
+		this.use_agent = false;
 		this.inputs = [];
+		
+		this.stdin = workflow.createInput({name: 'stdin'});
+		this.stdin._parent = this;
 		
 		if(typeof desc=='object') {
 			Object.assign(this, desc);
+			
+			this.merge_stderr = this.merge_stderr=='yes'?true:false;
+			this.use_agent = this.use_agent=='yes'?true:false;
 		}
 		
 		this._id = task.global.id++;
+		this._workflow = workflow;
 	}
 	
 	getWorkflow() {
@@ -54,6 +72,10 @@ export class task {
 	
 	getJob() {
 		return this._parent;
+	}
+	
+	getPath() {
+		return this.type=='BINARY'?this.path:this.name
 	}
 	
 	addInput(inputobj, copy) {

@@ -91,9 +91,12 @@ $separator-color: #e74c3c;
 			color: #34495e;
 			background-color: #bdc3c7;
 			padding: 0.5rem;
+			position: relative;
 			
-			span {
-				float: left;
+			.icons {
+				display: inline-block;
+				position: absolute;
+				left: 0;
 			}
 		}
 	}

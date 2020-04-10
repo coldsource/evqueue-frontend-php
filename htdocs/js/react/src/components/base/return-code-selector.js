@@ -16,35 +16,33 @@
   *
   * Author: Thibault Kummer
   */
- 
+
 'use strict';
 
-export class input_part {
-	constructor(desc = {}, workflow)
-	{
-		if(input_part.global===undefined)
-		{
-			input_part.global = {
-				id: 1
-			};
+import {Select} from '../../ui/select.js';
+
+export class ReturnCodeSelector extends React.Component {
+	constructor(props) {
+		super(props);
+		
+		this.state = { values: [{
+				name: 'Any return code',
+				value: ''
+			}]
+		};
+		
+		for(var i=0;i<256;i++) {
+			this.state.values.push({
+				name: ''+i,
+				value: ''+i
+			});
 		}
-		
-		this.type = '';
-		this.value = '';
-		
-		if(typeof desc=='object') {
-			Object.assign(this, desc);
-		}
-		
-		this._id = input_part.global.id++;
-		this._workflow = workflow;
 	}
 	
-	getWorkflow() {
-		return this._workflow;
-	}
-	
-	getInput() {
-		return this._parent;
+	render() {
+		return (
+			<Select value={this.props.value} values={this.state.values} name={this.props.name} disabled={this.props.disabled} onChange={this.props.onChange}>
+			</Select>
+		);
 	}
 }

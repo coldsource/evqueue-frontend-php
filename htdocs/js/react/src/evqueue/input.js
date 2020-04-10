@@ -22,7 +22,7 @@
 import {input_part} from './input-part.js';
 
 export class input {
-	constructor(desc = {})
+	constructor(desc = {}, workflow)
 	{
 		if(input.global===undefined)
 		{
@@ -41,6 +41,7 @@ export class input {
 		}
 		
 		this._id = input.global.id++;
+		this._workflow = workflow;
 	}
 	
 	getWorkflow() {

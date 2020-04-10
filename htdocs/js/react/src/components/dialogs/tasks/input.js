@@ -22,6 +22,7 @@
 import {Dialogs} from '../../../ui/dialogs.js';
 import {SortableHandle} from '../../../ui/sortable-handle.js';
 import {ValueSelector} from '../workflows/value-selector.js';
+import {XPathHelper} from '../../base/xpath-helper.js';
 
 export class TaskInput extends React.Component {
 	constructor(props) {
@@ -56,11 +57,32 @@ export class TaskInput extends React.Component {
 	
 	renderParts() {
 		var input = this.props.input;
+		var task = input.getTask();
+		var workflow = task.getWorkflow();
+		var path = workflow.getTaskPath(task._id);
 		
 		return input.parts.map( (part, idx) => {
+			let name = "\xa0";
+			if(part.value)
+			{
+				let composed = XPathHelper.parseValue(path, part.value);
+				if(composed.path)
+				{
+					let parts = composed.path.split('/');
+					let cmd = parts[parts.length-1];
+					
+					let cmd_parts = cmd.split(' ');
+					name = 'Task: '+cmd_parts[cmd_parts.length-1];
+				}
+				else
+					name = composed.name;
+				
+				name += ', node: '+composed.xpath;
+			}
+			
 			return (
 				<div key={idx} className="input-part">
-					<span onClick={ (e) => this.props.openDialog('task-input-select', part._id) }>{part.value?part.value:"\xa0"}</span>
+					<span onClick={ (e) => this.props.openDialog('task-input-select', part._id) }>{name}</span>
 					<span className="faicon fa-remove" title="Remove this input part" onClick={ (e) => this.removePart(e, idx) }></span>
 				</div>
 			);
@@ -74,9 +96,9 @@ export class TaskInput extends React.Component {
 		return (
 			<div className="input">
 				<div className="input-name">
-					<span className="faicon fa-remove" onClick={ (e) => this.props.removeInput(e, this.props.input) }>&#160;</span>
+					{ this.props.removeInput?(<span className="faicon fa-remove" onClick={ (e) => this.props.removeInput(e, this.props.input) }>&#160;</span>):false }
 					<SortableHandle>
-						<span className="action" onClick={ (e) => this.props.openDialog('task-input', input._id) }>
+						<span className="action" onClick={ (e) => this.props.editable===false?false:this.props.openDialog('task-input', input._id) }>
 							{name}
 							{ input.condition ?(<span className="faicon fa-code-fork" title="This input has a condition"></span>):'' }
 							{ input.loop?(<span className="faicon fa-repeat" title="This input has a loop"></span>):'' }

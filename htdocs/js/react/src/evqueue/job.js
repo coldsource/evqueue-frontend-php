@@ -22,7 +22,7 @@
 import {task} from './task.js';
 
 export class job {
-	constructor(desc = {})
+	constructor(desc = {}, workflow)
 	{
 		if(job.global===undefined)
 		{
@@ -43,6 +43,7 @@ export class job {
 		}
 		
 		this._id = job.global.id++;
+		this._workflow = workflow;
 	}
 	
 	getWorkflow() {

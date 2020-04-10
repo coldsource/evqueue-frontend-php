@@ -5,7 +5,7 @@ div.formdiv {
 		margin-top: 10px;
 		margin-bottom: 10px;
 		
-		&>label {
+		label {
 			min-width: 15rem;
 			display: inline-block;
 			text-align: right;
@@ -13,16 +13,16 @@ div.formdiv {
 			vertical-align: middle;
 		}
 		
-		&>input[type='text'] {
+		input[type='text'] {
 			width: 21rem;
 			box-sizing: border-box;
 		}
 		
-		&>.evq-select {
+		.evq-select {
 			width: 21rem;
 		}
 		
-		&>.evq-autocomplete {
+		.evq-autocomplete {
 			width: 21rem;
 		}
 	}

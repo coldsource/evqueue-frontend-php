@@ -19,20 +19,44 @@
 
 'use strict';
 
-import {SortableContext} from './sortable.js';
+import {Dialog} from '../../../ui/dialog.js';
+import {Help} from '../../../ui/help.js';
 
-export class SortableHandle extends React.Component {
+export class ScriptEditor extends React.Component {
 	constructor(props) {
 		super(props);
+		
+		this.state = {
+			script: this.props.script
+		};
+		
+		this.onClose = this.onClose.bind(this);
+	}
+	
+	onClose() {
+		var event = {
+			target: {
+				name: this.props.name,
+				value: this.state.script
+			}
+		};
+		
+		this.props.onChange(event);
 	}
 	
 	render() {
 		return (
-			<SortableContext.Consumer>
-			{
-				context => (<span onMouseDown={ (e) => context.onMouseDown?context.onMouseDown(e, context.root):false }>{this.props.children}</span>)
-			}
-			</SortableContext.Consumer>
+			<Dialog title="Script editor" width="600" onClose={this.onClose}>
+				<div className="evq-script-editor">
+					<h2>
+						Script editor
+						<Help>
+							Write here your script. Remember to have a shebang (#!) on the first line !
+						</Help>
+					</h2>
+					<textarea name="script" value={this.state.script} onChange={ (e) => this.setState({script: e.target.value}) } />
+				</div>
+			</Dialog>
 		);
 	}
 }

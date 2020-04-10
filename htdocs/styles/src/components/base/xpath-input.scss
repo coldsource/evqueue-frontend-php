@@ -1,0 +1,12 @@
+div.evq-xpath-input {
+	display: inline-block;
+	
+	div.evq-xpath-input-error {
+		position: absolute;
+		border: 1px dotted;
+		background-color: white;
+		padding: 0.3rem;
+		z-index: 1000;
+		margin-top: 3px;
+	}
+}

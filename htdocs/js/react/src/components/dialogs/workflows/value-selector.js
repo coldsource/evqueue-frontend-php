@@ -22,6 +22,7 @@
 import {App} from '../../base/app.js';
 import {evQueueComponent} from '../../base/evqueue-component.js';
 import {XPathHelper} from '../../base/xpath-helper.js';
+import {XPathInput} from '../../base/xpath-input.js';
 import {Dialog} from '../../../ui/dialog.js';
 import {Tabs} from '../../../ui/tabs.js';
 import {Tab} from '../../../ui/tab.js';
@@ -44,34 +45,11 @@ export class ValueSelector extends evQueueComponent {
 			}
 		};
 		
-		if(type!='text')
-		{
-			this.API({
-				group: 'xpath',
-				action: 'parse',
-				attributes: { expression: value }
-			}).then( (response) => {
-				if(response.documentElement.hasAttribute('parse-error'))
-					this.setState({xpath_error: response.documentElement.getAttribute('parse-error')});
-				else
-					this.setState({xpath_error: ''});
-			});
-		}
-		
 		this.props.onChange(event);
 	}
 	
 	changeMode(e) {
 		this.triggerPartChange(e.target.value, this.props.part.value);
-	}
-	
-	renderXPathError() {
-		if(!this.state.xpath_error)
-			return;
-		
-		return(
-			<div className="light-error">{this.state.xpath_error}</div>
-		);
 	}
 	
 	render() {
@@ -118,8 +96,7 @@ export class ValueSelector extends evQueueComponent {
 								<br />XPath mode&#160;:&#160;
 								<Select values={[{name: 'value', value: 'value'},{name: 'copy', value: 'copy'}]} value={type} filter={false} onChange={this.changeMode} />
 							</div>
-							<input type="text" name="advanced" value={this.props.part.value} onChange={ (e) => this.triggerPartChange(this.props.part.type, e.target.value) } />
-							{ this.renderXPathError() }
+							<XPathInput name="advanced" value={this.props.part.value} onChange={ (e) => this.triggerPartChange(this.props.part.type, e.target.value) } />
 						</Tab>
 					</Tabs>
 				</div>

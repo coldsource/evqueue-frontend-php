@@ -53,6 +53,9 @@ export class Select extends React.Component {
 	}
 	
 	toggleDropdown() {
+		if(this.props.disabled)
+			return;
+		
 		this.setState({dropdown_opened: !this.state.dropdown_opened});
 	}
 	
@@ -180,7 +183,7 @@ export class Select extends React.Component {
 		
 		return (
 			<div ref={this.ref} className={className}>
-				<div className="evq-select-value" style={value_style} onClick={this.toggleDropdown}>
+				<div className={"evq-select-value"+(this.props.disabled?' disabled':'')} style={value_style} onClick={this.toggleDropdown}>
 					{this.renderValue()}
 				</div>
 				{this.renderDropdown()}

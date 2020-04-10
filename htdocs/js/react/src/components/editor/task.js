@@ -29,10 +29,11 @@ export class Task extends React.Component {
 	renderName() {
 		var task = this.props.task;
 		
-		if(this.props.task.path=='')
+		let path = task.getPath()
+		if(path=='')
 			return (<span className="cmd action error">empty task</span>);
 		
-		var parts = this.props.task.path.split('/');
+		var parts = path.split('/');
 		
 		var cmd = parts[parts.length-1];
 		var params = '';

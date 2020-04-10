@@ -18,6 +18,11 @@ div.evq-select {
 			position: relative;
 			top: 3px;
 		}
+		
+		&.disabled {
+			background-color: lightgrey;
+			color: grey;
+		}
 	}
 	
 	div.evq-select-dropdown {

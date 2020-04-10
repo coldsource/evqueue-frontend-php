@@ -43,21 +43,15 @@ export class workflow {
 	}
 	
 	createTask(desc = {}) {
-		var new_task = new task(desc);
-		new_task._workflow = this;
-		return new_task;
+		return new task(desc, this);
 	}
 	
 	createInput(desc = {}) {
-		var new_input = new input(desc);
-		new_input._workflow = this;
-		return new_input;
+		return new input(desc, this);
 	}
 	
 	createInputPart(desc = {}) {
-		var new_input_part = new input_part(desc);
-		new_input_part._workflow = this;
-		return new_input_part;
+		return new input_part(desc, this);
 	}
 	
 	loadXML(workflow) {
@@ -105,6 +99,13 @@ export class workflow {
 			
 			this.load_inputs(task_node, new_task);
 			
+			if(task_node.hasAttribute('type') && task_node.getAttribute('type')=='SCRIPT')
+			{
+				var script_ite = task_node.ownerDocument.evaluate('script', task_node);
+				var script_node = script_ite.iterateNext();
+				new_task.script_source = script_node.textContent;
+			}
+			
 			job.addTask(new_task);
 		}
 	}
@@ -138,7 +139,10 @@ export class workflow {
 	node_to_object(node) {
 		var obj = {};
 		for(var i=0;i<node.attributes.length;i++)
-			obj[node.attributes[i].name] = node.attributes[i].value;
+		{
+			var name = node.attributes[i].name.replace(/-/g,"_");
+			obj[name] = node.attributes[i].value;
+		}
 		return obj;
 	}
 	
@@ -313,7 +317,10 @@ export class workflow {
 	
 	getTaskPath(id) {
 		var path = [];
+		
+		this.parent_depth = 0;
 		var ret = this.getObject('task', id, this.subjobs, path);
+		
 		return ret===false?false:path;
 	}
 	
@@ -330,11 +337,9 @@ export class workflow {
 		{
 			if(type=='job' && subjobs[i]._id==id)
 			{
-				if(subjobs[i].loop)
+				if(subjobs[i].loop && path!==undefined)
 				{
 					path.push({group: 'Current job', values: [{value: 'evqGetCurrentJob()/evqGetContext()', name: 'Loop context'}]});
-				
-					this.parent_depth = 0;
 				}
 				
 				return subjobs[i];
@@ -351,13 +356,23 @@ export class workflow {
 							
 							if(subjobs[i].loop)
 								path.push({group: 'Current job', value: 'evqGetCurrentJob()/evqGetContext()', name: 'Loop context'});
-							
-							this.parent_depth = 0;
 						}
 						return subjobs[i].tasks[j];
 					}
 					else if(type=='input' || type=='input-part')
 					{
+						if(type=='input' && subjobs[i].tasks[j].stdin._id==id)
+							return subjobs[i].tasks[j].stdin;
+						
+						if(type=='input-part')
+						{
+							for(var l=0;l<subjobs[i].tasks[j].stdin.parts.length;l++)
+							{
+								if(subjobs[i].tasks[j].stdin.parts[l]._id==id)
+									return subjobs[i].tasks[j].stdin.parts[l];
+							}
+						}
+						
 						for(var k=0;k<subjobs[i].tasks[j].inputs.length;k++)
 						{
 							if(type=='input' && subjobs[i].tasks[j].inputs[k]._id==id)
@@ -386,7 +401,7 @@ export class workflow {
 						path.push({group: group, value: 'evqGetParentJob('+(this.parent_depth)+'/evqGetContext()', name: 'Loop context'});
 					
 					for(var j=0;j<subjobs[i].tasks.length;j++)
-						path.push({group: group, value: "evqGetParentJob("+(this.parent_depth)+")/evqGetOutput('"+subjobs[i].tasks[j].path+"')", name:"Task: "+subjobs[i].tasks[j].path});
+						path.push({group: group, value: "evqGetParentJob("+(this.parent_depth)+")/evqGetOutput('"+subjobs[i].tasks[j].getPath()+"')", name:"Task: "+subjobs[i].tasks[j].getPath(), path: subjobs[i].tasks[j].getPath()});
 					
 					this.parent_depth++;
 				}
