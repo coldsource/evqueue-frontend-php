@@ -102,7 +102,7 @@ export class TaskEditor extends React.Component {
 				<h2>
 					Path
 					<Help>
-						If you want to callan existing binary command, choose 'binary' type and enter its path. The path can contain arguments.
+						If you want to call an existing binary command, choose 'binary' type and enter its path. The path can contain arguments. If path is relative (not starting with a /), it will be relative the the core.wd configuration directive.
 						<br /><br />You can still add dynamic inputs from evQueue. These inputs will be added to the command line arguments or sent as environment variables depending on the task configuration.
 						<br /><br />If you choose 'script' type and 'static' script type, you can write here a small script that will be executed.
 						<br /><br />If you select 'dynamic' script type, the content of the script will be taken from the output of an earlier task. For both cases, if you plan remote execution, you must enable the evQueue agent in the 'Remote execution' section.
