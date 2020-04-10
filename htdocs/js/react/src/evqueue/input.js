@@ -20,6 +20,7 @@
 'use strict';
 
 import {input_part} from './input-part.js';
+import {DOMUtils} from '../utils/DOM.js';
 
 export class input {
 	constructor(desc = {}, workflow)
@@ -36,9 +37,8 @@ export class input {
 		this.loop = '';
 		this.parts = [];
 		
-		if(typeof desc=='object') {
-			Object.assign(this, desc);
-		}
+		if(typeof desc=='object')
+			this.fromObject(desc);
 		
 		this._id = input.global.id++;
 		this._workflow = workflow;
@@ -74,5 +74,27 @@ export class input {
 		parts.splice(idx, 1);
 		
 		return parts;
+	}
+	
+	fromObject(desc) {
+		Object.assign(this, desc);
+	}
+	
+	fromXML(input_node) {
+		this.fromObject(DOMUtils.nodeToObject(input_node));
+		
+		this.load_input_parts(input_node);
+	}
+	
+	load_input_parts(input_node) {
+		var part_node = input_node.firstChild;
+		while(part_node) {
+			if(part_node.nodeType==Node.TEXT_NODE)
+				this.addPart(this._workflow.createInputPart({type: 'text', value: part_node.nodeValue}));
+			else if(part_node.nodeType==Node.ELEMENT_NODE)
+				this.addPart(this._workflow.createInputPart({type: part_node.nodeName, value: part_node.getAttribute('select')}));
+				
+			part_node = part_node.nextSibling;
+		}
 	}
 }

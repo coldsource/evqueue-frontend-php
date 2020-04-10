@@ -20,6 +20,7 @@
 'use strict';
 
 import {task} from './task.js';
+import {DOMUtils} from '../utils/DOM.js';
 
 export class job {
 	constructor(desc = {}, workflow)
@@ -38,9 +39,8 @@ export class job {
 		this.tasks = [];
 		this.subjobs = [];
 		
-		if(typeof desc=='object') {
-			Object.assign(this, desc);
-		}
+		if(typeof desc=='object')
+			this.fromObject(desc);
 		
 		this._id = job.global.id++;
 		this._workflow = workflow;
@@ -80,5 +80,31 @@ export class job {
 		
 		this.tasks.splice(idx, 1);
 		return true;
+	}
+	
+	fromObject(desc) {
+		Object.assign(this, desc);
+	}
+	
+	fromXML(job_node) {
+		this.fromObject(DOMUtils.nodeToObject(job_node));
+		
+		var tasks_ite = job_node.ownerDocument.evaluate('tasks',job_node);
+		var tasks_node = tasks_ite.iterateNext();
+		if(tasks_node)
+			this.load_tasks(tasks_node);
+	}
+	
+	load_tasks(tasks_node) {
+		var tasks_ite = tasks_node.ownerDocument.evaluate('task',tasks_node);
+		
+		var task_node;
+		while(task_node = tasks_ite.iterateNext())
+		{
+			var new_task = this._workflow.createTask();
+			new_task.fromXML(task_node);
+			
+			this.addTask(new_task);
+		}
 	}
 }

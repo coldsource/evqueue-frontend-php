@@ -20,6 +20,7 @@
 'use strict';
 
 import {input} from './input.js';
+import {DOMUtils} from '../utils/DOM.js';
 
 export class task {
 	constructor(desc = {}, workflow)
@@ -55,12 +56,8 @@ export class task {
 		this.stdin = workflow.createInput({name: 'stdin'});
 		this.stdin._parent = this;
 		
-		if(typeof desc=='object') {
-			Object.assign(this, desc);
-			
-			this.merge_stderr = this.merge_stderr=='yes'?true:false;
-			this.use_agent = this.use_agent=='yes'?true:false;
-		}
+		if(typeof desc=='object')
+			this.fromObject(desc);
 		
 		this._id = task.global.id++;
 		this._workflow = workflow;
@@ -107,5 +104,37 @@ export class task {
 		}
 		
 		return inputs;
+	}
+	
+	fromObject(desc) {
+		Object.assign(this, desc);
+		
+		this.merge_stderr = this.merge_stderr=='yes'?true:false;
+		this.use_agent = this.use_agent=='yes'?true:false;
+	}
+
+	fromXML(task_node) {
+		this.fromObject(DOMUtils.nodeToObject(task_node));
+			
+		this.load_inputs(task_node);
+		
+		if(task_node.hasAttribute('type') && task_node.getAttribute('type')=='SCRIPT')
+		{
+			var script_ite = task_node.ownerDocument.evaluate('script', task_node);
+			var script_node = script_ite.iterateNext();
+			this.script_source = script_node.textContent;
+		}
+	}
+	
+	load_inputs(task_node) {
+		var inputs_ite = task_node.ownerDocument.evaluate('input',task_node);
+		
+		var input_node;
+		while(input_node = inputs_ite.iterateNext())
+		{
+			var new_input = this._workflow.createInput();
+			new_input.fromXML(input_node);
+			this.addInput(new_input);
+		}
 	}
 }

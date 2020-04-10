@@ -72,78 +72,16 @@ export class workflow {
 		var job_node;
 		while(job_node = jobs_ite.iterateNext())
 		{
-			var new_job = this.createJob(this.node_to_object(job_node));
+			var new_job = this.createJob();
+			new_job.fromXML(job_node);
 			new_job._parent = parent;
 			
-			var tasks_ite = job_node.ownerDocument.evaluate('tasks',job_node);
-			var tasks_node = tasks_ite.iterateNext();
-			if(tasks_node)
-				this.load_tasks(tasks_node, new_job);
-			
 			subjobs.push(new_job);
-			
 			
 			var subjobs_node2 = job_node.ownerDocument.evaluate('subjobs',job_node).iterateNext();
 			if(subjobs_node2)
 				this.load_subjobs(subjobs_node2, new_job.subjobs, new_job);
 		}
-	}
-	
-	load_tasks(tasks_node, job) {
-		var tasks_ite = tasks_node.ownerDocument.evaluate('task',tasks_node);
-		
-		var task_node;
-		while(task_node = tasks_ite.iterateNext())
-		{
-			var new_task = this.createTask(this.node_to_object(task_node));
-			
-			this.load_inputs(task_node, new_task);
-			
-			if(task_node.hasAttribute('type') && task_node.getAttribute('type')=='SCRIPT')
-			{
-				var script_ite = task_node.ownerDocument.evaluate('script', task_node);
-				var script_node = script_ite.iterateNext();
-				new_task.script_source = script_node.textContent;
-			}
-			
-			job.addTask(new_task);
-		}
-	}
-	
-	load_inputs(task_node, task) {
-		var inputs_ite = task_node.ownerDocument.evaluate('input',task_node);
-		
-		var input_node;
-		while(input_node = inputs_ite.iterateNext())
-		{
-			var new_input = this.createInput(this.node_to_object(input_node));
-			
-			this.load_input_parts(input_node, new_input);
-			
-			task.addInput(new_input);
-		}
-	}
-	
-	load_input_parts(input_node, input) {
-		var part_node = input_node.firstChild;
-		while(part_node) {
-			if(part_node.nodeType==Node.TEXT_NODE)
-				input.addPart(this.createInputPart({type: 'text', value: part_node.nodeValue}));
-			else if(part_node.nodeType==Node.ELEMENT_NODE)
-				input.addPart(this.createInputPart({type: part_node.nodeName, value: part_node.getAttribute('select')}));
-				
-			part_node = part_node.nextSibling;
-		}
-	}
-	
-	node_to_object(node) {
-		var obj = {};
-		for(var i=0;i<node.attributes.length;i++)
-		{
-			var name = node.attributes[i].name.replace(/-/g,"_");
-			obj[name] = node.attributes[i].value;
-		}
-		return obj;
 	}
 	
 	stringify(obj) {
