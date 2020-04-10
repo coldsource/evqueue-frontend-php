@@ -311,6 +311,15 @@ export class workflow {
 		return this.getObject('job', id, this.subjobs);
 	}
 	
+	getJobPath(id) {
+		var path = [];
+		
+		this.parent_depth = 0;
+		var ret = this.getObject('job', id, this.subjobs, path);
+		
+		return ret===false?false:path;
+	}
+	
 	getTask(id) {
 		return this.getObject('task', id, this.subjobs);
 	}

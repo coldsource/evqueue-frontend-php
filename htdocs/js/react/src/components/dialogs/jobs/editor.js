@@ -23,6 +23,8 @@ import {Checkbox} from '../../../ui/checkbox.js';
 import {Dialog} from '../../../ui/dialog.js';
 import {Tabs} from '../../../ui/tabs.js';
 import {Tab} from '../../../ui/tab.js';
+import {XPathInput} from '../../base/xpath-input.js';
+import {MagicWand} from '../../base/magic-wand.js';
 
 export class JobEditor extends React.Component {
 	constructor(props) {
@@ -60,6 +62,8 @@ export class JobEditor extends React.Component {
 	}
 	
 	renderTabConditionsLoop() {
+		var job = this.props.job;
+		
 		var wait_condition = this.props.job.condition.substr(0,8)=="evqWait(";
 		var wait_iteration_condition = this.props.job.iteration_condition.substr(0,8)=="evqWait(";
 		
@@ -67,7 +71,8 @@ export class JobEditor extends React.Component {
 			<div className="formdiv">
 				<div>
 					<label>Condition</label>
-					<input type="text" name="condition" value={this.props.job.condition} onChange={this.props.onChange} />
+					<XPathInput name="condition" value={this.props.job.condition} onChange={this.props.onChange} />
+					<MagicWand name="condition" job={job} onChange={this.props.onChange} />
 				</div>
 				<div>
 					<label>Wait for condition to become true</label>
@@ -75,11 +80,13 @@ export class JobEditor extends React.Component {
 				</div>
 				<div>
 					<label>Loop</label>
-					<input type="text" name="loop" value={this.props.job.loop} onChange={this.props.onChange} />
+					<XPathInput name="loop" value={this.props.job.loop} onChange={this.props.onChange} />
+					<MagicWand name="loop" job={job} onChange={this.props.onChange} />
 				</div>
 				<div>
 					<label>Iteration condition</label>
-					<input type="text" name="iteration_condition" value={this.props.job.iteration_condition} onChange={this.props.onChange} />
+					<XPathInput name="iteration_condition" value={this.props.job.iteration_condition} onChange={this.props.onChange} />
+					<MagicWand name="iteration_condition" job={job} onChange={this.props.onChange} />
 				</div>
 				<div>
 					<label>Wait for condition to become true</label>
