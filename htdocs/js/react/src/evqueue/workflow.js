@@ -69,7 +69,7 @@ export class workflow {
 		let job_ite = workflow.ownerDocument.evaluate('workflow/subjobs/job',workflow);
 		let job_node;
 		while(job_node = job_ite.iterateNext())
-			this.subjobs.push(this.createJob(job_node));
+			this.addSubjob(this.createJob(job_node));
 	}
 	
 	saveXML() {
@@ -207,6 +207,9 @@ export class workflow {
 		}
 		else if(dst_position=='top')
 		{
+			if(src_parent==dst_parent)
+				return; // This is a no-op
+			
 			// New job is placed in place of old one
 			dst_idx = dst_parent.subjobs.indexOf(dst_job);
 			let dst_parent_removed_subjobs = dst_parent.replaceSubjob(src_job, dst_idx);
@@ -243,7 +246,8 @@ export class workflow {
 		if(src_parent)
 		{
 			// Remove old job
-			src_parent.removeSubjob(src_idx);
+			if(src_parent!=dst_parent || src_idx!=dst_idx)
+				src_parent.removeSubjob(src_idx);
 			
 			// Insert back removed children (ie old children of the newly inserted job)
 			for(let i=0;i<src_removed_subjobs.length;i++)
@@ -367,5 +371,6 @@ export class workflow {
 	}
 }
 
-workflow.addSubjob = job.addSubjob;
-workflow.removeSubjob = job.removeSubjob;
+workflow.prototype.addSubjob = job.prototype.addSubjob;
+workflow.prototype.replaceSubjob = job.prototype.replaceSubjob;
+workflow.prototype.removeSubjob = job.prototype.removeSubjob;

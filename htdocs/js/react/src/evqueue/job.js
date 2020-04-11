@@ -123,6 +123,9 @@ export class job {
 	}
 	
 	replaceSubjob(job, idx) {
+		if(this.subjobs[idx]===job)
+			return [];
+		
 		job._parent = this;
 		
 		let old_subjob = this.subjobs[idx];
