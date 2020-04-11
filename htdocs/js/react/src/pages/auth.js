@@ -61,7 +61,7 @@ export class PageAuth extends React.Component {
 	
 	render() {
 		return (
-			<div id="login">
+			<div id="login" onKeyDown={ (e) => { if(e.keyCode === 13) this.connect(e) } }>
 				<fieldset>
 					<div className="logo">
 						<img src="images/evQueue.svg" />
