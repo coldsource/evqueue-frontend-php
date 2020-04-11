@@ -210,6 +210,11 @@ export class workflow {
 				src_removed_subjobs = leaf.setSubjobs(dst_parent_removed_subjobs);
 			}
 		}
+		else if(dst_position=='trash')
+		{
+			if(src_type=='job')
+				src_removed_subjobs = src_job.subjobs;
+		}
 		
 		if(src_parent)
 		{
@@ -220,8 +225,6 @@ export class workflow {
 			for(let i=0;i<src_removed_subjobs.length;i++)
 				src_parent.addSubjob(src_removed_subjobs[i], src_idx++);
 		}
-		
-		return true;
 	}
 	
 	getJob(id) {

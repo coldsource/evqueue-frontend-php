@@ -97,10 +97,8 @@ export class WorkflowEditor extends evQueueComponent {
 	onDragEnd(e) {
 		e.stopPropagation();
 		
-		if(e.target.firstChild && e.target.firstChild.firstChild && e.target.firstChild.firstChild.style)
-		{
+		if(e.dataTransfer.getData('origin_type')=='branch')
 			e.target.firstChild.firstChild.style.display = 'block';
-		}
 	}
 	
 	onDragOver(e, type) {
@@ -134,14 +132,11 @@ export class WorkflowEditor extends evQueueComponent {
 			if(position=='job')
 				job.addTask(this.origin_task);
 			
-			this.origin_job.removeTask(this.origin_task);
+			if(job!==this.origin_job)
+				this.origin_job.removeTask(this.origin_task);
 		}
 		else if(origin_type=='job' || origin_type=='branch')
-		{
-			ret = this.state.workflow.moveJob(job, position, this.origin_job, origin_type);
-			if(ret!==true)
-				return App.warning(ret);
-		}
+			this.state.workflow.moveJob(job, position, this.origin_job, origin_type);
 		
 		this.state.workflow.postBackup();
 		this.setState({new_job: false, workflow: this.state.workflow});

@@ -67,12 +67,10 @@ export class job {
 			taskobj = this._workflow.createTask();
 		
 		if(this.tasks.indexOf(taskobj)!=-1)
-			return "This task is already in the job";
+			return;
 		
 		taskobj._parent = this;
 		this.tasks.push(taskobj);
-		
-		return true;
 	}
 	
 	removeTask(task) {
