@@ -9,4 +9,9 @@ div.evq-xpath-input {
 		z-index: 1000;
 		margin-top: 3px;
 	}
+	
+	input {
+		width: 100%;
+		box-sizing: border-box;
+	}
 }

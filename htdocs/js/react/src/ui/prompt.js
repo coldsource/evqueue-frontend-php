@@ -54,7 +54,7 @@ export class Prompt extends React.Component {
 		var width = this.props.width?this.props.width:300;
 		return (
 			<Dialog ref={this.dlg} dlgid={this.props.dlgid} width={width} modal={true} hasTitle={false}>
-				<div className="evq-prompt">
+				<div className="evq-prompt" onKeyDown={ (e) => { if(e.keyCode === 13) this.confirm() } }>
 					<div className="evq-content">{this.renderContent()}</div>
 					<div className="center">
 						<input name="value" type="text" placeholder={this.props.placeholder} onChange={ (e) => this.setState({value: e.target.value}) } />

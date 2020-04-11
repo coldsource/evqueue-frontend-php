@@ -61,7 +61,7 @@ export class WorkflowEditor extends evQueueComponent {
 	}
 	
 	componentDidMount() {
-		this.API({group: 'workflow', action: 'get', attributes: {id: 57}}).then( (response) => {
+		this.API({group: 'workflow', action: 'get', attributes: {id: 84}}).then( (response) => {
 			this.state.workflow.loadXML(response.documentElement.firstChild);
 			this.setState({workflow:this.state.workflow});
 		});

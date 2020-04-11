@@ -70,18 +70,35 @@ export class workflow {
 		let job_node;
 		while(job_node = job_ite.iterateNext())
 			this.addSubjob(this.createJob(job_node));
+		
+		let parameter_ite = workflow.ownerDocument.evaluate('workflow/parameters/parameter',workflow);
+		let parameter_node;
+		while(parameter_node = parameter_ite.iterateNext())
+			this.properties.parameters.push(parameter_node.getAttribute('name'));
 	}
 	
 	saveXML() {
 		let xmldoc = new Document();
 		
 		let workflow_node = xmldoc.appendChild(xmldoc.createElement('workflow'));
+		
+		if(this.properties.parameters.length>0)
+		{
+			let parameters_node = workflow_node.appendChild(xmldoc.createElement('parameters'));
+			for(let i=0;i<this.properties.parameters.length;i++)
+			{
+				let parameter_node = parameters_node.appendChild(xmldoc.createElement('parameter'));
+				parameter_node.setAttribute('name',this.properties.parameters[i]);
+			}
+		}
+		
 		let subjobs_node = workflow_node.appendChild(xmldoc.createElement('subjobs'));
 		
 		for(let i=0;i<this.subjobs.length;i++)
 			subjobs_node.appendChild(this.subjobs[i].toXML(xmldoc));
 		
 		let xml = new XMLSerializer().serializeToString(xmldoc);
+		return xml;
 	}
 	
 	stringify(obj) {
@@ -260,12 +277,7 @@ export class workflow {
 	}
 	
 	getJobPath(id) {
-		var path = [];
-		
-		this.parent_depth = 0;
-		var ret = this.getObject('job', id, this.subjobs, path);
-		
-		return ret===false?false:path;
+		return this.getObjectPath('job',id);
 	}
 	
 	getTask(id) {
@@ -273,12 +285,7 @@ export class workflow {
 	}
 	
 	getTaskPath(id) {
-		var path = [];
-		
-		this.parent_depth = 0;
-		var ret = this.getObject('task', id, this.subjobs, path);
-		
-		return ret===false?false:path;
+		return this.getObjectPath('task',id);
 	}
 	
 	getInput(id) {
@@ -368,6 +375,18 @@ export class workflow {
 		}
 		
 		return false;
+	}
+	
+	getObjectPath(type, id) {
+		let path = [];
+		
+		this.parent_depth = 0;
+		var ret = this.getObject(type, id, this.subjobs, path);
+		
+		for(let i=0;i<this.properties.parameters.length;i++)
+			path.push({group: 'Workflow parameters', value: "evqGetWorkflowParameter('"+this.properties.parameters[i]+"')", name: "Parameter: "+this.properties.parameters[i]});
+		
+		return ret===false?false:path;
 	}
 }
 

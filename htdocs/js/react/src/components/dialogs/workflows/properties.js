@@ -22,13 +22,45 @@
 import {Help} from '../../../ui/help.js';
 import {Checkbox} from '../../../ui/checkbox.js';
 import {Dialog} from '../../../ui/dialog.js';
+import {Dialogs} from '../../../ui/dialogs.js';
 import {Tabs} from '../../../ui/tabs.js';
 import {Tab} from '../../../ui/tab.js';
+import {Prompt} from '../../../ui/prompt.js';
 import {GroupAutocomplete} from '../../base/group-autocomplete.js';
 
 export class WorkflowProperties extends React.Component {
 	constructor(props) {
 		super(props);
+		
+		this.addParameter = this.addParameter.bind(this);
+		this.removeParameter = this.removeParameter.bind(this);
+	}
+	
+	triggerParametersChange(value) {
+		let event = {
+			target: {name: 'parameters', value: value }
+		}
+		
+		this.props.onChange(event);
+	}
+	
+	addParameter(e) {
+	Dialogs.open(Prompt,{
+			content: "Please enter your parameter's name",
+			placeholder: "parameter name",
+			width: 500,
+			confirm: (name) => {
+				let parameters = this.props.properties.parameters.concat();
+				parameters.push(name);
+				this.triggerParametersChange(parameters);
+			}
+		});
+	}
+	
+	removeParameter(e, idx) {
+		let parameters = this.props.properties.parameters.concat();
+		parameters.splice(idx, 1);
+		this.triggerParametersChange(parameters);
 	}
 	
 	renderTabProperties() {
@@ -63,6 +95,34 @@ export class WorkflowProperties extends React.Component {
 	}
 	
 	renderTabParameters() {
+		return (
+			<div>
+				<h2>
+					Parameters
+					<Help>
+						Workflow parameters are provided when a new instance is launched. These parameters can be used in XPath expressions and provided as input to tasks.
+					</Help>
+				</h2>
+				<div className="parameters">
+					{ this.renderParameters() }
+					<span className="faicon fa-plus" title="Add a new parameter" onClick={ (e) => this.addParameter(e) } />
+				</div>
+			</div>
+		);
+	}
+	
+	renderParameters() {
+		let parameters = this.props.properties.parameters;
+		
+		return parameters.map( (parameter, idx) => {
+			return (
+				<div key={parameter}>
+					<span className="faicon fa-remove" title="Remomve this parameters" onClick={ (e) => this.removeParameter(e, idx) } />
+					&#160;
+					{parameter}
+				</div>
+			);
+		});
 	}
 	
 	renderTabNotifications() {
