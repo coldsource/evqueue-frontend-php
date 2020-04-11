@@ -33,6 +33,7 @@ export class PageWorkflowEditor extends React.Component {
 		return (
 			<div>
 				<WorkflowEditorMenu
+					onProperties={ () => this.editor.current.openDialog('properties', 0) }
 					onNewJob={ () => this.editor.current.newJob() }
 					onUndo={ () => this.editor.current.undo() }
 					onRedo={ () => this.editor.current.redo() }

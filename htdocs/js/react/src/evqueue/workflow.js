@@ -23,13 +23,20 @@ import {job} from './job.js';
 import {task} from './task.js';
 import {input} from './input.js';
 import {input_part} from './input-part.js';
+import {DOMUtils} from '../utils/DOM.js';
 
 export class workflow {
 	constructor()
 	{
 		this.subjobs = [ this.createJob({name: "New job"}) ];
+		this.properties = {
+			name: '',
+			group: '',
+			comment: '',
+			parameters: []
+		}
 		
-		this.wf_pre_undo = '';
+		this.wf_pre_undo = undefined;
 		this.wf_undo = [];
 		this.wf_redo = [];
 		
@@ -57,9 +64,7 @@ export class workflow {
 	loadXML(workflow) {
 		this.subjobs = [];
 		
-		this.name= workflow.hasAttribute('name')?workflow.getAttribute('name'):'';
-		this.comment = workflow.hasAttribute('comment')?workflow.getAttribute('comment'):'';
-		this.group= workflow.hasAttribute('group')?workflow.getAttribute('group'):'';
+		Object.assign(this.properties, DOMUtils.nodeToObject(workflow));
 		
 		let job_ite = workflow.ownerDocument.evaluate('workflow/subjobs/job',workflow);
 		let job_node;
@@ -88,38 +93,45 @@ export class workflow {
 	}
 	
 	backup() {
-		this.wf_undo.push(this.stringify(this.subjobs));
+		this.wf_undo.push({
+			subjobs: this.stringify(this.subjobs),
+			properties: this.stringify(this.properties)
+		});
+		
 		this.wf_redo = [];
 	}
 	
 	preBackup() {
-		this.wf_pre_undo = this.stringify(this.subjobs);
+		this.wf_pre_undo = {
+			subjobs: this.stringify(this.subjobs),
+			properties: this.stringify(this.properties)
+		};
 	}
 	
 	postBackup() {
-		if(this.wf_pre_undo!='')
+		if(this.wf_pre_undo!==undefined)
 		{
 			this.wf_undo.push(this.wf_pre_undo);
-			this.wf_pre_undo = '';
+			this.wf_pre_undo = undefined;
 		}
 		
 		this.wf_redo = [];
 	}
 	
-	restore(json) {
+	restore_subjobs(json) {
 		let subjobs = JSON.parse(json);
 		for(let i=0;i<subjobs.length;i++)
 		{
-			subjobs[i] = this._restore(subjobs[i]);
+			subjobs[i] = this._restore_subjobs(subjobs[i]);
 			subjobs[i]._parent = this;
 		}
 		return subjobs;
 	}
 	
-	_restore(jobobj) {
+	_restore_subjobs(jobobj) {
 		for(var i=0;i<jobobj.subjobs.length;i++)
 		{
-			jobobj.subjobs[i] = this._restore(jobobj.subjobs[i]);
+			jobobj.subjobs[i] = this._restore_subjobs(jobobj.subjobs[i]);
 			jobobj.subjobs[i]._parent = jobobj;
 		}
 		
@@ -148,16 +160,28 @@ export class workflow {
 		if(this.wf_undo.length==0)
 			return;
 		
-		this.wf_redo.push(this.stringify(this.subjobs));
-		this.subjobs = this.restore(this.wf_undo.pop());
+		this.wf_redo.push({
+			subjobs: this.stringify(this.subjobs),
+			properties: this.stringify(this.properties)
+		});
+		
+		let backup = this.wf_undo.pop();
+		this.subjobs = this.restore_subjobs(backup.subjobs);
+		this.properties = JSON.parse(backup.properties);
 	}
 	
 	redo() {
 		if(this.wf_redo.length==0)
 			return;
 		
-		this.wf_undo.push(this.stringify(this.subjobs));
-		this.subjobs = this.restore(this.wf_redo.pop());
+		this.wf_undo.push({
+			subjobs: this.stringify(this.subjobs),
+			properties: this.stringify(this.properties)
+		});
+		
+		let backup = this.wf_redo.pop();
+		this.subjobs = this.restore_subjobs(backup.subjobs);
+		this.properties = JSON.parse(backup.properties);
 	}
 	
 	moveJob(dst_job, dst_position, src_job, src_type) {

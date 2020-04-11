@@ -30,6 +30,7 @@ import {JobEditor} from '../dialogs/jobs/editor.js';
 import {TaskEditor} from '../dialogs/tasks/editor.js';
 import {TaskInputEditor} from '../dialogs/tasks/input-editor.js';
 import {ValueSelector} from '../dialogs/workflows/value-selector.js';
+import {WorkflowProperties} from '../dialogs/workflows/properties.js';
 
 export class WorkflowEditor extends evQueueComponent {
 	constructor(props) {
@@ -187,7 +188,12 @@ export class WorkflowEditor extends evQueueComponent {
 	renderDialogs() {
 		return this.state.dialogs.map( (dialog) => {
 			var key = dialog.type+'|'+dialog.id;
-			if(dialog.type=='job')
+			if(dialog.type=='properties')
+			{
+				let properties = this.state.workflow.properties;
+				return (<WorkflowProperties key={key} properties={properties} onChange={ (e, obj) => this.onDlgChange(e, obj, properties) } onClose={ (e) => this.closeDialog(dialog) } />);
+			}
+			else if(dialog.type=='job')
 			{
 				let job = this.state.workflow.getJob(dialog.id);
 				return (<JobEditor key={key} job={job} onChange={ (e, obj) => this.onDlgChange(e, obj, job) } onClose={ (e) => this.closeDialog(dialog) } />);

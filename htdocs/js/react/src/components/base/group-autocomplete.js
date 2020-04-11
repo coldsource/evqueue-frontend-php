@@ -19,20 +19,33 @@
 
 'use strict';
 
-export class WorkflowEditorMenu extends React.Component {
+import {evQueueComponent} from './evqueue-component.js';
+import {Autocomplete} from '../../ui/autocomplete.js';
+
+export class GroupAutocomplete extends evQueueComponent {
 	constructor(props) {
 		super(props);
+		
+		this.state.groups = [];
+	}
+	
+	componentDidMount() {
+		this.API({
+			group: 'workflows',
+			action: 'list'
+		}).then( (xml) => {
+			let data = this.parseResponse(xml);
+			let groups = {};
+			for(let i=0;i<data.response.length;i++)
+				groups[data.response[i].group] = "";
+			
+			this.setState({groups: Object.keys(groups)});
+		});
 	}
 	
 	render() {
 		return (
-			<div className="evq-workflow-editor-menu">
-				<div>
-					<span className="faicon fa-cogs" title="Undo" onClick={ this.props.onProperties }></span>
-					<span className="faicon fa-rotate-left" title="Undo" onClick={ this.props.onUndo }></span>
-					<span className="faicon fa-rotate-right" title="Redo" onClick={ this.props.onRedo }></span>
-				</div>
-			</div>
+			<Autocomplete value={this.props.value} autocomplete={this.state.groups} name={this.props.name} onChange={this.props.onChange} />
 		);
 	}
 }
