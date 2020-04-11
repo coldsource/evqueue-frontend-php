@@ -61,28 +61,10 @@ export class workflow {
 		this.comment = workflow.hasAttribute('comment')?workflow.getAttribute('comment'):'';
 		this.group= workflow.hasAttribute('group')?workflow.getAttribute('group'):'';
 		
-		var subjobs_ite = workflow.ownerDocument.evaluate('workflow/subjobs',workflow);
-		var subjobs_node = subjobs_ite.iterateNext();
-		this.load_subjobs(subjobs_node, this.subjobs, undefined);
-		
-		this.saveXML();
-	}
-	
-	load_subjobs(subjobs_node, subjobs, parent) {
-		var jobs_ite = subjobs_node.ownerDocument.evaluate('job',subjobs_node);
-		
-		var job_node;
-		while(job_node = jobs_ite.iterateNext())
-		{
-			var new_job = this.createJob(job_node);
-			new_job._parent = parent;
-			
-			subjobs.push(new_job);
-			
-			var subjobs_node2 = job_node.ownerDocument.evaluate('subjobs',job_node).iterateNext();
-			if(subjobs_node2)
-				this.load_subjobs(subjobs_node2, new_job.subjobs, new_job);
-		}
+		let job_ite = workflow.ownerDocument.evaluate('workflow/subjobs/job',workflow);
+		let job_node;
+		while(job_node = job_ite.iterateNext())
+			this.subjobs.push(this.createJob(job_node));
 	}
 	
 	saveXML() {
@@ -125,9 +107,12 @@ export class workflow {
 	}
 	
 	restore(json) {
-		var subjobs = JSON.parse(json);
-		for(var i=0;i<subjobs.length;i++)
+		let subjobs = JSON.parse(json);
+		for(let i=0;i<subjobs.length;i++)
+		{
 			subjobs[i] = this._restore(subjobs[i]);
+			subjobs[i]._parent = this;
+		}
 		return subjobs;
 	}
 	
@@ -175,84 +160,65 @@ export class workflow {
 		this.subjobs = this.restore(this.wf_redo.pop());
 	}
 	
-	moveJob(subjobs, idx, position, origin_job, origin_subjobs, origin_idx, origin_type) {
-		// Place new job
-		var new_job = origin_job;
-		var old_subjobs = new_job.subjobs;
-		var type = origin_type;
+	moveJob(dst_job, dst_position, src_job, src_type) {
+		var src_parent = src_job._parent;
+		var src_removed_subjobs = [];
+		var src_idx = src_parent?src_parent.subjobs.indexOf(src_job):-1;
 		
-		if(position=='left')
+		var dst_parent = dst_position=='bottom'?dst_job:dst_job._parent;
+		var dst_idx;
+		
+		if(dst_position=='left' || dst_position=='right')
 		{
-			if(subjobs[idx]===new_job || subjobs[idx-1]===new_job)
-				return "Cannot move a job left of itself";
-
-			subjobs.splice(idx,0, new_job);
+			dst_idx = dst_position=='left'?dst_parent.subjobs.indexOf(dst_job):dst_parent.subjobs.indexOf(dst_job)+1
+			dst_parent.addSubjob(src_job, dst_idx);
 			
-			if(type=='job')
-				new_job.subjobs = [];
+			// When a job is inserted left or right, it has no more children, they will be re-inserted later
+			if(src_type=='job')
+				src_removed_subjobs = src_job.emptySubjobs();
+			
+			// If new job has been inserted on the same array, we have to recompute index
+			if(src_parent===dst_parent && dst_idx<=src_idx)
+				src_idx++;
 		}
-		else if(position=='right')
+		else if(dst_position=='top')
 		{
-			if(subjobs[idx]===new_job || subjobs[idx+1]===new_job)
-				return "Cannot move a job right of itself";
+			// New job is placed in place of old one
+			dst_idx = dst_parent.subjobs.indexOf(dst_job);
+			let dst_parent_removed_subjobs = dst_parent.replaceSubjob(src_job, dst_idx);
 			
-			subjobs.splice(idx+1,0, new_job);
-			
-			if(type=='job')
-				new_job.subjobs = [];
-		}
-		else if(position=='top')
-		{
-			if(subjobs[idx]===new_job)
-				 return "Cannot move a job above itself";
-			
-			if(type=='job')
-				new_job.subjobs = [ subjobs[idx] ];
+			// Re-insert old job
+			if(src_type=='job')
+				src_removed_subjobs = src_job.setSubjobs(dst_parent_removed_subjobs);
 			else
 			{
-				var leaf = new_job.leftLeaf();
-				leaf.subjobs = [ subjobs[idx] ];
+				let leaf = src_job.leftLeaf();
+				src_removed_subjobs = leaf.setSubjobs(dst_parent_removed_subjobs);
 			}
-			
-			subjobs[idx] = new_job;
 		}
-		else if(position=='bottom')
+		else if(dst_position=='bottom')
 		{
-			if(subjobs[idx].subjobs===new_job.subjobs)
-				return "Cannot move a job below itself";
+			// Set new job as only child of destination and store previous children
+			let dst_parent_removed_subjobs = dst_parent.setSubjobs(src_job);
 			
-			for(var i=0;i<subjobs[idx].subjobs.length;i++)
-			{
-				if(subjobs[idx].subjobs[i]===new_job)
-					return "Cannot move a job above itself";
-			}
-			
-			if(type=='job')
-				new_job.subjobs = subjobs[idx].subjobs;
+			// Re-insert old children after new job and get replaced subjobs, they will be re-inserted later
+			if(src_type=='job')
+				src_removed_subjobs = src_job.setSubjobs(dst_parent_removed_subjobs);
 			else
 			{
-				var leaf = new_job.leftLeaf();
-				leaf.subjobs = subjobs[idx].subjobs;
+				let leaf = src_job.leftLeaf();
+				src_removed_subjobs = leaf.setSubjobs(dst_parent_removed_subjobs);
 			}
-			
-			subjobs[idx].subjobs = [ new_job ];
 		}
 		
-		// Remove old job
-		if(origin_subjobs!==false && origin_idx!==false)
+		if(src_parent)
 		{
-			var remove_idx = origin_idx;
-			if(subjobs===origin_subjobs && idx<=origin_idx)
-				remove_idx++;
+			// Remove old job
+			src_parent.removeSubjob(src_idx);
 			
-			origin_subjobs.splice(remove_idx, 1);
-			
-			// Replace children
-			if(type=='job')
-			{
-				for(var i=0;i<old_subjobs.length;i++)
-					origin_subjobs.splice(idx-1, 0, old_subjobs[i]);
-			}
+			// Insert back removed children (ie old children of the newly inserted job)
+			for(let i=0;i<src_removed_subjobs.length;i++)
+				src_parent.addSubjob(src_removed_subjobs[i], src_idx++);
 		}
 		
 		return true;
@@ -373,3 +339,6 @@ export class workflow {
 		return false;
 	}
 }
+
+workflow.addSubjob = job.addSubjob;
+workflow.removeSubjob = job.removeSubjob;

@@ -84,6 +84,58 @@ export class job {
 		return true;
 	}
 	
+	emptySubjobs() {
+		var removed_subjobs = this.subjobs.concat(); // Backup nodes before they get removed
+		this.subjobs = [];
+		return removed_subjobs;
+	}
+	
+	setSubjobs(jobs) {
+		var removed_subjobs = this.emptySubjobs();
+		
+		if(!Array.isArray(jobs))
+			jobs = [ jobs ];
+		
+		for(let i=0;i<jobs.length;i++)
+		{
+			if(jobs[i]===this) // Do not append self to prevent loops
+				continue;
+				
+			this.addSubjob(jobs[i]);
+			
+			let idx = removed_subjobs.indexOf(jobs[i]);
+			if(idx!=-1)
+				removed_subjobs.splice(idx, 1); // We are finally not removed since we've be re-added
+		}
+		
+		return removed_subjobs;
+	}
+	
+	addSubjob(job, idx = undefined) {
+		job._parent = this;
+		if(idx!==undefined)
+			this.subjobs.splice(idx, 0, job);
+		else
+		{
+			this.subjobs.push(job);
+			idx = this.subjobs.length-1;
+		}
+		
+		return idx;
+	}
+	
+	replaceSubjob(job, idx) {
+		job._parent = this;
+		
+		let old_subjob = this.subjobs[idx];
+		this.subjobs[idx] = job;
+		return [ old_subjob ];
+	}
+	
+	removeSubjob(idx) {
+		this.subjobs.splice(idx, 1);
+	}
+	
 	fromObject(desc) {
 		Object.assign(this, desc);
 	}
@@ -91,21 +143,15 @@ export class job {
 	fromXML(job_node) {
 		this.fromObject(DOMUtils.nodeToObject(job_node));
 		
-		var tasks_ite = job_node.ownerDocument.evaluate('tasks',job_node);
-		var tasks_node = tasks_ite.iterateNext();
-		if(tasks_node)
-			this.load_tasks(tasks_node);
-	}
-	
-	load_tasks(tasks_node) {
-		var tasks_ite = tasks_node.ownerDocument.evaluate('task',tasks_node);
+		let task_ite = job_node.ownerDocument.evaluate('tasks/task',job_node);
+		let task_node;
+		while(task_node = task_ite.iterateNext())
+			this.addTask(this._workflow.createTask(task_node));
 		
-		var task_node;
-		while(task_node = tasks_ite.iterateNext())
-		{
-			var new_task = this._workflow.createTask(task_node);
-			this.addTask(new_task);
-		}
+		let subjob_ite = job_node.ownerDocument.evaluate('subjobs/job',job_node);
+		let subjob_node;
+		while(subjob_node = subjob_ite.iterateNext())
+			this.addSubjob(this._workflow.createJob(subjob_node));
 	}
 	
 	toXML(xmldoc) {

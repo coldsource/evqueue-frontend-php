@@ -41,8 +41,6 @@ export class WorkflowEditor extends evQueueComponent {
 		this.state.dialogs = [];
 		
 		this.origin_job = false;
-		this.origin_subjobs = false;
-		this.origin_idx = false;
 		this.origin_task = false;
 		
 		this.openDialog = this.openDialog.bind(this);
@@ -78,20 +76,18 @@ export class WorkflowEditor extends evQueueComponent {
 		this.setState({workflow:this.state.workflow});
 	}
 	
-	onTaskDragStart(e, job, task) {
+	onTaskDragStart(e, task) {
 		e.stopPropagation();
 		
-		this.origin_job = job;
+		this.origin_job = task.getJob();
 		this.origin_task = task;
 		e.dataTransfer.setData('origin_type','task');
 	}
 	
-	onJobDragStart(e, job, subjobs, idx, deep = false) {
+	onJobDragStart(e, job, deep = false) {
 		e.stopPropagation();
 		
 		this.origin_job = job;
-		this.origin_subjobs = subjobs;
-		this.origin_idx = idx;
 		e.dataTransfer.setData('origin_type', deep?'branch':'job');
 		
 		if(deep)
@@ -126,7 +122,7 @@ export class WorkflowEditor extends evQueueComponent {
 		e.currentTarget.classList.remove('dragover');
 	}
 	
-	onDrop(e, subjobs, idx, position) {
+	onDrop(e, job, position) {
 		e.currentTarget.classList.remove('dragover');
 		var origin_type = e.dataTransfer.getData('origin_type');
 		
@@ -136,18 +132,13 @@ export class WorkflowEditor extends evQueueComponent {
 		if(origin_type=='task')
 		{
 			if(position=='job')
-			{
-				ret = subjobs[idx].addTask(this.origin_task);
-				
-				if(ret!==true)
-					return App.warning(ret);
-			}
+				job.addTask(this.origin_task);
 			
 			this.origin_job.removeTask(this.origin_task);
 		}
 		else if(origin_type=='job' || origin_type=='branch')
 		{
-			ret = this.state.workflow.moveJob(subjobs, idx, position, this.origin_job, this.origin_subjobs, this.origin_idx, origin_type);
+			ret = this.state.workflow.moveJob(job, position, this.origin_job, origin_type);
 			if(ret!==true)
 				return App.warning(ret);
 		}
@@ -236,26 +227,26 @@ export class WorkflowEditor extends evQueueComponent {
 				sep_type += ' right-separator';
 			
 			return (
-				<div className="branch" key={idx} draggable onDragStart={ (e) => this.onJobDragStart(e, job, subjobs, idx, true) } onDragEnd={ this.onDragEnd }>
+				<div className="branch" key={idx} draggable onDragStart={ (e) => this.onJobDragStart(e, job, true) } onDragEnd={ this.onDragEnd }>
 					<div>
 						<div className={sep_type}></div>
 					</div>
-					<div onDragOver={ (e) => this.onDragOver(e, 'job-slot') } onDragLeave={ this.onDragLeave } onDrop={ (e) => this.onDrop(e, subjobs, idx, 'top') }>
+					<div onDragOver={ (e) => this.onDragOver(e, 'job-slot') } onDragLeave={ this.onDragLeave } onDrop={ (e) => this.onDrop(e, job, 'top') }>
 						<div className="post-separator"></div>
 					</div>
-					<div className="side-separator" onDragOver={ (e) => this.onDragOver(e, 'job-slot') } onDragLeave={ this.onDragLeave } onDrop={ (e) => this.onDrop(e, subjobs, idx, 'left') }></div>
+					<div className="side-separator" onDragOver={ (e) => this.onDragOver(e, 'job-slot') } onDragLeave={ this.onDragLeave } onDrop={ (e) => this.onDrop(e, job, 'left') }></div>
 					<Job
 						job={job}
 						openDialog={ this.openDialog }
 						onChange={ (e) => this.objectUpdate(e, job) }
-						onJobDragStart={ (e, job) => this.onJobDragStart(e, job, subjobs, idx) }
+						onJobDragStart={ (e, job) => this.onJobDragStart(e, job) }
 						onJobDragOver={ (e) => this.onDragOver(e, 'job') }
 						onJobDragLeave={ this.onDragLeave }
-						onJobDrop={ (e) => this.onDrop(e, subjobs, idx, 'job') }
+						onJobDrop={ (e) => this.onDrop(e, job, 'job') }
 						onTaskDragStart={ this.onTaskDragStart }
 					/>
-					<div className="side-separator" onDragOver={ (e) => this.onDragOver(e, 'job-slot') } onDragLeave={ this.onDragLeave } onDrop={ (e) => this.onDrop(e, subjobs, idx, 'right') }></div>
-					<div onDragOver={ (e) => this.onDragOver(e, 'job-slot') } onDragLeave={ this.onDragLeave } onDrop={ (e) => this.onDrop(e, subjobs, idx, 'bottom') }>
+					<div className="side-separator" onDragOver={ (e) => this.onDragOver(e, 'job-slot') } onDragLeave={ this.onDragLeave } onDrop={ (e) => this.onDrop(e, job, 'right') }></div>
+					<div onDragOver={ (e) => this.onDragOver(e, 'job-slot') } onDragLeave={ this.onDragLeave } onDrop={ (e) => this.onDrop(e, job, 'bottom') }>
 						<div className="pre-separator"></div>
 					</div>
 					
@@ -269,13 +260,13 @@ export class WorkflowEditor extends evQueueComponent {
 		return (
 			<div>
 				<div className="evq-workflow-editor">
-					<div className="trash" title="Trash" onDragOver={ (e) => this.onDragOver(e, 'trash') } onDragLeave={ this.onDragLeave } onDrop={ (e) => this.onDrop(e, false, false, 'trash') }>
+					<div className="trash" title="Trash" onDragOver={ (e) => this.onDragOver(e, 'trash') } onDragLeave={ this.onDragLeave } onDrop={ (e) => this.onDrop(e, false, 'trash') }>
 						<span className="faicon fa-trash"></span>
 						<br />Drop elements here to remove them
 					</div>
 					<div className="new-job">
 						{ this.state.new_job?
-							(<Job job={this.state.workflow.createJob({name: 'New job'})} onJobDragStart={ (e, job) => this.onJobDragStart(e, job, false, false) } />):
+							(<Job job={this.state.workflow.createJob({name: 'New job'})} onJobDragStart={ (e, job) => this.onJobDragStart(e, job) } />):
 							(<div><span className="faicon fa-plus" onClick={ (e) => this.setState({new_job: true}) }></span><br />Create a new job</div>)
 						}
 					</div>

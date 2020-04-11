@@ -52,7 +52,7 @@ export class Job extends React.Component {
 				<Task
 					task={task}
 					key={idx}
-					onDragStart={ (e) => this.props.onTaskDragStart(e, this.props.job, task) }
+					onDragStart={ (e) => this.props.onTaskDragStart(e, task) }
 					openDialog={ this.props.openDialog }
 				/>
 			);
